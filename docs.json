@@ -64,5 +64,9 @@
     ]
   },
   "favicon": "/images/favicon.svg",
-  "logo": "/images/figranium_logo.svg"
+  "logo": "/images/figranium_logo.svg",
+  "appearance": {
+    "strict": true,
+    "default": "dark"
+  }
 }
