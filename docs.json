@@ -70,5 +70,8 @@
   "appearance": {
     "strict": true,
     "default": "dark"
+  },
+  "seo": {
+    "indexing": "navigable"
   }
 }
