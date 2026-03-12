@@ -3,7 +3,9 @@
   "theme": "mint",
   "name": "Figranium Docs",
   "colors": {
-    "primary": "#0D9373"
+    "primary": "#ffffff",
+    "light": "#ffffff",
+    "dark": "#ffffff"
   },
   "navigation": {
     "groups": [
