@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Documentation",
+  "name": "Figranium Docs",
   "colors": {
     "primary": "#0D9373"
   },
@@ -62,5 +62,7 @@
         ]
       }
     ]
-  }
+  },
+  "favicon": "/images/favicon.svg",
+  "logo": "/images/figranium_logo.svg"
 }
