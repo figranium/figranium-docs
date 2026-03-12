@@ -1,0 +1,64 @@
+---
+title: "Multi-Architecture Installation (Git Clone)"
+---
+
+This guide covers the secondary installation method for Figranium, which is suitable for all architectures (x86_64, ARM64, etc.) by building the Docker image locally.
+
+While the primary and recommended installation method is using the pre-built images from [<u>GitHub Container Registry (GHCR)</u>](https://github.com/figranium/figranium-docs/blob/main/02-installation/01-docker-compose.md), this method provides a reliable fallback for environments where pre-built images might not be optimal or available.
+
+## **Prerequisites**
+
+- [<u>Git</u>](https://git-scm.com/downloads) installed.
+- [<u>Docker</u>](https://docs.docker.com/get-docker/) installed and running.
+- [<u>Docker Compose</u>](https://docs.docker.com/compose/install/) installed.
+
+## **Step-by-Step Installation**
+
+### **1. Clone the Repository**
+
+Clone the Figranium repository to your local machine:
+
+```text
+git clone https://github.com/figranium/figranium.git
+cd figranium
+```
+
+### **2. Build and Start with Docker Compose**
+
+Run the following command to build the image locally and start the application in detached mode:
+
+```text
+docker compose up --build -d
+```
+
+This command will:
+
+1. Download the necessary base images.
+2. Compile the Figranium source code and build the Docker image for your specific architecture.
+3. Start the containers as defined in the `docker-compose.yml` file.
+
+### **3. Access the Application**
+
+Once the build is complete and the containers are running, open your browser and navigate to:
+
+[<u>http://localhost:11345</u>](http://localhost:11345)
+
+## **Updating the Installation**
+
+To update your installation to the latest version, pull the latest changes from the repository and rebuild the image:
+
+```text
+git pull
+docker compose up --build -d
+```
+
+## **Comparison with GHCR (Primary Method)**
+
+| **Feature**       | **GHCR (Primary)**                 | **Git Clone (Secondary)**     |
+| :---------------- | :--------------------------------- | :---------------------------- |
+| **Speed**         | Faster (Downloads pre-built image) | Slower (Builds image locally) |
+| **Ease of Use**   | High (Single `docker-compose.yml`) | Medium (Requires `git clone`) |
+| **Architecture**  | Supports common architectures      | Supports all architectures    |
+| **Customization** | Limited to environment variables   | Full access to source code    |
+
+We recommend using the [<u>GHCR method</u>](https://github.com/figranium/figranium-docs/blob/main/02-installation/01-docker-compose.md) whenever possible, as it is faster and more streamlined. Use this Git Clone method if you encounter architecture-related issues or need to modify the source code.

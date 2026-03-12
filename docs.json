@@ -1,0 +1,66 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Documentation",
+  "colors": {
+    "primary": "#0D9373"
+  },
+  "navigation": {
+    "groups": [
+      {
+        "group": "Intro",
+        "pages": [
+          "overview",
+          "architecture"
+        ]
+      },
+      {
+        "group": "Installation",
+        "pages": [
+          "docker-compose",
+          "multi-arch",
+          "configuration"
+        ]
+      },
+      {
+        "group": "Basics",
+        "pages": [
+          "ui-tour",
+          "action-blocks",
+          "selectors"
+        ]
+      },
+      {
+        "group": "Features",
+        "pages": [
+          "proxy-rotation",
+          "captures-and-storage",
+          "headful-browser"
+        ]
+      },
+      {
+        "group": "Agent Logic",
+        "pages": [
+          "variables",
+          "control-flow",
+          "javascript-execution",
+          "data-extraction"
+        ]
+      },
+      {
+        "group": "API",
+        "pages": [
+          "rest-api",
+          "cli-tool"
+        ]
+      },
+      {
+        "group": "Ops",
+        "pages": [
+          "security",
+          "troubleshooting"
+        ]
+      }
+    ]
+  }
+}

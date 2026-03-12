@@ -1,0 +1,100 @@
+---
+title: "Installation with Docker Compose (Recommended)"
+---
+
+This guide covers the recommended installation method using Docker Compose. This ensures a consistent environment across different platforms (Linux, macOS, Windows) and simplifies dependency management.
+
+## **Prerequisites**
+
+- [<u>Docker</u>](https://docs.docker.com/get-docker/) installed and running.
+- [<u>Docker Compose</u>](https://docs.docker.com/compose/install/) (usually included with Docker Desktop).
+
+## **Step-by-Step Installation**
+
+### **1. Create a Project Directory**
+
+Create a directory for your Figranium installation and navigate into it:
+
+```text
+mkdir figranium-server
+cd figranium-server
+```
+
+### **2. Create** `docker-compose.yml`
+
+Create a `docker-compose.yml` file in your project directory:
+
+```text
+services:
+  figranium:
+    image: ghcr.io/figranium/figranium:latest
+    container_name: figranium
+    ports:
+      - "11345:11345"
+      - "54311:54311"
+    volumes:
+      - ./data:/app/data
+      - ./captures:/app/public/captures
+    environment:
+      - PORT=11345
+      - SESSION_SECRET=your_secure_random_string
+    restart: unless-stopped
+```
+
+### **3. Start with Docker Compose**
+
+Run the following command to start the application in detached mode:
+
+```text
+docker compose up -d
+```
+
+This command will:
+
+1. Pull the Figranium Docker image from GHCR.
+2. Start the container and map the necessary ports.
+3. Mount local directories to persist your tasks, settings, and captures.
+
+### **4. Access the Application**
+
+Once the container is running, open your browser and navigate to:
+
+[<u>http://localhost:11345</u>](http://localhost:11345)
+
+You should see the setup screen.
+
+## **Managing the Container**
+
+### **View Logs**
+
+To view the application logs:
+
+```text
+docker compose logs -f
+```
+
+### **Stop the Application**
+
+To stop the container:
+
+```text
+docker compose down
+```
+
+### **Update the Application**
+
+To update to the latest version, pull the latest image and restart:
+
+```text
+docker compose pull
+docker compose up -d
+```
+
+## **Volume Persistence**
+
+Figranium uses volume mounts to ensure your data persists even if you delete the container.
+
+- `./data`: Stores `tasks.json`, `proxies.json`, `settings.json`, and execution logs.
+- `./captures`: Stores screenshots and recordings.
+
+If you need to backup your data, simply copy these folders.
