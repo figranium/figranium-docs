@@ -31,8 +31,7 @@
         "pages": [
           "ui-tour",
           "action-blocks",
-          "selectors",
-          "ai-selectors"
+          "selectors"
         ]
       },
       {
@@ -61,7 +60,8 @@
       {
         "group": "Integrations",
         "pages": [
-          "openclaw-integration"
+          "openclaw-integration",
+          "community-presets"
         ]
       },
       {
