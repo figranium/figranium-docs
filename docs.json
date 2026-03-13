@@ -81,10 +81,7 @@
       }
     ]
   },
-  "favicon": {
-    "light": "/images/figranium_icon_light.svg",
-    "dark": "/images/figranium_icon.svg"
-  },
+  "favicon": "/images/favicon.svg",
   "logo": "/images/favicon.svg",
   "appearance": {
     "strict": true,
