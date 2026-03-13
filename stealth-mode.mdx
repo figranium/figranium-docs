@@ -1,0 +1,34 @@
+---
+title: "Stealth & Anti-Detection"
+---
+
+Figranium is designed to bypass modern bot detection systems by mimicking human behavior and masking automation fingerprints.
+
+## **Stealth Flags**
+
+When creating an **Agent** task, you can configure the following stealth settings in the **Advanced** panel:
+
+| **Flag** | **Description** |
+| :--- | :--- |
+| **Natural Typing** | Simulates human-like keystroke delays and variances. |
+| **Allow Typos** | Occasionally makes (and corrects) typing errors to appear more human. |
+| **Idle Movements** | Simulates random mouse movements and scrolls during wait periods. |
+| **Fatigue** | Gradually slows down interactions over long sessions to mimic user tiredness. |
+| **Dead Clicks** | Performs occasional clicks on non-interactive areas of the page. |
+| **Overscroll** | Slightly over-scrolls past target elements before correcting. |
+
+## **Browser Fingerprinting**
+
+Beyond behavioral simulation, Figranium implements several technical anti-detection measures:
+
+-   **User Agent Rotation**: Automatically switch between common browser user-agent strings.
+-   **Viewport Randomization**: Vary the browser window size slightly for each execution.
+-   **Stealth Plugin**: Integrates `puppeteer-extra-plugin-stealth` to hide Playwright/Chromium-specific properties (e.g., `navigator.webdriver`).
+-   **Proxy Support**: Easily route traffic through residential or mobile proxies to mask your IP address.
+
+## **Best Practices**
+
+1.  **Enable Human Typing**: Always use this for login forms and search bars.
+2.  **Vary Wait Times**: Use the `wait` action with small random variations instead of fixed durations.
+3.  **Use Residential Proxies**: Essential for scraping sites with aggressive IP-based blocking.
+4.  **Rotate User Agents**: Keep your automation from appearing as a single, static device.

@@ -4,7 +4,7 @@ title: "Multi-Architecture Installation (Git Clone)"
 
 This guide covers the secondary installation method for Figranium, which is suitable for all architectures (x86_64, ARM64, etc.) by building the Docker image locally.
 
-While the primary and recommended installation method is using the pre-built images from [<u>GitHub Container Registry (GHCR)</u>](https://github.com/figranium/figranium-docs/blob/main/02-installation/01-docker-compose.md), this method provides a reliable fallback for environments where pre-built images might not be optimal or available.
+While the primary and recommended installation method is using the pre-built images from [<u>GitHub Container Registry (GHCR)</u>](docker-compose.mdx), this method provides a reliable fallback for environments where pre-built images might not be optimal or available.
 
 ## **Prerequisites**
 
@@ -61,4 +61,4 @@ docker compose up --build -d
 | **Architecture**  | Supports common architectures      | Supports all architectures    |
 | **Customization** | Limited to environment variables   | Full access to source code    |
 
-We recommend using the [<u>GHCR method</u>](https://github.com/figranium/figranium-docs/blob/main/02-installation/01-docker-compose.md) whenever possible, as it is faster and more streamlined. Use this Git Clone method if you encounter architecture-related issues or need to modify the source code.
+We recommend using the [<u>GHCR method</u>](docker-compose.mdx) whenever possible, as it is faster and more streamlined. Use this Git Clone method if you encounter architecture-related issues or need to modify the source code.

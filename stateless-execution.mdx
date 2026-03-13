@@ -1,0 +1,26 @@
+---
+title: "Stateless Execution"
+---
+
+By default, Figranium maintains a persistent "Cookie Jar" (`storage_state.json`) across task runs. **Stateless Execution** allows you to bypass this for tasks that require a clean, isolated environment.
+
+## **What is Stateless Execution?**
+
+When enabled, Figranium launches the browser context **without loading** any existing cookies, local storage, or session data. Once the task completes, all session data generated during the run is **discarded** and not saved back to the global state.
+
+## **Use Cases**
+
+-   **Testing Logins**: Ensure your login flow works for a brand-new user.
+-   **Privacy**: Prevent cross-site tracking or data leakage between different automation tasks.
+-   **Multi-Account Management**: Run tasks for different accounts without manual cookie clearing.
+-   **Scraping Public Data**: Avoid being served personalized content or being blocked due to previous session history.
+
+## **How to Enable**
+
+1.  Open your task in the **Task Editor**.
+2.  In the **General Settings** panel (top right), toggle on **Stateless execution**.
+3.  Save the task.
+
+## **API Parameter**
+
+You can also force a stateless run via the API by setting `statelessExecution: true` in your task definition or execution request.

@@ -1,0 +1,31 @@
+---
+title: "OpenClaw Integration"
+---
+
+Figranium can act as a powerful browser automation provider for **OpenClaw** agents, allowing them to execute complex web tasks autonomously.
+
+## **The Doppelganger Skill**
+
+Integration is provided through the `Doppelganger API Provider` skill. This skill enables OpenClaw to:
+
+-   Discover existing Figranium tasks.
+-   Trigger tasks with dynamic variables.
+-   Create new automation profiles on the fly.
+-   Monitor execution logs and results.
+
+## **Setup Instructions**
+
+1.  **Obtain API Key**: In Figranium, go to **Settings > System** and copy your **API Key**.
+2.  **Configure OpenClaw**: Add the Doppelganger skill to your OpenClaw agent and provide the base URL (e.g., `http://localhost:11345`) and your API Key.
+3.  **Define Tasks**: Create tasks in the Figranium editor that represent common actions your agent needs to perform (e.g., "Extract LinkedIn Profile", "Post to Twitter").
+
+## **Example Workflow**
+
+1.  **Agent Request**: An OpenClaw user asks: "Find the latest pricing for Acme Corp."
+2.  **Skill Execution**: The OpenClaw agent identifies the appropriate Figranium task (or creates a new one) and triggers it via the API.
+3.  **Automation**: Figranium launches a browser, navigates to the URL, extracts the data, and returns it to OpenClaw.
+4.  **Response**: The agent summarizes the results for the user.
+
+## **Security Note**
+
+When using Figranium with external agents, always ensure your instance is protected by an **IP Allowlist** and that you rotate your **API Keys** regularly.

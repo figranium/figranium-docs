@@ -21,7 +21,9 @@
         "pages": [
           "docker-compose",
           "multi-arch",
-          "configuration"
+          "configuration",
+          "database-support",
+          "local-development"
         ]
       },
       {
@@ -37,16 +39,29 @@
         "pages": [
           "proxy-rotation",
           "captures-and-storage",
-          "headful-browser"
+          "headful-browser",
+          "stateless-execution",
+          "task-versioning"
         ]
       },
       {
         "group": "Agent Logic",
         "pages": [
           "variables",
+          "advanced-templating",
           "control-flow",
           "javascript-execution",
-          "data-extraction"
+          "data-extraction",
+          "stealth-mode",
+          "csv-processing",
+          "modular-workflows"
+        ]
+      },
+      {
+        "group": "Integrations",
+        "pages": [
+          "openclaw-integration",
+          "community-presets"
         ]
       },
       {

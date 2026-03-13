@@ -1,0 +1,32 @@
+---
+title: "PostgreSQL Support"
+---
+
+For production environments requiring high availability and robust data management, Figranium can be configured to use **PostgreSQL** instead of the default file-based storage.
+
+## **Configuration**
+
+To enable PostgreSQL, set the following environment variables in your deployment:
+
+| **Variable** | **Description** |
+| :--- | :--- |
+| **`DB_TYPE`** | Set to `postgres`. |
+| **`DB_POSTGRESDB_HOST`** | Hostname of your PostgreSQL server. |
+| **`DB_POSTGRESDB_PORT`** | Port of your PostgreSQL server (default: `5432`). |
+| **`DB_POSTGRESDB_USER`** | Username for the database. |
+| **`DB_POSTGRESDB_PASSWORD`** | Password for the database. |
+| **`DB_POSTGRESDB_DATABASE`** | Name of the database to use. |
+
+## **Migration**
+
+When you switch to PostgreSQL:
+
+1.  **Automatic Setup**: Figranium will automatically create the necessary tables on its first run.
+2.  **Data Persistence**: All task metadata, execution logs, and settings will be stored in the database.
+3.  **Captures**: Note that visual assets (screenshots/recordings) remain on the local file system or mounted volumes; only their metadata is stored in Postgres.
+
+## **Benefits**
+
+-   **Concurrency**: Better handling of simultaneous task executions and UI interactions.
+-   **Reliability**: Reduced risk of data corruption compared to plain JSON files.
+-   **Backups**: Leverage standard PostgreSQL backup and recovery tools.
