@@ -83,6 +83,7 @@
   },
   "favicon": "/images/favicon.svg",
   "logo": "/images/favicon.svg",
+  "css": "/styles.css",
   "appearance": {
     "strict": true,
     "default": "dark"
