@@ -89,6 +89,9 @@
     "default": "dark"
   },
   "seo": {
-    "indexing": "navigable"
+    "indexing": "navigable",
+    "metatags": {
+      "canonical": "https://figranium.dev/docs"
+    }
   }
 }
