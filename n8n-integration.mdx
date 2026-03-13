@@ -1,0 +1,63 @@
+---
+title: "n8n Integration"
+---
+
+The official Figranium n8n community node allows you to trigger and manage automated tasks directly from your n8n workflows.
+
+## **Overview**
+
+With the `n8n-nodes-figranium` package, you can:
+- Execute Figranium tasks as part of a larger automation.
+- Dynamically select tasks from your Figranium instance.
+- Pass custom variables to override task defaults at runtime.
+- Receive execution results as JSON for downstream processing in n8n.
+
+## **Installation**
+
+To install the Figranium node in your n8n instance:
+
+1. In n8n, navigate to **Settings > Community Nodes**.
+2. Click on **Install a community node**.
+3. Enter `n8n-nodes-figranium` in the **NPM Package Name** field.
+4. Agree to the risks and click **Install**.
+5. Restart n8n if prompted (depending on your deployment method).
+
+## **Configuration**
+
+### **Credentials**
+
+The node requires a **Figranium API** credential to communicate with your server.
+
+1. In n8n, go to **Credentials** and click **Add Credential**.
+2. Search for **Figranium API**.
+3. Configure the following fields:
+    - **Base URL**: The URL where your Figranium instance is reachable (e.g., `http://localhost:11345`). Do not include a trailing slash.
+    - **API Key**: Your Figranium API key. You can find or generate this in Figranium under **Settings > System**.
+
+### **Node Parameters**
+
+Once the credential is set up, add the **Figranium** node to your workflow.
+
+-   **Operation**: Currently supports `Execute Task`.
+-   **Task**: A searchable dropdown that automatically fetches available tasks from your Figranium server.
+-   **Variables**: An optional collection of key-value pairs. These variables will override any default variables defined within the task itself.
+
+## **Usage Example**
+
+1. **Trigger**: Use a webhook or schedule to start the workflow.
+2. **Figranium Node**:
+    - Select your **Figranium API** credentials.
+    - Select a task (e.g., "Extract Product Data").
+    - Add a variable `product_url` and use an expression to map it from the trigger node.
+3. **Results**: The output of the Figranium node will contain the full JSON response from the task execution, which you can then use in an HTTP Request node or save to a database.
+
+## **Troubleshooting**
+
+### **Task list is empty**
+If the **Task** dropdown does not populate:
+- Verify that your **Base URL** is correct and reachable from the n8n container/server.
+- Ensure the **API Key** is valid.
+- Check the n8n logs for any `401 Unauthorized` or `404 Not Found` errors during the "load options" phase.
+
+### **Connection Refused**
+If you are running both n8n and Figranium in Docker on the same machine, you may need to use your machine's internal IP address or the Docker bridge IP (e.g., `http://172.17.0.1:11345`) instead of `localhost`.

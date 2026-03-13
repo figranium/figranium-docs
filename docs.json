@@ -60,6 +60,7 @@
       {
         "group": "Integrations",
         "pages": [
+          "n8n-integration",
           "openclaw-integration",
           "community-presets"
         ]
