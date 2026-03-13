@@ -40,7 +40,7 @@ Headful sessions share the same **Cookie Jar** (`storage_state.json`) as automat
 You can start a headful session programmatically:
 
 ```text
-curl -X POST http://localhost:11345/api/tasks/headful \
+curl -X POST http://localhost:11345/headful \
   -H "Content-Type: application/json" \
   -d '{"url": "https://example.com"}'
 ```

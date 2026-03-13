@@ -1,0 +1,29 @@
+---
+title: "Modular Workflows (Task Chaining)"
+---
+
+Figranium supports **Modular Workflows**, allowing you to break down complex automations into smaller, reusable tasks and chain them together.
+
+## **The `start` Action**
+
+The `start` action is the key to task chaining. It allows one task to trigger the execution of another task by its ID.
+
+-   **Modular Design**: Create a "Login" task once and reuse it across all your other workflows.
+-   **Error Handling**: Use `on_error` blocks to trigger recovery tasks or notifications.
+-   **Data Passing**: Variables are passed from the parent task to the child task, ensuring continuity.
+
+## **How to Chain Tasks**
+
+1.  **Create Child Task**: Build a standalone task for a specific sub-flow (e.g., "Search and Filter").
+2.  **Add `start` Action**: In your main task, add a `start` action block.
+3.  **Provide Task ID**: Enter the ID of the child task in the `value` field.
+
+## **Recursive Flows**
+
+While possible, be cautious when creating recursive loops (Task A starts Task B, which starts Task A). Ensure you have a clear **Stop Task** condition to prevent infinite execution cycles.
+
+## **Benefits**
+
+-   **Maintainability**: Fix a bug in your "Login" task once, and it's fixed everywhere.
+-   **Readability**: Keep your main tasks clean and focused on high-level logic.
+-   **Scalability**: Easily build large, complex automation suites from simple, battle-tested components.

@@ -4,9 +4,15 @@ title: "REST API Reference"
 
 Figranium exposes a local REST API for task management, execution, and data retrieval.
 
-**Base URL**: `http://localhost:11345` (default) **Headers**:
+**Base URL**: `http://localhost:11345` (default)
 
-- `x-api-key`: Required if authentication is enabled.
+## **Authentication**
+
+If enabled, authentication must be provided via one of the following methods:
+
+-   **Header**: `x-api-key: your_key` or `key: your_key`
+-   **Authorization Header**: `Authorization: Bearer your_key`
+-   **Request Body**: `{"apiKey": "your_key"}` or `{"key": "your_key"}`
 
 ## **Tasks**
 

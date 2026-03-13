@@ -1,0 +1,63 @@
+---
+title: "Local Development Guide"
+---
+
+This guide is for developers who want to run Figranium's source code directly on their machine for modification or testing, without using Docker.
+
+## **Prerequisites**
+
+-   **Node.js**: Version 18 (LTS) or higher.
+-   **pnpm**: Recommended package manager.
+-   **Playwright**: Dependencies must be installed on your OS.
+
+## **Setup Steps**
+
+### **1. Install Dependencies**
+
+```bash
+pnpm install
+```
+
+### **2. Install Playwright Browsers**
+
+```bash
+npx playwright install chromium
+```
+
+### **3. Environment Setup**
+
+Create a `.env` file in the root directory (refer to the **Configuration** page for available variables). At minimum, set:
+
+```text
+SESSION_SECRET=your_random_secret_here
+```
+
+### **4. Start the Application**
+
+You need to run both the backend server and the frontend development server simultaneously:
+
+**Backend:**
+```bash
+pnpm run server
+```
+
+**Frontend:**
+```bash
+pnpm run dev
+```
+
+The frontend will be available at `http://localhost:5173`, and it will proxy API requests to the backend at `http://localhost:11345`.
+
+## **Building for Production**
+
+To create a production build:
+
+```bash
+pnpm run build
+```
+
+This generates a `dist/` folder with optimized assets. You can then run the server in production mode:
+
+```bash
+NODE_ENV=production pnpm run server
+```

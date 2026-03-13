@@ -1,0 +1,44 @@
+---
+title: "AI-Assisted Selectors"
+---
+
+Figranium integrates with powerful Large Language Models (LLMs) to automatically generate robust CSS selectors, making it easier to build and maintain automation workflows.
+
+## **Supported AI Providers**
+
+You can configure one or more of the following AI providers in the **Settings > System** tab:
+
+-   **Google Gemini**: Recommended for its speed and native integration.
+-   **OpenAI**: Supports `gpt-4o-mini` for efficient selector generation.
+-   **Anthropic Claude**: Supports `claude-3-5-haiku` for high-precision selector discovery.
+
+## **How it Works**
+
+When you use the **Highlight Tool** or the **Generate Selector** feature in the Task Editor:
+
+1.  **DOM Extraction**: Figranium captures a snapshot of the current page's HTML structure.
+2.  **LLM Prompting**: It sends the HTML and your natural language prompt (e.g., "the login button") to the configured AI provider.
+3.  **Selector Optimization**: The AI generates a selector based on best practices, prioritizing stability and semantic attributes (like `aria-label` or `data-testid`) over fragile, auto-generated classes.
+
+## **Benefits of AI Selectors**
+
+-   **Resilience**: AI-generated selectors are often more resistant to small layout changes compared to standard CSS paths.
+-   **Speed**: Drastically reduces the time spent inspecting the DOM manually.
+-   **Stealth**: By using human-readable attributes, the automation appears more like a natural user interaction.
+
+## **API Usage**
+
+You can also trigger selector generation programmatically via the API:
+
+```bash
+POST /api/tasks/generate-selector
+Content-Type: application/json
+
+{
+  "task": { ... },
+  "actionIndex": 5,
+  "prompt": "the search input field"
+}
+```
+
+The server will return the most reliable CSS selector discovered by the AI.

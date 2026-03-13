@@ -1,0 +1,47 @@
+---
+title: "Advanced Templating & Logic"
+---
+
+Figranium's templating system allows for complex, dynamic automation by combining variables with JavaScript expressions and specialized helper functions.
+
+## **JS Expression Support**
+
+In many action fields (like `if` conditions or `set` values), you can use full JavaScript expressions. These expressions have access to the current task's state and variables.
+
+**Example**:
+-   **Condition**: `vars.count > 10 && exists('.next-page')`
+-   **Calculation**: `{$index} * 100`
+
+## **Built-in JS Helpers**
+
+Inside JS expressions, Figranium provides several convenient helper functions:
+
+| **Function** | **Description** |
+| :--- | :--- |
+| **`exists(selector)`** | Returns `true` if the CSS selector matches any element on the page. |
+| **`text(selector)`** | Returns the inner text of the first element matching the selector. |
+| **`url()`** | Returns the current browser URL. |
+| **`vars`** | A global object containing all defined task variables. |
+| **`block.output`** | Contains the return value of the immediately preceding action. |
+
+## **Nested Variables**
+
+You can reference nested properties within objects or arrays using dot notation.
+
+**Example**:
+-   **Variable**: `user = { "profile": { "name": "Ada" } }`
+-   **Template**: `Hello {$user.profile.name}`
+
+## **Loop Context Variables**
+
+Inside a `foreach` loop, the following special variables are available:
+
+-   **`{$loop.index}`**: The current iteration index (starts at 0).
+-   **`{$loop.count}`**: The total number of items being iterated.
+-   **`{$loop.item}`**: The data object for the current row (if iterating over an array).
+-   **`{$loop.text}`**: The text content of the current DOM element.
+-   **`{$loop.html}`**: The inner HTML of the current DOM element.
+
+## **Handling Errors**
+
+Use the `on_error` block to define fallback logic. You can inspect the error message using `{$block.output}` inside the error handler to decide how to proceed.
