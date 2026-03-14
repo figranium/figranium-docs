@@ -2,7 +2,7 @@
 title: "Captures & Storage"
 ---
 
-Figranium automatically captures visual evidence of your automation runs. This is crucial for debugging, auditing, and ensuring quality.
+Figranium automatically captures visual evidence and intercepted files from your automation runs. This is crucial for debugging, auditing, and ensuring quality.
 
 ## **Screenshots**
 
@@ -29,6 +29,15 @@ Figranium can record full session videos (WebM format).
 
 **Note**: Recording consumes more disk space and CPU. Disable it for high-volume scraping.
 
+## **File Downloads**
+
+Figranium automatically intercepts and saves files downloaded during an automation run.
+
+- **Automatic Interception**: Any file download triggered by a click or navigation is captured.
+- **Location**: `public/captures/<run_id>_dl_<timestamp>_<filename>`
+- **Management**: Use the **Wait for Downloads** action block to ensure all pending downloads are completed before the task finishes.
+- **Accessibility**: Downloaded files appear in the **Results** drawer under the **Downloads** tab, and are included in the API response.
+
 ## **Cookie Persistence**
 
 Figranium stores cookies and local storage state in `storage_state.json`.
@@ -45,9 +54,9 @@ If you enable `statelessExecution` in a task, it will start with a fresh browser
 
 ### **File Cleanup**
 
-Screenshots and videos accumulate in `public/captures`. You can delete them:
+Screenshots, videos, and downloaded files accumulate in `public/captures`. You can delete them:
 
-1. **Manually**: Via the **Captures** tab (single delete).
+1. **Manually**: Via the **Captures** tab or **Results** drawer (single delete).
 2. **Bulk**: Use the API `DELETE /api/data/captures/:name` or clear all via **Settings**.
 
 ### **Execution Logs**
