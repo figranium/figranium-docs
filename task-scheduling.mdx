@@ -1,6 +1,5 @@
 ---
-title: "Task scheduling"
-description: Automate task execution with built-in cron scheduling
+title: "Task Scheduling"
 ---
 
 Figranium includes a built-in scheduler that runs tasks automatically without external cron jobs or triggers. Configure schedules visually or with cron expressions.
@@ -16,13 +15,13 @@ Figranium includes a built-in scheduler that runs tasks automatically without ex
 
 Visual mode provides preset frequencies for common scheduling patterns:
 
-| Frequency | Options |
-|-----------|---------|
+| Frequency    | Options                                      |
+| ------------ | -------------------------------------------- |
 | **Interval** | Run every X minutes (e.g., every 15 minutes) |
-| **Hourly** | Run once per hour at a specific minute |
-| **Daily** | Run once per day at a specific time |
-| **Weekly** | Run on selected days at a specific time |
-| **Monthly** | Run on a specific day of the month |
+| **Hourly**   | Run once per hour at a specific minute       |
+| **Daily**    | Run once per day at a specific time          |
+| **Weekly**   | Run on selected days at a specific time      |
+| **Monthly**  | Run on a specific day of the month           |
 
 ### Example: Daily at 9 AM
 
@@ -46,13 +45,13 @@ For complex schedules, switch to **Advanced** mode and enter a standard 5-field 
 
 ### Common cron examples
 
-| Expression | Description |
-|------------|-------------|
-| `*/15 * * * *` | Every 15 minutes |
-| `0 9 * * *` | Daily at 9:00 AM |
-| `0 9 * * 1-5` | Weekdays at 9:00 AM |
-| `0 0 1 * *` | First day of each month at midnight |
-| `30 8 * * 1` | Every Monday at 8:30 AM |
+| Expression     | Description                         |
+| -------------- | ----------------------------------- |
+| `*/15 * * * *` | Every 15 minutes                    |
+| `0 9 * * *`    | Daily at 9:00 AM                    |
+| `0 9 * * 1-5`  | Weekdays at 9:00 AM                 |
+| `0 0 1 * *`    | First day of each month at midnight |
+| `30 8 * * 1`   | Every Monday at 8:30 AM             |
 
 ## Monitoring schedules
 
@@ -69,11 +68,11 @@ Schedules are stored within the task metadata and persist across server restarts
 
 Manage schedules programmatically via the REST API:
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/schedules` | GET | List all scheduled tasks |
-| `/api/schedules/:taskId` | POST | Create or update a schedule |
-| `/api/schedules/:taskId` | DELETE | Disable a schedule |
-| `/api/schedules/status/all` | GET | Get all active job statuses |
+| Endpoint                    | Method | Description                 |
+| --------------------------- | ------ | --------------------------- |
+| `/api/schedules`            | GET    | List all scheduled tasks    |
+| `/api/schedules/:taskId`    | POST   | Create or update a schedule |
+| `/api/schedules/:taskId`    | DELETE | Disable a schedule          |
+| `/api/schedules/status/all` | GET    | Get all active job statuses |
 
 See the [REST API reference](/rest-api#schedules) for full details.
