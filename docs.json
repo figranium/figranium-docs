@@ -41,7 +41,8 @@
           "captures-and-storage",
           "headful-browser",
           "stateless-execution",
-          "task-versioning"
+          "task-versioning",
+          "task-scheduling"
         ]
       },
       {

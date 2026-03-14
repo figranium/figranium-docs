@@ -110,3 +110,93 @@ Adds a new proxy.
 ### `POST /api/settings/api-key`
 
 Generates/regenerates the API key.
+
+## **Schedules**
+
+### `GET /api/schedules`
+
+Lists all tasks with an associated schedule.
+
+**Response**:
+
+```json
+{
+  "schedules": [
+    {
+      "taskId": "c1f7a08b",
+      "taskName": "Daily Price Check",
+      "schedule": {
+        "enabled": true,
+        "frequency": "daily",
+        "hour": 9,
+        "minute": 0,
+        "nextRun": 1690099200000
+      }
+    }
+  ]
+}
+```
+
+### `POST /api/schedules/:taskId`
+
+Creates or updates a schedule for a task.
+
+**Body**:
+
+```json
+{
+  "enabled": true,
+  "frequency": "daily",
+  "hour": 9,
+  "minute": 0
+}
+```
+
+For advanced scheduling, use a cron expression:
+
+```json
+{
+  "enabled": true,
+  "cron": "0 9 * * 1-5"
+}
+```
+
+**Response**:
+
+```json
+{
+  "schedule": { ... },
+  "description": "Every day at 9:00 AM",
+  "nextRun": 1690099200000
+}
+```
+
+### `DELETE /api/schedules/:taskId`
+
+Disables the schedule for a task.
+
+**Response**:
+
+```json
+{ "success": true }
+```
+
+### `GET /api/schedules/status/all`
+
+Returns runtime status of the scheduler and all active jobs.
+
+**Response**:
+
+```json
+{
+  "running": true,
+  "scheduledCount": 2,
+  "tasks": [
+    {
+      "taskId": "c1f7a08b",
+      "cron": "0 9 * * *",
+      "nextRun": "2024-07-23T09:00:00.000Z"
+    }
+  ]
+}
+```
