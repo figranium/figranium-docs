@@ -115,7 +115,7 @@ Generates/regenerates the API key.
 
 ### `GET /api/schedules`
 
-Lists all tasks with an associated schedule.
+Lists all tasks that have an associated schedule configuration.
 
 **Response**:
 
@@ -125,12 +125,16 @@ Lists all tasks with an associated schedule.
     {
       "taskId": "c1f7a08b",
       "taskName": "Daily Price Check",
+      "mode": "agent",
       "schedule": {
         "enabled": true,
         "frequency": "daily",
         "hour": 9,
         "minute": 0,
-        "nextRun": 1690099200000
+        "nextRun": 1690099200000,
+        "lastRun": 1690012800000,
+        "lastRunStatus": "success",
+        "lastRunDurationMs": 15400
       }
     }
   ]
@@ -141,7 +145,7 @@ Lists all tasks with an associated schedule.
 
 Creates or updates a schedule for a task.
 
-**Body**:
+**Body (Visual/No-code)**:
 
 ```json
 {
@@ -152,7 +156,7 @@ Creates or updates a schedule for a task.
 }
 ```
 
-For advanced scheduling, use a cron expression:
+**Body (Advanced/Cron)**:
 
 ```json
 {
@@ -181,9 +185,41 @@ Disables the schedule for a task.
 { "success": true }
 ```
 
+### `GET /api/schedules/:taskId/status`
+
+Gets detailed schedule status and validation for a specific task.
+
+**Response**:
+
+```json
+{
+  "schedule": { ... },
+  "cron": "0 9 * * *",
+  "description": "Every day at 9:00 AM",
+  "isValid": true
+}
+```
+
+### `POST /api/schedules/:taskId/describe`
+
+Validates and describes a schedule configuration without saving it. Useful for UI previews.
+
+**Body**: Same as `POST /api/schedules/:taskId`.
+
+**Response**:
+
+```json
+{
+  "valid": true,
+  "cron": "0 9 * * *",
+  "description": "Every day at 9:00 AM",
+  "nextRun": 1690099200000
+}
+```
+
 ### `GET /api/schedules/status/all`
 
-Returns runtime status of the scheduler and all active jobs.
+Returns the runtime status of the global scheduler and all currently active jobs.
 
 **Response**:
 
@@ -195,7 +231,8 @@ Returns runtime status of the scheduler and all active jobs.
     {
       "taskId": "c1f7a08b",
       "cron": "0 9 * * *",
-      "nextRun": "2024-07-23T09:00:00.000Z"
+      "nextRun": "2024-07-23T09:00:00.000Z",
+      "nextRunMs": 1721725200000
     }
   ]
 }

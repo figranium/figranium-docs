@@ -14,7 +14,7 @@ Figranium includes a built-in scheduler that runs tasks automatically without ex
 
 ## Visual mode
 
-Visual mode provides preset frequencies for common scheduling patterns:
+Visual mode provides preset frequencies for common scheduling patterns. Figranium automatically converts these to cron expressions behind the scenes.
 
 | Frequency | Options |
 |-----------|---------|
@@ -24,15 +24,17 @@ Visual mode provides preset frequencies for common scheduling patterns:
 | **Weekly** | Run on selected days at a specific time |
 | **Monthly** | Run on a specific day of the month |
 
-### Example: Daily at 9 AM
+### Interval handling
 
-1. Select **Daily** from the frequency dropdown
-2. Set hour to `9` and minute to `0`
-3. Save the task
+For intervals that don't evenly divide into 60 minutes (e.g., every 7 minutes), Figranium generates a list-based cron expression to ensure accurate timing (e.g., `0,7,14,21,28,35,42,49,56 * * * *`).
 
 ## Advanced mode (cron expressions)
 
-For complex schedules, switch to **Advanced** mode and enter a standard 5-field cron expression:
+For complex schedules, switch to **Advanced** mode and enter a standard 5-field cron expression.
+
+### Cron Format
+
+Figranium uses a standard 5-field cron format (Minute, Hour, Day of Month, Month, Day of Week). Seconds are not supported.
 
 ```text
 ┌───────────── minute (0-59)
@@ -44,6 +46,20 @@ For complex schedules, switch to **Advanced** mode and enter a standard 5-field 
 * * * * *
 ```
 
+### Cron Presets
+
+You can use several standard presets instead of a full cron expression:
+
+| Preset | Equivalent | Description |
+|--------|------------|-------------|
+| `@hourly` | `0 * * * *` | Every hour at minute 0 |
+| `@daily` | `0 0 * * *` | Every day at midnight |
+| `@midnight` | `0 0 * * *` | Same as `@daily` |
+| `@weekly` | `0 0 * * 0` | Every Sunday at midnight |
+| `@monthly` | `0 0 1 * *` | First day of every month at midnight |
+| `@yearly` | `0 0 1 1 *` | Every year on January 1st at midnight |
+| `@annually` | `0 0 1 1 *` | Same as `@yearly` |
+
 ### Common cron examples
 
 | Expression | Description |
@@ -54,16 +70,20 @@ For complex schedules, switch to **Advanced** mode and enter a standard 5-field 
 | `0 0 1 * *` | First day of each month at midnight |
 | `30 8 * * 1` | Every Monday at 8:30 AM |
 
+## Human-readable descriptions
+
+The Figranium UI automatically generates human-readable descriptions for your schedules. This helps verify that your cron expression or visual configuration matches your intent. For example, `0 9 * * 1-5` will be described as "Every weekday at 9:00 AM".
+
 ## Monitoring schedules
 
 The Schedule tab displays:
 
-- **Next run**: When the task will execute next
-- **Last run**: When the task last executed, including status and duration
+- **Next run**: The calculated timestamp of the next execution.
+- **Last run**: When the task last executed, including status and duration.
 
 ## Persistence
 
-Schedules are stored within the task metadata and persist across server restarts. When Figranium starts, it automatically resumes all enabled schedules.
+Schedules are stored within the task metadata and persist across server restarts. When Figranium starts, it automatically resumes all enabled schedules and recalculates the next run times based on the current system clock.
 
 ## Schedule API
 
@@ -74,6 +94,8 @@ Manage schedules programmatically via the REST API:
 | `/api/schedules` | GET | List all scheduled tasks |
 | `/api/schedules/:taskId` | POST | Create or update a schedule |
 | `/api/schedules/:taskId` | DELETE | Disable a schedule |
+| `/api/schedules/:taskId/status` | GET | Get detailed schedule status for a task |
+| `/api/schedules/:taskId/describe`| POST | Validate and describe a config without saving |
 | `/api/schedules/status/all` | GET | Get all active job statuses |
 
 See the [REST API reference](/rest-api#schedules) for full details.
