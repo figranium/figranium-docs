@@ -31,7 +31,8 @@
         "pages": [
           "ui-tour",
           "action-blocks",
-          "selectors"
+          "selectors",
+          "ai-selectors"
         ]
       },
       {
@@ -42,7 +43,8 @@
           "headful-browser",
           "stateless-execution",
           "task-versioning",
-          "task-scheduling"
+          "task-scheduling",
+          "output-providers"
         ]
       },
       {
@@ -51,6 +53,7 @@
           "variables",
           "advanced-templating",
           "control-flow",
+          "error-handling",
           "javascript-execution",
           "data-extraction",
           "stealth-mode",
@@ -76,6 +79,7 @@
       {
         "group": "Ops",
         "pages": [
+          "performance",
           "security",
           "troubleshooting"
         ]
