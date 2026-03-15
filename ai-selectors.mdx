@@ -1,0 +1,77 @@
+---
+title: "AI Selector Generation"
+---
+
+Figranium includes an **AI Selector Generator** that uses large language models (Google Gemini or Anthropic Claude) to automatically produce robust, semantically meaningful CSS selectors from live page content.
+
+## **Why AI Selectors?**
+
+Writing CSS selectors by hand is tedious and error-prone. Class names like `.sc-abc123` or `.v2-product-card__title--active` are brittle — they change whenever a site updates its CSS-in-JS or styling framework.
+
+The AI Selector Generator analyzes the visible page structure and intent (e.g., "the submit button") and produces selectors based on stable signals: semantic HTML attributes, `aria-label`, `data-testid`, accessible roles, and visible text — selectors that survive minor restyling.
+
+## **How It Works**
+
+1. You click the **AI Selector Finder** icon next to a selector field.
+2. Figranium captures the page's current HTML structure.
+3. The HTML is sent to the configured AI provider (Gemini or Claude) with a prompt describing what element you're targeting.
+4. The AI returns a CSS selector.
+5. Figranium validates the selector against the live DOM and inserts it into your task.
+
+## **Supported AI Providers**
+
+| Provider | Model | Environment Variable |
+|:---|:---|:---|
+| Google Gemini | Gemini 2.0 Flash | `GEMINI_API_KEY` |
+| Anthropic Claude | Claude (latest) | `CLAUDE_API_KEY` |
+
+You can configure which provider to use in **Settings > System**.
+
+## **Setup**
+
+### **Option 1: Google Gemini**
+
+1. Obtain a Gemini API key from [Google AI Studio](https://aistudio.google.com/).
+2. In Figranium, go to **Settings > System > AI Selector**.
+3. Select **Gemini** as the provider.
+4. Enter your API key and save.
+
+Alternatively, set `GEMINI_API_KEY` in your environment before starting the server.
+
+### **Option 2: Anthropic Claude**
+
+1. Obtain a Claude API key from [Anthropic Console](https://console.anthropic.com/).
+2. In Figranium, go to **Settings > System > AI Selector**.
+3. Select **Claude** as the provider.
+4. Enter your API key and save.
+
+Alternatively, set `CLAUDE_API_KEY` in your environment.
+
+## **Using the AI Selector Finder**
+
+1. Open a task in the **Task Editor**.
+2. Add or select an action block (Click, Type, Wait for Selector, etc.).
+3. Click the **magic wand / AI** icon in the selector field.
+4. A panel opens showing the current page preview.
+5. Click the element you want to target, or describe it in text (e.g., "the blue submit button").
+6. The AI generates a selector. You can accept it, regenerate, or edit it manually.
+
+## **Setting the Default Selector Tool**
+
+Choose between the standard **Highlight Tool** (point-and-click visual picker) and the **AI Selector Finder** as your default:
+
+1. Go to **Settings > System**.
+2. Under **Selector Finder**, choose your preferred default.
+
+The other tool remains available via a toggle in the selector input.
+
+## **Tips for Best Results**
+
+- **Describe intent clearly**: Instead of clicking randomly, use the text description field: "the 'Add to Cart' button inside the product detail panel".
+- **Use AI for complex pages**: React/Vue SPAs with auto-generated class names benefit most from AI selectors.
+- **Always verify**: The AI may occasionally suggest a selector that matches multiple elements. Test it using the [browser console](/selectors#testing-in-the-browser-console).
+- **Combine approaches**: Use AI to generate a starting selector, then manually refine it to add `:nth-child`, `:visible`, or other constraints.
+
+## **Privacy Note**
+
+When you use the AI Selector Generator, a portion of the page's HTML structure is sent to the configured AI provider's API. Avoid using this feature on pages containing sensitive personal data.

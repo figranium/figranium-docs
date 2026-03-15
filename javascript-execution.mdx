@@ -2,7 +2,7 @@
 title: "JavaScript Execution"
 ---
 
-Figranium allows you to execute custom JavaScript in the browser context at any point in a task. This is the most powerful feature for handling complex logic, data transformation, and unsupported interactions.
+Figranium allows you to execute custom JavaScript in the browser context at any point in a task. This is the most powerful feature for handling complex logic, data transformation, unsupported interactions, and dynamic content.
 
 ## **The Run JavaScript Block**
 
@@ -10,54 +10,181 @@ Add a **Run JavaScript** action block (internally `javascript`) to your task.
 
 ### **Execution Context**
 
-The code runs directly in the browser console (via `page.evaluate()`).
+The code runs directly in the browser page context (via Playwright's `page.evaluate()`).
 
-- **Scope**: Global `window` object is available.
-- **DOM**: Full access to `document`, `querySelector`, etc.
-- **Variables**: Access runtime variables using `{$varName}` syntax.
+- **Scope**: Full access to the global `window` object.
+- **DOM**: Full access to `document`, `querySelector`, `querySelectorAll`, etc.
+- **Variables**: Access runtime variables using `{$varName}` syntax — they are injected as string literals before evaluation.
+- **Async**: `await` is supported. Figranium awaits promise resolution automatically.
 
 ### **Return Values**
 
-The return value of your script is captured and stored in `block.output`.
+The return value of your script is captured and stored in `block.output`, which can be used by subsequent blocks.
 
-- **String/Number/Boolean**: Saved directly.
-- **Object/Array**: Automatically JSON stringified.
-- **Promise**: figranium awaits the promise resolution.
+| Return type | How it's stored |
+|:---|:---|
+| String | Stored as-is |
+| Number | Stored as-is |
+| Boolean | Stored as-is |
+| Object | JSON-stringified |
+| Array | JSON-stringified |
+| Promise | Awaited, then stored |
+| `undefined` | Empty string |
 
-### **Examples**
+Access the result in later blocks with `{$block.output}` or in conditions with `block.output`.
 
-**1. Extract Text Content**
+---
 
-```text
-return document.querySelector(".price").innerText;
+## **Examples**
+
+### **Extract Text Content**
+
+```js
+return document.querySelector(".price").innerText.trim();
 ```
 
-**2. Scroll to Bottom**
+### **Extract Multiple Values**
 
-```text
+```js
+const title = document.querySelector("h1")?.innerText.trim() ?? "";
+const price = document.querySelector(".price")?.innerText.trim() ?? "";
+const rating = document.querySelector(".stars")?.dataset.rating ?? "0";
+
+return { title, price, rating };
+```
+
+### **Scroll to Bottom of Page**
+
+```js
 window.scrollTo(0, document.body.scrollHeight);
-return true; // Simple confirmation
+return true;
 ```
 
-**3. Complex Logic**
+### **Scroll to Load More Content (Infinite Scroll)**
 
-```text
-const items = document.querySelectorAll(".item");
-let total = 0;
-items.forEach((item) => {
-  const price = parseFloat(item.dataset.price);
-  if (price > 100) total += price;
+```js
+const before = document.querySelectorAll(".item").length;
+window.scrollTo(0, document.body.scrollHeight);
+await new Promise(resolve => setTimeout(resolve, 2000));
+const after = document.querySelectorAll(".item").length;
+return after > before; // returns true if new items loaded
+```
+
+### **Click an Element That Doesn't Respond to Standard Click**
+
+Some sites use custom event handlers. Dispatch a native event:
+
+```js
+const btn = document.querySelector(".custom-button");
+btn.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+return true;
+```
+
+### **Manipulate Local Storage**
+
+```js
+const token = localStorage.getItem("auth_token");
+return token;
+```
+
+### **Using Variables**
+
+Variables are injected as string literals before evaluation. Use them in expressions:
+
+```js
+const query = "{$searchQuery}";
+const category = "{$category}";
+const url = `https://api.example.com/search?q=${encodeURIComponent(query)}&cat=${category}`;
+return url;
+```
+
+### **Fetch Data from an API Inside the Page Context**
+
+Since the script runs in the browser, you can make `fetch` calls to APIs that the page has access to (bypassing CORS since you're inside the same origin):
+
+```js
+const response = await fetch("/api/user/profile", {
+  headers: { "Accept": "application/json" }
 });
-return total;
+const data = await response.json();
+return data.username;
 ```
 
-**4. Using Variables**
+### **Extract a Table as JSON**
 
-```text
-const user = "{$username}"; // Injected by figranium
-document.cookie = `user=${user}; path=/`;
+```js
+const rows = Array.from(document.querySelectorAll("table tbody tr"));
+return rows.map(row => {
+  const cells = Array.from(row.querySelectorAll("td"));
+  return {
+    name: cells[0]?.innerText.trim(),
+    value: cells[1]?.innerText.trim(),
+    status: cells[2]?.innerText.trim(),
+  };
+});
 ```
 
-## **Security Note**
+### **Wait for an Element with a Custom Timeout**
 
-Scripts run with the same privileges as the page itself. Be cautious when executing untrusted code or exposing sensitive variables.
+The `javascript` block runs synchronously by default. You can add custom polling logic:
+
+```js
+const maxWait = 10000; // 10 seconds
+const interval = 200;
+let elapsed = 0;
+
+while (elapsed < maxWait) {
+  if (document.querySelector(".loaded-content")) return true;
+  await new Promise(r => setTimeout(r, interval));
+  elapsed += interval;
+}
+return false;
+```
+
+---
+
+## **Chaining JavaScript Blocks**
+
+Use `block.output` to pass data between JavaScript blocks:
+
+```json
+[
+  {
+    "type": "javascript",
+    "value": "return document.querySelectorAll('.product').length"
+  },
+  {
+    "type": "if",
+    "value": "block.output > 0"
+  },
+    {
+      "type": "javascript",
+      "value": "/* process products */ return Array.from(document.querySelectorAll('.product')).map(p => p.innerText)"
+    },
+  { "type": "end" }
+]
+```
+
+---
+
+## **Extraction Scripts vs. JavaScript Action Blocks**
+
+Figranium has two places where you can run JavaScript:
+
+| | JavaScript Action Block | Extraction Script |
+|:---|:---|:---|
+| **When it runs** | At a specific step in the task flow | After all actions complete |
+| **Output** | `block.output` | Task's `result.data` |
+| **Use case** | Mid-flow logic, intermediate data | Final data extraction |
+| **DOM access** | Full | Full |
+
+For final data collection, prefer the **Extraction Script** field in task settings. Use JavaScript action blocks for mid-flow decisions and interactions.
+
+---
+
+## **Security Considerations**
+
+- Scripts run with the same privileges as the target page.
+- Variables injected via `{$varName}` are literal string substitutions — avoid injecting user-controlled data into scripts directly to prevent unintended code execution.
+- The JavaScript action block runs in the **browser** context, not in Node.js. You cannot access the file system or Node.js APIs from within these blocks.
+- For complex data processing that needs Node.js features, use the **Extraction Script** which runs through Figranium's sandboxed JSDOM environment.

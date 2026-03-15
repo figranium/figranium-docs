@@ -2,28 +2,157 @@
 title: "Modular Workflows (Task Chaining)"
 ---
 
-Figranium supports **Modular Workflows**, allowing you to break down complex automations into smaller, reusable tasks and chain them together.
+Figranium supports **Modular Workflows**, allowing you to break complex automations into smaller, reusable tasks and chain them together using the `start` action.
+
+## **Why Modular Workflows?**
+
+As automations grow, a single monolithic task becomes hard to maintain. Modular workflows let you:
+
+- **Reuse** common sub-flows (login, cookie consent, pagination) across many tasks.
+- **Debug** individual components in isolation without re-running the entire workflow.
+- **Organize** large automation suites into readable, focused building blocks.
+- **Share** components with your team as standalone, documented tasks.
 
 ## **The `start` Action**
 
-The `start` action is the key to task chaining. It allows one task to trigger the execution of another task by its ID.
+The `start` action triggers another task by its ID, running it as a sub-task within the current execution context.
 
--   **Modular Design**: Create a "Login" task once and reuse it across all your other workflows.
--   **Error Handling**: Use `on_error` blocks to trigger recovery tasks or notifications.
--   **Data Passing**: Variables are passed from the parent task to the child task, ensuring continuity.
+```json
+{
+  "type": "start",
+  "value": "task-id-of-child-task"
+}
+```
+
+**Key behaviors:**
+
+- The child task runs to completion before the parent continues.
+- Variables from the parent task are passed down to the child task automatically.
+- The child task's `block.output` (extraction result) is available back in the parent as `block.output` after the `start` action.
+- If the child task fails, the parent task's error handling applies.
 
 ## **How to Chain Tasks**
 
-1.  **Create Child Task**: Build a standalone task for a specific sub-flow (e.g., "Search and Filter").
-2.  **Add `start` Action**: In your main task, add a `start` action block.
-3.  **Provide Task ID**: Enter the ID of the child task in the `value` field.
+### **Step 1: Create the Child Task**
+
+Build a standalone task that handles a specific sub-flow. For example, a "Handle Cookie Banner" task:
+
+```json
+[
+  { "type": "if", "value": "exists('#cookie-accept')" },
+  { "type": "click", "selector": "#cookie-accept" },
+  { "type": "wait", "value": "500" },
+  { "type": "end" }
+]
+```
+
+Note its task ID from the dashboard URL or `GET /api/tasks`.
+
+### **Step 2: Add `start` to Your Main Task**
+
+In your main task, add a `start` action block where you want the child task to run:
+
+```json
+[
+  { "type": "navigate", "value": "https://example.com" },
+  { "type": "start", "value": "cookie-handler-task-id" },
+  { "type": "click", "selector": ".main-content" }
+]
+```
+
+### **Step 3: Pass Variables to Child Tasks**
+
+Variables defined in the parent task are automatically available in the child task using the same `{$varName}` syntax. There is no special configuration needed.
+
+```json
+// Parent task variables: { "username": "alice@example.com" }
+
+// Child task (login-task) can use:
+{ "type": "type", "selector": "#email", "value": "{$username}" }
+```
+
+## **Common Modular Patterns**
+
+### **Pattern 1: Shared Login Task**
+
+Create a single "Login" task and call it at the start of all tasks that require authentication:
+
+```json
+// Main scraper task
+[
+  { "type": "navigate", "value": "https://app.example.com" },
+  { "type": "start", "value": "login-task-id" },
+  { "type": "navigate", "value": "https://app.example.com/dashboard" },
+  // ... rest of scraping logic
+]
+```
+
+### **Pattern 2: Paginated Scraping**
+
+Break pagination into a loop calling a "Scrape One Page" sub-task:
+
+```json
+// Main orchestrator
+[
+  { "type": "navigate", "value": "https://shop.example.com/products" },
+  {
+    "type": "while",
+    "value": "exists('.next-page')"
+  },
+    { "type": "start", "value": "scrape-page-task-id" },
+    { "type": "click", "selector": ".next-page" },
+    { "type": "wait", "value": "1000" },
+  { "type": "end" }
+]
+```
+
+### **Pattern 3: Error Recovery**
+
+Use `on_error` to trigger a recovery sub-task when something goes wrong:
+
+```json
+[
+  { "type": "on_error" },
+    { "type": "start", "value": "handle-captcha-task-id" },
+  { "type": "end" }
+]
+```
+
+## **Accessing Child Task Output**
+
+After a `start` action, the child task's extraction result is available in `block.output`:
+
+```json
+[
+  { "type": "start", "value": "get-auth-token-task-id" },
+  {
+    "type": "navigate",
+    "value": "https://api.example.com/data?token={$block.output}"
+  }
+]
+```
 
 ## **Recursive Flows**
 
-While possible, be cautious when creating recursive loops (Task A starts Task B, which starts Task A). Ensure you have a clear **Stop Task** condition to prevent infinite execution cycles.
+It is technically possible to create recursive chains (Task A starts Task B, which starts Task A). This can be useful for retry loops or indefinite monitoring tasks.
 
-## **Benefits**
+**Always include a termination condition to prevent infinite loops:**
 
--   **Maintainability**: Fix a bug in your "Login" task once, and it's fixed everywhere.
--   **Readability**: Keep your main tasks clean and focused on high-level logic.
--   **Scalability**: Easily build large, complex automation suites from simple, battle-tested components.
+```json
+// Inside the recursive task
+[
+  { "type": "if", "value": "{$retries} > 5" },
+    { "type": "stop", "value": "error" },
+  { "type": "end" },
+  // ... do work ...
+  { "type": "start", "value": "this-tasks-own-id" }
+]
+```
+
+## **Finding Task IDs**
+
+You can find a task's ID in several ways:
+
+1. **Dashboard URL**: When you open a task, the URL contains the task ID (e.g., `/editor/task_abc123`).
+2. **REST API**: `GET /api/tasks` returns a list of all tasks with their IDs.
+3. **Export**: The exported JSON file includes the task ID at the top level.

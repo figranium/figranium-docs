@@ -2,60 +2,182 @@
 title: "CLI Tool & Standalone Scripts"
 ---
 
-Figranium can be run entirely from the command line, either interactively or for automated scripting.
+Figranium can be run entirely from the command line, either as a persistent web server or in standalone modes for one-off scraping and automation tasks.
 
 ## **Global Installation**
 
-```text
+```bash
 npm install -g figranium
 ```
 
-## **Commands**
+Or use without installing globally via `npx`:
 
-### **Start Server**
-
-Run the standard figranium server (API + UI).
-
-```text
-figranium
-# or
+```bash
 npx figranium
 ```
 
-### **Modes**
+## **Usage**
 
-#### **Scraper Mode (**`--scrape`**)**
-
-Runs a high-performance scraping task without the full agent logic. Ideal for simple data extraction.
-
-```text
-figranium --scrape --url "https://example.com" --selector ".content"
+```
+figranium [options]
+figranium --scrape --url <url> [--selector <css>]
+figranium --agent --task <id>
+figranium --headful --url <url>
 ```
 
-- `--url`: Target URL.
-- `--selector`: CSS selector to extract text from.
-- `--output`: (Optional) File to save the result.
+## **Modes**
 
-#### **Headful Execution (**`--headful`**)**
+### **Start Web Dashboard (Default)**
 
-Launches a visible browser session for debugging.
+Running `figranium` with no arguments starts the full web dashboard at `http://localhost:11345`.
 
-```text
+```bash
+figranium
+figranium --port 8080   # Start on a custom port
+```
+
+### **Scraper Mode (`--scrape`)**
+
+Runs a fast, one-off page scrape without full agent logic. Ideal for simple text extraction tasks.
+
+```bash
+figranium --scrape --url "https://example.com" --selector ".product-price"
+```
+
+**Flags for `--scrape`**:
+
+| Flag | Description |
+|:---|:---|
+| `--url <url>` | **Required.** Target URL to scrape. |
+| `--selector <css>` | CSS selector to extract text from. |
+| `--output <file>` | Optional file path to write the JSON result. |
+| `--wait <seconds>` | Seconds to wait after page load before extracting. |
+| `--task <id>` | Load a saved scrape task by ID (merged with other flags). |
+
+**Example — Save to file:**
+
+```bash
+figranium --scrape --url "https://quotes.toscrape.com" --selector ".quote" --output quotes.json
+```
+
+### **Agent Mode (`--agent`)**
+
+Executes the full block-based automation engine for a saved task.
+
+```bash
+figranium --agent --task "my-task-id"
+```
+
+**Flags for `--agent`**:
+
+| Flag | Description |
+|:---|:---|
+| `--task <id>` | **Required.** Run a saved task by its ID. |
+| `--url <url>` | Override the task's starting URL. |
+
+**What gets printed:**
+
+- All step-by-step execution logs
+- Final data output as formatted JSON
+
+**Example output:**
+
+```
+Figranium: Initializing standalone execution...
+Loaded task: Scrape Products (agent)
+Mode: Agent | URL: https://shop.example.com
+
+--- Agent Execution Finished ---
+Logs:
+  Navigated to https://shop.example.com
+  Clicked #accept-cookies
+  Found 24 product cards
+
+Data Output:
+[
+  { "name": "Widget A", "price": "$9.99" },
+  ...
+]
+```
+
+### **Headful Mode (`--headful`)**
+
+Launches a visible Chromium browser for manual inspection and debugging.
+
+```bash
 figranium --headful --url "https://example.com"
 ```
 
-#### **Agent Mode (**`--agent`**)**
+The browser opens on your display (requires a graphical environment). On a headless server, use the VNC integration instead — see [Headful Browser](/headful-browser).
 
-Executes a saved task by ID or a JSON definition file.
+## **All Flags Reference**
 
-```text
-figranium --agent --task "task_id_or_file.json"
-```
+| Flag | Default | Description |
+|:---|:---|:---|
+| `--scrape` | — | Run in scrape mode |
+| `--agent` | — | Run in agent mode |
+| `--headful` | — | Open a visible browser |
+| `--url <url>` | — | Target URL |
+| `--task <id>` | — | Load a saved task by ID |
+| `--selector <css>` | — | CSS selector (scrape mode) |
+| `--wait <seconds>` | — | Seconds to wait after load |
+| `--port <number>` | `11345` | Web server port |
+| `--help`, `-h` | — | Show help message |
 
 ## **Environment Variables**
 
-CLI commands respect the same environment variables as the server:
+All CLI modes respect the same environment variables as the server. Set them in your shell or a `.env` file:
 
-- `PORT`: Server port.
-- `SESSION_SECRET`: Session encryption key.
-- `HEADLESS`: Set to `false` to see the browser window (if running locally without Docker).
+| Variable | Description | Default |
+|:---|:---|:---|
+| `PORT` | Web dashboard port | `11345` |
+| `SESSION_SECRET` | Session cookie signing key | Auto-generated |
+| `ALLOWED_IPS` | Comma-separated IP allowlist | Open |
+| `ALLOW_PRIVATE_NETWORKS` | Allow scraping private IPs | `true` |
+| `TRUST_PROXY` | Honor `X-Forwarded-*` headers | `false` |
+| `SESSION_COOKIE_SECURE` | HTTPS-only session cookies | `false` |
+| `HEADLESS` | Set to `false` to see the browser (non-Docker) | `true` |
+| `LOG_LEVEL` | Logging verbosity | — |
+| `DB_TYPE` | Set to `postgres` for PostgreSQL storage | — |
+
+## **Scripting and Automation**
+
+Combine CLI modes with shell scripts for automated pipelines:
+
+```bash
+#!/bin/bash
+# Run a scrape and pipe results to a processor
+figranium --scrape --url "https://api.example.com/data" \
+  --selector ".data-row" \
+  --output /tmp/scraped.json
+
+python3 process_data.py /tmp/scraped.json
+```
+
+**Run on a schedule with cron:**
+
+```bash
+# Crontab: run every hour at the top of the hour
+0 * * * * /usr/local/bin/figranium --agent --task "my-hourly-task"
+```
+
+## **Exit Codes**
+
+| Code | Meaning |
+|:---|:---|
+| `0` | Success |
+| `1` | Error (task not found, scrape/agent failed) |
+
+## **Troubleshooting**
+
+**Task not found:**
+```
+Error: Task "my-task-id" not found.
+```
+The task ID must match exactly as stored in `data/tasks.json`. Retrieve the correct ID from the web dashboard URL or the REST API (`GET /api/tasks`).
+
+**Playwright browsers not installed:**
+```
+Error: browserType.launch: Failed to launch chromium
+```
+Run `npx playwright install chromium` to download the required browser binaries.

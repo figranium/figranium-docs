@@ -2,25 +2,93 @@
 title: "Stateless Execution"
 ---
 
-By default, Figranium maintains a persistent "Cookie Jar" (`storage_state.json`) across task runs. **Stateless Execution** allows you to bypass this for tasks that require a clean, isolated environment.
+By default, Figranium maintains a persistent "Cookie Jar" (`storage_state.json`) across task runs. **Stateless Execution** allows you to bypass this for tasks that require a clean, isolated browser environment.
 
 ## **What is Stateless Execution?**
 
-When enabled, Figranium launches the browser context **without loading** any existing cookies, local storage, or session data. Once the task completes, all session data generated during the run is **discarded** and not saved back to the global state.
+When enabled, Figranium launches the browser context **without loading** any existing cookies, local storage, IndexedDB, or session data. Once the task completes, all session data generated during the run is **discarded** and not saved back to the global storage state.
+
+Think of it as opening a private/incognito window for each task run.
+
+## **Default Behavior (Stateful)**
+
+Without stateless mode, Figranium:
+
+1. Loads cookies and session data from `data/storage_state.json` before the browser opens.
+2. Runs the task with the full browser context available (logged-in sessions, preferences, etc.).
+3. After execution, saves the updated cookies and storage back to `storage_state.json`.
+4. The next task run starts with those saved cookies already loaded.
+
+This is ideal for tasks that require a persistent login — you log in once, and subsequent runs reuse the session without re-authenticating.
+
+## **Stateless Behavior**
+
+With stateless mode enabled:
+
+1. The browser starts with a completely empty profile (no cookies, no local storage, no session).
+2. After execution, all generated cookies and storage are **thrown away**.
+3. The global `storage_state.json` is never read from or written to.
+
+Each run is completely independent and isolated from every other run.
 
 ## **Use Cases**
 
--   **Testing Logins**: Ensure your login flow works for a brand-new user.
--   **Privacy**: Prevent cross-site tracking or data leakage between different automation tasks.
--   **Multi-Account Management**: Run tasks for different accounts without manual cookie clearing.
--   **Scraping Public Data**: Avoid being served personalized content or being blocked due to previous session history.
+| Scenario | Recommended Mode |
+|:---|:---|
+| Persistent login session reuse | Stateful (default) |
+| Testing a login flow from scratch | **Stateless** |
+| Multi-account automation | **Stateless** |
+| Scraping public data without personalization | **Stateless** |
+| Privacy-sensitive workflows | **Stateless** |
+| Refreshing auth tokens periodically | Stateful (default) |
 
-## **How to Enable**
+**Common use cases explained:**
 
-1.  Open your task in the **Task Editor**.
-2.  In the **General Settings** panel (top right), toggle on **Stateless execution**.
-3.  Save the task.
+- **Testing Logins**: Confirm your login flow works for a brand-new user, with no saved cookies interfering.
+- **Multi-Account Management**: Run tasks for different accounts without manually clearing cookies between runs.
+- **Scraping Public Data**: Avoid being served personalized content based on previous browsing history stored in cookies.
+- **Privacy**: Prevent cross-task data leakage when automating sensitive workflows for different users or organizations.
 
-## **API Parameter**
+## **How to Enable in the Editor**
 
-You can also force a stateless run via the API by setting `statelessExecution: true` in your task definition or execution request.
+1. Open your task in the **Task Editor**.
+2. Click the **Settings** panel (gear icon, top-right of the editor).
+3. Under the **General** tab, toggle on **Stateless execution**.
+4. Save the task.
+
+## **How to Enable via API**
+
+Pass `statelessExecution: true` in the request body when triggering a run:
+
+```json
+POST /api/tasks/:id/api
+Content-Type: application/json
+
+{
+  "variables": {
+    "username": "user@example.com"
+  },
+  "statelessExecution": true
+}
+```
+
+You can also bake `statelessExecution: true` into the saved task definition itself, so every run — whether triggered from the UI, API, or scheduler — always runs stateless.
+
+## **Combining with Proxy Rotation**
+
+Stateless execution pairs naturally with proxy rotation. Each run:
+- Starts fresh with no cookies (looks like a brand-new visitor)
+- Routes through a different proxy IP (looks like a different device/location)
+
+This combination is effective for tasks that need to avoid rate limiting or per-account blocking.
+
+To enable both:
+1. Toggle **Stateless execution** on in task settings.
+2. Configure **Proxy Rotation** in `Settings > Proxies` and enable it for the task.
+
+## **Performance Consideration**
+
+Stateless tasks take slightly longer per run when they require authentication, because they must log in from scratch every time. For tasks that run frequently and need a logged-in state:
+
+- **Use stateful mode** (default) and implement a separate "Refresh Login" task on a schedule to keep cookies fresh.
+- **Use stateless mode** only when each run truly requires an isolated environment.

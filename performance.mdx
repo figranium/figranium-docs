@@ -1,0 +1,197 @@
+---
+title: "Performance & Optimization"
+---
+
+This guide covers strategies for making Figranium tasks faster, more efficient, and more reliable at scale.
+
+## **Understanding Execution Time**
+
+A typical task execution involves:
+1. **Browser launch**: ~1–3 seconds (includes Playwright startup and stealth plugin initialization)
+2. **Navigation**: ~0.5–5 seconds depending on the page
+3. **Actions**: Variable (clicks, types, waits)
+4. **Extraction**: ~0.1–1 second
+
+The biggest time sinks are usually **navigation** (waiting for pages to load) and **explicit waits**. Target these first.
+
+---
+
+## **Reduce Unnecessary Waits**
+
+### **Replace fixed waits with conditional waits**
+
+Instead of waiting a fixed time:
+
+```json
+{ "type": "click", "selector": "#submit" },
+{ "type": "wait", "value": "3000" }
+```
+
+Wait for the result element to appear:
+
+```json
+{ "type": "click", "selector": "#submit" },
+{ "type": "wait_selector", "selector": ".success-message" }
+```
+
+This completes as soon as the element appears — often much faster than the fixed wait.
+
+### **Use realistic minimum waits**
+
+For stealth purposes, some wait time is necessary. But 500ms is usually sufficient to appear human. Avoid blanket 3000ms waits unless the site specifically requires them.
+
+---
+
+## **Optimize Selector Performance**
+
+Broad selectors require more DOM traversal:
+
+```css
+/* Slow: searches entire document for deeply nested elements */
+.container div span.price
+
+/* Faster: scoped to a closer parent */
+.product-card .price
+```
+
+Prefer:
+- **ID selectors** (`#element-id`) — O(1) lookup by the browser
+- **Attribute selectors** (`[data-id="123"]`) — indexed in modern browsers
+- **Short class chains** over deep descendant paths
+
+---
+
+## **Minimize Page Navigations**
+
+Each `navigate` action waits for the page to fully load. If you can extract all data from a single page (e.g., using JavaScript to process an API response already in the DOM), do so.
+
+**Use in-page API calls instead of navigating:**
+
+```js
+// Instead of navigating to /api/products, fetch it from inside the current page
+const resp = await fetch("/api/products?page=1&limit=100");
+const data = await resp.json();
+return data.items;
+```
+
+This is dramatically faster than navigating to each product page individually.
+
+---
+
+## **Batch Extraction**
+
+Collect all data in one JavaScript block rather than iterating with `foreach` + individual JavaScript calls:
+
+```json
+// Slower: foreach + javascript per item
+{ "type": "foreach", "selector": ".product" },
+  { "type": "javascript", "value": "return loop.text" },
+{ "type": "end" }
+
+// Faster: single JavaScript block extracting everything
+{
+  "type": "javascript",
+  "value": "return Array.from(document.querySelectorAll('.product')).map(el => ({ name: el.querySelector('.name')?.innerText, price: el.querySelector('.price')?.innerText }))"
+}
+```
+
+---
+
+## **Stateless vs Stateful Execution**
+
+- **Stateful** (default): Skips login if cookies are still valid. Faster for repeated runs of tasks requiring authentication.
+- **Stateless**: Slightly slower per run because it authenticates from scratch. Use only when isolation is required.
+
+For frequently scheduled tasks requiring login, use stateful mode and set up a "Refresh Cookies" sub-task on a schedule (e.g., every 12 hours) to keep the session alive.
+
+---
+
+## **Proxy and Network Performance**
+
+Proxies add latency. Minimize proxy-related slowdowns:
+
+- Use **geographically nearby** proxies when possible.
+- Use **residential proxies** only when required for stealth. For internal or unprotected sites, skip the proxy entirely.
+- Set a proxy **default** rather than rotating on every request if consistency matters more than IP diversity.
+
+Test proxy latency before deploying at scale:
+
+```bash
+curl --proxy "http://user:pass@proxy-host:port" -o /dev/null -s -w "%{time_total}\n" https://example.com
+```
+
+---
+
+## **Resource Management**
+
+### **Execution History**
+
+Figranium stores execution records in `data/executions.json` (or in PostgreSQL). Over time, this file can grow large and slow down the dashboard.
+
+- Set up a periodic cleanup: **Settings > Data > Clear Execution History**.
+- Use the REST API to automate cleanup:
+  ```bash
+  POST /api/executions/clear
+  ```
+
+### **Screenshot and Recording Cleanup**
+
+Recordings (video files) can be large. Regularly purge them:
+- **Settings > Data > Clear Screenshots & Recordings**
+- Or via API: `POST /api/clear-screenshots`
+
+### **PostgreSQL for Scale**
+
+For high-volume deployments with many concurrent tasks or large execution histories, switch from file-based storage to PostgreSQL:
+
+```env
+DB_TYPE=postgres
+DB_POSTGRESDB_HOST=your-db-host
+DB_POSTGRESDB_PORT=5432
+DB_POSTGRESDB_USER=figranium
+DB_POSTGRESDB_PASSWORD=your-password
+DB_POSTGRESDB_DATABASE=figranium
+```
+
+PostgreSQL provides better concurrency, atomic writes, and faster queries for large datasets. See [Database Support](/database-support).
+
+---
+
+## **Task Design for Reliability**
+
+Performance and reliability go hand-in-hand. A task that fails and restarts wastes more time than one that completes slightly slower.
+
+- **Build in error handling**: Wrap optional interactions in `on_error`/`end` blocks. See [Error Handling](/error-handling).
+- **Use `wait_selector` over fixed waits**: More reliable and faster.
+- **Test on slow network**: Use browser DevTools throttling to verify your selectors and waits work under slow conditions before deploying.
+- **Keep tasks focused**: Large monolithic tasks are harder to debug. Break them into smaller, modular workflows. See [Modular Workflows](/modular-workflows).
+
+---
+
+## **Docker Resource Allocation**
+
+For production deployments, allocate adequate resources in `docker-compose.yml`:
+
+```yaml
+services:
+  figranium:
+    image: ghcr.io/figranium/figranium:latest
+    shm_size: '1g'          # Shared memory for Chromium
+    deploy:
+      resources:
+        limits:
+          memory: 2g        # Minimum 1g, 2g+ recommended
+          cpus: '2'
+```
+
+Chromium is memory-hungry. Running it with less than 512MB of RAM will cause frequent crashes.
+
+---
+
+## **Headless vs. Headful Performance**
+
+Headless mode (default) is significantly faster than headful mode because it skips rendering the browser UI. Only use headful mode for:
+- Debugging tasks during development
+- Sites that specifically require a visible browser to bypass detection
+
+Use the [Headful Browser](/headful-browser) as a development tool, then run production tasks headless.

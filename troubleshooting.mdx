@@ -2,64 +2,179 @@
 title: "Troubleshooting"
 ---
 
-Common issues and solutions when running Figranium.
+Common issues and their solutions when running Figranium.
 
 ## **1. Browser fails to launch**
 
 **Error**: `Failed to launch browser: Chromium revision is not downloaded.`
 
-- **Cause**: Playwright needs specific browser binaries.
-- **Fix (Docker)**:
-  - Rebuild the image: `docker compose build --no-cache`.
+- **Cause**: Playwright needs specific browser binaries that aren't installed.
+- **Fix (Docker)**: Rebuild the image to re-download browsers:
+  ```bash
+  docker compose build --no-cache
+  docker compose up -d
+  ```
 - **Fix (NPM)**:
-  - Run `npx playwright install chromium`.
+  ```bash
+  npx playwright install chromium
+  ```
+
+---
 
 **Error**: `Protocol error (Target.detachFromTarget): Target closed.`
 
-- **Cause**: The browser crashed due to memory limits.
+- **Cause**: The browser crashed, usually due to insufficient memory or shared memory limits.
 - **Fix**:
-  - Increase Docker memory: `--memory="2g" --shm-size="1g"`.
-  - Use `--disable-dev-shm-usage` flag (figranium does this by default).
+  - Increase Docker memory limits in `docker-compose.yml`:
+    ```yaml
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+    shm_size: '1g'
+    ```
+  - Figranium already passes `--disable-dev-shm-usage` by default, which helps on constrained systems.
+
+---
+
+**Error**: `spawn ENOMEM` or `Cannot allocate memory`
+
+- **Cause**: The host machine is out of RAM.
+- **Fix**: Restart Docker, increase swap space, or upgrade your instance.
+
+---
 
 ## **2. Proxies not working**
 
-**Error**: `ERR_PROXY_CONNECTION_FAILED`
+**Error**: `ERR_PROXY_CONNECTION_FAILED` or `net::ERR_TUNNEL_CONNECTION_FAILED`
 
-- **Cause**: Invalid proxy credentials or network firewall.
+- **Cause**: Invalid proxy credentials, wrong format, or network firewall blocking the connection.
 - **Fix**:
-  - Verify proxy server address and port.
-  - Check `Settings > Proxies` for connectivity status (future feature).
-  - Ensure your server can reach the proxy (check outbound rules).
+  1. Verify the proxy format: `http://user:pass@host:port` or `socks5://host:port`.
+  2. Test the proxy from your server: `curl --proxy "http://host:port" https://ifconfig.me`.
+  3. Check your server's outbound firewall rules.
+
+---
+
+**Error**: Proxy is set but traffic is still going through your direct IP.
+
+- **Cause**: The proxy is configured but the task doesn't have it enabled.
+- **Fix**:
+  - Open the task in the **Editor > Settings > Proxy** tab and confirm proxy use is toggled on.
+  - Check `Settings > Proxies` to ensure at least one proxy is marked as active/default.
+
+---
 
 ## **3. Element not found**
 
 **Error**: `Timeout 30000ms exceeded while waiting for selector ".foo"`
 
-- **Cause**: The selector is incorrect or the element loads dynamically.
-- **Fix**:
-  - Use **Headful Debugging** to inspect the page live.
-  - Increase `wait` time before the action.
-  - Use `wait_selector` explicitly.
-  - Check for iframes (figranium does not support cross-origin iframes yet).
+- **Cause 1**: The selector is wrong — the element doesn't match the CSS you provided.
+  - **Fix**: Use [Headful Debugging](/headful-browser) to open the browser and inspect the live page. Right-click > Inspect to find the correct selector.
 
-## **4. Session Expired frequently**
+- **Cause 2**: The element loads asynchronously after the page renders.
+  - **Fix**: Add a `wait` action (e.g., 2000ms) before the failing action, or use a `wait_selector` action explicitly targeting the element.
 
-**Error**: You are logged out repeatedly.
+- **Cause 3**: The element is inside a `<iframe>`.
+  - **Note**: Figranium does not currently support cross-origin iframes. Same-origin iframes may work via JavaScript execution.
 
-- **Cause**:
-  - `SESSION_SECRET` changed (server restart).
-  - Cookies are blocked by browser.
-- **Fix**:
-  - Set a static `SESSION_SECRET` in `.env`.
-  - Ensure `SESSION_COOKIE_SECURE` matches your protocol (HTTP vs HTTPS).
+- **Cause 4**: The element is inside a Shadow DOM.
+  - **Fix**: Enable **Shadow DOM** support in task settings, then use deep selectors.
+
+- **Cause 5**: The element is only visible on desktop and the viewport is too small.
+  - **Fix**: In task settings, set a larger viewport width (e.g., 1920x1080).
+
+---
+
+## **4. Figranium dashboard session expires frequently**
+
+**Error**: You are logged out from the Figranium dashboard repeatedly.
+
+- **Cause 1**: `SESSION_SECRET` changes on every server restart (auto-generated secret).
+  - **Fix**: Set a static `SESSION_SECRET` in your `.env` file:
+    ```env
+    SESSION_SECRET=your-long-random-secret-here
+    ```
+
+- **Cause 2**: `SESSION_COOKIE_SECURE=true` is set but you're accessing via HTTP.
+  - **Fix**: Either access via HTTPS, or set `SESSION_COOKIE_SECURE=false` for HTTP-only setups.
+
+---
 
 ## **5. CAPTCHA / Bot Detection**
 
-**Error**: Page shows a CAPTCHA or "Access Denied".
+**Error**: Page shows a CAPTCHA, "Access Denied", or redirects to a block page.
 
-- **Cause**: The site detected automation.
+- **Cause**: The target website detected automated browser behavior.
 - **Fix**:
-  - Enable **Stealth Mode** options in Task Editor.
-  - Use high-quality **Residential Proxies**.
-  - Rotate **User Agents**.
-  - Add random `wait` times between actions.
+  1. Enable **Stealth Mode** options in the Task Editor (natural typing, idle movements, etc.).
+  2. Use high-quality **Residential Proxies** rather than datacenter IPs.
+  3. Rotate **User Agents** in `Settings > System > User Agent`.
+  4. Add random `wait` actions (500–2000ms) between interactions.
+  5. Avoid actions that no human would do (instant form fill, no mouse movement).
+
+---
+
+## **6. Task runs successfully in headful mode but fails headless**
+
+- **Cause**: Some sites detect headless browsers via JavaScript (e.g., `navigator.webdriver`).
+- **Fix**:
+  - Ensure **Stealth Plugin** is active (it is by default in Figranium).
+  - Check if the failure is viewport-related (some sites show different content at different sizes). Set a realistic viewport in task settings.
+  - Compare the page HTML in both modes using `javascript` blocks that return `document.documentElement.outerHTML`.
+
+---
+
+## **7. Data extraction returns empty or wrong results**
+
+- **Cause 1**: The extraction script runs before dynamic content finishes loading.
+  - **Fix**: Add `wait` or `wait_selector` actions before your final extraction step.
+
+- **Cause 2**: The extraction script has a bug.
+  - **Fix**: Use a `javascript` action in the middle of your task to `return document.querySelector(".target")?.innerText` and inspect the result in the execution logs.
+
+- **Cause 3**: The page structure changed.
+  - **Fix**: Open the page in headful mode and re-inspect the selectors.
+
+---
+
+## **8. Execution hangs and never completes**
+
+- **Cause 1**: A `while` loop with a condition that's always true.
+  - **Fix**: Add a counter variable and a `stop` condition to break the loop.
+
+- **Cause 2**: A `wait_selector` waiting for an element that never appears.
+  - **Fix**: Wrap it in an `on_error` block with a fallback, or reduce the timeout.
+
+- **Cause 3**: A download action waiting for a file that never triggers.
+  - **Fix**: Check that the target element actually initiates a download.
+
+---
+
+## **9. PostgreSQL connection fails**
+
+**Error**: `ECONNREFUSED` or `password authentication failed for user`
+
+- **Cause**: Database connection environment variables are wrong or the database is unreachable.
+- **Fix**:
+  - Verify `DB_POSTGRESDB_HOST`, `DB_POSTGRESDB_PORT`, `DB_POSTGRESDB_USER`, `DB_POSTGRESDB_PASSWORD` in your `.env`.
+  - Test connectivity: `psql -h $DB_POSTGRESDB_HOST -U $DB_POSTGRESDB_USER`.
+  - Check that the database and user exist with correct permissions.
+  - Figranium will **fall back to file-based storage** if the DB is unavailable — check server logs for the fallback warning.
+
+---
+
+## **10. API requests return 401 or 403**
+
+- **401 Unauthorized**: Missing or invalid API key.
+  - **Fix**: Include the API key in the `X-API-Key` header. Retrieve it from `Settings > API Keys`.
+- **403 Forbidden**: Your IP is not in the allowlist.
+  - **Fix**: Add your IP to `Settings > System > Allowed IPs`, or clear the allowlist to allow all IPs.
+
+---
+
+## **Getting More Help**
+
+- Check the execution logs in the **Executions** tab for detailed error messages.
+- Use the **Headful Browser** to observe your task running in real time.
+- File issues at the [Figranium GitHub repository](https://github.com/figranium/figranium/issues).
