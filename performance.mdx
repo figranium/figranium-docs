@@ -78,9 +78,30 @@ This is dramatically faster than navigating to each product page individually.
 
 ---
 
-## **Batch Extraction**
+## **Foreach loop optimization**
 
-Collect all data in one JavaScript block rather than iterating with `foreach` + individual JavaScript calls:
+Figranium automatically optimizes `foreach` loops based on which loop variables you use. If your loop body does not reference `{$loop.html}`, the engine skips fetching the inner HTML of each element, which significantly reduces serialization overhead.
+
+This means simple text-based loops are fast by default:
+
+```json
+// Optimized automatically — loop.html is not referenced, so HTML is not fetched
+{ "type": "foreach", "selector": ".product" },
+  { "type": "javascript", "value": "return loop.text" },
+{ "type": "end" }
+```
+
+If your loop body uses `{$loop.html}`, the full HTML is still available as expected — no changes are needed.
+
+<Tip>
+For loops that only need text content, avoid referencing `{$loop.html}` to benefit from the automatic optimization.
+</Tip>
+
+---
+
+## **Batch extraction**
+
+For maximum performance when extracting structured data, collect all data in one JavaScript block rather than iterating with `foreach` + individual JavaScript calls:
 
 ```json
 // Slower: foreach + javascript per item
