@@ -40,6 +40,7 @@
         "pages": [
           "proxy-rotation",
           "captures-and-storage",
+          "file-downloads",
           "headful-browser",
           "stateless-execution",
           "task-versioning",
