@@ -2,7 +2,7 @@
 title: "Stateless Execution"
 ---
 
-By default, Figranium maintains a persistent "Cookie Jar" (`storage_state.json`) across task runs. **Stateless Execution** allows you to bypass this for tasks that require a clean, isolated browser environment.
+By default, Figranium maintains persistent browser profiles on disk across task runs. **Stateless Execution** allows you to bypass this for tasks that require a clean, isolated browser environment.
 
 ## **What is Stateless Execution?**
 
@@ -14,10 +14,10 @@ Think of it as opening a private/incognito window for each task run.
 
 Without stateless mode, Figranium:
 
-1. Loads cookies and session data from `data/storage_state.json` before the browser opens.
+1. Launches the browser using a persistent profile directory on disk (`data/browser-profile` for agent mode, `data/browser-profile-scrape` for scrape mode).
 2. Runs the task with the full browser context available (logged-in sessions, preferences, etc.).
-3. After execution, saves the updated cookies and storage back to `storage_state.json`.
-4. The next task run starts with those saved cookies already loaded.
+3. The browser profile is updated automatically — cookies and storage persist to disk as the session progresses.
+4. The next task run starts with those saved cookies already loaded from the profile directory.
 
 This is ideal for tasks that require a persistent login — you log in once, and subsequent runs reuse the session without re-authenticating.
 
@@ -25,9 +25,9 @@ This is ideal for tasks that require a persistent login — you log in once, and
 
 With stateless mode enabled:
 
-1. The browser starts with a completely empty profile (no cookies, no local storage, no session).
-2. After execution, all generated cookies and storage are **thrown away**.
-3. The global `storage_state.json` is never read from or written to.
+1. The browser starts as a true incognito session — launched in-memory with no disk profile directory at all (no cookies, no local storage, no session).
+2. After execution, all generated cookies and storage are **thrown away** — nothing is written to disk.
+3. No persistent browser profile is ever read from or written to.
 
 Each run is completely independent and isolated from every other run.
 

@@ -28,7 +28,7 @@ The VNC interface provides a standard desktop environment:
 
 ## **Persistence**
 
-Headful sessions share the same **Cookie Jar** (`storage_state.json`) as automated tasks. This means:
+Headful sessions use a dedicated persistent browser profile directory (`data/browser-profile-headful`), shared across all headful sessions. This means:
 
 1. **Login once**: Log in manually in the headful session.
 2. **Automate**: Run an Agent task that reuses the session cookies.
