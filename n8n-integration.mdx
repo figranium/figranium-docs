@@ -2,62 +2,209 @@
 title: "n8n Integration"
 ---
 
-The official Figranium n8n community node allows you to trigger and manage automated tasks directly from your n8n workflows.
+The official Figranium n8n community node (`n8n-nodes-figranium`) lets you trigger tasks, inspect execution history, and manage schedules from within any n8n workflow.
 
-## **Overview**
+## Installation
 
-With the `n8n-nodes-figranium` package, you can:
-- Execute Figranium tasks as part of a larger automation.
-- Dynamically select tasks from your Figranium instance.
-- Pass custom variables to override task defaults at runtime.
-- Receive execution results as JSON for downstream processing in n8n.
+1. In n8n, go to **Settings > Community Nodes**.
+2. Click **Install a community node**.
+3. Enter `n8n-nodes-figranium` and agree to the risks.
+4. Restart n8n if prompted.
 
-## **Installation**
+## Credentials
 
-To install the Figranium node in your n8n instance:
+The node authenticates using a **Figranium API** credential.
 
-1. In n8n, navigate to **Settings > Community Nodes**.
-2. Click on **Install a community node**.
-3. Enter `n8n-nodes-figranium` in the **NPM Package Name** field.
-4. Agree to the risks and click **Install**.
-5. Restart n8n if prompted (depending on your deployment method).
-
-## **Configuration**
-
-### **Credentials**
-
-The node requires a **Figranium API** credential to communicate with your server.
-
-1. In n8n, go to **Credentials** and click **Add Credential**.
+1. Go to **Credentials** and click **Add Credential**.
 2. Search for **Figranium API**.
-3. Configure the following fields:
-    - **Base URL**: The URL where your Figranium instance is reachable (e.g., `http://localhost:11345`). Do not include a trailing slash.
-    - **API Key**: Your Figranium API key. You can find or generate this in Figranium under **Settings > System**.
+3. Fill in the two fields:
 
-### **Node Parameters**
+| Field | Description |
+|---|---|
+| **Base URL** | The URL of your Figranium instance, e.g. `http://localhost:11345`. No trailing slash. |
+| **API Key** | Your API key from Figranium **Settings > System**. Sent as the `x-api-key` header on every request. |
 
-Once the credential is set up, add the **Figranium** node to your workflow.
+## Node Overview
 
--   **Operation**: Currently supports `Execute Task`.
--   **Task**: A searchable dropdown that automatically fetches available tasks from your Figranium server.
--   **Variables**: An optional collection of key-value pairs. These variables will override any default variables defined within the task itself.
+The **Figranium** node exposes three top-level resources, each with one or more operations.
 
-## **Usage Example**
+| Resource | Operations |
+|---|---|
+| **Task** | Execute, List |
+| **Execution** | List |
+| **Schedule** | List, Get Status, Set Schedule, Delete Schedule, Describe Schedule, Get Scheduler Status |
 
-1. **Trigger**: Use a webhook or schedule to start the workflow.
-2. **Figranium Node**:
-    - Select your **Figranium API** credentials.
-    - Select a task (e.g., "Extract Product Data").
-    - Add a variable `product_url` and use an expression to map it from the trigger node.
-3. **Results**: The output of the Figranium node will contain the full JSON response from the task execution, which you can then use in an HTTP Request node or save to a database.
+---
 
-## **Troubleshooting**
+## Task
 
-### **Task list is empty**
-If the **Task** dropdown does not populate:
-- Verify that your **Base URL** is correct and reachable from the n8n container/server.
-- Ensure the **API Key** is valid.
-- Check the n8n logs for any `401 Unauthorized` or `404 Not Found` errors during the "load options" phase.
+### Execute
 
-### **Connection Refused**
-If you are running both n8n and Figranium in Docker on the same machine, you may need to use your machine's internal IP address or the Docker bridge IP (e.g., `http://172.17.0.1:11345`) instead of `localhost`.
+Runs a saved task and returns its result as JSON.
+
+**Parameters**
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| **Task** | Dropdown | Yes | The task to run. Populated automatically from your Figranium server. |
+| **Variables** | Key-value collection | No | Runtime variable overrides. Each entry has a **Name** and a **Value**. These override any defaults defined in the task itself. |
+
+**API call:** `POST /api/tasks/{taskId}/api`
+
+**Output:** The full JSON response from the task execution — typically includes result data, status, and metadata.
+
+**Example use case:** A webhook fires when a new order arrives. The Figranium node executes a "Scrape Competitor Price" task, passing `product_url` as a variable extracted from the webhook payload. The result flows into a database insert node.
+
+---
+
+### List
+
+Returns all tasks available on the connected Figranium server.
+
+**Parameters:** None beyond the credential.
+
+**API call:** `GET /api/tasks/list`
+
+**Output:** One item per task, each containing at minimum a `name` and `id` field.
+
+---
+
+## Execution
+
+### List
+
+Returns a summary of all past task executions recorded by Figranium.
+
+**Parameters:** None beyond the credential.
+
+**API call:** `GET /api/executions/list`
+
+**Output:** An array of execution records. Each record typically includes the task ID, execution timestamp, status, and a result summary.
+
+---
+
+## Schedule
+
+### List
+
+Returns all tasks that currently have a schedule configured.
+
+**Parameters:** None beyond the credential.
+
+**API call:** `GET /api/schedules`
+
+**Output:** An array of schedule objects, one per scheduled task.
+
+---
+
+### Get Status
+
+Returns the schedule configuration and the next calculated run time for a specific task.
+
+**Parameters**
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| **Task ID** | String | Yes | The ID of the task whose schedule you want to inspect. |
+
+**API call:** `GET /api/schedules/{taskId}/status`
+
+**Output:** A single object containing the schedule definition and the `nextRun` timestamp.
+
+---
+
+### Set Schedule
+
+Creates or updates the schedule for a task. Two scheduling modes are available: **Frequency** (a structured picker) or **Cron Expression** (a raw cron string).
+
+**Parameters**
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| **Task ID** | String | Yes | The ID of the task to schedule. |
+| **Enabled** | Boolean | Yes | Whether the schedule should be active immediately. Default: `true`. |
+| **Schedule Mode** | Options | Yes | `Frequency (Interval)` or `Cron Expression`. |
+
+**When Schedule Mode is "Frequency"**
+
+| Parameter | Type | Shown when | Description |
+|---|---|---|---|
+| **Frequency** | Options | Always | `Every N Minutes`, `Daily`, `Weekly`, or `Monthly`. |
+| **Interval (Minutes)** | Number | Frequency = Every N Minutes | How often to run, in minutes. Default: `60`. |
+| **Hour** | Number | Frequency = Daily / Weekly / Monthly | Hour of day to run (0–23). Default: `9`. |
+| **Minute** | Number | Frequency = Daily / Weekly / Monthly | Minute of hour to run (0–59). Default: `0`. |
+| **Days of Week** | Multi-select | Frequency = Weekly | One or more days (Sunday–Saturday). Default: Monday. |
+| **Day of Month** | Number | Frequency = Monthly | Day of the month to run (1–31). Default: `1`. |
+
+**When Schedule Mode is "Cron Expression"**
+
+| Parameter | Type | Description |
+|---|---|---|
+| **Cron Expression** | String | A standard 5-field cron expression: `minute hour day month weekday`. Example: `0 9 * * 1` runs every Monday at 09:00. |
+
+**API call:** `POST /api/schedules/{taskId}`
+
+**Output:** The saved schedule object.
+
+---
+
+### Delete Schedule
+
+Disables and removes the schedule from a task. The task itself is not deleted.
+
+**Parameters**
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| **Task ID** | String | Yes | The ID of the task whose schedule should be removed. |
+
+**API call:** `DELETE /api/schedules/{taskId}`
+
+**Output:** A confirmation object.
+
+---
+
+### Describe Schedule
+
+Validates a schedule configuration and returns a human-readable preview (e.g. next run times) without saving anything. Useful for testing cron expressions before committing them.
+
+**Parameters**
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| **Task ID** | String | Yes | The task context for the preview. |
+| **Schedule Mode** | Options | Yes | `Frequency (Interval)` or `Cron Expression`. Same sub-fields as [Set Schedule](#set-schedule). |
+
+**API call:** `POST /api/schedules/{taskId}/describe`
+
+**Output:** A preview object describing when the schedule would fire.
+
+---
+
+### Get Scheduler Status
+
+Returns the overall health and status of the Figranium task scheduler — not tied to any specific task.
+
+**Parameters:** None beyond the credential.
+
+**API call:** `GET /api/schedules/status/all`
+
+**Output:** A status object for the scheduler engine (e.g. running, paused, number of active schedules).
+
+---
+
+## Troubleshooting
+
+### Task dropdown is empty
+
+- Confirm your **Base URL** is reachable from the n8n host (not just from your browser).
+- Verify the **API Key** is valid.
+- Check n8n logs for `401 Unauthorized` or `404 Not Found` errors during the "load options" phase.
+
+### Connection refused in Docker
+
+If both n8n and Figranium run in Docker on the same machine, `localhost` in the Base URL will resolve to the n8n container itself. Use your host machine's internal IP or the Docker bridge IP (e.g. `http://172.17.0.1:11345`) instead.
+
+### Variables not overriding task defaults
+
+Variable **Name** values are case-sensitive and must match the variable names defined in the task exactly.
