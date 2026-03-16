@@ -35,15 +35,23 @@ Figranium automatically intercepts files downloaded during an automation run. Fo
 
 ## **Cookie Persistence**
 
-Figranium stores cookies and local storage state in `storage_state.json`.
+Figranium stores cookies and browser session state in persistent profile directories on disk — one per execution mode:
+
+- `data/browser-profile` — agent mode
+- `data/browser-profile-scrape` — scrape mode
+- `data/browser-profile-headful` — headful/VNC mode
 
 - **Persistence**: Cookies persist across browser restarts and task executions (unless `statelessExecution` is enabled).
 - **Management**: View and delete individual cookies in **Settings \> Data**.
 - **Clear All**: Use the "Clear Storage" button in Settings to wipe all session data.
 
+### **Upgrading from v0.9.6 or Earlier**
+
+If you are upgrading from a version that used `storage_state.json`, Figranium will automatically migrate your existing cookies into all three profile directories on first startup. The `storage_state.json` file is then deleted. No manual action is required.
+
 ### **Stateless Execution**
 
-If you enable `statelessExecution` in a task, it will start with a fresh browser profile (no cookies) and discard any changes upon completion. This is ideal for testing login flows or anonymous scraping.
+If you enable `statelessExecution` in a task, it will launch a fully ephemeral in-memory browser session (no cookies, no disk profile written) and discard any changes upon completion. This is ideal for testing login flows or anonymous scraping.
 
 ## **Storage Management**
 
@@ -56,4 +64,4 @@ Screenshots, videos, and downloaded files accumulate in `public/captures`. You c
 
 ### **Execution Logs**
 
-Execution metadata is stored in `data/executions.json`. This file grows over time. Figranium automatically rotates logs (configurable via `MAX_EXECUTIONS` in `server/constants.js`, default 500) to prevent unlimited growth.
+Execution metadata is stored in `data/executions.json`. Browser session profiles are stored separately in `data/browser-profile*` directories and are not affected by execution log rotation. This file grows over time. Figranium automatically rotates logs (configurable via `MAX_EXECUTIONS` in `server/constants.js`, default 500) to prevent unlimited growth.

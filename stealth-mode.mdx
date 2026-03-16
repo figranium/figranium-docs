@@ -21,10 +21,12 @@ When creating an **Agent** task, you can configure the following stealth setting
 
 Beyond behavioral simulation, Figranium implements several technical anti-detection measures:
 
--   **User Agent Rotation**: Automatically switch between common browser user-agent strings.
+-   **User Agent Rotation**: Automatically switch between common browser user-agent strings (currently based on Chrome v143).
 -   **Viewport Randomization**: Vary the browser window size slightly for each execution.
 -   **Stealth Plugin**: Integrates `puppeteer-extra-plugin-stealth` to hide Playwright/Chromium-specific properties (e.g., `navigator.webdriver`).
 -   **Proxy Support**: Easily route traffic through residential or mobile proxies to mask your IP address.
+-   **DNS-over-HTTPS**: When no proxy is configured, DNS queries are routed through Cloudflare's encrypted DoH resolver, preventing DNS-based tracking and leaks.
+-   **WebRTC Leak Prevention**: WebRTC is configured to disallow non-proxied UDP connections, preventing IP address leaks through WebRTC channels.
 
 ## **Best Practices**
 
