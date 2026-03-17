@@ -82,6 +82,7 @@
         "pages": [
           "performance",
           "security",
+          "session-state",
           "troubleshooting"
         ]
       }
