@@ -107,6 +107,33 @@ Adds a new proxy.
 }
 ```
 
+### `POST /api/settings/credentials`
+
+Creates a new output provider credential.
+
+**Body**:
+
+```json
+{
+  "provider": "baserow",
+  "name": "My Baserow",
+  "config": {
+    "baseUrl": "https://baserow.io",
+    "token": "your-api-token"
+  }
+}
+```
+
+The `baseUrl` is validated against SSRF rules. If the URL points to a private or internal network address (and `ALLOW_PRIVATE_NETWORKS` is `false`), the request returns:
+
+```json
+{ "error": "INVALID_BASE_URL", "details": "..." }
+```
+
+### `PUT /api/settings/credentials/:id`
+
+Updates an existing credential. The same URL validation applies when updating the `baseUrl`.
+
 ### `POST /api/settings/api-key`
 
 Generates/regenerates the API key.

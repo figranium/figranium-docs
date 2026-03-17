@@ -47,6 +47,10 @@ Additional providers may be added in future releases.
    - **API Token**: Your Baserow user API token.
 4. Save the credential.
 
+<Note>
+Figranium validates the base URL to prevent requests to private or internal network addresses. If `ALLOW_PRIVATE_NETWORKS` is set to `false`, URLs pointing to private IP ranges (such as `10.x.x.x`, `172.16.x.x`, or `192.168.x.x`) are rejected. See [Security best practices](/security) for details.
+</Note>
+
 ### **Step 2: Configure the Task Output**
 
 1. Open the task in the **Task Editor**.
