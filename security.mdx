@@ -6,7 +6,12 @@ Securing your Figranium instance is critical, especially when running on a publi
 
 ## **1. Authentication**
 
-By default, the Figranium UI requires an account. However, you should also:
+By default, the Figranium UI requires an account. When you create your account during initial setup, Figranium enforces the following requirements:
+
+- **Email**: Must be a valid email address (max 255 characters).
+- **Password**: Must be at least 8 characters long.
+
+After setup, you should also:
 
 - **API Key**: Generate a strong API Key in **Settings \> System**.
 - **Rotate**: Regularly regenerate the API key if you suspect it's compromised.
@@ -31,8 +36,11 @@ Server-Side Request Forgery (SSRF) is a risk when allowing users to trigger scra
   - This prevents users from scanning your internal network (e.g., `http://169.254.169.254/latest/meta-data`).
   - It blocks RFC 1918 private IP ranges (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`).
 
+SSRF protection also applies to **output provider credentials**. When you add or update a credential with a `baseUrl` (for example, a Baserow instance URL), Figranium validates the URL to block requests to private or internal network addresses. If the URL fails validation, the credential is rejected with an `INVALID_BASE_URL` error.
+
 ## **4. Session Security**
 
+- **Session Lifetime**: Dashboard sessions expire after 7 days of inactivity. You will need to log in again after this period.
 - **HTTPS**: Always run Figranium behind a reverse proxy (Nginx, Caddy) that handles TLS/SSL.
 - **Secure Cookies**: Set `SESSION_COOKIE_SECURE=true` in your `.env` file to ensure cookies are only sent over HTTPS.
 - **Strong Secret**: Ensure `SESSION_SECRET` is a long, random string.

@@ -90,13 +90,15 @@ Common issues and their solutions when running Figranium.
 
 **Error**: You are logged out from the Figranium dashboard repeatedly.
 
-- **Cause 1**: `SESSION_SECRET` changes on every server restart (auto-generated secret).
+- **Cause 1**: Sessions expire after 7 days. This is expected behavior — log in again to start a new session.
+
+- **Cause 2**: `SESSION_SECRET` changes on every server restart (auto-generated secret).
   - **Fix**: Set a static `SESSION_SECRET` in your `.env` file:
     ```env
     SESSION_SECRET=your-long-random-secret-here
     ```
 
-- **Cause 2**: `SESSION_COOKIE_SECURE=true` is set but you're accessing via HTTP.
+- **Cause 3**: `SESSION_COOKIE_SECURE=true` is set but you're accessing via HTTP.
   - **Fix**: Either access via HTTPS, or set `SESSION_COOKIE_SECURE=false` for HTTP-only setups.
 
 ---
