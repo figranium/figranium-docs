@@ -1,0 +1,196 @@
+---
+title: "Session State & TTL"
+---
+
+Figranium manages two distinct types of session state: **dashboard sessions** (your login to the Figranium UI) and **browser sessions** (the cookies and storage used by your automation tasks). Each has its own lifetime and storage mechanism.
+
+---
+
+## **Dashboard Sessions**
+
+When you log in to the Figranium dashboard, a server-side session is created and stored in `data/sessions/`.
+
+### **Session Lifetime (TTL)**
+
+| Property | Value |
+|:---|:---|
+| **Session TTL** | **7 days** of inactivity |
+| **Rolling TTL** | Yes — every request resets the 7-day countdown |
+| **Session reaping** | Every 1 hour (expired session files are deleted) |
+
+Sessions are **rolling**: the 7-day TTL resets on every authenticated request. A session only expires if you are completely inactive for 7 consecutive days.
+
+These values come from `src/server/constants.js`:
+
+```js
+SESSION_TTL_SECONDS = 7 * 24 * 60 * 60  // 604,800 seconds
+```
+
+And are applied in the session store setup in `server.js`:
+
+```js
+const sessionStore = new FileStore({
+    path: SESSIONS_DIR,
+    ttl: SESSION_TTL_SECONDS,   // 7 days
+    reapInterval: 3600,         // clean up expired files every hour
+});
+
+app.use(session({
+    store: sessionStore,
+    rolling: true,              // reset TTL on every request
+    cookie: {
+        maxAge: SESSION_TTL_SECONDS * 1000,
+        sameSite: 'strict',
+        secure: SESSION_COOKIE_SECURE,
+    },
+}));
+```
+
+### **Session Secret and Persistence Across Restarts**
+
+The session secret is used to sign session cookies. If it changes, all existing sessions are immediately invalidated.
+
+By default, Figranium:
+1. Reads the secret from `SESSION_SECRET` in your `.env` file.
+2. Falls back to reading from `data/session_secret.txt` (auto-generated on first run and persisted there).
+3. Generates a new random secret if neither exists.
+
+**For persistent sessions across server restarts**, set a static secret in `.env`:
+
+```env
+SESSION_SECRET=your-long-random-secret-here
+```
+
+Without this, restarting the server may generate a new secret and log out all users.
+
+### **Cookie Security**
+
+| Setting | Env Variable | Default | Notes |
+|:---|:---|:---|:---|
+| HTTPS-only cookie | `SESSION_COOKIE_SECURE` | `false` | Set `true` when running behind HTTPS |
+| SameSite policy | _(fixed)_ | `strict` | Protects against CSRF |
+
+Set `SESSION_COOKIE_SECURE=true` in your `.env` when Figranium is served over HTTPS. If this is `true` but you access via plain HTTP, the browser will reject the cookie and you will appear logged out immediately.
+
+---
+
+## **Browser Session State (Cookies & Storage)**
+
+Browser session state refers to the cookies, local storage, and other browser data accumulated during task automation. This is separate from the dashboard login session.
+
+### **Persistent Mode (Default)**
+
+Each execution mode maintains its own isolated browser profile directory on disk:
+
+| Execution Mode | Profile Directory |
+|:---|:---|
+| Agent | `data/browser-profile` |
+| Scrape | `data/browser-profile-scrape` |
+| Headful/VNC | `data/browser-profile-headful` |
+
+Cookies in these profiles have **no platform-imposed TTL** — they persist indefinitely unless:
+- The cookie's own `Expires` / `Max-Age` attribute causes it to expire.
+- You manually clear cookies in **Settings > Data**.
+- You click **Clear Storage** to wipe all session data.
+
+### **Stateless Mode**
+
+When `statelessExecution: true` is set on a task, Figranium launches an ephemeral in-memory browser context. No profile directory is read from or written to. All cookies and storage generated during the run are **discarded immediately** when the task completes.
+
+See [Stateless Execution](/stateless-execution) for full details.
+
+---
+
+## **Headful-to-Agent/Scrape Cookie Sync**
+
+Cookies accumulated during a **headful (VNC) browser session** are shared with agent and scrape runs automatically. This is done via a JSON snapshot file:
+
+```
+data/headful-storage-state.json
+```
+
+### **Sync Interval**
+
+| Event | Action |
+|:---|:---|
+| Every **30 seconds** during an active headful session | Cookies written to `headful-storage-state.json` |
+| On headful **session close** | Final write before shutdown |
+| Agent / scrape **task startup** | Reads and injects cookies from `headful-storage-state.json` |
+
+The 30-second interval is set in `headful.js`:
+
+```js
+const syncInterval = setInterval(() => {
+    saveHeadfulStorageState(activeSession.context).catch(() => {});
+}, 30000);
+```
+
+### **Expired Cookie Filtering**
+
+Before writing or injecting cookies, Figranium filters out expired ones:
+
+```js
+const now = Date.now() / 1000;
+const validCookies = cookies.filter(
+    c => !c.expires || c.expires === -1 || c.expires > now
+);
+```
+
+Only non-expired cookies are saved to the snapshot or injected into new contexts. This prevents stale authentication tokens from being replayed.
+
+**Note**: Cookie sync is skipped entirely for stateless runs — the sync interval is not started when `statelessExecution` is `true`.
+
+---
+
+## **Internal Cache TTLs**
+
+For performance, Figranium caches frequently-read data in memory with short TTLs:
+
+| Cache | TTL | What It Covers |
+|:---|:---|:---|
+| Storage cache | **5 seconds** | Users, tasks, API keys read from disk/DB |
+| Allowed IPs cache | **5 seconds** | Contents of `data/allowed_ips.json` |
+
+These are internal implementation details (`src/server/constants.js`):
+
+```js
+STORAGE_CACHE_TTL = 5000        // 5 seconds
+ALLOWED_IPS_TTL_MS = 5000       // 5 seconds
+```
+
+Changes to allowed IPs or tasks take effect within 5 seconds without a server restart.
+
+---
+
+## **Rate Limit Windows**
+
+Authentication and data API endpoints use a sliding 15-minute window:
+
+| Endpoint Type | Env Variable | Default |
+|:---|:---|:---|
+| Login attempts | `AUTH_RATE_LIMIT_MAX` | 10 per 15 min |
+| Data API requests | `DATA_RATE_LIMIT_MAX` | 100 per 15 min |
+
+---
+
+## **Cookie Migration (v0.9.6 and Earlier)**
+
+Figranium previously stored cookies in a single `storage_state.json` file. As of v0.10.0, cookies are stored in persistent browser profile directories. On first startup after upgrading, Figranium automatically:
+
+1. Reads cookies from the old `storage_state.json`.
+2. Filters out any expired cookies.
+3. Injects the valid cookies into all three profile directories.
+4. Deletes `storage_state.json`.
+
+No manual action is required. If migration fails partway through, the file is retained so the next startup can retry.
+
+---
+
+## **Clearing Session Data**
+
+| Action | How |
+|:---|:---|
+| Clear all browser cookies | **Settings > Data > Clear Storage** |
+| Delete an individual cookie | **Settings > Data > Cookies** — select and delete |
+| Invalidate dashboard sessions | Restart server with a new `SESSION_SECRET` |
+| Clear execution logs | **Settings > Data** (up to `MAX_EXECUTIONS` entries retained) |
