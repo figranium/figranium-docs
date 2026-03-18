@@ -107,7 +107,29 @@ Adds a new proxy.
 }
 ```
 
-### `POST /api/settings/credentials`
+## **Credentials**
+
+### `GET /api/credentials`
+
+Lists all saved credentials. Tokens are redacted in the response.
+
+**Response**:
+
+```json
+[
+  {
+    "id": "cred_a1b2c3d4e5f6g7h8",
+    "name": "My Baserow",
+    "provider": "baserow",
+    "config": {
+      "baseUrl": "https://baserow.io",
+      "token": "••••••••"
+    }
+  }
+]
+```
+
+### `POST /api/credentials`
 
 Creates a new output provider credential.
 
@@ -130,13 +152,45 @@ The `baseUrl` is validated against SSRF rules. If the URL points to a private or
 { "error": "INVALID_BASE_URL", "details": "..." }
 ```
 
-### `PUT /api/settings/credentials/:id`
+### `PUT /api/credentials/:id`
 
 Updates an existing credential. The same URL validation applies when updating the `baseUrl`.
+
+### `DELETE /api/credentials/:id`
+
+Deletes a credential by ID.
+
+**Response**:
+
+```json
+{ "success": true }
+```
 
 ### `POST /api/settings/api-key`
 
 Generates/regenerates the API key.
+
+### `GET /api/settings/selector-finder`
+
+Returns the default selector finder preference.
+
+**Response**:
+
+```json
+{ "selectorFinder": "highlight" }
+```
+
+Possible values: `"highlight"` (standard point-and-click picker) or `"ai"` (AI Selector Finder).
+
+### `POST /api/settings/selector-finder`
+
+Sets the default selector finder tool.
+
+**Body**:
+
+```json
+{ "selectorFinder": "ai" }
+```
 
 ## **Schedules**
 
