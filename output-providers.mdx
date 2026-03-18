@@ -37,15 +37,20 @@ Additional providers may be added in future releases.
 2. A Baserow API token with write access to the target table.
 3. The **Table ID** of the destination table in Baserow.
 
-### **Step 1: Configure Credentials**
+### **Step 1: Configure credentials**
 
-1. In Figranium, go to **Settings > Data > Output Providers**.
-2. Click **Add Credential**.
-3. Enter:
-   - **Name**: A label for this credential (e.g., "My Baserow").
-   - **Base URL**: Your Baserow instance URL (e.g., `https://baserow.io` or `https://baserow.your-domain.com`).
-   - **API Token**: Your Baserow user API token.
+You can add credentials in two places:
+
+**From Settings:**
+1. Go to **Settings > API Keys**.
+2. Under **Database / Output**, click **Add API Key** and select **Baserow**.
+3. Enter a **Name**, **Base URL** (e.g., `https://api.baserow.io`), and your **API Token**.
 4. Save the credential.
+
+**From the task editor:**
+1. Open a task and go to **Settings > Output**.
+2. Click **+ New** next to the Credential dropdown.
+3. Fill in the same fields and save.
 
 <Note>
 Figranium validates the base URL to prevent requests to private or internal network addresses. If `ALLOW_PRIVATE_NETWORKS` is set to `false`, URLs pointing to private IP ranges (such as `10.x.x.x`, `172.16.x.x`, or `192.168.x.x`) are rejected. See [Security best practices](/security) for details.
@@ -122,12 +127,12 @@ You can also configure output providers via the REST API:
 
 **Save a credential:**
 ```json
-POST /api/settings/credentials
+POST /api/credentials
 {
   "provider": "baserow",
   "name": "My Baserow",
   "config": {
-    "baseUrl": "https://baserow.io",
+    "baseUrl": "https://api.baserow.io",
     "token": "your-api-token"
   }
 }
