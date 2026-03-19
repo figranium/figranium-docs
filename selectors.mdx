@@ -102,7 +102,22 @@ Figranium provides multiple tools for finding and verifying selectors:
 
 ### **Built-in Highlight Tool**
 
-Click the selector/crosshair icon in any action block's selector field. This opens a visual picker that lets you click elements on the live page to generate a selector automatically.
+Click the selector/crosshair icon in any action block's selector field. This activates a visual picker in the [headful browser](/headful-browser) that lets you hover over and click elements on the live page.
+
+When you click an element, Figranium generates **up to five selector candidates** ranked by stability and readability. The top candidate is automatically inserted into the selector field, and the remaining alternatives appear as clickable pill buttons below the input. Click any alternative to switch.
+
+The selector generation algorithm prioritizes selectors in this order:
+
+1. **Name and placeholder attributes** — `[name="email"]`, `[placeholder="Search..."]`
+2. **Text content** — `:has-text("Submit")` for buttons, links, and labels
+3. **Semantic attributes** — `[aria-label="Close"]`, `[title="Settings"]`, `[alt="Logo"]`
+4. **Data attributes** — `[data-testid="login-btn"]`, `[data-cy="submit"]`
+5. **IDs** — `#checkout-form` (skips random or obfuscated IDs)
+6. **Other attributes** — `[type="submit"]`, `[href="/account"]`
+7. **Classes** — `.product-card` (skips auto-generated hashes like `.sc-abc123`)
+8. **Structural fallback** — `tag:nth-of-type(n)` or parent path
+
+This priority order means you get human-readable, resilient selectors by default, with structural fallbacks only when no better option exists.
 
 ### **AI Selector Generator**
 
