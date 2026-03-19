@@ -166,6 +166,34 @@ Deletes a credential by ID.
 { "success": true }
 ```
 
+### `GET /api/credentials/:id/proxy/baserow/databases`
+
+Lists all Baserow databases accessible by the credential. This proxies the request through Figranium so your Baserow token is never exposed to the browser.
+
+**Response**:
+
+```json
+[
+  { "id": 1, "name": "Web Scraping" },
+  { "id": 2, "name": "Product Data" }
+]
+```
+
+### `GET /api/credentials/:id/proxy/baserow/databases/:databaseId/tables`
+
+Lists all tables within a specific Baserow database.
+
+**Response**:
+
+```json
+[
+  { "id": 45, "name": "Products" },
+  { "id": 46, "name": "Pricing History" }
+]
+```
+
+These proxy endpoints are used by the task editor's **Output** tab to let you browse and select a destination table without leaving Figranium.
+
 ### `POST /api/settings/api-key`
 
 Generates/regenerates the API key.
