@@ -43,11 +43,11 @@ This means the typical workflow still works:
 
 **Stateless Option**: Enable `statelessExecution` to launch a clean, incognito-like session that won't save cookies and won't receive headful cookies.
 
-## **Element Picking**
+## **Element picking**
 
-The headful browser doubles as a selector discovery tool. When you activate the **Highlight Tool** from an action block's selector field:
+The headful browser doubles as a selector discovery tool. When you click the **Highlight Tool** icon in an action block's selector field, Figranium opens a headful session with **inspect mode already active** — no extra step required.
 
-1. A crosshair overlay appears in the VNC viewer.
+1. The crosshair overlay appears automatically in the VNC viewer.
 2. Hover over any element to see it highlighted with a tooltip showing the top selector candidates.
 3. Click the element to confirm your selection.
 
@@ -55,7 +55,17 @@ Figranium generates up to five selector alternatives, ranked from most readable 
 
 See [CSS Selectors — Built-in Highlight Tool](/selectors#built-in-highlight-tool) for details on the ranking algorithm.
 
-## **API Integration**
+## **Variable support**
+
+Headful sessions resolve [task variables](/variables) in the starting URL. For example, if your task defines a variable `site`, you can set the headful URL to:
+
+```text
+https://{$site}.example.com/dashboard
+```
+
+Figranium replaces the variable with its current value before navigating.
+
+## **API integration**
 
 You can start a headful session programmatically:
 
