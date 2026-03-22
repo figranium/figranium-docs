@@ -8,8 +8,11 @@ Securing your Figranium instance is critical, especially when running on a publi
 
 By default, the Figranium UI requires an account. When you create your account during initial setup, Figranium enforces the following requirements:
 
+- **Name**: Must be 100 characters or fewer.
 - **Email**: Must be a valid email address (max 255 characters).
-- **Password**: Must be at least 8 characters long.
+- **Password**: Must be between 8 and 128 characters long.
+
+All fields must be plain text strings. Requests with missing fields or values that exceed these limits are rejected with a `400` error.
 
 After setup, you should also:
 
