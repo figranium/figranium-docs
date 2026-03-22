@@ -44,7 +44,7 @@ Figranium stores cookies and browser session state in persistent profile directo
 Each mode has its own isolated profile. Cookies from a headful login are bridged to agent and scrape runs automatically via `data/headful-storage-state.json` — headful writes this file every 30 seconds and on session close; agent and scrape inject it at startup (skipped for stateless runs).
 
 - **Persistence**: Cookies persist across browser restarts and task executions (unless `statelessExecution` is enabled).
-- **Management**: View and delete individual cookies in **Settings \> Data**.
+- **Management**: View, copy, and delete individual cookies in **Settings \> Data**. Click the **Copy** button next to any cookie to copy its value to your clipboard.
 - **Clear All**: Use the "Clear Storage" button in Settings to wipe all session data.
 
 ### **Upgrading from v0.9.6 or Earlier**
