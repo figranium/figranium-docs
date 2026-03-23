@@ -175,6 +175,13 @@ Common issues and their solutions when running Figranium.
 
 ---
 
+## **11. API key save returns 400 (`API_KEY_TOO_LONG`)**
+
+- **Cause**: The API key you provided exceeds the 512-character limit. This applies to the system API key and all AI provider keys (Gemini, Claude).
+- **Fix**: Use a shorter key. Standard provider keys are well under this limit — if you hit it, check for accidental whitespace or extra characters in your input.
+
+---
+
 ## **Getting More Help**
 
 - Check the execution logs in the **Executions** tab for detailed error messages.
