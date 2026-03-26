@@ -43,6 +43,26 @@ Server-Side Request Forgery (SSRF) is a risk when allowing users to trigger scra
 
 SSRF protection also applies to **output provider credentials**. When you add or update a credential with a `baseUrl` (for example, a Baserow instance URL), Figranium validates the URL to block requests to private or internal network addresses. If the URL fails validation, the credential is rejected with an `INVALID_BASE_URL` error.
 
+### Webhook redirect protection
+
+When `ALLOW_PRIVATE_NETWORKS` is `false`, webhook callbacks are protected against redirect-based SSRF attacks. If a webhook URL returns a redirect (HTTP 3xx), Figranium validates the destination URL at every hop before following it. This prevents an attacker from providing a webhook URL that initially resolves to a public address but redirects to a private one (such as `169.254.169.254` or `localhost`).
+
+- Up to 5 redirects are followed per request. If this limit is exceeded, the request fails.
+- Each redirect destination is checked against the same private-IP blocklist used for scrape URLs.
+- No configuration is needed — this protection is automatic when `ALLOW_PRIVATE_NETWORKS=false`.
+
+### Browser navigation protection
+
+When `ALLOW_PRIVATE_NETWORKS` is `false`, Figranium also guards against SSRF at the browser level. Every cross-origin navigation in a scrape, headful, or agent browser session is validated before the request leaves the browser. If a page attempts to navigate to a private network address, the navigation is blocked.
+
+- Same-origin navigations (where the destination shares the same origin as the current page) are allowed without additional checks.
+- Only top-level navigations are validated; sub-resource requests (images, scripts, etc.) are not intercepted.
+- Blocked navigations are logged to the server console with a `[SECURITY]` prefix.
+
+### DNS validation caching
+
+To reduce the overhead of repeated DNS lookups during URL validation, Figranium caches hostname resolution results for 30 seconds. Both allowed and blocked hostnames are cached, so subsequent requests to the same host resolve instantly. The cache is cleared automatically after the TTL expires.
+
 ## **4. Session Security**
 
 - **Session Lifetime**: Dashboard sessions expire after 7 days of inactivity. You will need to log in again after this period.
