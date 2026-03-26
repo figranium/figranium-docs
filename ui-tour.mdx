@@ -24,7 +24,9 @@ The core of figranium. This screen features an infinite canvas spatial editor fo
   - **View Mode**: Toggle between `Visual` (blocks), `JSON` (raw code), and `API` (integration details).
   - **Target URL**: The starting point for the automation.
   - **Spatial Actions**: Add, arrange, and connect action blocks (Click, Type, Wait, etc.) directly on the zoomable, pannable canvas.
-  - **Action Palette**: A floating overlay to quickly find and add new action blocks anywhere on the canvas.
+   - **Action Palette**: A floating overlay to quickly find and add new action blocks anywhere on the canvas. The palette opens with the search field focused so you can start typing immediately. As you type, blocks are filtered in real time.
+     - **Search**: Type to filter available actions (e.g., "click", "if", "while"). A clear button appears inside the search field when text is entered, letting you reset the filter with one click.
+     - **Keyboard navigation**: Press `Escape` to clear the current search query. If the search field is already empty, pressing `Escape` closes the palette. All interactive elements have visible focus indicators for keyboard and screen-reader users.
   - **Variables**: Define dynamic parameters (e.g., `{$query}`) for reuse.
   - **Extraction Script**: Write JavaScript to parse the page content after execution.
   - **Settings**: Configure stealth, recording, proxy rotation, and viewports.
