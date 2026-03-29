@@ -43,13 +43,28 @@ Server-Side Request Forgery (SSRF) is a risk when allowing users to trigger scra
 
 SSRF protection also applies to **output provider credentials**. When you add or update a credential with a `baseUrl` (for example, a Baserow instance URL), Figranium validates the URL to block requests to private or internal network addresses. If the URL fails validation, the credential is rejected with an `INVALID_BASE_URL` error.
 
-### Webhook redirect protection
+### Redirect protection
 
-When `ALLOW_PRIVATE_NETWORKS` is `false`, webhook callbacks are protected against redirect-based SSRF attacks. If a webhook URL returns a redirect (HTTP 3xx), Figranium validates the destination URL at every hop before following it. This prevents an attacker from providing a webhook URL that initially resolves to a public address but redirects to a private one (such as `169.254.169.254` or `localhost`).
+When `ALLOW_PRIVATE_NETWORKS` is `false`, all outbound HTTP requests — including webhook callbacks and output provider requests (such as Baserow) — are protected against redirect-based SSRF attacks. If a URL returns a redirect (HTTP 3xx), Figranium validates the destination URL at every hop before following it. This prevents an attacker from providing a URL that initially resolves to a public address but redirects to a private one (such as `169.254.169.254` or `localhost`).
 
 - Up to 5 redirects are followed per request. If this limit is exceeded, the request fails.
 - Each redirect destination is checked against the same private-IP blocklist used for scrape URLs.
 - No configuration is needed — this protection is automatic when `ALLOW_PRIVATE_NETWORKS=false`.
+- Redirects that change method (HTTP 301, 302, 303) automatically switch to `GET` and drop the request body, following HTTP standards.
+
+### Cross-origin credential stripping
+
+When a redirect crosses origin boundaries (for example, from `api.baserow.io` to a different domain), Figranium automatically strips sensitive headers from the redirected request. This prevents credentials from leaking to untrusted third-party servers.
+
+The following headers are removed on cross-origin redirects:
+
+- `Authorization`
+- `X-API-Key`
+- `Token`
+- `Cookie`
+- `Proxy-Authorization`
+
+This protection applies to all outbound requests that follow redirects, including output provider pushes and webhook callbacks. No configuration is required — it is always active.
 
 ### Browser navigation protection
 
