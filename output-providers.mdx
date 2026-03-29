@@ -53,7 +53,7 @@ You can add credentials in two places:
 3. Fill in the same fields and save.
 
 <Note>
-Figranium validates the base URL to prevent requests to private or internal network addresses. If `ALLOW_PRIVATE_NETWORKS` is set to `false`, URLs pointing to private IP ranges (such as `10.x.x.x`, `172.16.x.x`, or `192.168.x.x`) are rejected. See [Security best practices](/security) for details.
+Figranium validates the base URL to prevent requests to private or internal network addresses. If `ALLOW_PRIVATE_NETWORKS` is set to `false`, URLs pointing to private IP ranges (such as `10.x.x.x`, `172.16.x.x`, or `192.168.x.x`) are rejected. Redirect chains are also validated — if a Baserow instance returns a redirect, each hop is checked against the same blocklist. Additionally, sensitive headers like `Authorization` are automatically stripped if a redirect crosses to a different origin. See [Security best practices](/security) for details.
 </Note>
 
 ### **Step 2: Configure the Task Output**
