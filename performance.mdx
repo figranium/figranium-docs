@@ -99,6 +99,14 @@ For loops that only need text content, avoid referencing `{$loop.html}` to benef
 
 ---
 
+## **Large result previews**
+
+The table view in the results drawer previews up to **200 rows** of extracted data (CSV, JSON arrays, or nested arrays). This keeps the UI responsive even when your extraction returns tens of thousands of rows. The full dataset is still available through **Export** and **Copy Full** — only the in-editor preview is capped.
+
+If you are working with very large extractions and notice slow rendering, switch from the **Table** tab to **Raw** for a lightweight text view.
+
+---
+
 ## **Batch extraction**
 
 For maximum performance when extracting structured data, collect all data in one JavaScript block rather than iterating with `foreach` + individual JavaScript calls:
