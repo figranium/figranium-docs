@@ -6,6 +6,42 @@ Figranium exposes a local REST API for task management, execution, and data retr
 
 **Base URL**: `http://localhost:11345` (default)
 
+## **Health**
+
+### `GET /api/health`
+
+Returns the server status and storage backend connectivity. Use this endpoint for uptime monitoring, load-balancer health checks, or verifying that Figranium is ready to accept work.
+
+**Response** (healthy):
+
+```json
+{
+  "status": "ok",
+  "uptime": 3600,
+  "storage": "json"
+}
+```
+
+**Response** (degraded — database unreachable):
+
+```json
+{
+  "status": "degraded",
+  "uptime": 3600,
+  "storage": "postgres",
+  "storage_error": "Database unreachable"
+}
+```
+
+| Field | Description |
+|:---|:---|
+| `status` | `"ok"` or `"degraded"` |
+| `uptime` | Server uptime in seconds |
+| `storage` | `"json"` (file-based) or `"postgres"` |
+| `storage_error` | Present only when the database is unreachable |
+
+Returns HTTP `200` when healthy and `503` when degraded. This endpoint does not require authentication.
+
 ## **Authentication**
 
 If enabled, authentication must be provided via one of the following methods:
@@ -18,34 +54,41 @@ If enabled, authentication must be provided via one of the following methods:
 
 ### `GET /api/tasks`
 
-Lists all saved tasks.
+Lists all saved tasks. Each task includes its full configuration except for the version history, which is fetched separately when you open a task in the editor.
 
 **Response**:
 
-```text
+```json
 [
   {
     "id": "task_1",
     "name": "Scraper",
-    "url": "https://example.com"
+    "description": "Extracts product prices daily",
+    "url": "https://example.com",
+    "mode": "agent"
   }
 ]
 ```
 
+The `description` field is optional and only present if the task has one.
+
 ### `POST /api/tasks`
 
-Creates a new task.
+Creates or updates a task. If a task with the same `id` already exists, it is overwritten. Include `?version=true` in the query string to save a version snapshot before overwriting.
 
 **Body**:
 
-```text
+```json
 {
   "name": "New Task",
+  "description": "Optional summary of what this task does",
   "url": "https://example.com",
   "mode": "agent",
   "actions": []
 }
 ```
+
+The `description` field is optional. When set, it appears on the canvas trigger card and in the `GET /api/tasks/list` response so external tools and AI agents have context about the task without fetching its full definition.
 
 ### `POST /api/tasks/:id/api`
 
@@ -53,15 +96,40 @@ Triggers an execution of a specific task.
 
 **Body**:
 
-```text
+```json
 {
   "variables": {
     "query": "override value"
-  }
+  },
+  "webhookUrl": "https://your-server.com/callback"
 }
 ```
 
+| Field | Type | Required | Description |
+|:---|:---|:---|:---|
+| `variables` | object | No | Override task-level variables for this run |
+| `webhookUrl` | string | No | URL to receive a POST callback with the execution result |
+| `statelessExecution` | boolean | No | Run in a clean browser context with no saved cookies |
+
 **Response**: Returns the execution result (JSON).
+
+#### Completion webhook
+
+When you include a `webhookUrl`, Figranium sends a `POST` request to that URL after the task finishes. The webhook URL is validated against the same SSRF rules as all other outbound requests (see [Security](/security)). If the URL points to a private network and `ALLOW_PRIVATE_NETWORKS` is `false`, the request returns `400 INVALID_WEBHOOK_URL`.
+
+The callback payload looks like this:
+
+```json
+{
+  "executionId": "exec_abc123",
+  "taskId": "task_1",
+  "status": "success",
+  "durationMs": 4200,
+  "result": { "data": [ ... ] }
+}
+```
+
+The webhook request times out after 10 seconds. Delivery failures are logged on the server but do not affect the execution result returned to the original caller.
 
 ## **Executions**
 

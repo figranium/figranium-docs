@@ -15,6 +15,16 @@ Figranium uses environment variables to configure key aspects of the server and 
 | `ALLOW_PRIVATE_NETWORKS` | `true`            | Set to `false` or `0` to block access to local/private networks (SSRF protection). |
 | `TRUST_PROXY`            | `false`           | Set to `true` or `1` if running behind a reverse proxy (e.g., Nginx, AWS ALB).     |
 
+## **Execution**
+
+| **Variable**                  | **Default Value** | **Description**                                                                                            |
+| :---------------------------- | :---------------- | :--------------------------------------------------------------------------------------------------------- |
+| `MAX_CONCURRENT_EXECUTIONS`   | _(unlimited)_     | Maximum number of tasks that can run simultaneously. Excess requests are queued until a slot is available.  |
+
+When set, Figranium queues incoming execution requests that exceed the limit and processes them in order as slots free up. Leave unset (or set to `0`) for unlimited concurrency — this is the default and matches the behavior of earlier versions.
+
+This is useful when running on resource-constrained hosts or when you want to prevent a burst of scheduled tasks from overwhelming the browser pool.
+
 ## **Rate Limiting**
 
 | **Variable**          | **Default Value** | **Description**                                          |
@@ -46,6 +56,7 @@ AUTH_RATE_LIMIT_MAX=20
 DATA_RATE_LIMIT_MAX=500
 NOVNC_PORT=54311
 SESSION_COOKIE_SECURE=true
+MAX_CONCURRENT_EXECUTIONS=3
 ```
 
 ## **Notes**
