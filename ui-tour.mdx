@@ -42,12 +42,21 @@ The core of figranium. This screen features an infinite canvas spatial editor fo
 - **Schedule Tab**:
   - Configure automated task execution using visual presets (interval, daily, weekly, monthly) or cron expressions.
   - View next/last run status and duration.
+- **Keyboard shortcuts**:
+  - Press `Escape` to dismiss the topmost overlay. Figranium evaluates overlays in the following priority order and closes the first one that is open:
+    1. Version preview
+    2. Action Palette
+    3. Cabinet (side panel)
+    4. Context menu
+    5. Results drawer
+  - Press `Cmd/Ctrl + K` to open the Action Palette.
 - **Results Drawer**:
   - A slide-out panel that contains real-time feedback and results.
   - **Live Logs**: Real-time feedback from the runner.
   - **Screenshot Preview**: See the final state of the browser.
   - **Extracted Data**: View the JSON/CSV output. The table preview displays up to **200 rows** for fast rendering. Use **Export** or **Copy Full** to access the complete dataset.
   - **Activity Log**: A scrollable, timestamped log of every action taken during the automation run. Use the **Copy** button in the log header to copy the full log to your clipboard — useful for debugging or sharing run details. The button shows brief "Copied" confirmation feedback after you click it.
+  - **Captures**: When viewing captures from the results drawer, press `Escape` to close the captures overlay.
   - **History**: Access previous versions of the task (if saved).
 
 ## **3. Captures (**`/captures`**)**
