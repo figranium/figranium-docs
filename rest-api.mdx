@@ -302,6 +302,38 @@ Sets the default selector finder tool.
 { "selectorFinder": "ai" }
 ```
 
+## **Headful**
+
+### `GET /api/headful/status`
+
+Returns the current state of the headful (VNC) browser session. Requires authentication.
+
+**Response** (VNC enabled, session active):
+
+```json
+{
+  "useNovnc": true,
+  "novncPort": 54311,
+  "isRunning": true
+}
+```
+
+**Response** (VNC disabled):
+
+```json
+{
+  "useNovnc": false
+}
+```
+
+| Field | Description |
+|:---|:---|
+| `useNovnc` | Whether VNC support is enabled on the server |
+| `novncPort` | The port the noVNC viewer is running on (only present when enabled) |
+| `isRunning` | Whether a headful browser session is currently active |
+
+Use this endpoint to check if a headful session is running before starting a new one, or to display connection status in a custom integration.
+
 ## **Schedules**
 
 ### `GET /api/schedules`

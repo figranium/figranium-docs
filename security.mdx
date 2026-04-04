@@ -82,7 +82,8 @@ To reduce the overhead of repeated DNS lookups during URL validation, Figranium 
 
 - **Session Lifetime**: Dashboard sessions expire after 7 days of inactivity. You will need to log in again after this period.
 - **HTTPS**: Always run Figranium behind a reverse proxy (Nginx, Caddy) that handles TLS/SSL.
-- **Secure Cookies**: Set `SESSION_COOKIE_SECURE=true` in your `.env` file to ensure cookies are only sent over HTTPS.
+- **Secure Cookies**: Set `SESSION_COOKIE_SECURE=true` in your `.env` file to ensure cookies are only sent over HTTPS. Session cookies are always set with the `httpOnly` flag, which prevents client-side JavaScript from accessing the session token and mitigates XSS-based session theft.
+- **HSTS**: When `SESSION_COOKIE_SECURE` is enabled, Figranium automatically sets `Strict-Transport-Security` headers (`max-age=31536000; includeSubDomains`) on every response. This instructs browsers to only communicate with your instance over HTTPS for one year, preventing protocol-downgrade attacks.
 - **Strong Secret**: Ensure `SESSION_SECRET` is a long, random string.
 
 ## **5. Reverse proxy and `TRUST_PROXY`**

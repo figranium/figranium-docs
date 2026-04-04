@@ -187,4 +187,4 @@ For final data collection, prefer the **Extraction Script** field in task settin
 - Scripts run with the same privileges as the target page.
 - Variables injected via `{$varName}` are literal string substitutions — avoid injecting user-controlled data into scripts directly to prevent unintended code execution.
 - The JavaScript action block runs in the **browser** context, not in Node.js. You cannot access the file system or Node.js APIs from within these blocks.
-- For complex data processing that needs Node.js features, use the **Extraction Script** which runs through Figranium's sandboxed JSDOM environment.
+- For complex data processing that needs Node.js features, use the **Extraction Script** which runs through Figranium's sandboxed JSDOM environment. The sandbox is hardened against prototype-chain escape techniques, so extraction scripts cannot break out to access the host Node.js runtime.
