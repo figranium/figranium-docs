@@ -36,7 +36,8 @@ The core of figranium. This screen features an infinite canvas spatial editor fo
      - **Keyboard navigation**: All sticky note actions are fully keyboard-accessible. Tab into a note to reveal the action buttons, and use visible focus indicators to navigate between controls.
    - **Action Palette**: A floating overlay to quickly find and add new action blocks anywhere on the canvas. The palette opens with the search field focused so you can start typing immediately. As you type, blocks are filtered in real time.
      - **Search**: Type to filter available actions (e.g., "click", "if", "while"). A clear button appears inside the search field when text is entered, letting you reset the filter with one click.
-     - **Keyboard navigation**: Press `Escape` to clear the current search query. If the search field is already empty, pressing `Escape` closes the palette. All interactive elements have visible focus indicators for keyboard and screen-reader users.
+     - **Keyboard navigation**: Use the arrow keys to move between actions in the grid — `Up`/`Down` move between rows and `Left`/`Right` move within a row. Press `Enter` to insert the highlighted action. Press `Escape` to clear the current search query; if the search field is already empty, pressing `Escape` closes the palette. The active item is visually highlighted so you always know which action is selected. All interactive elements have visible focus indicators for keyboard and screen-reader users.
+     - **Shortcut hints**: Buttons throughout the editor display their keyboard shortcut in a tooltip when you hover or focus them (e.g., "Add action (Ctrl + K)" or "Run Task (Ctrl + Enter)").
   - **Variables**: Define dynamic parameters (e.g., `{$query}`) for reuse.
   - **Extraction Script**: Write JavaScript to parse the page content after execution.
   - **Settings**: Configure stealth, recording, proxy rotation, and viewports.
