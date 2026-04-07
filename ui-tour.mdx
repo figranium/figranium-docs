@@ -95,3 +95,13 @@ Global configuration for the figranium instance.
   - **Import**: Bulk add proxies from a list.
   - **Rotation**: Configure rotation strategy (Round-Robin vs Random) and whether to include your local IP.
   - **Keyboard navigation**: All proxy panel buttons support keyboard navigation with visible focus indicators. Hover over any button to see a tooltip describing its action.
+
+## **Notifications**
+
+Figranium displays toast-style notifications in the center of the screen to confirm actions or report errors. Each notification includes:
+
+- **Status icon**: A checkmark icon for success or an error icon for failures, so the status is clear without relying on color alone.
+- **Status label**: An explicit "Success" or "Error" heading above the message text.
+- **Dismiss**: Click the close button (×) to dismiss the notification, or wait for it to auto-dismiss. The close button includes an accessible label for keyboard and screen-reader users.
+
+Notifications use `role="alert"` for errors (announced immediately by screen readers) and `role="status"` for success messages (announced at the next convenient pause).
