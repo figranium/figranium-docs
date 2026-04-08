@@ -158,17 +158,89 @@ Deletes a specific capture file.
 
 ## **Settings**
 
-### `GET /api/settings/proxies`
+### AI provider keys
+
+Manage API keys for each AI provider. All providers support multiple keys for automatic failover.
+
+#### `GET /api/settings/gemini-api-key`
+
+Returns the configured Gemini API keys.
+
+#### `POST /api/settings/gemini-api-key`
+
+Saves one or more Gemini API keys.
+
+**Body**:
+
+```json
+{
+  "geminiApiKeys": ["your-gemini-key"]
+}
+```
+
+#### `GET /api/settings/openai-api-key`
+
+Returns the configured OpenAI API keys.
+
+#### `POST /api/settings/openai-api-key`
+
+Saves one or more OpenAI API keys.
+
+**Body**:
+
+```json
+{
+  "openAiApiKeys": ["your-openai-key"]
+}
+```
+
+#### `GET /api/settings/claude-api-key`
+
+Returns the configured Claude (Anthropic) API keys.
+
+#### `POST /api/settings/claude-api-key`
+
+Saves one or more Claude API keys.
+
+**Body**:
+
+```json
+{
+  "claudeApiKeys": ["your-claude-key"]
+}
+```
+
+#### `GET /api/settings/ollama-api-key`
+
+Returns the configured Ollama instances.
+
+#### `POST /api/settings/ollama-api-key`
+
+Saves one or more Ollama instance configurations. Each entry is a JSON string containing the base URL and model name.
+
+**Body**:
+
+```json
+{
+  "ollamaApiKeys": ["{\"url\":\"http://localhost:11434\",\"model\":\"gemma4:e2b\"}"]
+}
+```
+
+You can also pass a plain URL string (e.g., `"http://localhost:11434"`), in which case the default model `gemma4:e2b` is used.
+
+### Proxies
+
+#### `GET /api/settings/proxies`
 
 Lists configured proxies.
 
-### `POST /api/settings/proxies`
+#### `POST /api/settings/proxies`
 
 Adds a new proxy.
 
 **Body**:
 
-```text
+```json
 {
   "server": "http://1.2.3.4:8080",
   "label": "US Proxy"

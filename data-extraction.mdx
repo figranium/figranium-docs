@@ -48,7 +48,35 @@ const price = document.querySelector(".main-price").innerText;
 return { price };
 ```
 
-## **Handling Dynamic Content**
+## **DOM cleaning**
+
+Before your extraction script runs, Figranium cleans the page HTML to remove noise and reduce payload size. This cleaned HTML is what you receive via `$$data.html()` and what is sent to AI providers when generating selectors or scripts.
+
+### What is removed
+
+The following elements are stripped entirely:
+
+`script`, `style`, `link`, `meta`, `noscript`, `svg`, `canvas`, `iframe`, `object`, `embed`, `applet`, `param`, `source`, `track`
+
+### What is kept
+
+Only attributes that are useful for extraction are preserved:
+
+- Identification: `id`, `class`, `name`
+- Content: `href`, `src`, `alt`, `title`, `value`, `placeholder`, `content`, `datetime`
+- Semantics: `aria-label`, `type`, `for`, `action`, `method`, `selected`, `checked`, `disabled`
+- Table structure: `colspan`, `rowspan`, `scope`
+- All `data-*` attributes (e.g., `data-id`, `data-price`, `data-sku`)
+
+All other attributes are removed to keep the HTML compact and focused on extractable content.
+
+### Shadow DOM support
+
+If your target page uses Shadow DOM (common in web components), Figranium includes shadow root content by default. Shadow roots are serialized as `<template data-shadowroot="open">` elements inside the cleaned HTML, so your extraction scripts can traverse them like regular DOM nodes.
+
+You can disable Shadow DOM inclusion in the task settings if it is not needed.
+
+## **Handling dynamic content**
 
 If the page loads content dynamically (AJAX), ensure your task includes `wait` or `wait_selector` actions _before_ the extraction script runs. The script executes only after the last action completes.
 
