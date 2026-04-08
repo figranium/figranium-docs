@@ -142,6 +142,36 @@ Merges multiple arrays, objects, or primitive values into a single output. Use t
 - **Value**: Comma-separated list of values or variables to merge (e.g., `items, extraItems, {$block.output}`).
 - **Target Variable**: (Optional) The name of a new or existing variable to store the merged result (e.g., `allItems`).
 
+### **HTTP Request (**`http_request`**)**
+
+Makes a server-side HTTP request to any URL. Use this to call external APIs, send webhook notifications, or fetch data from REST endpoints — without leaving the task flow.
+
+- **Method**: `GET`, `POST`, `PUT`, `PATCH`, or `DELETE`.
+- **URL**: The target endpoint. Supports `{$variables}` for dynamic URLs.
+- **Headers**: (Optional) A JSON object of request headers (e.g., `{"Authorization": "Bearer {$token}"}`).
+- **Body**: (Optional, shown for POST/PUT/PATCH/DELETE) The request payload, typically JSON.
+- **Store Response In Variable**: (Optional) A variable name to store the parsed response for use in later blocks.
+
+The request is executed on the server, not in the browser context. If the response body is valid JSON it is parsed automatically; otherwise it is stored as a plain string. Non-2xx responses throw an error that you can catch with an [On Error](/error-handling) block.
+
+<Note>
+Requests to private or internal network addresses are blocked unless the `ALLOW_PRIVATE_NETWORKS` environment variable is enabled. See [Security](/security) for details.
+</Note>
+
+**Example — fetch an API and store the result:**
+
+```json
+{
+  "type": "http_request",
+  "method": "GET",
+  "value": "https://api.example.com/products?page={$page}",
+  "headers": "{\"Authorization\": \"Bearer {$token}\"}",
+  "varName": "apiResponse"
+}
+```
+
+After this block runs, `{$apiResponse}` contains the parsed JSON response.
+
 ### **Start Task (**`start`**)**
 
 Triggers another task to run from within the current task. Use this to create modular workflows by chaining tasks together.
