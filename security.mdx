@@ -99,12 +99,12 @@ The policy is applied automatically with no configuration required. The default 
 | `style-src`    | `'self'`, inline styles, Google Fonts |
 | `font-src`     | `'self'`, Google Fonts static assets |
 | `img-src`      | `'self'`, `data:`, `blob:`, Google, jsDelivr CDN, GitHub raw content |
-| `connect-src`  | `'self'`, GitHub API, Google Generative Language API, OpenAI API, Anthropic API, Baserow API |
+| `connect-src`  | `'self'`, GitHub API, Google Generative Language API, OpenAI API, Anthropic API, Baserow API, Ollama (local) |
 | `media-src`    | `'self'`, `blob:` |
 | `frame-src`    | `'self'` |
 
 <Note>
-If you integrate a third-party service whose domain is not in the allow-list above, the browser will block those requests. Check the browser console for CSP violation reports to diagnose connectivity issues with external services.
+If you integrate a third-party service whose domain is not in the allow-list above, the browser will block those requests. Check the browser console for CSP violation reports to diagnose connectivity issues with external services. Ollama requests are made server-side, so CSP does not affect connectivity to your Ollama instance.
 </Note>
 
 Figranium also sets the following security headers on every response:

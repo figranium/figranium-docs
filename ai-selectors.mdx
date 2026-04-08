@@ -2,7 +2,7 @@
 title: "AI Selector Generation"
 ---
 
-Figranium includes an **AI Selector Generator** that uses large language models (Google Gemini or Anthropic Claude) to automatically produce robust, semantically meaningful CSS selectors from live page content.
+Figranium includes an **AI Selector Generator** that uses large language models to automatically produce robust, semantically meaningful CSS selectors from live page content. You can choose from cloud providers (Google Gemini, OpenAI, or Anthropic Claude) or run models locally with **Ollama** for fully private, self-hosted inference.
 
 ## **Why AI Selectors?**
 
@@ -14,38 +14,65 @@ The AI Selector Generator analyzes the visible page structure and intent (e.g., 
 
 1. You click the **AI Selector Finder** icon next to a selector field.
 2. Figranium captures the page's current HTML structure.
-3. The HTML is sent to the configured AI provider (Gemini or Claude) with a prompt describing what element you're targeting.
+3. The HTML is cleaned (non-essential elements and attributes are stripped) and sent to the configured AI provider with a prompt describing what element you're targeting.
 4. The AI returns a CSS selector.
 5. Figranium validates the selector against the live DOM and inserts it into your task.
 
-## **Supported AI Providers**
+## **Supported AI providers**
 
-| Provider | Model | Environment Variable |
+| Provider | Model | Setup |
 |:---|:---|:---|
-| Google Gemini | Gemini 2.0 Flash | `GEMINI_API_KEY` |
-| Anthropic Claude | Claude (latest) | `CLAUDE_API_KEY` |
+| Google Gemini | Gemini 2.0 Flash | Cloud API key |
+| OpenAI | GPT (latest) | Cloud API key |
+| Anthropic Claude | Claude (latest) | Cloud API key |
+| Ollama | Any local model (default: `gemma4:e2b`) | Self-hosted, no API key required |
 
-You can configure which provider to use in **Settings > System**.
+Figranium tries each configured provider in order — Gemini, OpenAI, Claude, then Ollama — and uses the first one that succeeds. You can add multiple keys per provider for automatic fallback.
+
+Manage all provider keys in **Settings > System > API Keys**.
 
 ## **Setup**
 
 ### **Option 1: Google Gemini**
 
 1. Obtain a Gemini API key from [Google AI Studio](https://aistudio.google.com/).
-2. In Figranium, go to **Settings > System > AI Selector**.
-3. Select **Gemini** as the provider.
-4. Enter your API key and save.
+2. In Figranium, go to **Settings > System**.
+3. Click **Add API Key**, select **Gemini**, and enter your key.
 
-Alternatively, set `GEMINI_API_KEY` in your environment before starting the server.
+### **Option 2: OpenAI**
 
-### **Option 2: Anthropic Claude**
+1. Obtain an API key from the [OpenAI dashboard](https://platform.openai.com/api-keys).
+2. In Figranium, go to **Settings > System**.
+3. Click **Add API Key**, select **OpenAI**, and enter your key.
+
+### **Option 3: Anthropic Claude**
 
 1. Obtain a Claude API key from [Anthropic Console](https://console.anthropic.com/).
-2. In Figranium, go to **Settings > System > AI Selector**.
-3. Select **Claude** as the provider.
-4. Enter your API key and save.
+2. In Figranium, go to **Settings > System**.
+3. Click **Add API Key**, select **Claude**, and enter your key.
 
-Alternatively, set `CLAUDE_API_KEY` in your environment.
+### **Option 4: Ollama (local)**
+
+Run models on your own hardware with no data leaving your network.
+
+1. [Install Ollama](https://ollama.com/download) and pull a model:
+
+```bash
+ollama pull gemma4:e2b
+```
+
+2. Start Ollama so it listens on `http://localhost:11434` (the default).
+3. In Figranium, go to **Settings > System**.
+4. Click **Add API Key**, select **Ollama**, and enter:
+   - **Base URL**: `http://localhost:11434` (or the address of a remote Ollama instance)
+   - **Model**: the model name you pulled (e.g., `gemma4:e2b`, `llama3`, `mistral`)
+5. Click **Save**.
+
+You can add multiple Ollama instances for redundancy. The first entry is used as the primary, and additional entries serve as backups.
+
+<Note>
+Ollama communicates over its OpenAI-compatible API (`/v1/chat/completions`). Make sure the Ollama server is reachable from the machine running Figranium. When running in Docker, use `host.docker.internal` instead of `localhost` to reach Ollama on the host machine.
+</Note>
 
 ## **Using the AI Selector Finder**
 
@@ -72,6 +99,8 @@ The other tool remains available via a toggle in the selector input.
 - **Always verify**: The AI may occasionally suggest a selector that matches multiple elements. Test it using the [browser console](/selectors#testing-in-the-browser-console).
 - **Combine approaches**: Use AI to generate a starting selector, then manually refine it to add `:nth-child`, `:visible`, or other constraints.
 
-## **Privacy Note**
+## **Privacy note**
 
-When you use the AI Selector Generator, a portion of the page's HTML structure is sent to the configured AI provider's API. Avoid using this feature on pages containing sensitive personal data.
+When you use the AI Selector Generator, a cleaned portion of the page's HTML structure is sent to the configured AI provider's API. Non-essential elements (`script`, `style`, `svg`, `iframe`, etc.) and most attributes are stripped before the HTML leaves Figranium, reducing the amount of page content shared with the provider.
+
+To keep all data on your own infrastructure, configure [Ollama](#option-4-ollama-local) as your AI provider. No page content is sent to any external service when using a local model.
