@@ -34,10 +34,10 @@ This blocks unauthorized traffic at the network level before it reaches the appl
 
 Server-Side Request Forgery (SSRF) is a risk when allowing users to trigger scrapes of arbitrary URLs.
 
-- **Default**: `ALLOW_PRIVATE_NETWORKS=true` (convenient for local dev).
-- **Production**: Set `ALLOW_PRIVATE_NETWORKS=false`.
+- **Default**: `ALLOW_PRIVATE_NETWORKS=false` — private network access is blocked out of the box.
   - This prevents users from scanning your internal network (e.g., `http://169.254.169.254/latest/meta-data`).
   - It blocks RFC 1918 private IP ranges (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) and IPv6 private ranges.
+- **Local development**: If you need to scrape services on your local network, set `ALLOW_PRIVATE_NETWORKS=true`.
 
 **Protocol validation** is always enforced regardless of the `ALLOW_PRIVATE_NETWORKS` setting. Only `http:` and `https:` URLs are allowed. Schemes such as `file://`, `ftp://`, and `javascript:` are blocked even when private network access is enabled.
 

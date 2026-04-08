@@ -12,7 +12,7 @@ Figranium uses environment variables to configure key aspects of the server and 
 | `SESSION_SECRET`         | _(Required)_      | A random string used to sign session cookies.                                      |
 | `NODE_ENV`               | `production`      | Set to `development` for local dev mode.                                           |
 | `ALLOWED_IPS`            | `*` (Open)        | Comma-separated list of allowed IP addresses or CIDR ranges.                       |
-| `ALLOW_PRIVATE_NETWORKS` | `true`            | Set to `false` or `0` to block access to local/private networks (SSRF protection). |
+| `ALLOW_PRIVATE_NETWORKS` | `false`           | Set to `true` or `1` to allow access to local/private networks (SSRF risk).        |
 | `TRUST_PROXY`            | `false`           | Set to `true` or `1` if running behind a reverse proxy (e.g., Nginx, AWS ALB).     |
 
 ## **Execution**
@@ -61,6 +61,6 @@ MAX_CONCURRENT_EXECUTIONS=3
 
 ## **Notes**
 
-- **Allow Private Networks**: By default, `ALLOW_PRIVATE_NETWORKS` is `true`, meaning figranium can access internal services. In production environments exposed to untrusted users, set this to `false`.
+- **Allow Private Networks**: By default, `ALLOW_PRIVATE_NETWORKS` is `false`, meaning Figranium blocks requests to private and internal network addresses. If you need to scrape services on your local network (e.g., during development), set this to `true`.
 - **Session Secret**: If `SESSION_SECRET` is not provided, figranium will generate a random one on startup (or read from `data/session_secret.txt` if available). However, for consistent sessions across restarts, set a static secret.
 - **Allowed IPs**: If you expose figranium to the internet, **always restrict access** using `ALLOWED_IPS` or authentication.
