@@ -99,6 +99,10 @@ The other tool remains available via a toggle in the selector input.
 - **Always verify**: The AI may occasionally suggest a selector that matches multiple elements. Test it using the [browser console](/selectors#testing-in-the-browser-console).
 - **Combine approaches**: Use AI to generate a starting selector, then manually refine it to add `:nth-child`, `:visible`, or other constraints.
 
+## **AI extraction script generation**
+
+The same AI provider configuration powers the **extraction script generator**. From the extraction script editor, click the **Generate** button to describe the data you want in plain language. Figranium sends the prompt to your configured providers using the same fallback chain and returns a ready-to-use JavaScript script. See [Extraction Scripts — AI script generation](/data-extraction#ai-script-generation) for details.
+
 ## **Privacy note**
 
 When you use the AI Selector Generator, a cleaned portion of the page's HTML structure is sent to the configured AI provider's API. Non-essential elements (`script`, `style`, `svg`, `iframe`, etc.) and most attributes are stripped before the HTML leaves Figranium, reducing the amount of page content shared with the provider.

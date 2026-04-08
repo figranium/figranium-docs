@@ -131,6 +131,37 @@ The callback payload looks like this:
 
 The webhook request times out after 10 seconds. Delivery failures are logged on the server but do not affect the execution result returned to the original caller.
 
+### `POST /api/tasks/generate-script`
+
+Uses the configured AI provider to generate a JavaScript extraction script from a plain-language description. The endpoint tries each provider in order (Gemini → OpenAI → Claude → Ollama) and returns the first successful result. Requires authentication.
+
+**Body**:
+
+```json
+{
+  "description": "extract all article titles and links from the page"
+}
+```
+
+| Field | Type | Required | Description |
+|:---|:---|:---|:---|
+| `description` | string | Yes | A natural-language description of the data to extract |
+
+**Response** (success):
+
+```json
+{
+  "script": "const articles = Array.from(document.querySelectorAll('article'));\nreturn articles.map(a => ({\n  title: a.querySelector('h2')?.innerText.trim(),\n  link: a.querySelector('a')?.href\n}));"
+}
+```
+
+**Error responses**:
+
+| Status | Cause |
+|:---|:---|
+| `400` | Missing or empty `description`, or no AI provider keys configured |
+| `502` | All configured AI providers failed to generate a script |
+
 ## **Executions**
 
 ### `GET /api/executions`
