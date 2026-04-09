@@ -36,8 +36,22 @@ Server-Side Request Forgery (SSRF) is a risk when allowing users to trigger scra
 
 - **Default**: `ALLOW_PRIVATE_NETWORKS=false` — private network access is blocked out of the box.
   - This prevents users from scanning your internal network (e.g., `http://169.254.169.254/latest/meta-data`).
-  - It blocks RFC 1918 private IP ranges (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) and IPv6 private ranges.
 - **Local development**: If you need to scrape services on your local network, set `ALLOW_PRIVATE_NETWORKS=true`.
+
+### Blocked destinations
+
+When `ALLOW_PRIVATE_NETWORKS` is `false`, the following addresses are blocked:
+
+| Category | Blocked ranges |
+| :--- | :--- |
+| **IPv4 private** | `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16` (RFC 1918) |
+| **IPv4 special** | `0.0.0.0/8` (current network), `127.0.0.0/8` (loopback), `169.254.0.0/16` (link-local), `100.64.0.0/10` (shared/CGN) |
+| **IPv6 private** | `::1/128` (loopback), `fc00::/7` (unique local), `fe80::/10` (link-local), `::/128` (unspecified) |
+| **Hostnames** | `localhost`, `*.localhost`, `host.docker.internal` |
+
+<Note>
+`host.docker.internal` is blocked because it resolves to the Docker host machine, which could expose internal services. This does not affect [Ollama](/ai-selectors#option-4-ollama-local) connections — Ollama requests are made server-side and bypass URL validation.
+</Note>
 
 **Protocol validation** is always enforced regardless of the `ALLOW_PRIVATE_NETWORKS` setting. Only `http:` and `https:` URLs are allowed. Schemes such as `file://`, `ftp://`, and `javascript:` are blocked even when private network access is enabled.
 
