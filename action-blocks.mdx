@@ -172,6 +172,27 @@ Requests to private or internal network addresses are blocked unless the `ALLOW_
 
 After this block runs, `{$apiResponse}` contains the parsed JSON response.
 
+### **Get Content (**`get_content`**)**
+
+Extracts the text content of the current page or a specific element. Use this to capture visible text without writing a custom JavaScript block — for example, grabbing an article body, a table's contents, or the entire page text for downstream processing.
+
+- **Selector**: (Optional) A CSS selector targeting the element to read. If empty, the full page text is returned.
+- **Store In Variable**: (Optional) A variable name to store the extracted text for use in later blocks.
+
+The action returns the `innerText` of the matched element (or `document.body` when no selector is provided). If the selector matches no element, the result is `null`.
+
+**Example — store the main article text in a variable:**
+
+```json
+{
+  "type": "get_content",
+  "selector": ".article-body",
+  "varName": "articleText"
+}
+```
+
+After this block runs, `{$articleText}` contains the visible text of the `.article-body` element.
+
 ### **Start Task (**`start`**)**
 
 Triggers another task to run from within the current task. Use this to create modular workflows by chaining tasks together.

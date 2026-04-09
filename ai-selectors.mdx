@@ -99,6 +99,33 @@ The other tool remains available via a toggle in the selector input.
 - **Always verify**: The AI may occasionally suggest a selector that matches multiple elements. Test it using the [browser console](/selectors#testing-in-the-browser-console).
 - **Combine approaches**: Use AI to generate a starting selector, then manually refine it to add `:nth-child`, `:visible`, or other constraints.
 
+## **Global AI model settings**
+
+By default, Figranium uses a preset model for each AI provider. You can override these defaults in **Settings > System > AI Models** to choose a specific model per provider — for example, switching from the default Gemini model to a larger variant, or pinning OpenAI to a particular release.
+
+### Supported providers and defaults
+
+| Provider | Default model |
+|:---|:---|
+| Gemini | `gemini-3-flash-preview` |
+| OpenAI | `gpt-5-nano` |
+| Anthropic | `claude-haiku-4-6` |
+| Ollama | `llama3.2` |
+
+### How to change the default model
+
+1. Go to **Settings > System**.
+2. Scroll to the **AI Models** panel.
+3. Click **Edit** next to the provider you want to change.
+4. Select a model from the dropdown or type a custom model name.
+5. Click **Save**.
+
+The selected model is used wherever that provider is invoked — AI selector generation, extraction script generation, and any future AI-powered features. You can also manage these settings via the REST API (see [AI model settings endpoints](/rest-api#ai-model-settings)).
+
+<Note>
+Changing the model here does not affect API keys. You still need a valid API key for each cloud provider in **Settings > System > API Keys**. Ollama models require a running Ollama instance.
+</Note>
+
 ## **AI extraction script generation**
 
 The same AI provider configuration powers the **extraction script generator**. From the extraction script editor, click the **Generate** button to describe the data you want in plain language. Figranium sends the prompt to your configured providers using the same fallback chain and returns a ready-to-use JavaScript script. See [Extraction Scripts — AI script generation](/data-extraction#ai-script-generation) for details.

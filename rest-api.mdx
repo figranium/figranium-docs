@@ -259,6 +259,38 @@ Saves one or more Ollama instance configurations. Each entry is a JSON string co
 
 You can also pass a plain URL string (e.g., `"http://localhost:11434"`), in which case the default model `gemma4:e2b` is used.
 
+### AI model settings
+
+#### `GET /api/settings/ai-models`
+
+Returns the currently configured default model for each AI provider. Requires authentication.
+
+**Response**:
+
+```json
+{
+  "gemini": "gemini-3-flash-preview",
+  "openai": "gpt-5-nano",
+  "claude": "claude-haiku-4-6",
+  "ollama": "llama3.2"
+}
+```
+
+#### `POST /api/settings/ai-models`
+
+Updates the default model for one or more AI providers. Omitted providers keep their current value. Requires authentication.
+
+**Body**:
+
+```json
+{
+  "openai": "gpt-4o",
+  "claude": "claude-sonnet-4-5"
+}
+```
+
+**Response**: Returns the full updated model configuration (same shape as the `GET` response).
+
 ### Proxies
 
 #### `GET /api/settings/proxies`
