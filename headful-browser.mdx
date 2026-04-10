@@ -26,6 +26,18 @@ The VNC interface provides a standard desktop environment:
 - **Clipboard**: Copy/paste text between your host and the remote browser.
 - **Resolution**: The viewport resizes dynamically (default 1920x1080).
 
+## **Popups and multi-page navigation**
+
+Headful sessions automatically track the active browser page across popups and new tabs. When a site opens a popup — for example, an OAuth login window or a payment gateway — Figranium switches to the new page so you can interact with it in the VNC viewer. When that page closes, the session returns to the previous page.
+
+This means workflows that span multiple pages work without any extra configuration:
+
+- **OAuth and SSO flows**: Complete third-party login prompts that open in a popup.
+- **Payment windows**: Interact with payment providers that redirect through a new tab.
+- **Multi-tab browsing**: Open links in new tabs and switch between them naturally.
+
+If all pages in a session are closed, the headful session remains active and waits for a new page to open.
+
 ## **Persistence**
 
 Headful sessions use a dedicated persistent browser profile directory (`data/browser-profile-headful`). Cookies are automatically synced to agent and scrape runs via `data/headful-storage-state.json`:
