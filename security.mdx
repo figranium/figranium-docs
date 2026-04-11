@@ -51,12 +51,18 @@ When `ALLOW_PRIVATE_NETWORKS` is `false`, the following addresses are blocked:
 | **Hostnames** | `localhost`, `*.localhost`, `host.docker.internal` |
 
 <Note>
-`host.docker.internal` is blocked because it resolves to the Docker host machine, which could expose internal services. This does not affect [Ollama](/ai-selectors#option-4-ollama-local) connections — Ollama requests are made server-side and bypass URL validation.
+`host.docker.internal` is blocked because it resolves to the Docker host machine, which could expose internal services. This includes [Ollama](/ai-selectors#option-4-ollama-local) connections — both Ollama configuration URLs and API calls are validated against the SSRF blocklist. If you need to reach Ollama on the Docker host, set `ALLOW_PRIVATE_NETWORKS=true`.
 </Note>
 
 **Protocol validation** is always enforced regardless of the `ALLOW_PRIVATE_NETWORKS` setting. Only `http:` and `https:` URLs are allowed. Schemes such as `file://`, `ftp://`, and `javascript:` are blocked even when private network access is enabled.
 
 SSRF protection also applies to **output provider credentials**. When you add or update a credential with a `baseUrl` (for example, a Baserow instance URL), Figranium validates the URL to block requests to private or internal network addresses. If the URL fails validation, the credential is rejected with an `INVALID_BASE_URL` error.
+
+### Ollama URL validation
+
+Ollama base URLs are validated against the same SSRF blocklist when you save them in **Settings > System > API Keys**. If an Ollama URL points to a private or internal address (such as `localhost` or `host.docker.internal`), the save is rejected with an `INVALID_URL` error. Outbound API calls to Ollama also use redirect-safe fetching, so a public Ollama URL that redirects to a private address is blocked.
+
+If you run Ollama on the same machine or local network as Figranium, set `ALLOW_PRIVATE_NETWORKS=true` to permit these connections.
 
 ### Redirect protection
 
