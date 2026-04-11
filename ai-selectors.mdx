@@ -71,7 +71,7 @@ ollama pull gemma4:e2b
 You can add multiple Ollama instances for redundancy. The first entry is used as the primary, and additional entries serve as backups.
 
 <Note>
-Ollama communicates over its OpenAI-compatible API (`/v1/chat/completions`). Make sure the Ollama server is reachable from the machine running Figranium. When running in Docker, use `host.docker.internal` instead of `localhost` to reach Ollama on the host machine.
+Ollama communicates over its OpenAI-compatible API (`/v1/chat/completions`). Make sure the Ollama server is reachable from the machine running Figranium. When running in Docker, use `host.docker.internal` instead of `localhost` to reach Ollama on the host machine. Because Ollama URLs are validated against the [SSRF blocklist](/security#ssrf-protection-allow_private_networks), you must set `ALLOW_PRIVATE_NETWORKS=true` when connecting to a local or Docker-hosted Ollama instance.
 </Note>
 
 ## **Using the AI Selector Finder**
