@@ -31,8 +31,7 @@
         "pages": [
           "ui-tour",
           "action-blocks",
-          "selectors",
-          "ai-selectors"
+          "selectors"
         ]
       },
       {
