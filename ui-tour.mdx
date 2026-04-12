@@ -84,9 +84,10 @@ Global configuration for the figranium instance.
 - **System**:
   - **API Keys**: A unified panel for managing all keys and provider connections:
     - **Tasks API Key**: Your key for remote execution via the REST API. Copy or regenerate it here.
-    - **AI Providers**: Add keys for Gemini, OpenAI, Claude, or connect a local [Ollama](/ai-selectors#option-4-ollama-local) instance. Each provider supports multiple keys — the first is marked **Primary** and the rest serve as **Backup** for automatic failover. For Ollama, you enter a base URL and model name instead of an API key.
+    - **AI Providers**: Add keys for Gemini, OpenAI, Claude, or connect a local Ollama instance. Each provider supports multiple keys — the first is marked **Primary** and the rest serve as **Backup** for automatic failover. For Ollama, you enter a base URL instead of an API key.
     - **Database / Output Providers**: Add credentials for output destinations like Baserow.
     - Click **Add API Key** to open the provider selection modal and configure a new entry.
+  - **AI Models**: Set the preferred model for each AI provider. This panel lists Gemini, OpenAI, Anthropic (Claude), and Ollama. Click **Edit** next to a provider to change its model — you can pick from the suggestions or type a custom model identifier. The selected model is used whenever that provider handles AI-powered actions such as selector generation. Default models are `gemini-3-flash-preview`, `gpt-5-nano`, `claude-haiku-4-6`, and `llama3.2`.
   - **User Agent**: Set a global User-Agent string or let figranium rotate them.
   - **Selector Finder**: Choose your default selector tool. Select between the **Highlight Tool** (standard browser inspector) or the **AI Selector Finder** (uses AI to generate selectors). The Highlight Tool is the default.
   - **Storage**: Clear all captures or cookies.
