@@ -51,7 +51,7 @@ When `ALLOW_PRIVATE_NETWORKS` is `false`, the following addresses are blocked:
 | **Hostnames** | `localhost`, `*.localhost`, `host.docker.internal` |
 
 <Note>
-`host.docker.internal` is blocked because it resolves to the Docker host machine, which could expose internal services. This includes [Ollama](/ai-selectors#option-4-ollama-local) connections — both Ollama configuration URLs and API calls are validated against the SSRF blocklist. If you need to reach Ollama on the Docker host, set `ALLOW_PRIVATE_NETWORKS=true`.
+`host.docker.internal` is blocked because it resolves to the Docker host machine, which could expose internal services. This includes Ollama connections — both Ollama configuration URLs and API calls are validated against the SSRF blocklist. If you need to reach Ollama on the Docker host, set `ALLOW_PRIVATE_NETWORKS=true`.
 </Note>
 
 **Protocol validation** is always enforced regardless of the `ALLOW_PRIVATE_NETWORKS` setting. Only `http:` and `https:` URLs are allowed. Schemes such as `file://`, `ftp://`, and `javascript:` are blocked even when private network access is enabled.
