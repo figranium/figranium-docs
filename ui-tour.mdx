@@ -28,6 +28,8 @@ The core of figranium. This screen features an infinite canvas spatial editor fo
   - **View Mode**: Toggle between `Visual` (blocks), `JSON` (raw code), and `API` (integration details).
   - **Target URL**: The starting point for the automation.
    - **Spatial Actions**: Add, arrange, and connect action blocks (Click, Type, Wait, etc.) directly on the zoomable, pannable canvas.
+     - **Opening block settings**: Double-click any action block to open its settings modal. This lets you configure the block's parameters (selector, value, timeout, etc.) without accidentally triggering other interactions while dragging or rearranging blocks.
+     - **Changing block type**: Click the type label on a block (e.g., "CLICK", "TYPE") to open the Action Palette for that block, letting you switch it to a different action type. If you click the label a second time quickly, the block settings modal opens instead.
    - **Sticky Notes**: Right-click the canvas and select **Add sticky note** to place a free-form text note anywhere on the canvas. Use sticky notes to annotate your workflow, leave reminders, or document complex logic for collaborators.
      - **Colors**: Click a color swatch in the note header to change the note color (default, yellow, pink, green, or purple).
      - **Edit**: Click the edit button in the note header to modify the text.
