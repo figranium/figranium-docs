@@ -63,9 +63,10 @@ Screenshots, videos, and downloaded files accumulate in `public/captures`. Video
 
 1. **Download**: Click the download icon on any capture card to save the file to your device.
 2. **Single delete**: Click the delete icon on a capture card in the **Captures** tab, or remove it from the **Results** drawer.
-3. **Bulk**: Use the API `DELETE /api/data/captures/:name` or clear all via **Settings**.
+3. **Clear all**: Click the trash icon in the **Captures** tab header to delete every screenshot and recording at once. You can also clear all captures from **Settings > Data**.
+4. **API**: Use `DELETE /api/data/captures/:name` to remove individual files programmatically.
 
-When you clear captures from **Settings > Data**, both screenshots in `public/captures` and video recordings in `data/recordings` are deleted.
+When you clear captures — whether from the **Captures** tab or from **Settings > Data** — both screenshots in `public/captures` and video recordings in `data/recordings` are deleted.
 
 ### **Execution Logs**
 
