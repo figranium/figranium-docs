@@ -177,6 +177,26 @@ Lists execution history.
 
 Gets detailed logs and result for a specific execution.
 
+### `DELETE /api/executions/:id`
+
+Deletes a single execution record by ID.
+
+**Response**:
+
+```json
+{ "success": true }
+```
+
+### `POST /api/executions/clear`
+
+Deletes all execution records. Use this endpoint to free disk space or reset history after large batch runs.
+
+**Response**:
+
+```json
+{ "success": true }
+```
+
 ## **Data**
 
 ### `GET /api/data/captures`
