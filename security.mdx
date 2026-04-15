@@ -140,8 +140,16 @@ Figranium also sets the following security headers on every response:
 If you run Figranium behind a reverse proxy (Nginx, Caddy, AWS ALB), you should set `TRUST_PROXY=true` so the server can read the real client IP from proxy headers for logging and rate limiting.
 
 <Warning>
-When `TRUST_PROXY` is enabled, headers like `X-Forwarded-For` are trusted for **all** request metadata, including security-sensitive checks such as verifying whether a request originates from the local machine. This means your reverse proxy must be configured to overwrite (not append to) the `X-Forwarded-For` header so that untrusted client-supplied values are stripped. If your proxy does not sanitize this header, an external client could spoof a loopback address and bypass API key authentication.
+When `TRUST_PROXY` is enabled, headers like `X-Forwarded-For` are trusted for general request metadata such as logging and rate limiting. Your reverse proxy must be configured to overwrite (not append to) the `X-Forwarded-For` header so that untrusted client-supplied values are stripped.
 </Warning>
+
+### Loopback bypass hardening
+
+The internal task-execution bypass (used by the `x-internal-run` header) requires **both** the proxy-resolved client IP and the direct TCP connection address to be loopback addresses. This dual validation prevents an external attacker from bypassing API key authentication by spoofing the `X-Forwarded-For` header — even when `TRUST_PROXY` is enabled, the raw socket address must also resolve to `127.0.0.1` or `::1`.
+
+In practice this means:
+- **Local processes** calling the API from the same machine pass both checks automatically.
+- **Remote requests** that spoof a loopback `X-Forwarded-For` value are still rejected because the TCP connection originates from an external address.
 
 To stay secure with `TRUST_PROXY` enabled:
 
