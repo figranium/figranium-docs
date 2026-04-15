@@ -158,3 +158,22 @@ Figranium includes built-in rate limiting to prevent abuse.
 - **Settings endpoints**: API key, proxy, and other settings routes are rate-limited to prevent automated abuse.
 
 Adjust these values in `.env` if legitimate traffic is being blocked.
+
+## **8. Sanitized error responses**
+
+API error responses return generic error codes instead of detailed internal messages. This prevents information disclosure that could help an attacker map your infrastructure or discover implementation details.
+
+For example, a failed credential URL validation returns `INVALID_BASE_URL` with a fixed description rather than the underlying system error. The same applies to authentication endpoints, settings routes, and webhook URL validation.
+
+Each error response includes a structured error code you can match on programmatically:
+
+| Error code | Endpoint | Meaning |
+| :--- | :--- | :--- |
+| `INVALID_WEBHOOK_URL` | `POST /api/execute/:id` | Webhook URL failed SSRF validation |
+| `INVALID_BASE_URL` | `POST /api/credentials`, `PUT /api/credentials/:id` | Credential base URL is malformed or points to a restricted address |
+| `INVALID_URL` | `POST /api/settings/ollama-api-key` | Ollama base URL failed SSRF validation |
+| `INTERNAL_ERROR` | Various | An unexpected server-side error occurred |
+
+<Tip>
+Use the error code field (not the message) for programmatic error handling in your integrations. The message text may change between releases, but error codes are stable.
+</Tip>
