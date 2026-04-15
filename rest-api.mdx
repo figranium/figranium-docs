@@ -372,7 +372,7 @@ Creates a new output provider credential.
 The `baseUrl` is validated against SSRF rules. If the URL points to a private or internal network address (and `ALLOW_PRIVATE_NETWORKS` is `false`), the request returns:
 
 ```json
-{ "error": "INVALID_BASE_URL", "details": "..." }
+{ "error": "INVALID_BASE_URL", "details": "Invalid base URL format or restricted destination" }
 ```
 
 ### `PUT /api/credentials/:id`
