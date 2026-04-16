@@ -18,6 +18,10 @@ Click **Add Proxy** and enter the details:
 
 The **Add Proxy** button remains disabled until you provide a server address. When you click it, a loading spinner appears and the button disables to prevent duplicate submissions while the proxy is being saved.
 
+<Note>
+Proxy server addresses are validated against the SSRF blocklist. Addresses that resolve to private or internal networks (such as `localhost`, `127.0.0.1`, or `169.254.169.254`) are rejected unless you set `ALLOW_PRIVATE_NETWORKS=true`. See [Security best practices](/security) for the full list of blocked ranges.
+</Note>
+
 ### **Importing Proxies**
 
 You can bulk import proxies using a JSON or text file
@@ -50,4 +54,8 @@ You can also manage proxies via the API:
 
 - `GET /api/settings/proxies`: List all proxies.
 - `POST /api/settings/proxies`: Add a proxy.
+- `POST /api/settings/proxies/import`: Bulk import proxies.
+- `PUT /api/settings/proxies/:id`: Update an existing proxy.
 - `POST /api/settings/proxies/rotation`: Update rotation settings.
+
+All proxy write endpoints validate the server address against the SSRF blocklist. If the address is restricted, the API returns a `400` status with an `INVALID_URL` error code.
