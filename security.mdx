@@ -58,6 +58,20 @@ When `ALLOW_PRIVATE_NETWORKS` is `false`, the following addresses are blocked:
 
 SSRF protection also applies to **output provider credentials**. When you add or update a credential with a `baseUrl` (for example, a Baserow instance URL), Figranium validates the URL to block requests to private or internal network addresses. If the URL fails validation, the credential is rejected with an `INVALID_BASE_URL` error.
 
+### Proxy server validation
+
+Proxy server addresses are validated against the same SSRF blocklist when you add, import, or update proxies in **Settings > Proxies** or through the API. If a proxy server URL points to a private or internal address, the request is rejected with an `INVALID_URL` error.
+
+This prevents an attacker (or a misconfiguration) from routing scrape traffic through a proxy that resolves to your internal network. The validation applies to all proxy management endpoints:
+
+- `POST /api/settings/proxies` — adding a single proxy
+- `POST /api/settings/proxies/import` — bulk importing proxies
+- `PUT /api/settings/proxies/:id` — updating an existing proxy
+
+When bulk importing, each proxy entry is validated individually. If any entry points to a restricted address, the entire import is rejected and the error message identifies which server failed validation.
+
+If you need to use a proxy on your local network (for example, a SOCKS5 proxy running on the same machine), set `ALLOW_PRIVATE_NETWORKS=true`.
+
 ### Ollama URL validation
 
 Ollama base URLs are validated against the same SSRF blocklist when you save them in **Settings > System > API Keys**. If an Ollama URL points to a private or internal address (such as `localhost` or `host.docker.internal`), the save is rejected with an `INVALID_URL` error. Outbound API calls to Ollama also use redirect-safe fetching, so a public Ollama URL that redirects to a private address is blocked.
@@ -180,6 +194,7 @@ Each error response includes a structured error code you can match on programmat
 | `INVALID_WEBHOOK_URL` | `POST /api/execute/:id` | Webhook URL failed SSRF validation |
 | `INVALID_BASE_URL` | `POST /api/credentials`, `PUT /api/credentials/:id` | Credential base URL is malformed or points to a restricted address |
 | `INVALID_URL` | `POST /api/settings/ollama-api-key` | Ollama base URL failed SSRF validation |
+| `INVALID_URL` | `POST /api/settings/proxies`, `POST /api/settings/proxies/import`, `PUT /api/settings/proxies/:id` | Proxy server address failed SSRF validation |
 | `INTERNAL_ERROR` | Various | An unexpected server-side error occurred |
 
 <Tip>
