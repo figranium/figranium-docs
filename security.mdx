@@ -109,6 +109,29 @@ When `ALLOW_PRIVATE_NETWORKS` is `false`, Figranium also guards against SSRF at 
 - Only top-level navigations are validated; sub-resource requests (images, scripts, etc.) are not intercepted.
 - Blocked navigations are logged to the server console with a `[SECURITY]` prefix.
 
+### Sandbox isolation
+
+Extraction scripts and the extraction worker run inside a sandboxed environment that isolates them from the host Node.js runtime. The sandbox enforces the following restrictions on all data objects passed into your script:
+
+- **Read-only access** — you cannot set, define, or delete properties on proxied data objects. Attempts to do so are silently ignored.
+- **Null prototypes** — `Object.getPrototypeOf()` returns `null` on sandboxed objects, preventing prototype-chain traversal back to host objects.
+
+These restrictions apply to the data objects provided by Figranium (such as the page content passed to extraction workers), not to objects you create within your script. If your extraction script creates its own arrays or objects, those work normally.
+
+```js
+// This works — you're creating your own object
+const results = [];
+results.push({ title: "Example" });
+return results;
+
+// This does NOT work — the source object is read-only
+sourceData.customField = "value"; // silently ignored
+```
+
+<Note>
+If you have existing extraction scripts that modify proxied data objects, update them to copy values into new objects instead of mutating the originals.
+</Note>
+
 ### DNS validation caching
 
 To reduce the overhead of repeated DNS lookups during URL validation, Figranium caches hostname resolution results for 30 seconds. Both allowed and blocked hostnames are cached, so subsequent requests to the same host resolve instantly. The cache is cleared automatically after the TTL expires.
@@ -195,6 +218,7 @@ Each error response includes a structured error code you can match on programmat
 | `INVALID_BASE_URL` | `POST /api/credentials`, `PUT /api/credentials/:id` | Credential base URL is malformed or points to a restricted address |
 | `INVALID_URL` | `POST /api/settings/ollama-api-key` | Ollama base URL failed SSRF validation |
 | `INVALID_URL` | `POST /api/settings/proxies`, `POST /api/settings/proxies/import`, `PUT /api/settings/proxies/:id` | Proxy server address failed SSRF validation |
+| `INVALID_DATABASE_ID` | `GET /api/credentials/:id/proxy/baserow/databases/:dbId/tables` | Database ID is not a valid numeric identifier |
 | `INTERNAL_ERROR` | Various | An unexpected server-side error occurred |
 
 <Tip>
