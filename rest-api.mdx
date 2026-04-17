@@ -404,7 +404,7 @@ Lists all Baserow databases accessible by the credential. This proxies the reque
 
 ### `GET /api/credentials/:id/proxy/baserow/databases/:databaseId/tables`
 
-Lists all tables within a specific Baserow database.
+Lists all tables within a specific Baserow database. The `databaseId` parameter must be a numeric value.
 
 **Response**:
 
@@ -414,6 +414,12 @@ Lists all tables within a specific Baserow database.
   { "id": 46, "name": "Pricing History" }
 ]
 ```
+
+**Error responses**:
+
+| Status | Error code | Cause |
+|:---|:---|:---|
+| `400` | `INVALID_DATABASE_ID` | The `databaseId` parameter is not a valid number |
 
 These proxy endpoints are used by the task editor's **Output** tab to let you browse and select a destination table without leaving Figranium.
 

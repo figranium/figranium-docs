@@ -188,3 +188,4 @@ For final data collection, prefer the **Extraction Script** field in task settin
 - Variables injected via `{$varName}` are literal string substitutions — avoid injecting user-controlled data into scripts directly to prevent unintended code execution.
 - The JavaScript action block runs in the **browser** context, not in Node.js. You cannot access the file system or Node.js APIs from within these blocks.
 - For complex data processing that needs Node.js features, use the **Extraction Script** which runs through Figranium's sandboxed JSDOM environment. The sandbox is hardened against prototype-chain escape techniques, so extraction scripts cannot break out to access the host Node.js runtime.
+- Data objects passed into the sandbox are **read-only**. You cannot set, define, or delete properties on them. If you need to transform data, copy values into new objects you create within your script. See [Sandbox isolation](/security#sandbox-isolation) for details.
