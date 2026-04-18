@@ -74,7 +74,19 @@ If you need to use a proxy on your local network (for example, a SOCKS5 proxy ru
 
 ### Ollama URL validation
 
-Ollama base URLs are validated against the same SSRF blocklist when you save them in **Settings > System > API Keys**. If an Ollama URL points to a private or internal address (such as `localhost` or `host.docker.internal`), the save is rejected with an `INVALID_URL` error. Outbound API calls to Ollama also use redirect-safe fetching, so a public Ollama URL that redirects to a private address is blocked.
+Ollama base URLs are validated against the same SSRF blocklist when you save them in **Settings > System > API Keys**. If an Ollama URL points to a private or internal address (such as `localhost` or `host.docker.internal`), the save is rejected with an `INVALID_URL` error.
+
+Figranium also validates Ollama URLs at request time, not just when they are saved. Every outbound call to an Ollama instance — including AI-powered selector generation and extraction script generation — goes through redirect-safe fetching. This means:
+
+- The Ollama URL is re-validated against the SSRF blocklist before each request.
+- If the URL returns a redirect, every hop is validated before following it.
+- Sensitive headers are stripped on cross-origin redirects.
+
+This defense-in-depth approach protects against cases where an Ollama URL was saved before stricter validation was introduced, or where DNS resolution changes between save time and request time.
+
+<Note>
+Other AI providers (Gemini, OpenAI, Claude) connect to fixed public API endpoints and do not require this additional validation. Only Ollama uses user-supplied URLs, so only Ollama calls go through request-time SSRF checks.
+</Note>
 
 If you run Ollama on the same machine or local network as Figranium, set `ALLOW_PRIVATE_NETWORKS=true` to permit these connections.
 

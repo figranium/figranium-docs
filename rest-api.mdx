@@ -131,6 +131,45 @@ The callback payload looks like this:
 
 The webhook request times out after 10 seconds. Delivery failures are logged on the server but do not affect the execution result returned to the original caller.
 
+### `POST /api/tasks/generate-selector`
+
+Uses the configured AI provider to generate a CSS selector from a plain-language description and the current page DOM. The endpoint runs the task up to the specified action index to capture the live HTML, then sends it to the AI provider chain (Gemini → OpenAI → Claude → Ollama) and returns the first successful result. Requires authentication.
+
+**Body**:
+
+```json
+{
+  "task": { "url": "https://example.com", "actions": [...] },
+  "actionIndex": 2,
+  "prompt": "the search input field"
+}
+```
+
+| Field | Type | Required | Description |
+|:---|:---|:---|:---|
+| `task` | object | Yes | The full task object, including `url` and `actions` |
+| `actionIndex` | number | Yes | Run actions up to this index to capture the page state |
+| `prompt` | string | Yes | A natural-language description of the element to find |
+
+**Response** (success):
+
+```json
+{
+  "selector": "input[aria-label=\"Search\"]"
+}
+```
+
+**Error responses**:
+
+| Status | Cause |
+|:---|:---|
+| `400` | Missing `task`, `actionIndex`, or `prompt`, or no AI provider keys configured |
+| `500` | All configured AI providers failed to generate a selector, or the DOM extraction failed |
+
+<Note>
+Ollama requests from this endpoint go through redirect-safe fetching with SSRF validation at every hop. See [Ollama URL validation](/security#ollama-url-validation) for details.
+</Note>
+
 ### `POST /api/tasks/generate-script`
 
 Uses the configured AI provider to generate a JavaScript extraction script from a plain-language description. The endpoint tries each provider in order (Gemini → OpenAI → Claude → Ollama) and returns the first successful result. Requires authentication.
@@ -161,6 +200,10 @@ Uses the configured AI provider to generate a JavaScript extraction script from 
 |:---|:---|
 | `400` | Missing or empty `description`, or no AI provider keys configured |
 | `502` | All configured AI providers failed to generate a script |
+
+<Note>
+Ollama requests from this endpoint go through redirect-safe fetching with SSRF validation at every hop. See [Ollama URL validation](/security#ollama-url-validation) for details.
+</Note>
 
 ## **Executions**
 
