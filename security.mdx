@@ -88,6 +88,10 @@ This defense-in-depth approach protects against cases where an Ollama URL was sa
 Other AI providers (Gemini, OpenAI, Claude) connect to fixed public API endpoints and do not require this additional validation. Only Ollama uses user-supplied URLs, so only Ollama calls go through request-time SSRF checks.
 </Note>
 
+### Gemini API key transport
+
+Gemini API keys are sent to Google's API using the `x-goog-api-key` HTTP header rather than a URL query parameter. This prevents keys from appearing in server access logs, reverse-proxy logs, or `Referer` headers — all common sources of credential leakage. No configuration is required; this is the default behavior for all Gemini-powered endpoints (selector generation and script generation).
+
 If you run Ollama on the same machine or local network as Figranium, set `ALLOW_PRIVATE_NETWORKS=true` to permit these connections.
 
 ### Redirect protection
@@ -211,6 +215,7 @@ To stay secure with `TRUST_PROXY` enabled:
 Figranium includes built-in rate limiting to prevent abuse.
 
 - **Authentication**: Max 10 failed login attempts per 15 minutes (`AUTH_RATE_LIMIT_MAX`).
+- **Setup check**: The setup status endpoint is rate-limited with the same authentication limiter to prevent attackers from probing whether your instance has been configured.
 - **Data API**: Max 100 data requests per 15 minutes (`DATA_RATE_LIMIT_MAX`).
 - **Settings endpoints**: API key, proxy, and other settings routes are rate-limited to prevent automated abuse.
 
