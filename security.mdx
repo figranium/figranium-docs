@@ -20,6 +20,10 @@ After setup, you should also:
 - **Rotate**: Regularly regenerate the API key if you suspect it's compromised.
 - **Header**: Always use `x-api-key` or `Authorization: Bearer` for API calls.
 
+### Settings endpoints always require authentication
+
+Every route under `/api/settings/*` — including API key management, proxy configuration, AI model selection, and the Gemini, OpenAI, Claude, and Ollama key endpoints — requires a logged-in session regardless of `NODE_ENV`. There is no development mode that bypasses this check, so unauthenticated requests to settings routes always return `401 UNAUTHORIZED`, even on a local `npm run dev` instance. This prevents accidental exposure of credentials if a development instance is reachable from the network.
+
 ## **2. IP Allowlist (**`ALLOWED_IPS`**)**
 
 The most effective way to secure a deployment is to restrict access to trusted IP addresses.
