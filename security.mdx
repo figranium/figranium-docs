@@ -14,6 +14,12 @@ By default, the Figranium UI requires an account. When you create your account d
 
 All fields must be plain text strings. Requests with missing fields or values that exceed these limits are rejected with a `400` error.
 
+### Timing-safe login
+
+`POST /api/auth/login` always performs a bcrypt comparison before returning, even when the email does not match a known user, the request body has the wrong field types, or the email or password exceeds the allowed length. This keeps the response time consistent across all failure modes so an attacker cannot use response-time differences to enumerate valid email addresses or probe for soft-fail paths in input validation.
+
+No configuration is required — timing equalisation is always active on the login endpoint.
+
 After setup, you should also:
 
 - **API Key**: Generate a strong API key in **Settings \> System**. All API keys are limited to 512 characters.
@@ -235,10 +241,15 @@ Each error response includes a structured error code you can match on programmat
 
 | Error code | Endpoint | Meaning |
 | :--- | :--- | :--- |
-| `INVALID_INPUT_TYPE` | `POST /api/auth/setup`, `POST /api/auth/login` | A required field is missing or not a string |
+| `INVALID_INPUT_TYPE` | `POST /api/auth/setup`, `POST /api/auth/login` | One or more required fields is not a string |
+| `MISSING_FIELDS` | `POST /api/auth/setup` | `name`, `email`, or `password` was empty after trimming |
+| `INVALID_EMAIL` | `POST /api/auth/setup` | The `email` field is malformed or exceeds 255 characters |
 | `NAME_TOO_LONG` | `POST /api/auth/setup` | The `name` field exceeds 100 characters |
-| `INPUT_TOO_LONG` | `POST /api/auth/login` | The `email` or `password` field exceeds the allowed length (255 / 128 characters) |
+| `PASSWORD_TOO_SHORT` | `POST /api/auth/setup` | The `password` field is fewer than 8 characters |
 | `PASSWORD_TOO_LONG` | `POST /api/auth/setup` | The `password` field exceeds 128 characters |
+| `INPUT_TOO_LONG` | `POST /api/auth/login` | The `email` or `password` field exceeds the allowed length (255 / 128 characters) |
+| `ALREADY_SETUP` | `POST /api/auth/setup` | An account already exists; setup can only run once |
+| `INVALID` | `POST /api/auth/login` | Generic credential-rejection response. The same code is returned for unknown emails and wrong passwords to prevent user enumeration |
 | `INVALID_WEBHOOK_URL` | `POST /api/execute/:id` | Webhook URL failed SSRF validation |
 | `INVALID_BASE_URL` | `POST /api/credentials`, `PUT /api/credentials/:id` | Credential base URL is malformed or points to a restricted address |
 | `INVALID_URL` | `POST /api/settings/ollama-api-key` | Ollama base URL failed SSRF validation |
