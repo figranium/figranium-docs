@@ -235,6 +235,10 @@ Each error response includes a structured error code you can match on programmat
 
 | Error code | Endpoint | Meaning |
 | :--- | :--- | :--- |
+| `INVALID_INPUT_TYPE` | `POST /api/auth/setup`, `POST /api/auth/login` | A required field is missing or not a string |
+| `NAME_TOO_LONG` | `POST /api/auth/setup` | The `name` field exceeds 100 characters |
+| `INPUT_TOO_LONG` | `POST /api/auth/login` | The `email` or `password` field exceeds the allowed length (255 / 128 characters) |
+| `PASSWORD_TOO_LONG` | `POST /api/auth/setup` | The `password` field exceeds 128 characters |
 | `INVALID_WEBHOOK_URL` | `POST /api/execute/:id` | Webhook URL failed SSRF validation |
 | `INVALID_BASE_URL` | `POST /api/credentials`, `PUT /api/credentials/:id` | Credential base URL is malformed or points to a restricted address |
 | `INVALID_URL` | `POST /api/settings/ollama-api-key` | Ollama base URL failed SSRF validation |
