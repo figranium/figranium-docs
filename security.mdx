@@ -20,6 +20,25 @@ All fields must be plain text strings. Requests with missing fields or values th
 
 No configuration is required — timing equalisation is always active on the login endpoint.
 
+### Timing-safe API key comparison
+
+API key authentication on every API endpoint that accepts `x-api-key`, `Authorization: Bearer`, or a `key` header is hardened against timing attacks. Instead of comparing the provided key to the stored key directly, Figranium computes an HMAC-SHA256 of each key against a freshly generated random salt and compares the resulting digests with `crypto.timingSafeEqual`.
+
+This means:
+
+- Comparison time does not vary with how many leading characters of the key are correct, so an attacker cannot probe for the key one byte at a time.
+- A new salt is generated for every request, so digests cannot be precomputed or replayed offline.
+- The same code path is used whether or not a key is configured, returning a stable error response regardless of the request shape.
+
+The endpoint distinguishes two failure modes via separate error codes:
+
+| Error code | Status | When |
+| :--- | :--- | :--- |
+| `API_KEY_NOT_SET` | `403` | The server has no API key configured. Set one in **Settings > System** before calling protected endpoints. |
+| `INVALID_API_KEY` | `401` | A key was sent (or omitted) and did not match the configured key. The same code is returned for missing, malformed, and incorrect keys to avoid leaking which case applied. |
+
+No configuration is required — this protection is always active on every endpoint that uses API key authentication, including `requireApiKey` and `requireAuthOrApiKey` routes.
+
 After setup, you should also:
 
 - **API Key**: Generate a strong API key in **Settings \> System**. All API keys are limited to 512 characters.
@@ -112,8 +131,6 @@ x-goog-api-key: <your key>
 <Note>
 If you previously relied on the `?key=` query-parameter form for log inspection or proxy filtering, update your tooling — the key only appears in the `x-goog-api-key` header now.
 </Note>
-
-If you run Ollama on the same machine or local network as Figranium, set `ALLOW_PRIVATE_NETWORKS=true` to permit those connections.
 
 ### Redirect protection
 
@@ -266,6 +283,8 @@ Each error response includes a structured error code you can match on programmat
 | `INVALID_URL` | `POST /api/settings/ollama-api-key` | Ollama base URL failed SSRF validation |
 | `INVALID_URL` | `POST /api/settings/proxies`, `POST /api/settings/proxies/import`, `PUT /api/settings/proxies/:id` | Proxy server address failed SSRF validation |
 | `INVALID_DATABASE_ID` | `GET /api/credentials/:id/proxy/baserow/databases/:dbId/tables` | Database ID is not a valid numeric identifier |
+| `API_KEY_NOT_SET` | Any API-key-protected endpoint (`403`) | The server has no API key configured in **Settings > System** |
+| `INVALID_API_KEY` | Any API-key-protected endpoint (`401`) | The provided API key was missing, malformed, or did not match the configured key |
 | `INTERNAL_ERROR` | Various | An unexpected server-side error occurred |
 
 <Tip>
