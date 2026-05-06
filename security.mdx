@@ -102,7 +102,18 @@ Other AI providers (Gemini, OpenAI, Claude) connect to fixed public API endpoint
 
 Gemini API keys are sent to Google's API using the `x-goog-api-key` HTTP header rather than a URL query parameter. This prevents keys from appearing in server access logs, reverse-proxy logs, or `Referer` headers — all common sources of credential leakage. No configuration is required; this is the default behavior for all Gemini-powered endpoints (selector generation and script generation).
 
-If you run Ollama on the same machine or local network as Figranium, set `ALLOW_PRIVATE_NETWORKS=true` to permit these connections.
+```http
+POST /v1beta/models/gemini-2.0-flash:generateContent HTTP/1.1
+Host: generativelanguage.googleapis.com
+Content-Type: application/json
+x-goog-api-key: <your key>
+```
+
+<Note>
+If you previously relied on the `?key=` query-parameter form for log inspection or proxy filtering, update your tooling — the key only appears in the `x-goog-api-key` header now.
+</Note>
+
+If you run Ollama on the same machine or local network as Figranium, set `ALLOW_PRIVATE_NETWORKS=true` to permit those connections.
 
 ### Redirect protection
 
@@ -224,8 +235,8 @@ To stay secure with `TRUST_PROXY` enabled:
 
 Figranium includes built-in rate limiting to prevent abuse.
 
-- **Authentication**: Max 10 failed login attempts per 15 minutes (`AUTH_RATE_LIMIT_MAX`).
-- **Setup check**: The setup status endpoint is rate-limited with the same authentication limiter to prevent attackers from probing whether your instance has been configured.
+- **Authentication**: Max 10 failed login attempts per 15 minutes (`AUTH_RATE_LIMIT_MAX`). The same limiter is applied to `POST /api/auth/setup` and `POST /api/auth/login` to slow brute-force attempts.
+- **Setup check**: `GET /api/auth/check-setup` is rate-limited with the same authentication limiter so attackers cannot rapidly probe whether your instance has been configured (a precondition for targeted setup-hijack attacks against fresh deployments).
 - **Data API**: Max 100 data requests per 15 minutes (`DATA_RATE_LIMIT_MAX`).
 - **Settings endpoints**: API key, proxy, and other settings routes are rate-limited to prevent automated abuse.
 
