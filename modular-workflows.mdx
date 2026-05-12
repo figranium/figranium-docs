@@ -156,3 +156,22 @@ You can find a task's ID in several ways:
 1. **Dashboard URL**: When you open a task, the URL contains the task ID (e.g., `/editor/task_abc123`).
 2. **REST API**: `GET /api/tasks` returns a list of all tasks with their IDs.
 3. **Export**: The exported JSON file includes the task ID at the top level.
+
+## **Task ID validation**
+
+The `start` action sanitizes the task ID before issuing the internal API call. Only alphanumeric characters, underscores (`_`), and hyphens (`-`) are preserved; any other character — including path separators, query strings, and whitespace — is stripped out.
+
+If sanitization removes every character (for example, when a template variable resolves to `../../api/clear-cookies?` or any other non-conforming string), the action fails fast with `Invalid task id.` and no request is made. This prevents a crafted variable value from being used to probe other internal endpoints through the `start` action.
+
+```json
+{
+  "type": "start",
+  "value": "{{ user_input }}"
+}
+```
+
+When `user_input` resolves to `task_abc123`, the action runs normally. When it resolves to `../../api/clear-cookies?`, the action errors with `Invalid task id.` and the parent task continues with that step marked failed.
+
+<Tip>
+If you build task IDs dynamically with variables, make sure the upstream source can only produce values matching `[A-Za-z0-9_-]+`. Otherwise the sanitizer may silently shorten the ID before the call.
+</Tip>
