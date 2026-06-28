@@ -6,25 +6,32 @@ This guide is for developers who want to run Figranium's source code directly on
 
 ## **Prerequisites**
 
--   **Node.js**: Version 18 (LTS) or higher.
--   **pnpm**: Recommended package manager.
--   **Playwright**: Dependencies must be installed on your OS.
+- **Node.js**: Version 18 (LTS) or higher.
+- **pnpm**: Recommended package manager.
+- **Playwright**: Dependencies must be installed on your OS.
 
 ## **Setup Steps**
 
-### **1. Install Dependencies**
+### **1. Clone the Repository**
+
+```bash
+git clone https://github.com/figranium/figranium.git
+cd figranium
+```
+
+### **2. Install Dependencies**
 
 ```bash
 pnpm install
 ```
 
-### **2. Install Playwright Browsers**
+### **3. Install Playwright Browsers**
 
 ```bash
 npx playwright install chromium
 ```
 
-### **3. Environment Setup**
+### **4. Environment Setup**
 
 Create a `.env` file in the root directory (refer to the **Configuration** page for available variables). At minimum, set:
 
@@ -32,16 +39,18 @@ Create a `.env` file in the root directory (refer to the **Configuration** page 
 SESSION_SECRET=your_random_secret_here
 ```
 
-### **4. Start the Application**
+### **5. Start the Application**
 
 You need to run both the backend server and the frontend development server simultaneously:
 
 **Backend:**
+
 ```bash
 pnpm run server
 ```
 
 **Frontend:**
+
 ```bash
 pnpm run dev
 ```
