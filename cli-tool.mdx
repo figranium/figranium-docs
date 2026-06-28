@@ -2,6 +2,10 @@
 title: "CLI Tool & Standalone Scripts"
 ---
 
+<Warning>
+  **The official `figranium` NPM package is retired and is not supported from v0.13 onward.** Install and run Figranium via Docker or from source instead. The `npm`/`npx` commands below are kept for reference for users on older releases.
+</Warning>
+
 Figranium can be run entirely from the command line, either as a persistent web server or in standalone modes for one-off scraping and automation tasks.
 
 ## **Global Installation**
@@ -18,7 +22,7 @@ npx figranium
 
 ## **Usage**
 
-```
+```text
 figranium [options]
 figranium --scrape --url <url> [--selector <css>]
 figranium --agent --task <id>
@@ -47,7 +51,7 @@ figranium --scrape --url "https://example.com" --selector ".product-price"
 **Flags for `--scrape`**:
 
 | Flag | Description |
-|:---|:---|
+| :-- | :-- |
 | `--url <url>` | **Required.** Target URL to scrape. |
 | `--selector <css>` | CSS selector to extract text from. |
 | `--output <file>` | Optional file path to write the JSON result. |
@@ -71,7 +75,7 @@ figranium --agent --task "my-task-id"
 **Flags for `--agent`**:
 
 | Flag | Description |
-|:---|:---|
+| :-- | :-- |
 | `--task <id>` | **Required.** Run a saved task by its ID. |
 | `--url <url>` | Override the task's starting URL. |
 
@@ -82,7 +86,7 @@ figranium --agent --task "my-task-id"
 
 **Example output:**
 
-```
+```text
 Figranium: Initializing standalone execution...
 Loaded task: Scrape Products (agent)
 Mode: Agent | URL: https://shop.example.com
@@ -113,7 +117,7 @@ The browser opens on your display (requires a graphical environment). On a headl
 ## **All Flags Reference**
 
 | Flag | Default | Description |
-|:---|:---|:---|
+| :-- | :-- | :-- |
 | `--scrape` | — | Run in scrape mode |
 | `--agent` | — | Run in agent mode |
 | `--headful` | — | Open a visible browser |
@@ -129,7 +133,7 @@ The browser opens on your display (requires a graphical environment). On a headl
 All CLI modes respect the same environment variables as the server. Set them in your shell or a `.env` file:
 
 | Variable | Description | Default |
-|:---|:---|:---|
+| :-- | :-- | :-- |
 | `PORT` | Web dashboard port | `11345` |
 | `SESSION_SECRET` | Session cookie signing key | Auto-generated |
 | `ALLOWED_IPS` | Comma-separated IP allowlist | Open |
@@ -164,20 +168,24 @@ python3 process_data.py /tmp/scraped.json
 ## **Exit Codes**
 
 | Code | Meaning |
-|:---|:---|
+| :-- | :-- |
 | `0` | Success |
 | `1` | Error (task not found, scrape/agent failed) |
 
 ## **Troubleshooting**
 
 **Task not found:**
-```
+
+```text
 Error: Task "my-task-id" not found.
 ```
+
 The task ID must match exactly as stored in `data/tasks.json`. Retrieve the correct ID from the web dashboard URL or the REST API (`GET /api/tasks`).
 
 **Playwright browsers not installed:**
-```
+
+```text
 Error: browserType.launch: Failed to launch chromium
 ```
+
 Run `npx playwright install chromium` to download the required browser binaries.
