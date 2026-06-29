@@ -78,6 +78,12 @@
         ]
       },
       {
+        "group": "Changelog",
+        "pages": [
+          "changelog/2026-06-29"
+        ]
+      },
+      {
         "group": "Ops",
         "pages": [
           "performance",

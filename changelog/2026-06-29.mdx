@@ -1,0 +1,27 @@
+---
+title: "Week of June 29, 2026"
+description: "Figranite Engine launch and execution improvements."
+---
+
+## New features
+
+<Update label="Figranite Engine" tags={["new"]}>
+  **A new deterministic execution kernel powers every task.** Figranite replaces ad-hoc script execution with a state-machine interpreter that handles nested `if/else` logic, `while` loops, and `foreach` iterations through a pre-calculated jump map — so workflows stay predictable even on chaotic, dynamic pages.
+
+  What this means for you:
+  - **More reliable runs.** Block sequences resolve in a consistent order, including across error boundaries (`on_error`).
+  - **Better stealth out of the box.** Cursor movements follow Bezier curves with randomized jitter, typing uses fatigue-aware speeds, and scrolling can overshoot like a real user — all without configuration.
+  - **Smarter performance.** The engine pre-computes which actions need DOM snapshots, avoiding repeated full-page serialization on long workflows.
+
+  Read the [Figranite Engine guide](/figranite-engine) for a full breakdown.
+</Update>
+
+## Updates
+
+<Update label="Human-physics simulation" tags={["improved"]}>
+  Stealth interactions are now part of the core engine rather than an optional layer. Clicks, hovers, typing, and scrolling go through the physics module by default. See [Stealth mode](/stealth-mode) for tuning.
+</Update>
+
+<Update label="Variable scoping and templates" tags={["improved"]}>
+  Runtime variables, `block.output`, and loop contexts (`loop.index`, `loop.item`) now resolve through a unified system, including inside `foreach` loops over dynamic data. Details in [Variables](/variables) and [Advanced templating](/advanced-templating).
+</Update>
