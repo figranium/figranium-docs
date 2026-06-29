@@ -1,0 +1,34 @@
+---
+title: "Changelog"
+description: "Product updates and new features in Figranium."
+---
+
+Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
+
+<Update label="2026-06-29" description="This week">
+
+## Updates
+
+### Expanded SSRF protection
+
+The default SSRF blocklist now covers a much broader set of internal and reserved network addresses, hardening Figranium against requests that target internal infrastructure.
+
+- **More IPv4 ranges blocked by default**: in addition to RFC 1918 private ranges and loopback, Figranium now blocks IETF protocol assignments (`192.0.0.0/24`), TEST-NET ranges, benchmarking (`198.18.0.0/15`), shared CGN space (`100.64.0.0/10`), multicast, and other reserved space.
+- **Full IPv6 coverage**: loopback (`::1/128`), unique local (`fc00::/7`), link-local (`fe80::/10`), unspecified, and multicast ranges are blocked.
+- **Hostname blocking**: `localhost`, `*.localhost`, and `host.docker.internal` are blocked unless `ALLOW_PRIVATE_NETWORKS=true`.
+- **Proxy server validation**: proxy URLs added through Settings or the API are validated against the same blocklist. Invalid entries are rejected with `INVALID_URL`, and bulk imports fail atomically if any entry is unsafe.
+- **Ollama URL validation**: Ollama base URLs are validated both at save time and again at request time, with every redirect hop re-checked and sensitive headers stripped on cross-origin redirects.
+- **Output provider credentials**: `baseUrl` values (e.g. Baserow) are validated when credentials are saved, rejecting unsafe URLs with `INVALID_BASE_URL`.
+- **Redirect protection**: outbound webhook and output provider requests now validate every hop in an HTTP 3xx chain (up to 5 redirects).
+
+What this means for you: if you previously pointed Figranium at a service on `localhost`, `host.docker.internal`, or any private network, you'll need to set `ALLOW_PRIVATE_NETWORKS=true` for local development. Production deployments are protected by default with no configuration required.
+
+See [Security](/security) for the full list of blocked ranges and configuration details.
+
+### Gemini API key transport
+
+Gemini API keys are now sent via the `x-goog-api-key` HTTP header instead of the `?key=` query parameter, preventing keys from leaking through server access logs, reverse-proxy logs, or `Referer` headers. No configuration is required.
+
+If you previously relied on the `?key=` form for log inspection or proxy filtering, update your tooling accordingly.
+
+</Update>

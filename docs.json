@@ -85,6 +85,12 @@
           "session-state",
           "troubleshooting"
         ]
+      },
+      {
+        "group": "Changelog",
+        "pages": [
+          "changelog/overview"
+        ]
       }
     ]
   },
