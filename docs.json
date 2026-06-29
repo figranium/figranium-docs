@@ -50,6 +50,7 @@
       {
         "group": "Agent Logic",
         "pages": [
+          "figranite-engine",
           "variables",
           "advanced-templating",
           "control-flow",
