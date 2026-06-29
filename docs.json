@@ -78,6 +78,12 @@
         ]
       },
       {
+        "group": "Changelog",
+        "pages": [
+          "changelog/overview"
+        ]
+      },
+      {
         "group": "Ops",
         "pages": [
           "performance",

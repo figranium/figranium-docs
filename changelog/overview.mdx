@@ -1,0 +1,18 @@
+---
+title: "Changelog"
+description: "New features, updates, and fixes shipped to Figranium."
+---
+
+<Update label="2026-06-29" description="This week at Figranium">
+
+## New features
+
+- **Rotating pool proxies** — Mark any proxy as a rotating pool gateway when your provider gives you a single address that cycles through multiple IPs. You can also record an estimated pool size, which appears as a badge (for example, `Pool (~500)`) next to the proxy in Settings so a mixed list of single-IP and gateway proxies stays easy to scan. See [Proxy rotation](/proxy-rotation).
+
+## Updates
+
+- **Expanded proxy API** — The proxy management API now covers the full lifecycle: list, add, bulk import, update, single delete, bulk delete, and rotation settings. The new `isRotatingPool` and `estimatedPoolSize` fields are supported on add and update. See the [REST API reference](/rest-api).
+- **Bulk proxy import** — Import proxies from a text file using URL, `host:port`, or `host:port:user:pass` formats, separated by newlines, commas, or semicolons. Duplicate server addresses are merged with existing entries rather than creating duplicates. See [Importing proxies](/proxy-rotation).
+- **SSRF validation on proxy endpoints** — Proxy server addresses are now validated against an SSRF blocklist. Addresses resolving to private or internal networks (such as `localhost`, `127.0.0.1`, or `169.254.169.254`) are rejected unless you opt in with `ALLOW_PRIVATE_NETWORKS=true`. Bulk imports are validated entry-by-entry and rejected as a whole if any address is restricted. See [Security best practices](/security).
+
+</Update>
