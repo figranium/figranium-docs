@@ -358,7 +358,21 @@ Updates the default model for one or more AI providers. Omitted providers keep t
 
 #### `GET /api/settings/proxies`
 
-Lists configured proxies.
+Lists configured proxies, rotation settings, and the default proxy.
+
+**Response**:
+
+```json
+{
+  "proxies": [
+    { "id": "host", "server": "host_ip", "label": "Host IP (no proxy)" },
+    { "id": "proxy_a1b2c3", "server": "http://1.2.3.4:8080", "label": "US Proxy" }
+  ],
+  "defaultProxyId": "host",
+  "includeDefaultInRotation": false,
+  "rotationMode": "round-robin"
+}
+```
 
 #### `POST /api/settings/proxies`
 
@@ -369,9 +383,83 @@ Adds a new proxy.
 ```json
 {
   "server": "http://1.2.3.4:8080",
-  "label": "US Proxy"
+  "username": "user",
+  "password": "pass",
+  "label": "US Proxy",
+  "isRotatingPool": false,
+  "estimatedPoolSize": 500
 }
 ```
+
+| Field | Type | Required | Description |
+|:---|:---|:---|:---|
+| `server` | string | Yes | Proxy address (e.g., `http://1.2.3.4:8080`, `socks5://10.0.0.5:1080`) |
+| `username` | string | No | Authentication username |
+| `password` | string | No | Authentication password |
+| `label` | string | No | Friendly display name |
+| `isRotatingPool` | boolean | No | Mark this proxy as a rotating pool gateway |
+| `estimatedPoolSize` | number | No | Approximate number of IPs behind the gateway (informational) |
+
+The server address is validated against the SSRF blocklist. If it points to a private or internal network address, the request returns `400` with `INVALID_URL`.
+
+#### `POST /api/settings/proxies/import`
+
+Bulk imports proxies. Existing proxies with matching server addresses are updated; new addresses are added.
+
+**Body**:
+
+```json
+{
+  "proxies": [
+    { "server": "http://1.2.3.4:8080", "label": "US" },
+    { "server": "socks5://5.6.7.8:1080", "username": "user", "password": "pass" }
+  ]
+}
+```
+
+Each entry supports the same fields as `POST /api/settings/proxies`. Every entry is validated individually against the SSRF blocklist — if any entry fails, the entire import is rejected.
+
+#### `PUT /api/settings/proxies/:id`
+
+Updates an existing proxy by ID.
+
+**Body**: Same fields as `POST /api/settings/proxies`. The `server` field is required and re-validated against the SSRF blocklist.
+
+#### `DELETE /api/settings/proxies/:id`
+
+Deletes a single proxy by ID.
+
+#### `DELETE /api/settings/proxies`
+
+Deletes multiple proxies by ID.
+
+**Body**:
+
+```json
+{
+  "ids": ["proxy_a1b2c3", "proxy_d4e5f6"]
+}
+```
+
+#### `POST /api/settings/proxies/rotation`
+
+Updates rotation settings.
+
+**Body**:
+
+```json
+{
+  "defaultProxyId": "proxy_a1b2c3",
+  "includeDefaultInRotation": true,
+  "rotationMode": "random"
+}
+```
+
+| Field | Type | Description |
+|:---|:---|:---|
+| `defaultProxyId` | string | ID of the proxy to use when rotation is off (use `null` for Host IP) |
+| `includeDefaultInRotation` | boolean | Whether to include the default proxy in the rotation pool |
+| `rotationMode` | string | `"round-robin"` or `"random"` |
 
 ## **Credentials**
 

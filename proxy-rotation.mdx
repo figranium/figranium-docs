@@ -24,7 +24,25 @@ Proxy server addresses are validated against the SSRF blocklist. Addresses that 
 
 ### **Importing Proxies**
 
-You can bulk import proxies using a JSON or text file
+You can bulk import proxies from a text file. Click the **Import** button and select a file containing one proxy per line. Supported formats:
+
+- **URL**: `http://1.2.3.4:8080` or `socks5://user:pass@10.0.0.5:1080`
+- **host:port**: `1.2.3.4:8080`
+- **host:port:user:pass**: `1.2.3.4:8080:myuser:mypass`
+
+Lines can also be separated by commas or semicolons. Duplicate server addresses are merged automatically — if an imported proxy matches an existing one, the existing entry is updated.
+
+<Note>
+Each proxy in the import is validated individually against the SSRF blocklist. If any entry points to a restricted address, the entire import is rejected. See [Security best practices](/security) for blocked ranges.
+</Note>
+
+### **Rotating pool proxies**
+
+Some proxy providers give you a single gateway address that rotates through a pool of IPs on each request. You can mark a proxy as a **rotating pool** to track this in Figranium.
+
+When adding or editing a proxy, enable the **Rotating pool** checkbox. You can optionally provide an **estimated pool size** — the approximate number of IPs behind the gateway. This is purely informational and appears as a badge next to the proxy in the list (for example, "Pool (~500)").
+
+Rotating pool proxies work the same as regular proxies for rotation and execution. The flag helps you distinguish single-IP proxies from pool gateways when managing a mixed proxy list.
 
 ## **Rotation Strategies**
 
