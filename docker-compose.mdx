@@ -11,45 +11,7 @@ This guide covers the recommended installation method using Docker Compose. This
 
 ## **Step-by-Step Installation**
 
-### **1. Create a Project Directory**
-
-Create a directory for your Figranium installation and navigate into it:
-
-```text
-mkdir figranium-server
-cd figranium-server
-```
-
-### **2. Create** `docker-compose.yml`
-
-Create a `docker-compose.yml` file in your project directory:
-
-```text
-services:
-  figranium:
-    image: ghcr.io/figranium/figranium:latest
-    container_name: figranium
-    ports:
-      - "11345:11345"
-      - "54311:54311"
-    volumes:
-      - ./data:/app/data
-      - ./captures:/app/public/captures
-    environment:
-      - PORT=11345
-      - SESSION_SECRET=your_secure_random_string
-    restart: unless-stopped
-```
-
-### **3. Start with Docker Compose**
-
-Run the following command to start the application in detached mode:
-
-```text
-docker compose up -d
-```
-
-This command will:
+###  This command will:
 
 1. Pull the Figranium Docker image from GHCR.
 2. Start the container and map the necessary ports.
