@@ -13,7 +13,8 @@
         "group": "Intro",
         "pages": [
           "overview",
-          "architecture"
+          "architecture",
+          "figranite-engine"
         ]
       },
       {
