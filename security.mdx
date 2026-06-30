@@ -230,6 +230,10 @@ Figranium also sets the following security headers on every response:
 
 If you run Figranium behind a reverse proxy (Nginx, Caddy, AWS ALB), you should set `TRUST_PROXY=true` so the server can read the real client IP from proxy headers for logging and rate limiting.
 
+<Note>
+On Render, `trust proxy` is enabled automatically when the platform-provided `RENDER=true` environment variable is present, so you do not need to set `TRUST_PROXY` yourself. This prevents the server from crashing with `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR` when the rate limiter receives the platform's `X-Forwarded-For` header.
+</Note>
+
 <Warning>
 When `TRUST_PROXY` is enabled, headers like `X-Forwarded-For` are trusted for general request metadata such as logging and rate limiting. Your reverse proxy must be configured to overwrite (not append to) the `X-Forwarded-For` header so that untrusted client-supplied values are stripped.
 </Warning>
