@@ -9,6 +9,17 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
 
 ## Updates
 
+### Expanded PostgreSQL storage
+
+PostgreSQL is now a first-class backend for nearly all Figranium configuration, not just tasks and logs.
+
+- **More data in Postgres**: proxy configuration, saved credentials, AI model selections, and Ollama API keys are now persisted in the database when `DB_TYPE=postgres`.
+- **SSL support**: a new `DB_POSTGRESDB_SSL=true` environment variable enables encrypted connections to managed Postgres providers (RDS, Cloud SQL, Supabase, Neon, etc.).
+- **Longer API keys**: API key columns are now `TEXT` instead of `VARCHAR(255)`, and existing tables are migrated automatically on startup.
+- **Graceful fallback**: if the database is unreachable at startup, Figranium falls back to file-based storage.
+
+See [PostgreSQL Support](/database-support) for the full configuration reference.
+
 ### Expanded SSRF protection
 
 The default SSRF blocklist now covers a much broader set of internal and reserved network addresses, hardening Figranium against requests that target internal infrastructure.

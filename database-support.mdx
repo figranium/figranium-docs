@@ -16,17 +16,46 @@ To enable PostgreSQL, set the following environment variables in your deployment
 | **`DB_POSTGRESDB_USER`** | Username for the database. |
 | **`DB_POSTGRESDB_PASSWORD`** | Password for the database. |
 | **`DB_POSTGRESDB_DATABASE`** | Name of the database to use. |
+| **`DB_POSTGRESDB_SSL`** | Set to `true` to connect over SSL/TLS. Defaults to `false`. |
+
+### **SSL connections**
+
+Set `DB_POSTGRESDB_SSL=true` when your PostgreSQL server requires encrypted connections — for example, managed Postgres services such as AWS RDS, Google Cloud SQL, Azure Database, Supabase, or Neon. Figranium connects with SSL enabled and `rejectUnauthorized: false`, which allows self-signed certificates commonly used by managed providers.
+
+```bash
+DB_TYPE=postgres
+DB_POSTGRESDB_HOST=db.example.com
+DB_POSTGRESDB_PORT=5432
+DB_POSTGRESDB_USER=figranium
+DB_POSTGRESDB_PASSWORD=supersecret
+DB_POSTGRESDB_DATABASE=figranium
+DB_POSTGRESDB_SSL=true
+```
+
+## **What's stored in PostgreSQL**
+
+When PostgreSQL is enabled, the following data is stored in the database instead of on disk:
+
+- **Tasks and execution logs** — task definitions, run history, and metadata.
+- **API keys** — Figranium API key, plus provider keys for Gemini, OpenAI, Claude, and Ollama.
+- **Credentials** — saved credentials used by output providers and action blocks.
+- **AI model configuration** — selected models for each provider.
+- **Proxy configuration** — proxy list, default proxy, rotation mode, and rotation settings.
+
+API key columns use the `TEXT` type, so longer keys (such as service-account tokens) are stored without truncation.
 
 ## **Migration**
 
 When you switch to PostgreSQL:
 
-1.  **Automatic Setup**: Figranium will automatically create the necessary tables on its first run.
-2.  **Data Persistence**: All task metadata, execution logs, and settings will be stored in the database.
-3.  **Captures**: Note that visual assets (screenshots/recordings) remain on the local file system or mounted volumes; only their metadata is stored in Postgres.
+1.  **Automatic setup**: Figranium creates the necessary tables on first run, and migrates existing API key columns to `TEXT` if you are upgrading from an earlier version.
+2.  **Data persistence**: Task metadata, execution logs, settings, credentials, API keys, AI model selections, and proxy configuration are stored in the database.
+3.  **Captures**: Visual assets (screenshots and recordings) remain on the local file system or mounted volumes; only their metadata is stored in Postgres.
+4.  **Fallback**: If the database is unreachable at startup, Figranium falls back to file-based storage and logs the failure.
 
 ## **Benefits**
 
 -   **Concurrency**: Better handling of simultaneous task executions and UI interactions.
 -   **Reliability**: Reduced risk of data corruption compared to plain JSON files.
 -   **Backups**: Leverage standard PostgreSQL backup and recovery tools.
+-   **Centralized configuration**: Proxies, credentials, and API keys are shared across instances pointed at the same database.
