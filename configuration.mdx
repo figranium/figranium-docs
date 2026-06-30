@@ -13,7 +13,7 @@ Figranium uses environment variables to configure key aspects of the server and 
 | `NODE_ENV`               | `production`      | Set to `development` for local dev mode.                                           |
 | `ALLOWED_IPS`            | `*` (Open)        | Comma-separated list of allowed IP addresses or CIDR ranges.                       |
 | `ALLOW_PRIVATE_NETWORKS` | `false`           | Set to `true` or `1` to allow access to local/private networks (SSRF risk).        |
-| `TRUST_PROXY`            | `false`           | Set to `true` or `1` if running behind a reverse proxy (e.g., Nginx, AWS ALB).     |
+| `TRUST_PROXY`            | `false`           | Set to `true` or `1` if running behind a reverse proxy (e.g., Nginx, AWS ALB). Automatically enabled when `RENDER=true`. |
 
 ## **Execution**
 
