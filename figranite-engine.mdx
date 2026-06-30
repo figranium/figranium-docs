@@ -1,0 +1,57 @@
+---
+title: "Figranite Engine"
+---
+
+At the heart of Figranium lies the **Figranite Engine**, a high-performance, deterministic workflow interpreter designed for sophisticated, stateful browser automation. It serves as the primary execution kernel, responsible for translating abstract block definitions into complex, human-like browser behaviors.
+
+## **Overview**
+
+Unlike simple script-based runners, Figranite is a structured execution environment that manages task state, variable resolution, and environmental interaction through a modular architecture. It is built to handle everything from simple scraping to multi-step agentic workflows that require logic, looping, and error recovery.
+
+## **Core Components**
+
+The engine is divided into several specialized modules:
+
+- **Action Handler**: Processes individual interaction blocks such as clicks, typing, navigation, and HTTP requests.
+- **Logic Handler**: Evaluates structured conditions and JavaScript expressions to drive decision-making.
+- **Human Interaction Layer**: Simulates organic user behavior, including non-linear mouse movements (Bezier curves), varying typing speeds, and "dead clicks" to evade bot detection.
+- **Workflow Orchestrator**: Manages the execution flow, including block mapping, jump logic (for loops and conditionals), and error handling state.
+
+## **Key Features**
+
+### **1. Advanced Variable Templating**
+Figranite features a powerful template engine that allows for dynamic injection of data into any action property.
+- Syntax: `{$variable_name}`
+- Supports global variables, task-specific variables, and loop-local variables (e.g., `loop.index`, `loop.item`).
+- Built-in helpers like `{$now}` for timestamps.
+
+### **2. Stealth & Humanization**
+One of Figranite's standout features is its "sentient-like" interaction model. Instead of mechanical automation, it implements:
+- **Human Typing**: Simulates keystrokes with realistic delays and optional typos.
+- **Cursor Glide**: Moves the mouse across the page using natural paths rather than instant jumps.
+- **Restlessness**: Simulates idle cursor movements and scrolling during "wait" periods.
+- **Randomized Target Selection**: Clicks on slightly different parts of an element each time to avoid signature patterns.
+
+### **3. Flow Control & Logic**
+The engine supports complex control structures that allow for non-linear execution:
+- **Conditionals**: `if` / `else` blocks based on page state or variable values.
+- **Loops**: `while`, `repeat`, and `foreach` (iterating over lists or DOM elements).
+- **Error Handling**: `on_error` blocks that allow workflows to recover gracefully from failures.
+
+### **4. Intelligent Data Extraction**
+Figranite integrates tightly with a sandboxed extraction worker to parse DOM content. It supports:
+- **Structured Extraction**: Defining JSON schemas for data capture.
+- **Shadow DOM Support**: Seamlessly penetrating shadow roots to access encapsulated content.
+- **Auto-Formatting**: Converting results into JSON or CSV formats automatically.
+
+## **Execution Lifecycle**
+
+1.  **Initialization**: The engine loads the action sequence and initializes the `runtimeVars`.
+2.  **Browser Setup**: A new Playwright context is created with specific stealth configurations and user-agent rotation.
+3.  **Block Mapping**: The engine builds a jump map to handle control flow (e.g., finding the end of a loop or an else branch).
+4.  **Step Execution**: Each block is processed sequentially. For each step, the engine:
+    - Resolves templates.
+    - Reports progress via WebSockets/SSE.
+    - Executes the specific action or logic.
+    - Updates the `block.output` for the next step.
+5.  **Finalization**: The engine performs final data extraction, captures a terminal screenshot, and closes the browser context before returning the output payload.
