@@ -252,7 +252,28 @@ To stay secure with `TRUST_PROXY` enabled:
 - Configure your proxy to overwrite (not append to) the `X-Forwarded-For` header so untrusted values from clients are stripped.
 - Combine with `ALLOWED_IPS` to restrict which addresses can reach the server.
 
-## **7. Rate Limiting**
+## **7. Headful / VNC access control**
+
+The [headful browser](/headful-browser) is powered by an embedded VNC stack (`x11vnc` + noVNC + `websockify`). Figranium hardens this stack against unauthenticated access with three layers of protection:
+
+- **Localhost-only binding**: `x11vnc` (port `5900`) and `websockify` (port `NOVNC_PORT`, default `54311`) both listen on `127.0.0.1` only. They are not reachable from outside the container, even if you publish the ports. All browser traffic is proxied through the authenticated `/websockify` endpoint on the main Figranium port.
+- **Password-protected VNC**: `x11vnc` is launched with `-passwd`, using a random password generated on first start and persisted at `data/vnc_password.txt`. The embedded viewer fetches this password from `GET /api/headful/vnc-password` (auth required) before connecting.
+- **Authenticated WebSocket upgrades**: every upgrade request to `/websockify` must pass the [`ALLOWED_IPS`](#2-ip-allowlist-allowed-ips) check, an Origin/Host match (CSWSH protection), and either a valid session cookie or an API key (`x-api-key` header or `?apiKey=` query parameter). Failed attempts are dropped and logged with a `[SECURITY]` prefix.
+
+<Note>
+No configuration is required — all three protections are always active. If you previously connected a VNC client directly to `<host>:54311` or `<host>:5900`, that path is now closed. Connect through the Figranium UI, or proxy through `wss://<host>:11345/websockify` with a session cookie or API key.
+</Note>
+
+To retrieve the VNC password for a custom client:
+
+```bash
+curl -H "x-api-key: $FIGRANIUM_API_KEY" \
+  http://localhost:11345/api/headful/vnc-password
+```
+
+See [Headful browser — Access control](/headful-browser#access-control) for the full walkthrough.
+
+## **8. Rate Limiting**
 
 Figranium includes built-in rate limiting to prevent abuse.
 
@@ -263,7 +284,7 @@ Figranium includes built-in rate limiting to prevent abuse.
 
 Adjust these values in `.env` if legitimate traffic is being blocked.
 
-## **8. Sanitized error responses**
+## **9. Sanitized error responses**
 
 API error responses return generic error codes instead of detailed internal messages. This prevents information disclosure that could help an attacker map your infrastructure or discover implementation details.
 

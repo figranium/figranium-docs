@@ -92,3 +92,54 @@ The response includes the VNC connection URL.
 ## **Stopping**
 
 Click **Close Browser** in the Editor to terminate the session and close the browser. This ensures resources are freed.
+
+## **Access control**
+
+Figranium's VNC stack is hardened against unauthenticated access. If you connect to it through the embedded viewer in the UI, everything works automatically — this section is only relevant if you build a custom client or open a raw VNC connection.
+
+### Network binding
+
+Both the VNC server (`x11vnc`) and the noVNC websocket proxy (`websockify`) bind to `127.0.0.1` only. They are **not reachable from outside the container**, even if you publish port `54311` on the Docker host. All browser traffic reaches the VNC session through the authenticated `/websockify` endpoint on the main Figranium port (default `11345`).
+
+<Note>
+If you were previously connecting a VNC client directly to `<host>:54311` or `<host>:5900`, this no longer works. Connect through the Figranium UI, or proxy through `wss://<host>:11345/websockify` with a valid session cookie or API key.
+</Note>
+
+### VNC password
+
+On first start, Figranium generates a random VNC password and writes it to `data/vnc_password.txt`. `x11vnc` requires this password for every connection, so a client that reaches port `5900` still cannot attach without it.
+
+The embedded noVNC viewer fetches the password automatically from an authenticated endpoint before connecting — you do not need to type it in.
+
+To retrieve the password for a custom client:
+
+```bash
+curl -H "x-api-key: $FIGRANIUM_API_KEY" \
+  http://localhost:11345/api/headful/vnc-password
+```
+
+```json
+{ "password": "aB3cD4eF5gH6" }
+```
+
+The endpoint requires an authenticated session or a valid API key. See [`GET /api/headful/vnc-password`](/rest-api#get-api-headful-vnc-password).
+
+<Warning>
+Treat `data/vnc_password.txt` like any other secret. It is stored inside the persistent data volume and remains valid across restarts. Delete the file to force regeneration on the next start.
+</Warning>
+
+### Authenticated WebSocket upgrades
+
+Every WebSocket upgrade to `/websockify` (used by noVNC) is validated before the connection is proxied to the VNC server. Requests must satisfy **all** of the following:
+
+- Originate from an IP address permitted by [`ALLOWED_IPS`](/security#2-ip-allowlist-allowed-ips).
+- Present an `Origin` header that matches the request `Host` (CSWSH protection).
+- Carry either a valid session cookie or an API key (`x-api-key` header or `?apiKey=` query parameter).
+
+Unauthenticated upgrade attempts are dropped and logged with a `[SECURITY]` prefix on the server console.
+
+If you build a custom noVNC client, pass your API key on the WebSocket URL:
+
+```text
+wss://your-host.example.com/websockify?apiKey=YOUR_API_KEY
+```

@@ -5,7 +5,25 @@ description: "Product updates and new features in Figranium."
 
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
-<Update label="2026-06-29" description="This week">
+<Update label="2026-07-29" description="This week">
+
+## Security
+
+### Hardened VNC and websockify access
+
+Unauthenticated access to the headful browser's VNC stack is now closed. This affects anyone who was reaching the VNC or noVNC ports directly (for example, from a custom client or an exposed Docker port).
+
+- **Localhost-only binding**: both `x11vnc` (port `5900`) and `websockify`/noVNC (`NOVNC_PORT`, default `54311`) now listen on `127.0.0.1` only. Publishing these ports on the Docker host no longer exposes them.
+- **Password-protected VNC**: `x11vnc` requires a random password generated on first start and stored at `data/vnc_password.txt`. The embedded viewer fetches it automatically from the new authenticated endpoint `GET /api/headful/vnc-password`.
+- **Authenticated `/websockify` upgrades**: every WebSocket upgrade to `/websockify` on the main Figranium port must pass the IP allowlist, an Origin/Host match (CSWSH protection), and present either a session cookie or an API key. Unauthenticated attempts are dropped and logged.
+
+**What this means for you**: if you use the headful browser through the Figranium UI, nothing changes — the embedded viewer authenticates automatically. If you built a custom VNC client that connected directly to port `54311` or `5900`, update it to proxy through `wss://<host>:11345/websockify` with an API key (`?apiKey=...` or `x-api-key` header). Retrieve the VNC password from `GET /api/headful/vnc-password`.
+
+See [Headful browser — Access control](/headful-browser#access-control) and [Security — Headful / VNC access control](/security#7-headful-vnc-access-control) for the full details.
+
+</Update>
+
+<Update label="2026-06-29" description="Earlier update">
 
 ## Updates
 

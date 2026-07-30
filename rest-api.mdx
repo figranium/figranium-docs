@@ -626,6 +626,27 @@ Returns the current state of the headful (VNC) browser session. Requires authent
 
 Use this endpoint to check if a headful session is running before starting a new one, or to display connection status in a custom integration.
 
+### `GET /api/headful/vnc-password`
+
+Returns the auto-generated VNC password used by `x11vnc` for the headful browser session. Requires authentication (session or API key).
+
+**Response** (`200`):
+
+```json
+{
+  "password": "aB3cD4eF5gH6"
+}
+```
+
+**Error responses**:
+
+| Status | Error code | Meaning |
+| :--- | :--- | :--- |
+| `404` | `VNC_PASSWORD_NOT_FOUND` | Figranium has not generated a VNC password yet. This can happen if the VNC stack has never started (for example, on a build without headful support). |
+| `500` | `FAILED_TO_READ_VNC_PASSWORD` | The password file exists but could not be read. Check filesystem permissions on `data/vnc_password.txt`. |
+
+The password is generated on first start and persisted at `data/vnc_password.txt`. The embedded noVNC viewer fetches it automatically. You only need to call this endpoint when building a custom VNC client — for example, connecting a standalone VNC viewer through an SSH tunnel. See [Headful browser — Access control](/headful-browser#access-control).
+
 ## **Schedules**
 
 ### `GET /api/schedules`
