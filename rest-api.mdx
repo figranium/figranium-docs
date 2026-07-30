@@ -110,6 +110,7 @@ Triggers an execution of a specific task.
 | `variables` | object | No | Override task-level variables for this run |
 | `webhookUrl` | string | No | URL to receive a POST callback with the execution result |
 | `statelessExecution` | boolean | No | Run in a clean browser context with no saved cookies |
+| `sessionId` | string | No | Load and save browser storage state to a dedicated `data/sessions/<sessionId>.json` file, enabling multiple named persistent sessions. Ignored when `statelessExecution` is `true`. See [Named session persistence](/session-state#named-session-persistence-sessionid). |
 
 **Response**: Returns the execution result (JSON).
 

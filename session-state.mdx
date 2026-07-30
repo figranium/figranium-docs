@@ -99,6 +99,50 @@ When `statelessExecution: true` is set on a task, Figranium launches an ephemera
 
 See [Stateless Execution](/stateless-execution) for full details.
 
+### **Named Session Persistence (`sessionId`)**
+
+Pass a `sessionId` on a task run to save and restore browser storage state (cookies, `localStorage`, `sessionStorage`, IndexedDB) into a **dedicated file**, separate from the shared browser profile. Use this when you need multiple independent, named sessions on the same Figranium instance — for example, one per end-user or one per account.
+
+Each `sessionId` maps to its own file under `data/sessions/`:
+
+```
+data/sessions/<sessionId>.json
+```
+
+At the start of a run, if a file matching the `sessionId` exists, Figranium loads it as the browser context's `storageState`. At the end of the run, the current storage state is written back to the same file, so the next run with that ID resumes exactly where the previous one left off.
+
+**When to use it:**
+
+| Scenario | Recommended |
+|:---|:---|
+| Multi-tenant automations that need one persistent session per customer | **`sessionId`** |
+| Running the same task for different logged-in accounts | **`sessionId`** |
+| Sharing one long-lived login across all runs of a task | Default profile |
+| One-off, isolated run with no persistence | `statelessExecution` |
+
+**Rules and behavior:**
+
+- `sessionId` is sanitized to `[a-zA-Z0-9_-]` before being used as a filename. Any other characters are stripped.
+- If the file does not yet exist, the first run starts with an empty storage state and creates the file at the end.
+- If `statelessExecution: true` is also set, stateless mode wins and no session file is read or written.
+- The `data/sessions/` directory is created automatically on first use.
+
+**Enable via API:**
+
+```json
+POST /api/tasks/:id/api
+Content-Type: application/json
+
+{
+  "variables": {
+    "username": "user@example.com"
+  },
+  "sessionId": "customer-42"
+}
+```
+
+The next run with `"sessionId": "customer-42"` will resume that customer's logged-in state without re-authenticating. Runs with a different `sessionId` (or none) are unaffected.
+
 ---
 
 ## **Headful-to-Agent/Scrape Cookie Sync**
