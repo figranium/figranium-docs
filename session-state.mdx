@@ -99,6 +99,51 @@ When `statelessExecution: true` is set on a task, Figranium launches an ephemera
 
 See [Stateless Execution](/stateless-execution) for full details.
 
+### **Named Session Snapshots (`sessionId`)**
+
+For workflows that need multiple isolated logged-in identities on the same target — for example, one automation per customer account, or a shared account per team — pass a `sessionId` on the run. Figranium stores that run's cookies and local storage in a dedicated snapshot file, keyed by name, and reloads it on every subsequent run that passes the same `sessionId`.
+
+Snapshots are written to:
+
+```
+data/sessions/<sessionId>.json
+```
+
+**How it works:**
+
+1. On task start, if `sessionId` is provided and a snapshot file exists, Figranium loads it into the browser context as the initial `storageState` (cookies + localStorage).
+2. The task runs against that pre-loaded state — logged-in sessions from earlier runs with the same `sessionId` are already available.
+3. On successful completion, the browser's current storage state is written back to the same snapshot file, so any new cookies or refreshed tokens are captured for next time.
+
+**Naming rules**: `sessionId` is sanitized to `[a-zA-Z0-9_-]` before use. Any other characters are stripped. If the sanitized name is empty, no snapshot is loaded or saved. Keep names short and predictable — for example `acct-alice`, `acct-bob`, `tenant_42`.
+
+**When to use it vs. the default profile directory:**
+
+| Situation | Use |
+|:---|:---|
+| A single logged-in identity per execution mode | Default profile directory (nothing to configure) |
+| Multiple accounts on the same site, one per run | `sessionId` per account |
+| Per-tenant or per-customer automations | `sessionId` per tenant |
+| Fresh browser every time | `statelessExecution: true` |
+
+**Example — trigger a task with a specific session identity:**
+
+```bash
+curl -X POST http://localhost:11345/api/tasks/task_1/api \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: your_key" \
+  -d '{
+    "variables": { "search": "widgets" },
+    "sessionId": "acct-alice"
+  }'
+```
+
+The first run signs Alice in and saves her cookies to `data/sessions/acct-alice.json`. Every future run that passes `"sessionId": "acct-alice"` starts already signed in as Alice. Passing `"sessionId": "acct-bob"` on the next run instead starts a completely separate session under Bob's cookies.
+
+<Note>
+`sessionId` snapshots are independent of the persistent profile directories (`data/browser-profile*`). They are also independent of the headful cookie sync — a `sessionId`-driven run does not read from or write to `data/headful-storage-state.json`. If you set both `sessionId` and `statelessExecution: true`, the snapshot is still not persisted (stateless wins).
+</Note>
+
 ---
 
 ## **Headful-to-Agent/Scrape Cookie Sync**

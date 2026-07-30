@@ -5,7 +5,32 @@ description: "Product updates and new features in Figranium."
 
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
-<Update label="2026-07-29" description="This week">
+<Update label="2026-07-30" description="This week">
+
+## Features
+
+### Named session snapshots (`sessionId`)
+
+Tasks and API-triggered runs now accept a `sessionId` field that persists browser cookies and local storage to a dedicated snapshot file per name.
+
+- Pass `sessionId: "acct-alice"` on a run and Figranium loads `data/sessions/acct-alice.json` as the browser's initial storage state. After the run, the current state is written back to the same file.
+- Different `sessionId` values give you fully isolated logged-in identities on the same target — one per customer, tenant, or account, without touching the shared profile directories.
+- `sessionId` is sanitized to `[a-zA-Z0-9_-]`; other characters are stripped for path safety.
+- Combining `sessionId` with `statelessExecution: true` keeps the run stateless — the snapshot is not written.
+
+See [Named Session Snapshots](/session-state#named-session-snapshots-sessionid) for the full walkthrough and [`POST /api/tasks/:id/api`](/rest-api#tasks) for the API field.
+
+## Updates
+
+### Async and top-level `return` in **Run JavaScript**
+
+The **Run JavaScript** action block now wraps your code in an async function, so top-level `await` and top-level `return` work directly. Existing scripts that used plain expressions or `return` from `eval` continue to work — the block falls back to the previous behavior if the async wrapper cannot compile the code.
+
+See [JavaScript Execution](/javascript-execution) for examples.
+
+</Update>
+
+<Update label="2026-07-29" description="Earlier update">
 
 ## Security
 

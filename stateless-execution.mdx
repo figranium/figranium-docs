@@ -86,6 +86,12 @@ To enable both:
 1. Toggle **Stateless execution** on in task settings.
 2. Configure **Proxy Rotation** in `Settings > Proxies` and enable it for the task.
 
+## **Isolating Multiple Identities Instead**
+
+If your goal is not a clean browser but rather **separate cookies per account or tenant**, stateless execution is the wrong tool — every run would have to log in from scratch. Use a **named session snapshot** instead: pass `sessionId` with the run to persist cookies into `data/sessions/<sessionId>.json` and restore them on the next run with the same name.
+
+See [Named Session Snapshots](/session-state#named-session-snapshots-sessionid) for details.
+
 ## **Performance Consideration**
 
 Stateless tasks take slightly longer per run when they require authentication, because they must log in from scratch every time. For tasks that run frequently and need a logged-in state:

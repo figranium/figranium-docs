@@ -15,7 +15,7 @@ The code runs directly in the browser page context (via Playwright's `page.evalu
 - **Scope**: Full access to the global `window` object.
 - **DOM**: Full access to `document`, `querySelector`, `querySelectorAll`, etc.
 - **Variables**: Access runtime variables using `{$varName}` syntax — they are injected as string literals before evaluation.
-- **Async**: `await` is supported. Figranium awaits promise resolution automatically.
+- **Async**: Your code is wrapped in an async function, so top-level `await` and top-level `return` both work directly. Figranium awaits the returned promise automatically.
 
 ### **Return Values**
 
@@ -126,7 +126,7 @@ return rows.map(row => {
 
 ### **Wait for an Element with a Custom Timeout**
 
-The `javascript` block runs synchronously by default. You can add custom polling logic:
+The `javascript` block runs inside an async function wrapper, so top-level `await` works directly. You can add custom polling logic:
 
 ```js
 const maxWait = 10000; // 10 seconds
