@@ -198,6 +198,18 @@ To reduce the overhead of repeated DNS lookups during URL validation, Figranium 
 - **HSTS**: When `SESSION_COOKIE_SECURE` is enabled, Figranium automatically sets `Strict-Transport-Security` headers (`max-age=31536000; includeSubDomains`) on every response. This instructs browsers to only communicate with your instance over HTTPS for one year, preventing protocol-downgrade attacks.
 - **Strong Secret**: Ensure `SESSION_SECRET` is a long, random string.
 
+### Secrets in execution logs
+
+Figranium does not currently mask variable values, typed input, or `javascript` block return values in the execution record it writes to `data/executions.json` (or the equivalent PostgreSQL table). If a task types a password into a login form or receives a token as a runtime variable, that value can appear in the stored execution log.
+
+Because Figranium is self-hosted, this data never leaves your machine, but anyone with filesystem or database access to the host can read it. To limit exposure:
+
+- Pass secrets as **runtime variables** via `POST /api/tasks/:id/api` instead of saving them as task defaults — see [Variables & Templating](/variables#handling-sensitive-values).
+- Clear runs that contain sensitive values from **Settings > Data > Clear Execution History**.
+- Restrict who can reach the host with the [`ALLOWED_IPS`](#2-ip-allowlist-allowed-ips) allowlist and require API key auth on all endpoints.
+
+Saved output provider credentials (Baserow tokens, Gemini/OpenAI/Claude keys) are a separate store and are redacted in the `GET /api/credentials` response — see [REST API](/rest-api).
+
 ## **5. Content Security Policy**
 
 Figranium sets a `Content-Security-Policy` (CSP) header on every HTTP response. This header tells browsers which origins are allowed to load scripts, styles, fonts, images, and network connections — providing defense-in-depth against cross-site scripting (XSS) and code injection attacks.
