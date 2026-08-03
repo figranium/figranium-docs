@@ -51,3 +51,19 @@ The `set` action allows you to update variables during execution.
 - **Value**: `{$counter} + 1` (JavaScript expression)
 
 This value persists for the remainder of the task execution.
+
+## **Handling sensitive values**
+
+Figranium does not currently mask or redact variable values in execution logs. Any value you `Type` into an input, pass as a `{$variable}`, or return from a `javascript` block can appear in the execution record stored at `data/executions.json` (or the equivalent PostgreSQL table). Treat that record as sensitive.
+
+For passwords, API tokens, and other secrets used in a login flow, we recommend:
+
+1. **Do not hard-code secrets as task variable defaults.** Default values are saved with the task definition and persist across executions and exports.
+2. **Pass secrets at runtime instead.** Trigger the task via `POST /api/tasks/:id/api` with the secret in the `variables` payload — the value only lives in memory for that run and is not saved back to the task definition. See [REST API](/rest-api).
+3. **Reference the value once.** Use `{$password}` directly in the `Type` action's **Value** field rather than copying it into intermediate `set` variables or `javascript` blocks, which increases the surface area where the value can be logged.
+4. **Rotate execution history.** Delete runs that contain secrets from **Executions**, or purge everything via **Settings > Data > Clear Execution History**. Figranium also auto-rotates the log at `MAX_EXECUTIONS` entries (default 500) — see [Captures & Storage](/captures-and-storage).
+5. **Restrict access to the host.** All execution data stays on your own machine or server. Because there is no in-app redaction, anyone with filesystem or database access to `data/executions.json` can read historical values. Follow [Security best practices](/security) — IP allowlist, API key auth, and a locked-down reverse proxy — to keep that data private.
+
+<Note>
+Output provider credentials saved under **Settings > API Keys** (Baserow tokens, Gemini/OpenAI/Claude keys, and similar) are stored separately and are redacted in the `GET /api/credentials` API response. This section applies to values typed into pages during a scrape, not to those saved credentials.
+</Note>
