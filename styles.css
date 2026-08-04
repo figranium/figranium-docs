@@ -1,3 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+/* Replace JetBrains Mono with Space Mono as the monospace */
+code, pre, .font-mono, kbd, samp {
+  font-family: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+}
+
 ::-webkit-scrollbar {
   width: 5px;
 }
