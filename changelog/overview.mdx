@@ -5,7 +5,24 @@ description: "Product updates and new features in Figranium."
 
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
-<Update label="2026-07-30" description="This week">
+<Update label="2026-08-05" description="This week">
+
+## Features
+
+### Model Context Protocol (MCP) server
+
+Figranium now ships an official **MCP server** so LLM clients like Claude Desktop, Cursor, and Manus AI can discover, run, inspect, and schedule Figranium tasks directly.
+
+- **Prebuilt image**: pull `ghcr.io/figranium/figranium-mcp:latest` — no Node.js install or local clone required.
+- **STDIO transport**: works with any MCP-compatible client over the standard STDIO transport.
+- **Point at your instance**: configure `FIGRANIUM_BASE_URL` and `FIGRANIUM_API_KEY` in the client's MCP server config. Use `http://host.docker.internal:11345` when Figranium runs on the same host.
+- **Registry namespace**: clients that support automatic registry resolution can install it as `io.github.figranium/figranium-mcp`.
+
+See [MCP Integration](/mcp-integration) for client-by-client setup, the available tools, and local development instructions.
+
+</Update>
+
+<Update label="2026-07-30" description="Earlier update">
 
 ## Features
 
