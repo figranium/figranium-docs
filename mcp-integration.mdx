@@ -1,0 +1,220 @@
+---
+title: "Model Context Protocol (MCP) Integration"
+---
+
+The **Figranium MCP Server** is a Model Context Protocol (MCP) server for Figranium built using the official `@modelcontextprotocol/sdk`. This integration allows LLM clients—such as **Claude Desktop**, **Cursor**, and **Manus AI**—to seamlessly discover, execute, inspect, schedule, and programmatically construct Figranium browser automation tasks via standard STDIO transport.
+
+With this server, your AI assistant or agent can autonomously navigate the web, scrape structured data, handle multi-step workflows, and manage automated schedules directly using Figranium.
+
+---
+
+## Quick Start (Docker / OCI)
+
+No local Node.js installation or repository cloning is required to run the server. Figranium publishes pre-built OCI container images on GitHub Container Registry (GHCR).
+
+You can pull the latest image with:
+
+```bash
+docker pull ghcr.io/figranium/figranium-mcp:latest
+```
+
+---
+
+## Client Integration
+
+### Claude Desktop
+
+To connect Claude Desktop to your Figranium MCP server, update your client configuration file:
+
+* **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+* **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+Add the following configuration block under `mcpServers`:
+
+```json
+{
+  "mcpServers": {
+    "figranium": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "ghcr.io/figranium/figranium-mcp:latest"
+      ],
+      "env": {
+        "FIGRANIUM_BASE_URL": "http://host.docker.internal:11345",
+        "FIGRANIUM_API_KEY": "[your_figranium_api_key_here]"
+      }
+    }
+  }
+}
+```
+
+<Note>
+  **Note for Local Hosts**: If your Figranium instance runs locally on your host machine, use `http://host.docker.internal:11345` inside the Docker `env` configuration so that the containerized MCP server can route traffic back to your host system correctly.
+</Note>
+
+---
+
+### Cursor IDE
+
+You can easily integrate Figranium into your Cursor environment as an MCP server:
+
+1. Navigate to **Settings > Features > MCP**.
+2. Click **Add New MCP Server**.
+3. Configure the following parameters:
+   - **Name**: `figranium`
+   - **Type**: `command`
+   - **Command**: `docker run -i --rm -e FIGRANIUM_BASE_URL=http://host.docker.internal:11345 -e FIGRANIUM_API_KEY=[your_figranium_api_key_here] ghcr.io/figranium/figranium-mcp:latest`
+
+---
+
+### Manus AI / Registry Clients
+
+For platforms and clients that support automatic registry resolution, you can configure and register the MCP server using its official registry namespace:
+
+```text
+io.github.figranium/figranium-mcp
+```
+
+This namespace points to the official GHCR OCI identifier which compatible clients resolve and download automatically.
+
+---
+
+## Environment Variables
+
+The Figranium MCP server expects the following environment variables:
+
+| Variable | Description | Default |
+|---|---|---|
+| `FIGRANIUM_BASE_URL` | Base URL of your running Figranium API. | `http://localhost:11345` |
+| `FIGRANIUM_API_KEY` | The API Key generated under Figranium **Settings > System**. | *(Required)* |
+
+---
+
+## Server-Wide System Instructions
+
+The server initializes and communicates a predefined set of instructions directly to the connected LLM client. These instructions govern how the agent interacts with Figranium throughout a task's lifecycle:
+
+### 1. Task Creation and Execution Environments
+* **Task Modes**: Fast, non-interactive tasks should use the `scrape` mode. Detailed, interactive, multi-step tasks requiring complex mouse and keyboard simulation should use the `agent` mode.
+* **Headful Execution**: For debugging or executing tasks that require a visible environment, headful execution is supported to let you visually inspect interactions in real-time.
+* **Stealth Configurations**: Anti-bot stealth mechanisms can be toggled inside the `stealth` configuration block. These simulate organic mouse curves, natural delays, randomized click offsets, and other human-like interactions.
+
+### 2. Step Sequence Construction (Actions)
+* Automation workflows are organized sequentially in the `actions` array.
+* Supported actions include navigation (`navigate`), waits (`wait`, `wait_selector`, `wait_downloads`), interactions (`click`, `type`, `hover`, `press`, `scroll`), custom scripts (`javascript`), and control flow (`if`, `else`, `end`, `while`, `repeat`, `foreach`).
+* Always insert a `wait_selector` step **before** performing any interactive actions (e.g. `click` or `type`) to ensure the target element is loaded in the DOM.
+
+### 3. Target Selector Strategy
+* Prefer highly robust and resilient selector targets: IDs (e.g., `#[your-css-selector]`), semantic class names, ARIA roles, or reliable text matches.
+* Avoid fragile, heavily nested structural paths (e.g. `div > div > span > button`) that are prone to breakage.
+* When targeting elements inside the Shadow DOM, set the `includeShadowDom` property to `true`.
+
+### 4. Variables and Execution Context
+* Declare dynamic values and intermediate data inside the task's `variables` object.
+* Initiate runs via the `task_execute` tool, and pass variable overrides to change defaults dynamically during execution.
+
+---
+
+## Available Resources
+
+### `figranium://schemas/task-v1.json`
+* **MIME Type**: `application/json`
+* **Description**: Exposes the complete JSON Schema definition for a Figranium task. Connected agents read this resource to understand valid action steps, nested attributes, and execution parameters.
+
+---
+
+## Available Tools
+
+The MCP server exposes rich tools mapped to Figranium's REST API.
+
+### Task Operations
+
+* **`create_task`**
+  - Creates a completely configured Figranium task.
+  - *Parameters*: Name, starting URL, execution mode (`scrape` or `agent`), stealth settings, actions array, variables list, and scheduling details.
+* **`task_list`**
+  - Fetches all task IDs, names, and descriptions registered on the server.
+* **`task_execute`**
+  - Triggers the execution of a task by ID. Supports runtime variable overrides.
+
+### Execution Operations
+
+* **`execution_list`**
+  - Retrieves a summary of previous task execution logs, run durations, and final statuses.
+
+### Schedule Operations
+
+* **`schedule_list`**
+  - Lists all task IDs with active, configured schedules.
+* **`schedule_get_all_status`**
+  - Returns the overall status of the scheduler engine.
+* **`schedule_get_status`**
+  - Fetches the active schedule rules and next calculated run time for a given `taskId`.
+* **`schedule_set`**
+  - Registers or updates a task schedule using either a structured Frequency format or standard Cron expressions.
+* **`schedule_delete`**
+  - Disables and removes scheduling rules from a task.
+* **`schedule_describe`**
+  - Validates and previews schedule execution intervals and next run times without committing changes.
+
+---
+
+## Rich Input Diagnostics & Self-Correction
+
+When an LLM client calls `create_task` with malformed arguments, the Figranium MCP server returns structured, highly descriptive Zod validation errors, setting `isError: true`. This structured output allows advanced LLMs to pinpoint schema mismatches and perform immediate, automatic self-correction.
+
+For example, if an agent provides a typo in an action step's `type` field, the server returns:
+
+```text
+Schema Validation Failed!
+
+Detailed breakdown of validation errors:
+ - At Step Index 2 (action step #3), parameter "type" failed validation: Invalid enum value. Expected 'click' | 'type' | 'wait' ..., received 'clikc'
+```
+
+Using this feedback, the LLM corrects `'clikc'` to `'click'` and retries the command autonomously.
+
+---
+
+## Local Development & Source Build
+
+To build the Figranium MCP server locally from source:
+
+### Prerequisites
+* **Node.js**: v18+
+* **NPM**: v9+
+
+### Build Steps
+
+1. Clone the repository and navigate into the folder:
+   ```bash
+   git clone https://github.com/figranium/figranium-mcp.git
+   cd figranium-mcp
+   ```
+
+2. Install dependencies and compile the TypeScript source:
+   ```bash
+   npm install
+   npm run build
+   ```
+
+3. Run the compiled server locally:
+   ```bash
+   npm start
+   ```
+
+You can also run the TypeScript compiler in watch-mode during active development:
+```bash
+npm run watch
+```
+
+### Inspecting & Debugging
+
+To debug the server's tools, schemas, and resource outputs, use the official MCP Inspector utility:
+
+```bash
+npx @modelcontextprotocol/inspector node dist/index.js
+```
