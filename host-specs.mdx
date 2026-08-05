@@ -1,0 +1,94 @@
+---
+title: "Host Specifications"
+---
+
+To run Figranium reliably, it is essential to provision your hosting environment with sufficient resources. Figranium runs in a containerized environment powered by Playwright and Chromium. While the backend Node.js application is highly efficient, browser automation and page rendering are resource-heavy tasks.
+
+This guide outlines the recommended hardware specifications for self-hosting Figranium.
+
+---
+
+## **Resource Tier Quick Reference**
+
+| Metric | Sub-Minimum (Can run, not recommended) | Minimum Smooth (Baseline reliability) | Sweet Spot (Recommended production) |
+| :--- | :--- | :--- | :--- |
+| **vCPU** | 0.5 Cores | 1 Core | 2 Cores or more |
+| **RAM** | 512 MB | 1 GB | 2 GB or more |
+| **Shared Memory (`/dev/shm`)** | 64 MB | 512 MB | 1 GB |
+| **Storage Type** | HDD / Low-performance | SSD | SSD / NVMe |
+| **Storage Space** | 2 GB free | 10 GB free | 20 GB+ (depending on captures) |
+
+---
+
+## **Hosting Tiers**
+
+### **1. Sub-Minimum (Low-Spec Hosting)**
+Figranium is highly portable and *can* boot and run on lower specs than recommended—such as on 512 MB RAM environments, low-end VPS instances, or Raspberry Pi 3/4 devices.
+
+However, **this is not recommended** for production workloads:
+* **Memory Starvation**: Running Chromium with less than 512 MB RAM often triggers system out-of-memory errors (`ENOMEM`), leading to abrupt task terminations and browser context crashes.
+* **CPU Bottlenecks**: Single-core low-power processors will experience significant slowdowns during page load execution, script evaluation, and proxy negotiation.
+* **No Video/Screenshot Buffers**: Automating multiple concurrent browsers or capturing video logs under these conditions will likely result in heavy latency or failed executions.
+
+### **2. Minimum Smooth (Baseline Reliability)**
+This is the recommended baseline for running single-threaded, scheduled workflows, lightweight data extraction, and periodic scraping tasks without performance issues.
+
+* **CPU**: 1 vCPU
+* **RAM**: 1 GB of RAM
+* **Shared Memory**: At least 512 MB of shared memory (`/dev/shm`) allocated to the Docker container.
+* **Workload Scope**: Suitable for executing a single task at a time, performing API extraction, or basic web scraping without extensive media capture.
+
+### **3. Sweet Spot (Recommended Production Environment)**
+This specification is highly recommended for production environments. It ensures snappy UI response times, smooth concurrent scheduling, and optimal browser execution.
+
+* **CPU**: 2 vCPUs (or more)
+* **RAM**: 2 GB of RAM (or more)
+* **Shared Memory**: 1 GB of shared memory (`/dev/shm`) allocated to the Docker container.
+* **Workload Scope**: Highly stable. Handles multiple concurrent tasks, heavy workflows, extensive screenshots, high-resolution video recordings, and environments such as Headful Execution for troubleshooting or Headful Debugging.
+
+---
+
+## **Why Shared Memory (`/dev/shm`) Matters**
+
+Chromium utilizes `/dev/shm` (shared memory) for rendering pages and passing frames. By default, Docker allocates only 64 MB to `/dev/shm`, which is insufficient for modern web pages and will lead to browser tab crashes (e.g., `Target closed` or `Session crashed` errors).
+
+For standard Docker Compose environments, ensure `shm_size` is configured appropriately:
+
+```yaml
+services:
+  figranium:
+    image: ghcr.io/figranium/figranium:latest
+    shm_size: '1g' # Recommended sweet spot size (minimum 512m)
+```
+
+For more details on resolving container resource exhaustion, see our [Troubleshooting](/troubleshooting) guide.
+
+---
+
+## **Docker Resource Limits**
+
+If you are deploying Figranium on shared infrastructure or Kubernetes, we recommend setting CPU and Memory limits to protect your host while ensuring the containers do not get throttled:
+
+```yaml
+services:
+  figranium:
+    image: ghcr.io/figranium/figranium:latest
+    shm_size: '1g'
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2g
+        reservations:
+          cpus: '1'
+          memory: 1g
+```
+
+---
+
+## **Storage Considerations**
+
+Because Figranium captures screenshots, records videos of executions, and can store extensive database transaction history, storage speed and capacity should be matched to your usage:
+
+* **Use Solid State Drives (SSD)**: Figranium utilizes file-based persistent storage (by default) and heavily interacts with the disk during logging and browser state preservation. SSDs prevent disk-write bottlenecks.
+* **Video Recording & Captures**: Automated recordings consume more CPU and disk space. If you automate a large volume of tasks, we recommend disabling automated recording inside the General Settings panel of your tasks or setting up a regular cleanup schedule via API (`POST /api/clear-screenshots`) or through the Settings UI. See [Performance & Optimization](/performance) for instructions on maintaining a clean storage footprint.

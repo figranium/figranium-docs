@@ -20,6 +20,7 @@
       {
         "group": "Installation",
         "pages": [
+          "host-specs",
           "docker-compose",
           "multi-arch",
           "configuration",
