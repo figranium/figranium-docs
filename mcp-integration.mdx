@@ -8,11 +8,15 @@ With this server, your AI assistant or agent can autonomously navigate the web, 
 
 ---
 
-## Quick Start (Docker / OCI)
+## Quick Start (NPM / NPX)
 
-No local Node.js installation or repository cloning is required to run the server. Figranium publishes pre-built OCI container images on GitHub Container Registry (GHCR).
+The recommended way to run the Figranium MCP server is via `npx` from npm. This lets you launch the official package directly without cloning the repository.
 
-You can pull the latest image with:
+```bash
+npx -y figranium-mcp
+```
+
+If you prefer containerized deployment, you can also use the official OCI image from GitHub Container Registry:
 
 ```bash
 docker pull ghcr.io/figranium/figranium-mcp:latest
@@ -35,15 +39,10 @@ Add the following configuration block under `mcpServers`:
 {
   "mcpServers": {
     "figranium": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "ghcr.io/figranium/figranium-mcp:latest"
-      ],
+      "command": "npx",
+      "args": ["-y", "figranium-mcp"],
       "env": {
-        "FIGRANIUM_BASE_URL": "http://host.docker.internal:11345",
+        "FIGRANIUM_BASE_URL": "http://localhost:11345",
         "FIGRANIUM_API_KEY": "[your_figranium_api_key_here]"
       }
     }
@@ -52,7 +51,7 @@ Add the following configuration block under `mcpServers`:
 ```
 
 <Note>
-  **Note for Local Hosts**: If your Figranium instance runs locally on your host machine, use `http://host.docker.internal:11345` inside the Docker `env` configuration so that the containerized MCP server can route traffic back to your host system correctly.
+  **Note for Local Hosts**: If you run the server from within Docker, use `http://host.docker.internal:11345` so the container can route traffic back to your host system. For local `npx` execution, use `http://localhost:11345`.
 </Note>
 
 ---
@@ -66,7 +65,14 @@ You can easily integrate Figranium into your Cursor environment as an MCP server
 3. Configure the following parameters:
    - **Name**: `figranium`
    - **Type**: `command`
-   - **Command**: `docker run -i --rm -e FIGRANIUM_BASE_URL=http://host.docker.internal:11345 -e FIGRANIUM_API_KEY=[your_figranium_api_key_here] ghcr.io/figranium/figranium-mcp:latest`
+   - **Command**: `npx -y figranium-mcp`
+   - **Environment Variables**:
+     - `FIGRANIUM_BASE_URL=http://localhost:11345`
+     - `FIGRANIUM_API_KEY=[your_figranium_api_key_here]`
+
+<Note>
+  **Note for Local Hosts**: Use `http://localhost:11345` when running the MCP server locally via `npx`. If you choose to run the MCP server inside Docker instead, swap the base URL to `http://host.docker.internal:11345`.
+</Note>
 
 ---
 
