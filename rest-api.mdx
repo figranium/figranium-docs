@@ -90,6 +90,60 @@ Creates or updates a task. If a task with the same `id` already exists, it is ov
 
 The `description` field is optional. When set, it appears on the canvas trigger card and in the `GET /api/tasks/list` response so external tools and AI agents have context about the task without fetching its full definition.
 
+### `PATCH /api/tasks/:id`
+
+Applies a partial update to an existing task. Only the fields you include in the body are changed. The `id` and `versions` fields are ignored if supplied. Figranium takes a version snapshot of the task before applying the update, so you can restore the previous state from the version history.
+
+Use this endpoint when you want to change a single attribute (for example, a schedule, a variable, or one action) without re-sending the full task definition.
+
+**Body**: Any subset of the task's top-level fields.
+
+```json
+{
+  "name": "Renamed scraper",
+  "description": "Runs every morning",
+  "url": "https://example.com/products"
+}
+```
+
+**Response**:
+
+```json
+{
+  "id": "task_1",
+  "updatedAt": "2026-08-05T18:04:12.335Z",
+  "status": "success",
+  "task": { "id": "task_1", "name": "Renamed scraper", "...": "..." }
+}
+```
+
+**Error responses**:
+
+| Status | Error code | Cause |
+|:---|:---|:---|
+| `400` | `INVALID_PAYLOAD` | The request body is not a JSON object |
+| `404` | `TASK_NOT_FOUND` | No task exists with the given `id` |
+
+### `DELETE /api/tasks/:id`
+
+Deletes a task by ID. Any in-process schedule registered for the task is also removed, so a scheduled run will not fire after deletion.
+
+**Response**:
+
+```json
+{
+  "id": "task_1",
+  "deleted": true,
+  "message": "Task successfully removed."
+}
+```
+
+**Error responses**:
+
+| Status | Error code | Cause |
+|:---|:---|:---|
+| `404` | `TASK_NOT_FOUND` | No task exists with the given `id` |
+
 ### `POST /api/tasks/:id/api`
 
 Triggers an execution of a specific task.
@@ -593,6 +647,117 @@ Sets the default selector finder tool.
 
 ```json
 { "selectorFinder": "ai" }
+```
+
+## **Browser**
+
+Programmatic control of the managed headful browser session. Use these endpoints when an external tool or agent needs to open a browser, drive it, and inspect the page without going through the Figranium UI.
+
+### `POST /api/browser/open`
+
+Launches a headful browser session, or reattaches to the one already running. Returns a `sessionId` you can pass to other endpoints and a WebSocket endpoint suitable for connecting a Playwright or Chrome DevTools client. Requires authentication.
+
+**Body**:
+
+```json
+{
+  "url": "https://example.com",
+  "mode": "headful",
+  "devTools": false
+}
+```
+
+| Field | Type | Required | Description |
+|:---|:---|:---|:---|
+| `url` | string | No | URL to navigate to after the session starts |
+| `mode` | string | No | Currently only `"headful"` is supported (default) |
+| `devTools` | boolean | No | Reserved for future use |
+
+**Response** (`200`):
+
+```json
+{
+  "sessionId": "sess_a1b2c3",
+  "status": "launched",
+  "wsEndpoint": "ws://localhost:11345/devtools/browser/sess_a1b2c3"
+}
+```
+
+**Error responses**:
+
+| Status | Error code | Cause |
+|:---|:---|:---|
+| `409` | `HEADFUL_DISPLAY_UNAVAILABLE` | No X server is available on the host, so the headful stack cannot start |
+| `409` | `BROWSER_LAUNCH_FAILED` | The session was created but did not reach a running state |
+| `500` | `BROWSER_LAUNCH_FAILED` | The launch threw an unexpected error; see `details` for the underlying message |
+
+**Example**:
+
+```bash
+curl -X POST http://localhost:11345/api/browser/open \
+  -H "x-api-key: $FIGRANIUM_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com"}'
+```
+
+## **Inspector**
+
+### `POST /api/inspector/highlight`
+
+Activates the inspect overlay on the active browser session and, given a `targetHint`, returns up to five candidate elements with CSS selectors, XPath, and a confidence score. Optionally returns a base64-encoded JPEG snapshot of the current viewport with the top match visually outlined. Requires authentication.
+
+Use this endpoint from an external agent or CLI to resolve a plain-language target (for example, `"Sign in"` or `input[name="q"]`) into a selector you can feed back into a task action. Match strategy, in order:
+
+1. Treat `targetHint` as a CSS selector and run `querySelectorAll`.
+2. Match common attributes (`name`, `placeholder`, `aria-label`, `title`, `alt`, `value`, `data-testid`, `data-test-id`).
+3. Match visible text on `button`, `a`, `label`, `span`, `div`, `h1`–`h4`, `li`, and `p`.
+
+If no browser session is running and you supply `url`, Figranium launches one first.
+
+**Body**:
+
+```json
+{
+  "sessionId": "sess_a1b2c3",
+  "url": "https://example.com",
+  "targetHint": "Sign in"
+}
+```
+
+| Field | Type | Required | Description |
+|:---|:---|:---|:---|
+| `sessionId` | string | No | If provided, must match the active session or the request returns `409` |
+| `url` | string | No | Navigate to this URL before searching. Also used to launch a session if none is active |
+| `targetHint` | string | No | CSS selector, attribute value, or visible text to locate. Omit to only enable inspect mode and return a snapshot |
+
+**Response** (`200`):
+
+```json
+{
+  "success": true,
+  "selectors": [
+    { "css": "button#login", "xpath": "//*[@id=\"login\"]", "confidence": 0.98 },
+    { "css": "button.primary", "xpath": "/html/body/div[2]/button[1]", "confidence": 0.93 }
+  ],
+  "snapshot": "<base64 JPEG or null>"
+}
+```
+
+**Error responses**:
+
+| Status | Error code | Cause |
+|:---|:---|:---|
+| `404` | `NO_ACTIVE_SESSION` | No browser session is running and no `url` was supplied to launch one |
+| `409` | `SESSION_ID_MISMATCH` | The supplied `sessionId` does not match the active session; the active ID is returned as `activeSessionId` |
+| `500` | `INSPECTOR_FAILED` | The inspector threw an unexpected error; see `details` |
+
+**Example**:
+
+```bash
+curl -X POST http://localhost:11345/api/inspector/highlight \
+  -H "x-api-key: $FIGRANIUM_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com", "targetHint": "Sign in"}'
 ```
 
 ## **Headful**
