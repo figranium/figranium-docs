@@ -5,7 +5,26 @@ description: "Product updates and new features in Figranium."
 
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
-<Update label="2026-07-30" description="This week">
+<Update label="2026-08-05" description="This week">
+
+## Features
+
+### Figranium MCP Server
+
+Figranium now ships an official Model Context Protocol (MCP) server, letting LLM clients like **Claude Desktop**, **Cursor**, and **Manus AI** discover, execute, inspect, and schedule Figranium tasks directly.
+
+- **Prebuilt image**: pull `ghcr.io/figranium/figranium-mcp:latest` from GHCR — no local Node.js or repo clone required.
+- **Task lifecycle tools**: `create_task`, `task_list`, `task_execute`, and `execution_list` cover creation, listing, execution with variable overrides, and run history.
+- **Scheduling tools**: `schedule_set`, `schedule_get_status`, `schedule_get_all_status`, `schedule_list`, `schedule_describe`, and `schedule_delete` manage cron and frequency-based schedules from the agent.
+- **Task schema resource**: `figranium://schemas/task-v1.json` exposes the full task JSON Schema so agents build valid tasks on the first try.
+- **Self-correcting validation**: malformed `create_task` calls return structured Zod errors (with the offending step index and field), so LLMs can auto-correct and retry.
+- **Registry namespace**: clients that support automatic resolution can register the server as `io.github.figranium/figranium-mcp`.
+
+Configure the server with `FIGRANIUM_BASE_URL` and an API key from **Settings > System**. See [MCP Integration](/mcp-integration) for full client setup instructions.
+
+</Update>
+
+<Update label="2026-07-30" description="Earlier update">
 
 ## Features
 
