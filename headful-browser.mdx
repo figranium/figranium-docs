@@ -133,7 +133,7 @@ Treat `data/vnc_password.txt` like any other secret. It is stored inside the per
 Every WebSocket upgrade to `/websockify` (used by noVNC) is validated before the connection is proxied to the VNC server. Requests must satisfy **all** of the following:
 
 - Originate from an IP address permitted by [`ALLOWED_IPS`](/security#2-ip-allowlist-allowed-ips).
-- Present an `Origin` header that matches the request `Host` (CSWSH protection).
+- Present an `Origin` header that matches the request `Host` (CSWSH protection). If both `Origin` and `Host` resolve to loopback or private addresses (`localhost`, `127.0.0.1`, `::1`, `host.docker.internal`, any `*.local` hostname, or an [RFC 1918](https://datatracker.ietf.org/doc/html/rfc1918) private range), the ports and aliases do not need to match. This lets Vite dev servers, Docker port mappings, and IPv6 loopback aliases connect without tripping the CSWSH check while still rejecting cross-origin upgrades from public hosts.
 - Carry either a valid session cookie or an API key (`x-api-key` header or `?apiKey=` query parameter).
 
 Unauthenticated upgrade attempts are dropped and logged with a `[SECURITY]` prefix on the server console.
