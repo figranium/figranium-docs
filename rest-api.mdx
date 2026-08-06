@@ -655,7 +655,9 @@ Programmatic control of the managed headful browser session. Use these endpoints
 
 ### `POST /api/browser/open`
 
-Launches a headful browser session, or reattaches to the one already running. Returns a `sessionId` you can pass to other endpoints and a WebSocket endpoint suitable for connecting a Playwright or Chrome DevTools client. Requires authentication.
+Launches a headful browser session, or reattaches to the one already running. Returns a `sessionId` you can pass to other endpoints and a WebSocket endpoint suitable for connecting a Playwright or Chrome DevTools client.
+
+Accepts either a signed-in dashboard session or an API key. Session-authenticated callers (the Figranium UI) can launch the browser without adding a header. External callers such as MCP servers or scripts authenticate with `x-api-key`, `Authorization: Bearer`, or an `apiKey` body field, as described under [Authentication](#authentication).
 
 **Body**:
 
@@ -704,7 +706,9 @@ curl -X POST http://localhost:11345/api/browser/open \
 
 ### `POST /api/inspector/highlight`
 
-Activates the inspect overlay on the active browser session and, given a `targetHint`, returns up to five candidate elements with CSS selectors, XPath, and a confidence score. Optionally returns a base64-encoded JPEG snapshot of the current viewport with the top match visually outlined. Requires authentication.
+Activates the inspect overlay on the active browser session and, given a `targetHint`, returns up to five candidate elements with CSS selectors, XPath, and a confidence score. Optionally returns a base64-encoded JPEG snapshot of the current viewport with the top match visually outlined.
+
+Accepts either a signed-in dashboard session or an API key. This lets the Figranium UI drive the inspector directly while external clients (for example, an MCP server resolving a plain-language target into a selector) authenticate with an API key. See [Authentication](#authentication) for accepted formats.
 
 Use this endpoint from an external agent or CLI to resolve a plain-language target (for example, `"Sign in"` or `input[name="q"]`) into a selector you can feed back into a task action. Match strategy, in order:
 
