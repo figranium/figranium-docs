@@ -34,7 +34,11 @@ services:
       - "54311:54311"
     volumes:
       - ./data:/app/data
+      # Mount the same host directory to both container paths so captures from
+      # agent runs (which write to /app/src/public/captures) and scrape runs
+      # (which write to /app/public/captures) both land on the host.
       - ./captures:/app/public/captures
+      - ./captures:/app/src/public/captures
     environment:
       - PORT=11345
       - SESSION_SECRET=your_secure_random_string
@@ -95,6 +99,6 @@ docker compose up -d
 Figranium uses volume mounts to ensure your data persists even if you delete the container.
 
 - `./data`: Stores `tasks.json`, `proxies.json`, `settings.json`, and execution logs.
-- `./captures`: Stores screenshots and recordings.
+- `./captures`: Stores screenshots and recordings. Mount this host directory to **both** `/app/public/captures` and `/app/src/public/captures` inside the container. Agent runs write to the `src/public/captures` path, while scrape runs write to `public/captures`. Mounting both to the same host directory ensures every capture is persisted and visible in the **Captures** tab.
 
 If you need to backup your data, simply copy these folders.
