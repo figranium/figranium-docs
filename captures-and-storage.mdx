@@ -61,6 +61,11 @@ If you enable `statelessExecution` in a task, it will launch a fully ephemeral i
 
 Screenshots, videos, and downloaded files accumulate in `public/captures`. Video recordings are stored separately in `data/recordings`. You can delete or download them:
 
+<Note>
+Agent runs write captures to `src/public/captures`, while scrape runs write to `public/captures`. Figranium serves and reads from both paths, so captures always surface in the **Captures** tab regardless of which mode produced them. If you run Figranium in Docker, mount the same host directory to both `/app/public/captures` and `/app/src/public/captures` so no captures are lost. See [Installation with Docker Compose](/docker-compose) for the recommended volume configuration.
+</Note>
+
+
 1. **Download**: Click the download icon on any capture card to save the file to your device.
 2. **Single delete**: Click the delete icon on a capture card in the **Captures** tab, or remove it from the **Results** drawer.
 3. **Clear all**: Click the trash icon in the **Captures** tab header to delete every screenshot and recording at once. You can also clear all captures from **Settings > Data**.
