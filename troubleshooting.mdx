@@ -176,7 +176,36 @@ Common issues and their solutions when running Figranium.
 
 ---
 
-## **12. Server crashes on Render with `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR`**
+## **12. Headful viewer shows "Connecting…" then "Disconnected" on Apple Silicon Macs**
+
+- **Cause**: An older Figranium image was published as `linux/amd64` only. On Apple Silicon (M1–M4) Macs, Docker Desktop pulls that image and runs it under QEMU emulation, where Xvfb and x11vnc are prone to crashing seconds after start. The noVNC viewer connects briefly, then drops. The selector-picker SSE stream fails the same way because it depends on the same headful browser session.
+- **Fix**: Update to the latest image. Figranium is now published as a true multi-architecture image (`linux/amd64` and `linux/arm64`), so Apple Silicon pulls a native ARM64 build:
+
+  ```bash
+  docker compose pull
+  docker compose up -d
+  ```
+
+  Confirm the pulled architecture matches your host:
+
+  ```bash
+  docker image inspect ghcr.io/figranium/figranium:latest \
+    --format '{{.Architecture}}'
+  ```
+
+  On Apple Silicon this should print `arm64`. If it prints `amd64`, your Docker client is not selecting the ARM variant — run `docker compose pull --platform linux/arm64` to force it.
+
+- **If the viewer still drops**: Xvfb, x11vnc, and websockify each run inside a restart loop, and the noVNC page auto-reconnects with backoff. Look at the per-process logs to see which component is crashing:
+
+  ```bash
+  docker compose exec figranium tail -f data/xvfb.log data/x11vnc.log data/novnc.log
+  ```
+
+  A quick post-connect drop is labeled **"Browser session crashed, retrying…"** in the viewer, distinguishing a real crash from a routine reconnect.
+
+---
+
+## **13. Server crashes on Render with `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR`**
 
 - **Cause**: When Figranium runs behind a reverse proxy (such as Render's edge), incoming requests carry an `X-Forwarded-For` header. The rate limiter rejects this header unless the server is explicitly told to trust the proxy, causing the process to crash on the first authenticated request.
 - **Fix**: On Render, no action is needed — the server detects the platform-provided `RENDER=true` environment variable and enables `trust proxy` automatically. On other proxied deployments (Nginx, Caddy, AWS ALB, Fly.io), set `TRUST_PROXY=true` in your environment:

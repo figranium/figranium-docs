@@ -93,6 +93,21 @@ The response includes the VNC connection URL.
 
 Click **Close Browser** in the Editor to terminate the session and close the browser. This ensures resources are freed.
 
+## **Crash resilience and auto-reconnect**
+
+The three processes that back the headful viewer — Xvfb, x11vnc, and websockify — each run inside a restart loop. If any one of them exits, the container restarts it within a second and appends the event to its per-process log:
+
+- `data/xvfb.log`
+- `data/x11vnc.log`
+- `data/novnc.log`
+
+The noVNC page mirrors this on the client side: on an RFB disconnect it retries with backoff (up to 8 attempts, capped at 5 seconds between attempts). The status label distinguishes a routine reconnect from a genuine crash:
+
+- **Reconnecting…** — the previous session was open for at least 4 seconds before dropping, so the disconnect is treated as a network blip.
+- **Browser session crashed, retrying…** — the session dropped within 4 seconds of connecting, which usually means Xvfb or x11vnc crashed and the viewer is waiting for the restart loop to bring it back.
+
+On Apple Silicon Macs, make sure Docker Desktop is pulling the native `linux/arm64` image. Running the AMD64 image under QEMU emulation is the most common cause of the fast-crash pattern above. See [Troubleshooting — Headful viewer shows "Connecting…" then "Disconnected" on Apple Silicon Macs](/troubleshooting#12-headful-viewer-shows-connecting-then-disconnected-on-apple-silicon-macs).
+
 ## **Access control**
 
 Figranium's VNC stack is hardened against unauthenticated access. If you connect to it through the embedded viewer in the UI, everything works automatically — this section is only relevant if you build a custom client or open a raw VNC connection.
