@@ -6,6 +6,10 @@ This guide covers the secondary installation method for Figranium, which is suit
 
 While the primary and recommended installation method is using the pre-built images from [GitHub Container Registry (GHCR)](/docker-compose), this method provides a reliable fallback for environments where pre-built images might not be optimal or available.
 
+<Note>
+  The published GHCR images now ship as a true multi-architecture manifest covering `linux/amd64` and `linux/arm64`. Docker automatically pulls the variant that matches your host, so Apple Silicon Macs and ARM64 Linux servers get a native image instead of running the AMD64 build under QEMU emulation. In most cases the GHCR path is now sufficient — reach for this Git Clone method only if you need to modify the source or run on an architecture outside those two.
+</Note>
+
 ## **Prerequisites**
 
 - [Git](https://git-scm.com/downloads) installed.
