@@ -5,7 +5,79 @@ description: "Product updates and new features in Figranium."
 
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
-<Update label="2026-08-05" description="This week">
+<Update label="2026-08-10" description="This week">
+
+## Features
+
+### Multi-theme support
+
+Figranium now ships with four selectable UI themes: **Dark** (default), **Light**, **Solarized Light**, and **Solarized Dark**.
+
+- Switch themes from **Settings → System → Theme**. Each option shows a preview image plus a surface and accent color swatch.
+- The choice is stored in the browser's local storage (`figranium.theme`), so it persists across reloads on the same device.
+- The first time you open Figranium after upgrading, a one-time picker prompts you to choose a theme. Dismissing it also persists locally and it will not appear again.
+- Themes are implemented as CSS custom properties (`--app-bg`, `--app-surface`, `--app-accent`, and the full syntax-highlight palette), so the whole UI — including code blocks — retunes for readability under each background.
+
+See [UI Tour — System settings](/ui-tour) for the switcher location.
+
+### Authenticated programmatic browser & inspector API
+
+The programmatic browser endpoints introduced in the previous release now require authentication and are safe to expose to external orchestrators (MCP servers, custom agents, CLIs).
+
+- `POST /api/browser/open` launches or reattaches a managed headful session and returns `{ sessionId, status, wsEndpoint }`.
+- `POST /api/inspector/highlight` activates the inspect overlay on the active session and, given a `targetHint`, returns up to five candidate elements with CSS selectors, XPath, confidence scores, and an optional base64 JPEG snapshot of the viewport.
+- `PATCH /api/tasks/:id` performs a partial update on a task. Figranium snapshots the current task into the version history before applying the change.
+- `DELETE /api/tasks/:id` now also removes any in-process schedule registered for the task, so a scheduled run cannot fire after deletion.
+
+Every endpoint accepts either a signed-in dashboard session or an API key (`x-api-key`, `Authorization: Bearer`, or an `apiKey` body field). External callers should use the API-key path.
+
+```bash
+curl -X POST http://localhost:11345/api/inspector/highlight \
+  -H "x-api-key: $FIGRANIUM_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com", "targetHint": "Sign in"}'
+```
+
+See [REST API — Browser](/rest-api#browser) and [REST API — Inspector](/rest-api#inspector) for full request and error schemas.
+
+## Security
+
+### VNC and websockify path hardening
+
+- The noVNC/websockify proxy path now requires authentication before it will accept an upgrade or serve `public/novnc.html`. Unauthenticated attempts are dropped.
+- `websockify` binds to the IPv4 loopback (`127.0.0.1`) explicitly, closing a mismatch where Docker on macOS could bind unpredictably across IPv4/IPv6 loopback and leave the VNC stream unreachable or unexpectedly reachable.
+- `sessionId` and `taskId` are strictly validated before they are used to look up files on disk, closing a path-traversal edge case.
+- Raw cron ranges are now validated for correct ordering as well as bounds, so a malformed field cannot slip past the scheduler.
+
+If you built a custom client that reached `/websockify` directly, update it to authenticate with a session cookie or an API key. See [Headful browser — Access control](/headful-browser#access-control) and [Security — Headful / VNC access control](/security#7-headful-vnc-access-control).
+
+## Bug fixes
+
+- **Captures now surface reliably** — Runs no longer produce screenshots or recordings that fail to appear in the UI. The capture read path in `server.js` and `src/server/routes/data.js` now matches the actual write path, and captures are also served from the alternate `public/captures` location used inside Docker.
+- **Captures survive container restarts** — Runtime capture artifacts persist to a host volume instead of being lost when the container is recreated.
+- **Persistent browser session ID** — Session IDs are stored across reconnects instead of being regenerated on every new session, so external tooling that pins to a `sessionId` stays valid.
+- **Mac/Docker WebSocket disconnects** — Loopback WebSocket connections used by the headful viewer no longer drop on Mac hosts, and the `HeadfulModal` no longer flashes its loading state during a normal reconnect.
+- **Theme contrast fixes** — Dot-grid canvas background, theme-accent buttons, and previously hardcoded blue accent text (API keys, **Add API Key** button) are readable across all four themes; syntax-highlight colors were retuned to meet WCAG AA contrast on every theme's actual code background.
+
+## Updates
+
+### Exported task filename
+
+Exported task bundles are now named `figranium-tasks-<date>.json` (previously `doppelganger-tasks-...`).
+
+### Font change
+
+The UI now uses **Space Mono** in place of JetBrains Mono. Custom stylesheets that referenced the old font family should be updated.
+
+### Under the hood: CAPTCHA detection scaffolding
+
+Figranium 0.14.0 lands the foundation for a future human-handoff CAPTCHA workflow. This release includes only the internal engine layer — a DOM/shadow-DOM/iframe observer that classifies interactive elements (slider, audio, grid, rotational, distorted-text, widget-frame, form), a 2 GB memory guardrail (`os.totalmem()` plus cgroup v1/v2 limits), and typed handoff interfaces (`onCaptchaDetected`, `pauseForHuman`, `submitSolution`) that pipe an externally supplied solution into the existing human-like mouse trajectory generator.
+
+There is no automated solver and no user-facing API for this yet — the module ships as internal scaffolding only. Tasks continue to pause for manual intervention through the [headful browser](/headful-browser) as they do today.
+
+</Update>
+
+<Update label="2026-08-05" description="Earlier update">
 
 ## Features
 
