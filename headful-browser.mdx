@@ -114,10 +114,12 @@ Figranium's VNC stack is hardened against unauthenticated access. If you connect
 
 ### Network binding
 
-Both the VNC server (`x11vnc`) and the noVNC websocket proxy (`websockify`) bind to `127.0.0.1` only. They are **not reachable from outside the container**, even if you publish port `54311` on the Docker host. All browser traffic reaches the VNC session through the authenticated `/websockify` endpoint on the main Figranium port (default `11345`).
+`x11vnc` (port `5900`) binds to `127.0.0.1` inside the container and is not reachable from outside. `websockify` (port `54311`) binds to `0.0.0.0` so it can be reached over a Docker port forward. This is what makes the headful viewer work on Apple Silicon Macs and other setups that rely on port forwarding into the container.
+
+Exposing `54311` to the network is not the same as leaving VNC unauthenticated. Every WebSocket upgrade to `54311` is checked against the same rules as `/websockify` on the main Figranium port: `ALLOWED_IPS`, Origin/Host match, and a valid session cookie or API key. Direct RFB connections to port `5900` are still impossible from outside the container.
 
 <Note>
-If you were previously connecting a VNC client directly to `<host>:54311` or `<host>:5900`, this no longer works. Connect through the Figranium UI, or proxy through `wss://<host>:11345/websockify` with a valid session cookie or API key.
+For production, keep publishing the main Figranium port (default `11345`) and route the viewer through `wss://<host>:11345/websockify`. Only publish `54311` if you need direct access from a custom noVNC client, and put it behind the same auth as any other Figranium endpoint.
 </Note>
 
 ### VNC password
