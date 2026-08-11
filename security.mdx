@@ -268,12 +268,12 @@ To stay secure with `TRUST_PROXY` enabled:
 
 The [headful browser](/headful-browser) is powered by an embedded VNC stack (`x11vnc` + noVNC + `websockify`). Figranium hardens this stack against unauthenticated access with three layers of protection:
 
-- **Localhost-only binding**: `x11vnc` (port `5900`) and `websockify` (port `NOVNC_PORT`, default `54311`) both listen on `127.0.0.1` only. They are not reachable from outside the container, even if you publish the ports. All browser traffic is proxied through the authenticated `/websockify` endpoint on the main Figranium port.
+- **VNC bound to localhost, websockify gated by auth**: `x11vnc` (port `5900`) listens on `127.0.0.1` inside the container and is not reachable from outside. `websockify` (port `NOVNC_PORT`, default `54311`) listens on `0.0.0.0` so it can be reached over a Docker port forward — required for Apple Silicon hosts and other setups that need port forwarding to work — but every WebSocket upgrade is validated against the checks below before it is proxied to `x11vnc`. Do not publish `54311` on a public interface: rely on the main Figranium port (default `11345`) and the authenticated `/websockify` endpoint instead.
 - **Password-protected VNC**: `x11vnc` is launched with `-passwd`, using a random password generated on first start and persisted at `data/vnc_password.txt`. The embedded viewer fetches this password from `GET /api/headful/vnc-password` (auth required) before connecting.
 - **Authenticated WebSocket upgrades**: every upgrade request to `/websockify` must pass the [`ALLOWED_IPS`](#2-ip-allowlist-allowed-ips) check, an Origin/Host match (CSWSH protection), and either a valid session cookie or an API key (`x-api-key` header or `?apiKey=` query parameter). Failed attempts are dropped and logged with a `[SECURITY]` prefix.
 
 <Note>
-No configuration is required — all three protections are always active. If you previously connected a VNC client directly to `<host>:54311` or `<host>:5900`, that path is now closed. Connect through the Figranium UI, or proxy through `wss://<host>:11345/websockify` with a session cookie or API key.
+No configuration is required. All three protections are always active. Connect through the Figranium UI, or proxy through `wss://<host>:11345/websockify` with a session cookie or API key. Direct connections to `<host>:54311` still require a valid session cookie or API key on the upgrade request, so an exposed `54311` without credentials will be rejected.
 </Note>
 
 To retrieve the VNC password for a custom client:
