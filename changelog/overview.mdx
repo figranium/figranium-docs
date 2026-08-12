@@ -5,7 +5,27 @@ description: "Product updates and new features in Figranium."
 
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
-<Update label="2026-08-10" description="This week">
+<Update label="2026-08-12" description="This week">
+
+## Updates
+
+### Single self-theming brand icon
+
+The Figranium mark at `public/figranium_icon.svg` is now a single SVG that adapts to the viewer's color scheme, instead of shipping as separate dark and light variants.
+
+- The mark fills black by default and switches to white inside `@media (prefers-color-scheme: dark)`, so it stays legible on both light and dark surfaces.
+- Use this file when you can only supply one logo URL — for example, third-party integrations, README embeds, or partner directories that accept a single `<img src>`.
+- No configuration change is required. Existing embeds keep working; you can drop the separate dark/light variants from your integration if you were maintaining both.
+
+```html
+<img src="https://<your-figranium-host>/figranium_icon.svg" alt="Figranium" width="32" height="32" />
+```
+
+If your embedding surface forces a fixed background and ignores the OS color scheme, keep pointing at whichever variant matches that background.
+
+</Update>
+
+<Update label="2026-08-10" description="Earlier update">
 
 ## Features
 
