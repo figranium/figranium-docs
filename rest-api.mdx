@@ -665,7 +665,8 @@ Accepts either a signed-in dashboard session or an API key. Session-authenticate
 {
   "url": "https://example.com",
   "mode": "headful",
-  "devTools": false
+  "devTools": false,
+  "headless": false
 }
 ```
 
@@ -674,6 +675,7 @@ Accepts either a signed-in dashboard session or an API key. Session-authenticate
 | `url` | string | No | URL to navigate to after the session starts |
 | `mode` | string | No | Currently only `"headful"` is supported (default) |
 | `devTools` | boolean | No | Reserved for future use |
+| `headless` | boolean | No | Launch Chromium in headless mode. Defaults to `false`. Set to `true` when the host has no display server (for example, a Mac dev machine running Figranium directly on the host, or a headless CI runner). The `HEADLESS` environment variable is honored as a fallback. |
 
 **Response** (`200`):
 
@@ -685,11 +687,13 @@ Accepts either a signed-in dashboard session or an API key. Session-authenticate
 }
 ```
 
+**Automatic headless fallback**: if the initial headful launch fails because no display is available, Figranium retries once in headless mode automatically and returns the running session. You only need to pass `headless: true` explicitly if you want to skip the failed first attempt.
+
 **Error responses**:
 
 | Status | Error code | Cause |
 |:---|:---|:---|
-| `409` | `HEADFUL_DISPLAY_UNAVAILABLE` | No X server is available on the host, so the headful stack cannot start |
+| `409` | `HEADFUL_DISPLAY_UNAVAILABLE` | No X server is available on the host and the headless fallback also failed. Figranium detects this from any of: `missing X server`, `$DISPLAY`, `platform failed to initialize`, `no display server`, `X11 connection failed`, `cannot open display`, or `target closed` during launch. |
 | `409` | `BROWSER_LAUNCH_FAILED` | The session was created but did not reach a running state |
 | `500` | `BROWSER_LAUNCH_FAILED` | The launch threw an unexpected error; see `details` for the underlying message |
 
@@ -700,6 +704,15 @@ curl -X POST http://localhost:11345/api/browser/open \
   -H "x-api-key: $FIGRANIUM_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://example.com"}'
+```
+
+**Example (explicit headless)**:
+
+```bash
+curl -X POST http://localhost:11345/api/browser/open \
+  -H "x-api-key: $FIGRANIUM_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com", "headless": true}'
 ```
 
 ## **Inspector**

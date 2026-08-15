@@ -5,7 +5,35 @@ description: "Product updates and new features in Figranium."
 
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
-<Update label="2026-08-12" description="This week">
+<Update label="2026-08-15" description="This week">
+
+## Updates
+
+### `headless` flag and automatic fallback for `POST /api/browser/open`
+
+The programmatic browser launch endpoint now accepts a `headless` boolean and recovers automatically when no display server is available.
+
+- Pass `"headless": true` in the request body to launch Chromium without a display. This is the right choice when you run Figranium directly on a Mac (outside Docker) or on a headless CI runner. The `HEADLESS` environment variable is also honored.
+- If you don't set `headless` and the initial headful launch fails because there is no display, Figranium retries once in headless mode and returns the running session. External orchestrators no longer have to detect `HEADFUL_DISPLAY_UNAVAILABLE` and reissue the call themselves.
+- The display-unavailable detector now also matches `no display server`, `X11 connection failed`, `cannot open display`, and unexpected `target closed` errors during launch, so the fallback triggers on Mac hosts where the underlying error text differs from Linux.
+
+```bash
+curl -X POST http://localhost:11345/api/browser/open \
+  -H "x-api-key: $FIGRANIUM_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com", "headless": true}'
+```
+
+See [REST API — `POST /api/browser/open`](/rest-api#post-apibrowseropen) for the full request and error schema.
+
+## Bug fixes
+
+- **Browser open and inspector highlight on Mac** — Launching the managed browser session from `POST /api/browser/open` and resolving a `targetHint` through `POST /api/inspector/highlight` now work when Figranium runs on macOS. Chromium is launched without the `--disable-gpu`, `--window-position=0,0`, and `--start-maximized` flags on Darwin, which were causing the process to exit before the first page was ready. The CDP `Browser.setWindowBounds` maximize call is also skipped on Darwin. Selector generation, XPath resolution, and the top-match highlight overlay for `/api/inspector/highlight` now run in a single in-page evaluation, so they don't lose the element handle to a mid-flight page navigation.
+- **GitHub star prompt no longer appears on first run** — The in-app prompt asking you to star the Figranium repo is now gated on both **3+ successful task runs** and **3 days since your first run** (tracked locally in the browser). It also uses a quick slide-in animation instead of the previous fade so it's easier to notice when it does appear. Dismissing or clicking through still permanently silences it.
+
+</Update>
+
+<Update label="2026-08-12" description="Earlier update">
 
 ## Updates
 
