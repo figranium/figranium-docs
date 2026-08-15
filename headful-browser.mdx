@@ -89,6 +89,17 @@ curl -X POST http://localhost:11345/headful \
 
 The response includes the VNC connection URL.
 
+For programmatic browser control outside of Docker (for example, from an MCP server or a script running on a macOS dev machine), use [`POST /api/browser/open`](/rest-api#post-api-browser-open). That endpoint accepts a `headless` flag and falls back to headless mode automatically when no display server is available.
+
+## **Running without a display server**
+
+Figranium's normal headful stack expects an X server (Xvfb inside the Docker image). When you run the Node process directly on a host without X11 — most commonly a macOS laptop or a bare CI runner — you have two options:
+
+- Set the `HEADLESS` environment variable to `true` before starting the server. Every headful launch, including `POST /api/browser/open`, then starts Chromium without a window.
+- Pass `"headless": true` in the request body of `POST /api/browser/open` for a single call.
+
+If neither is set and the launch fails because no display is available, Figranium retries the same request in headless mode automatically and returns the resulting session. The VNC viewer is not available in headless mode, but selector highlighting, navigation, and the browser automation APIs still work.
+
 ## **Stopping**
 
 Click **Close Browser** in the Editor to terminate the session and close the browser. This ensures resources are freed.

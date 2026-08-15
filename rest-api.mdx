@@ -665,7 +665,8 @@ Accepts either a signed-in dashboard session or an API key. Session-authenticate
 {
   "url": "https://example.com",
   "mode": "headful",
-  "devTools": false
+  "devTools": false,
+  "headless": false
 }
 ```
 
@@ -674,6 +675,9 @@ Accepts either a signed-in dashboard session or an API key. Session-authenticate
 | `url` | string | No | URL to navigate to after the session starts |
 | `mode` | string | No | Currently only `"headful"` is supported (default) |
 | `devTools` | boolean | No | Reserved for future use |
+| `headless` | boolean | No | Launch Chromium without a graphical window. Defaults to `false`, or to the value of the `HEADLESS` environment variable when it is set |
+
+Pass `"headless": true` when running on a host without a display server (for example, a macOS dev machine or a CI runner without Xvfb). If you omit `headless` and the launch fails because no display is available, Figranium automatically retries the same request in headless mode, so you rarely need to set the flag by hand.
 
 **Response** (`200`):
 
@@ -689,7 +693,7 @@ Accepts either a signed-in dashboard session or an API key. Session-authenticate
 
 | Status | Error code | Cause |
 |:---|:---|:---|
-| `409` | `HEADFUL_DISPLAY_UNAVAILABLE` | No X server is available on the host, so the headful stack cannot start |
+| `409` | `HEADFUL_DISPLAY_UNAVAILABLE` | No display server is available and the automatic headless retry also failed to start Chromium |
 | `409` | `BROWSER_LAUNCH_FAILED` | The session was created but did not reach a running state |
 | `500` | `BROWSER_LAUNCH_FAILED` | The launch threw an unexpected error; see `details` for the underlying message |
 
