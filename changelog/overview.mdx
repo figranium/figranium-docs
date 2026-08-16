@@ -5,7 +5,21 @@ description: "Product updates and new features in Figranium."
 
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
-<Update label="2026-08-15" description="This week">
+<Update label="2026-08-16" description="This week">
+
+## Updates
+
+### Agent Mode description clarified in Task Settings
+
+The mode picker in the Task Settings cabinet previously described **Agent Mode** as "Autonomous decision making," which suggested the runner would decide steps on its own at execution time. That was misleading: Agent Mode runs a fixed sequence of action blocks that you author, and any branching comes from explicit control-flow blocks (`If`, `While`, `Loop`, etc.) on the canvas.
+
+- The label under **Agent Mode** now reads **"Custom action sequence with logic."**
+- No behavior change. If you were choosing Scraper Mode because you didn't want the runner making its own decisions, you can safely use Agent Mode — the same author-defined blocks execute in the same order on every run.
+- If you want an actual AI-driven, decision-making runner, that lives in [MCP Integration](/mcp-integration), not in Agent Mode.
+
+</Update>
+
+<Update label="2026-08-15" description="Earlier update">
 
 ## Updates
 
