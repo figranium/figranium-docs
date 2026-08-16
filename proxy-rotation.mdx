@@ -16,6 +16,8 @@ Click **Add Proxy** and enter the details:
 - **Username/Password**: Optional credentials for authentication.
 - **Label**: A friendly name (e.g., "US Residential").
 
+If you paste a full URL with embedded credentials (for example `http://user:pass@1.2.3.4:8080`) into the **Server** field, Figranium extracts the `user` and `pass` parts into the **Username** and **Password** fields automatically and stores only `http://1.2.3.4:8080` as the server. The same split happens on bulk import. This prevents duplicate-looking entries in the list and keeps upstream authentication working when the proxy is used in a rotation pool.
+
 The **Add Proxy** button remains disabled until you provide a server address. When you click it, a loading spinner appears and the button disables to prevent duplicate submissions while the proxy is being saved.
 
 <Note>
