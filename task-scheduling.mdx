@@ -68,11 +68,13 @@ Schedules are stored within the task metadata and persist across server restarts
 
 Manage schedules programmatically via the REST API:
 
-| Endpoint                    | Method | Description                 |
-| --------------------------- | ------ | --------------------------- |
-| `/api/schedules`            | GET    | List all scheduled tasks    |
-| `/api/schedules/:taskId`    | POST   | Create or update a schedule |
-| `/api/schedules/:taskId`    | DELETE | Disable a schedule          |
-| `/api/schedules/status/all` | GET    | Get all active job statuses |
+| Endpoint                       | Method | Description                                      |
+| ------------------------------ | ------ | ------------------------------------------------ |
+| `/api/schedules`               | GET    | List all scheduled tasks                         |
+| `/api/schedules/:taskId`       | POST   | Create or update a schedule                      |
+| `/api/schedules/:taskId`       | DELETE | Disable a schedule                               |
+| `/api/schedules/:taskId/status` | GET    | Get schedule status for a specific task          |
+| `/api/schedules/:taskId/describe` | POST | Validate and describe a schedule without saving  |
+| `/api/schedules/status/all`    | GET    | Get all active job statuses                      |
 
 See the [REST API reference](/rest-api#schedules) for full details.
