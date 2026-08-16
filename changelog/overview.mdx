@@ -5,7 +5,50 @@ description: "Product updates and new features in Figranium."
 
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
-<Update label="2026-08-15" description="This week">
+<Update label="2026-08-16" description="This week">
+
+## Features
+
+### Lightweight task listing endpoint
+
+`GET /api/tasks/list` returns a summary view of every saved task without version history or full action lists.
+
+- Each entry includes `id`, `name`, `description`, `mode`, `schedule`, `variables`, `createdAt`, and `updatedAt`.
+- Use this instead of `GET /api/tasks` when you're populating a dashboard, an external picker, or an AI agent's tool catalog, where the full action definitions are wasted bandwidth.
+- The `description` field also surfaces in this response, so agents can pick a task by intent without fetching each definition first.
+
+See [REST API — `GET /api/tasks/list`](/rest-api#get-apitaskslist).
+
+### Touch a task's `updatedAt` without editing it
+
+`POST /api/tasks/:id/touch` sets a task's `updatedAt` to the current server time and leaves every other field unchanged.
+
+- Useful for bumping a task to the top of a "recently updated" sort, or for signalling to external caches that a task is still live even though its definition hasn't changed.
+- No version snapshot is created, because the configuration itself isn't modified.
+
+See [REST API — `POST /api/tasks/:id/touch`](/rest-api#post-apitasksidtouch).
+
+### Per-task schedule status endpoint
+
+`GET /api/schedules/:taskId/status` returns the stored schedule config plus the computed cron expression, a human-readable description, and a validity flag for a single task.
+
+- Previously you had to call `GET /api/schedules/status/all` and filter client-side. The per-task endpoint is cheaper and returns the description string directly, so you can render "Every day at 9:00 AM" without re-parsing the cron.
+- Response shape: `{ schedule, cron, description, isValid }`.
+
+See [REST API — `GET /api/schedules/:taskId/status`](/rest-api#get-apischedulestaskidstatus).
+
+### Validate a schedule before saving it
+
+`POST /api/schedules/:taskId/describe` accepts a proposed schedule in the request body and returns whether it's valid, the resulting cron expression, a human-readable description, and the next run timestamp — without persisting anything to the task.
+
+- Use it to power a live preview in a schedule editor, or to confirm that a computed cron string will actually fire before wiring it into a task.
+- Response shape: `{ valid, cron, description, nextRun }`.
+
+See [REST API — `POST /api/schedules/:taskId/describe`](/rest-api#post-apischedulestaskiddescribe) and [Task Scheduling — Schedule API](/task-scheduling#schedule-api).
+
+</Update>
+
+<Update label="2026-08-15" description="Earlier update">
 
 ## Updates
 
