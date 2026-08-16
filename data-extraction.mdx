@@ -89,10 +89,10 @@ You can have Figranium write extraction scripts for you using AI. Instead of wri
 5. Press **Enter** or click **Generate**. The AI returns a script and inserts it into the editor.
 6. Review the generated script, make any adjustments, and save.
 
-The generation uses the AI provider fallback chain: Gemini → OpenAI → Claude → Ollama. At least one provider must be configured in **Settings > System > API Keys**. You can change the preferred model for each provider in **Settings > System > AI Models**.
+The generation uses the AI provider fallback chain: Gemini → OpenAI → Claude → Ollama. At least one provider must be configured in **Settings \> System \> API Keys**. You can change the preferred model for each provider in **Settings \> System \> AI Models**.
 
 <Tip>
-The generated script is standard JavaScript that runs via `page.evaluate()`. You can edit it freely after generation — it is not locked or managed by AI after insertion.
+  The generated script is standard JavaScript that runs via `page.evaluate()`. You can edit it freely after generation — it is not locked or managed by AI after insertion.
 </Tip>
 
 ## **Handling dynamic content**
@@ -105,7 +105,7 @@ If you select **CSV** as the output format:
 
 1. Ensure your script returns an **Array of Objects**.
 2. Keys in the first object become the CSV headers.
-3. figranium handles quoting and escaping automatically.
+3. Figranium handles quoting and escaping automatically.
 
 ```text
 return [
