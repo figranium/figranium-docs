@@ -683,6 +683,50 @@ Sets the default selector finder tool.
 { "selectorFinder": "ai" }
 ```
 
+### `GET /api/settings/theme`
+
+Returns the currently persisted UI theme.
+
+**Response**:
+
+```json
+{ "theme": "dark" }
+```
+
+Possible values: `"dark"`, `"light"`, `"solarized-light"`, `"solarized-dark"`.
+
+If no theme has been saved yet, Figranium falls back to any `figranium_theme` or `theme` cookie sent with the request, writes that value to the backend data store, and returns it. When neither the store nor a cookie has a valid value, Figranium returns `"dark"`.
+
+**Error responses**:
+
+| Status | Error code | Cause |
+|:---|:---|:---|
+| `500` | `THEME_LOAD_FAILED` | Reading the theme from the backend data store failed |
+
+### `POST /api/settings/theme`
+
+Persists the UI theme to the backend data store so it follows the user across browsers and devices on the same instance. The response also sets a `figranium_theme` cookie (path `/`, `SameSite=Lax`, 1-year `max-age`) for fast initial page loads.
+
+**Body**:
+
+```json
+{ "theme": "solarized-dark" }
+```
+
+Any value outside `"dark"`, `"light"`, `"solarized-light"`, `"solarized-dark"` is silently coerced to `"dark"`.
+
+**Response**:
+
+```json
+{ "theme": "solarized-dark" }
+```
+
+**Error responses**:
+
+| Status | Error code | Cause |
+|:---|:---|:---|
+| `500` | `THEME_SAVE_FAILED` | Writing the theme to the backend data store failed |
+
 ## **Browser**
 
 Programmatic control of the managed headful browser session. Use these endpoints when an external tool or agent needs to open a browser, drive it, and inspect the page without going through the Figranium UI.
