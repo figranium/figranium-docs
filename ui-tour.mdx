@@ -19,7 +19,7 @@ Figranium's user interface is designed for simplicity and power. It consists of 
 
 ## **2. Editor (**`/tasks/:id`**)**
 
-The core of figranium. This screen features an infinite canvas spatial editor for building your automation flows:
+The core of Figranium. This screen features an infinite canvas spatial editor for building your automation flows:
 
 - **Infinite Canvas (Configuration)**:
   - **Task Name**: Rename your task.
@@ -93,7 +93,7 @@ A chronological log of every task run, whether triggered from the editor or via 
 
 ## **5. Settings (**`/settings`**)**
 
-Global configuration for the figranium instance. Each settings tab (**System**, **Data**, **Proxies**) displays a semantic icon alongside its label so you can identify sections at a glance.
+Global configuration for the Figranium instance. Each settings tab (**System**, **Data**, **Proxies**) displays a semantic icon alongside its label so you can identify sections at a glance.
 
 - **System**:
   - **API Keys**: A unified panel for managing all keys and provider connections:
@@ -102,7 +102,7 @@ Global configuration for the figranium instance. Each settings tab (**System**, 
     - **Database / Output Providers**: Add credentials for output destinations like Baserow.
     - Click **Add API Key** to open the provider selection modal and configure a new entry.
   - **AI Models**: Set the preferred model for each AI provider. This panel lists Gemini, OpenAI, Anthropic (Claude), and Ollama. Click **Edit** next to a provider to change its model — you can pick from the suggestions or type a custom model identifier. The selected model is used whenever that provider handles AI-powered actions such as selector generation. Default models are `gemini-3-flash-preview`, `gpt-5-nano`, `claude-haiku-4-6`, and `llama3.2`.
-  - **User Agent**: Set a global User-Agent string or let figranium rotate them.
+  - **User Agent**: Set a global User-Agent string or let Figranium rotate them.
   - **Selector Finder**: Choose your default selector tool. Select between the **Highlight Tool** (standard browser inspector) or the **AI Selector Finder** (uses AI to generate selectors). The Highlight Tool is the default.
   - **Theme**: Pick the color scheme for the Figranium UI. Four themes ship out of the box — **Dark** (default), **Light**, **Solarized Light**, and **Solarized Dark**. Each option shows a preview image with a swatch of its surface and accent colors so you can see what you're switching to before you commit. The selected theme is applied instantly and is saved to your browser's local storage under `figranium.theme`, so it persists across reloads on the same device. The first time you open Figranium after upgrading, a one-time picker prompts you to choose a theme; dismiss it once and it will not appear again.
   - **Storage**: Clear all captures or cookies.
