@@ -5,7 +5,35 @@ description: "Product updates and new features in Figranium."
 
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
-<Update label="2026-08-16" description="This week">
+<Update label="2026-08-17" description="This week">
+
+## Features
+
+### Highlight Tool for visual element selection
+
+The **Highlight Tool** (Inspect Mode) connects the headful browser to the workflow editor, so you can point at live page elements and drop a ranked selector straight into an action block.
+
+- **Action block targeting** — click the crosshair icon on any action block that takes a selector (`click`, `type`, `hover`, `wait_selector`, …), then click the element in the headful browser. The highest-ranked CSS selector is inserted into the field, and up to four alternatives appear as pill buttons below it for one-click swapping.
+- **Standalone inspect mode** — toggle **Inspect UI** in the Headful Browser toolbar to hover-highlight elements, see live selector candidates in a tooltip, and click to copy the primary selector to your clipboard. Link clicks and form submits are suppressed while inspecting so exploring interactive elements is safe.
+- **Programmatic access** — `POST /api/inspector/highlight` accepts a `targetHint` (text, attribute, or CSS) and returns up to five ranked `{ css, xpath, confidence }` candidates plus an optional viewport JPEG snapshot.
+- **Ranking** — candidates are prioritized by `name`/`placeholder`, text content, semantic attributes (`aria-label`, `title`, `alt`), test attributes (`data-testid`, `data-cy`), clean IDs, typed attributes, clean classes, and finally structural fallbacks — filtering out framework-generated hashes and obfuscated IDs.
+
+See [Highlight Tool](/highlight-tool) for the full walkthrough.
+
+### AI extraction script generation
+
+Describe the data you want in plain language and Figranium writes the JavaScript [extraction script](/data-extraction) for you.
+
+- In the Spatial Editor, open the **Extraction Script** block, click the **Generate** (sparkle) button, type a prompt like *"Extract all product titles, prices, and star ratings as an array of objects,"* and the generated script is inserted directly into the code editor for review and editing.
+- Also available programmatically via `POST /api/tasks/generate-script` with a `description` field. Returns `{ script }`. Errors with `400` when no AI keys are configured and `502` when every provider fails.
+- **Multi-provider fallback** — Gemini → OpenAI → Claude → Ollama. Configure keys in **Settings → System → API Keys** and default models in **Settings → System → AI Models**. Any one provider is enough.
+- Generated scripts always `return` a JSON object or array of objects, use standard DOM APIs, and run inside `page.evaluate()`. Markdown code fences from the model output are stripped automatically. If your task format is `csv`, the script returns an array of objects and Figranium turns the keys into column headers.
+
+See [AI Extraction Script Generation](/extraction-script-generation) for prompt tips and full examples.
+
+</Update>
+
+<Update label="2026-08-16" description="Earlier update">
 
 ## Updates
 
