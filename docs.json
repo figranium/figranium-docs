@@ -33,7 +33,8 @@
         "pages": [
           "ui-tour",
           "action-blocks",
-          "selectors"
+          "selectors",
+          "highlight-tool"
         ]
       },
       {
@@ -58,6 +59,7 @@
           "error-handling",
           "javascript-execution",
           "data-extraction",
+          "extraction-script-generation",
           "stealth-mode",
           "csv-processing",
           "modular-workflows"
