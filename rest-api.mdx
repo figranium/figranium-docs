@@ -683,6 +683,40 @@ Sets the default selector finder tool.
 { "selectorFinder": "ai" }
 ```
 
+### `GET /api/settings/theme`
+
+Returns the theme currently persisted for this Figranium instance. If no theme has been saved yet, Figranium checks the request's `figranium_theme` (or legacy `theme`) cookie and, when it matches a known theme, saves that value to backend storage and returns it. If neither source is available, the response falls back to `"dark"`.
+
+**Response**:
+
+```json
+{ "theme": "dark" }
+```
+
+Possible values: `"dark"`, `"light"`, `"solarized-light"`, `"solarized-dark"`.
+
+**Error responses**:
+
+| Status | Error code | Cause |
+|:---|:---|:---|
+| `500` | `THEME_LOAD_FAILED` | Backend storage could not be read |
+
+### `POST /api/settings/theme`
+
+Saves the theme for this Figranium instance. Unknown or missing values are coerced to `"dark"`. The response also sets a one-year `figranium_theme` cookie so the UI can apply the theme on the next page load before React mounts, avoiding a flash of unstyled content.
+
+**Body**:
+
+```json
+{ "theme": "solarized-dark" }
+```
+
+**Error responses**:
+
+| Status | Error code | Cause |
+|:---|:---|:---|
+| `500` | `THEME_SAVE_FAILED` | Backend storage could not be written |
+
 ## **Browser**
 
 Programmatic control of the managed headful browser session. Use these endpoints when an external tool or agent needs to open a browser, drive it, and inspect the page without going through the Figranium UI.
