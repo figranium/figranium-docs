@@ -5,7 +5,25 @@ description: "Product updates and new features in Figranium."
 
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
-<Update label="2026-08-16" description="This week">
+<Update label="2026-08-17" description="This week">
+
+## Features
+
+### Visual field-mapping mode for extraction scripts
+
+The Extraction Script editor (both the canvas block and the Extraction tab in Task Settings) now opens in a new **Visual** mode by default. You describe the data you want as a list of named fields with a selector, an attribute type (`Text`, `HTML`, `Input Value`, or `Attribute`), and an optional **Multiple (list)** toggle. Figranium generates the underlying JavaScript for you and keeps it in sync as you edit — no raw code required for typical scraping tasks.
+
+- The mode toggle at the top of the editor flips between **Visual** and **JavaScript**. The selected mode now has a solid fill so it's obvious which one is active.
+- Every field has a target icon that hands off to the [Headful Browser](/headful-browser) inspector. Click an element on the page and the selector, plus a row of alternative candidates, get written back into the field.
+- Playwright-only `:has-text(...)` selector candidates are filtered out of the pick list **for extraction fields only**. Extraction scripts run through native `document.querySelector`, which does not understand that pseudo-selector, so surfacing it would have produced selectors that returned `null` at extraction time. Action blocks (Click, Type, etc.) still receive the full candidate list because Playwright runs those.
+- Switching to **JavaScript** mode surfaces the auto-generated script in the code editor, still fully editable. Existing hand-written extraction scripts open in JavaScript mode automatically so your code is never hidden behind an empty field list.
+- The canvas Extraction Script modal no longer closes when you click the backdrop, so a stray click on the dimmed area outside the modal will not throw away in-progress edits. Use the **Done** button or the close icon in the header to save and dismiss.
+
+See [Extraction Scripts — Visual field mapping](/data-extraction#visual-field-mapping-default) for the full field reference and an end-to-end example.
+
+</Update>
+
+<Update label="2026-08-16" description="Earlier update">
 
 ## Updates
 

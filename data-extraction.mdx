@@ -4,7 +4,61 @@ title: "Extraction Scripts"
 
 Figranium offers powerful tools to extract structured data from web pages. The extraction process runs **after** all automation steps are complete.
 
-## **Extraction Script**
+## **Visual field mapping (default)**
+
+Every task now opens its extraction editor in **Visual** mode. Instead of writing JavaScript, you list the fields you want and point each one at an element on the page. Figranium generates the underlying extraction script for you and keeps it in sync as you edit.
+
+Visual mode is the right choice when:
+
+- You are pulling a fixed set of named values (title, price, author, image URL, etc.).
+- You want to build the mapping by clicking elements in the [Headful Browser](/headful-browser) rather than reading HTML.
+- You do not need custom logic, conditionals, or post-processing between the DOM read and the returned value.
+
+### Configuring a field
+
+Open the **Extraction Script** block on the canvas (or the Extraction tab in **Task Settings**), keep the mode toggle on **Visual**, and click **Add Field**. Each field has four inputs:
+
+| Input | What it does |
+|:---|:---|
+| **Name** | The key used in the returned JSON (e.g. `title`, `price`). |
+| **Selector** | A native CSS selector. Passed straight to `document.querySelector` / `document.querySelectorAll`. Variables like `{{query}}` are interpolated. |
+| **Attribute type** | What to read from the matched element: `Text` (textContent, trimmed), `HTML` (innerHTML), `Input Value` (`el.value`, falling back to text for non-inputs), or `Attribute` (any named attribute). |
+| **Attribute name** | Only shown when the type is `Attribute`. The attribute to read, e.g. `href`, `src`, `data-id`. |
+| **Multiple (list)** | Off returns the first match or `null`. On returns an array of every match. |
+
+### Picking selectors from the page
+
+Next to each field's selector input is a target icon that opens the [Headful Browser](/headful-browser) in inspect mode. Click any element and Figranium writes the selector back into the field, along with a row of alternative candidates you can swap in with one click.
+
+Extraction scripts run through the browser's native `document.querySelector`, which does not understand Playwright's `:has-text(...)` pseudo-selector. Figranium filters those candidates out of the pick list for extraction fields so you never end up with a selector that works in the inspector but returns `null` at extraction time. Action blocks (Click, Type, etc.) still receive the full candidate list, because Playwright runs those.
+
+### Example
+
+Three fields — `title` (text), `price` (text), `image` (attribute `src`, single match) — generate this script under the hood:
+
+```javascript
+return {
+  "title": (() => { const el = document.querySelector(".product-title"); return el ? el.textContent.trim() : null; })(),
+  "price": (() => { const el = document.querySelector(".price-tag"); return el ? el.textContent.trim() : null; })(),
+  "image": (() => { const el = document.querySelector(".product-image"); return el ? el.getAttribute("src") : null; })()
+};
+```
+
+Flip **Multiple (list)** on and the field switches to an array:
+
+```javascript
+"tags": Array.from(document.querySelectorAll(".tag")).map(el => el.textContent.trim()),
+```
+
+### Switching to JavaScript mode
+
+The mode toggle at the top of the editor flips between **Visual** and **JavaScript**. Switching to JavaScript surfaces the auto-generated script in a full code editor, where you can edit it freely — add filters, reshape the object, call `$$data.html()`, whatever you need. Tasks that were created before Visual mode existed, or tasks where you have hand-written a script, open in JavaScript mode automatically so your code is never hidden behind the field list.
+
+<Tip>
+  Switching modes does not delete anything. Your field list stays intact when you jump to JavaScript, and jumping back to Visual replaces the script with the freshly generated one from your fields. If you edited the script by hand, keep the task in JavaScript mode so those edits are not overwritten.
+</Tip>
+
+## **Extraction Script (JavaScript mode)**
 
 Every task includes an **Extraction Script** field in the editor. This JavaScript code runs in the browser context to parse the final page state.
 
