@@ -229,3 +229,28 @@ When setting the task output format to **CSV**:
 1. Ensure the extraction result returns an **Array of Objects** (or an object containing a single array property).
 2. Object keys in the array elements automatically become CSV header columns.
 3. Values are formatted, quoted, and escaped automatically according to RFC 4180 standards.
+
+#### **Single Repeating Group Unwrapping**
+
+When the extraction result is an object with a single key whose value is an array of objects (the shape produced by a lone repeating group), Figranium unwraps that array before serialization. Each group item becomes its own CSV row instead of a single row containing a stringified array in one cell.
+
+For example, an extraction that returns:
+
+```json
+{
+  "products": [
+    { "name": "Wireless Headphones", "price": "$99.99" },
+    { "name": "Mechanical Keyboard", "price": "$149.00" }
+  ]
+}
+```
+
+is exported as:
+
+```csv
+name,price
+Wireless Headphones,$99.99
+Mechanical Keyboard,$149.00
+```
+
+Add any top-level field alongside the repeating group to opt out of unwrapping and get one row containing all keys.
