@@ -5,7 +5,41 @@ description: "Product updates and new features in Figranium."
 
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
-<Update label="2026-08-17" description="This week">
+<Update label="2026-08-18" description="This week">
+
+## Features
+
+### Repeating groups in visual extraction
+
+The Extraction Script editor's Visual mode now supports **Repeating Groups** (`extractionGroups`) for pulling nested, structured lists like product cards, search results, table rows, or comment feeds without hand-writing a loop.
+
+- Set a **Container Selector** for the repeating element (for example, `.product-card` or `table.results > tr`), then add sub-fields underneath it. Each sub-field selector runs relative to its container via `container.querySelector(...)`.
+- The extraction returns an array of structured objects per group, keyed by the group name, alongside your top-level fields.
+- The Headful Inspector target icon works on container selectors as well as individual field selectors.
+
+See [Repeating Groups](/data-extraction#repeating-groups-extractiongroups) for the field reference and a worked example.
+
+### New attribute types: Element Exists, Image URL, Link URL
+
+Visual field mapping now exposes three additional attribute types on top of `Text`, `HTML`, `Input Value`, and `Attribute`:
+
+- **Element Exists (`exists`)** — returns a boolean for whether the selector matches, so you can flag conditions like `is_sale` or `is_in_stock` without a custom script.
+- **Image URL (`image`)** — resolves an absolute image URL from `<img>` elements, handling lazy loading (`data-src`, `data-lazy-src`, `data-original`), responsive `srcset` (highest-density candidate), and CSS `background-image` fallbacks. Relative paths are resolved against the current page.
+- **Link URL (`link`)** — reads `href`, `src`, or `data-href` on the matched element and returns a canonical absolute URL.
+
+See [Supported Attribute Types](/data-extraction#supported-attribute-types) and [Advanced Media Extraction Types](/data-extraction#advanced-media-extraction-types) for details.
+
+## Updates
+
+### Playwright-only selectors filtered from extraction candidate lists
+
+The Headful Inspector candidate list now omits Playwright-specific pseudo-selectors such as `:has-text(...)` when you're picking a selector for an extraction field or a repeating-group container. Extraction scripts run through native `document.querySelector`, which does not understand those pseudo-selectors, so surfacing them would have produced selectors that returned `null` at extraction time. Action blocks (Click, Type, etc.) still receive the full candidate list.
+
+See [Picking Selectors with Headful Inspector](/data-extraction#picking-selectors-with-headful-inspector).
+
+</Update>
+
+<Update label="2026-08-17" description="Earlier update">
 
 ## Features
 
