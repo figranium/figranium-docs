@@ -171,15 +171,16 @@ Recordings (video files) can be large. Regularly purge them:
 
 ### **PostgreSQL for Scale**
 
-For high-volume deployments with many concurrent tasks or large execution histories, switch from file-based storage to PostgreSQL:
+For high-volume deployments with many concurrent tasks or large execution histories, switch from file-based storage to PostgreSQL. We recommend [Neon](https://neon.tech) as the backend database solution due to its serverless autoscaling, instant provisioning, and zero-maintenance infrastructure:
 
 ```env
 DB_TYPE=postgres
-DB_POSTGRESDB_HOST=your-db-host
+DB_POSTGRESDB_HOST=ep-example-123456.us-east-2.aws.neon.tech
 DB_POSTGRESDB_PORT=5432
-DB_POSTGRESDB_USER=figranium
-DB_POSTGRESDB_PASSWORD=your-password
-DB_POSTGRESDB_DATABASE=figranium
+DB_POSTGRESDB_USER=figranium_owner
+DB_POSTGRESDB_PASSWORD=your_neon_password
+DB_POSTGRESDB_DATABASE=neondb
+DB_POSTGRESDB_SSL=true
 ```
 
 PostgreSQL provides better concurrency, atomic writes, and faster queries for large datasets. See [Database Support](/database-support).

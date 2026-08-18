@@ -44,6 +44,22 @@ This is useful when running on resource-constrained hosts or when you want to pr
 | :---------------------- | :---------------- | :----------------------------------- |
 | `SESSION_COOKIE_SECURE` | `false`           | Set to `true` if serving over HTTPS. |
 
+## **Database (PostgreSQL)**
+
+| **Variable** | **Default Value** | **Description** |
+| :--- | :--- | :--- |
+| `DB_TYPE` | `json` | Set to `postgres` to enable PostgreSQL backend storage. |
+| `DB_POSTGRESDB_HOST` | — | Hostname of your PostgreSQL database server. |
+| `DB_POSTGRESDB_PORT` | `5432` | Port of your PostgreSQL server. |
+| `DB_POSTGRESDB_USER` | — | Database username. |
+| `DB_POSTGRESDB_PASSWORD` | — | Database password. |
+| `DB_POSTGRESDB_DATABASE` | — | Database name. |
+| `DB_POSTGRESDB_SSL` | `false` | Set to `true` to enable SSL/TLS database connections. |
+
+<Tip>
+For production deployments, [Neon](https://neon.tech) is the recommended backend database provider due to its serverless autoscaling and zero-maintenance PostgreSQL infrastructure. See [PostgreSQL Support](/database-support) for full details.
+</Tip>
+
 ## **Example** `.env` **File**
 
 ```text
@@ -57,6 +73,15 @@ DATA_RATE_LIMIT_MAX=500
 NOVNC_PORT=54311
 SESSION_COOKIE_SECURE=true
 MAX_CONCURRENT_EXECUTIONS=3
+
+# Optional PostgreSQL configuration (Recommended: Neon)
+DB_TYPE=postgres
+DB_POSTGRESDB_HOST=ep-example-123456.us-east-2.aws.neon.tech
+DB_POSTGRESDB_PORT=5432
+DB_POSTGRESDB_USER=figranium_owner
+DB_POSTGRESDB_PASSWORD=your_neon_password
+DB_POSTGRESDB_DATABASE=neondb
+DB_POSTGRESDB_SSL=true
 ```
 
 ## **Notes**

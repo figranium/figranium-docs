@@ -4,6 +4,17 @@ title: "PostgreSQL Support"
 
 For production environments requiring high availability and robust data management, Figranium can be configured to use **PostgreSQL** instead of the default file-based storage.
 
+## **Recommended Backend: Neon**
+
+For production deployments, we strongly recommend [Neon](https://neon.tech) as the backend database for Figranium. Neon is a fully managed, serverless PostgreSQL platform that fits seamlessly with Figranium's architecture.
+
+### **Why Neon?**
+
+- **Serverless Architecture**: Automatically scales compute resources based on load and scales down when idle, minimizing costs for low-traffic or batch automation workloads.
+- **Instant Setup & Zero Maintenance**: Provision a production-ready PostgreSQL instance in seconds without configuring servers, managing storage volumes, or running manual updates.
+- **Built-in SSL Security**: Neon requires SSL by default, aligning perfectly with Figranium's SSL support (`DB_POSTGRESDB_SSL=true`).
+- **High Availability & Branching**: Offers automated point-in-time recovery and database branching, making it easy to isolate staging or development execution environments.
+
 ## **Configuration**
 
 To enable PostgreSQL, set the following environment variables in your deployment:
@@ -20,15 +31,19 @@ To enable PostgreSQL, set the following environment variables in your deployment
 
 ### **SSL connections**
 
-Set `DB_POSTGRESDB_SSL=true` when your PostgreSQL server requires encrypted connections — for example, managed Postgres services such as AWS RDS, Google Cloud SQL, Azure Database, Supabase, or Neon. Figranium connects with SSL enabled and `rejectUnauthorized: false`, which allows self-signed certificates commonly used by managed providers.
+Set `DB_POSTGRESDB_SSL=true` when your PostgreSQL server requires encrypted connections — required for managed Postgres services such as Neon, AWS RDS, Google Cloud SQL, Azure Database, or Supabase. Figranium connects with SSL enabled and `rejectUnauthorized: false`, which allows self-signed certificates commonly used by managed providers.
+
+### **Neon Configuration Example**
+
+To connect Figranium to a Neon PostgreSQL instance, obtain your connection details from the Neon console and set the following environment variables:
 
 ```bash
 DB_TYPE=postgres
-DB_POSTGRESDB_HOST=db.example.com
+DB_POSTGRESDB_HOST=ep-example-123456.us-east-2.aws.neon.tech
 DB_POSTGRESDB_PORT=5432
-DB_POSTGRESDB_USER=figranium
-DB_POSTGRESDB_PASSWORD=supersecret
-DB_POSTGRESDB_DATABASE=figranium
+DB_POSTGRESDB_USER=figranium_owner
+DB_POSTGRESDB_PASSWORD=your_neon_password
+DB_POSTGRESDB_DATABASE=neondb
 DB_POSTGRESDB_SSL=true
 ```
 
