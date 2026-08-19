@@ -5,7 +5,35 @@ description: "Product updates and new features in Figranium."
 
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
-<Update label="2026-08-17" description="This week">
+<Update label="2026-08-19" description="This week">
+
+## Features
+
+### Automatic cookie-consent dismissal in Agent mode
+
+Agent tasks now click through common cookie-consent banners for you before your first action block runs. Figranium injects the community-maintained [`idcac-playwright`](https://www.npmjs.com/package/idcac-playwright) ruleset (a port of the "I don't care about cookies" extension) into every page in the Agent browser context on `domcontentloaded`.
+
+- Covers hundreds of providers (OneTrust, Cookiebot, TrustArc, Quantcast, and more). The script always clicks **reject** or **close** — never **accept**.
+- Always on in Agent mode. Headful mode is unchanged (it's for human interaction), and Scrape mode doesn't render banners because it no longer launches a browser.
+- If no matching banner is present, the script silently no-ops so your task runs as usual. If a specific site's dialog isn't covered, you can still author an explicit `Click` block.
+
+See [Stealth & Anti-Detection — Cookie-Consent Auto-Dismissal](/stealth-mode#cookie-consent-auto-dismissal) for details.
+
+## Changes
+
+### Scrape mode is now browserless (no screenshots or video)
+
+Scrape mode has been rewritten as a lightweight HTTP fetch. It now issues the request through `got-scraping` (with the same proxy pool and user-agent rotation as before) and parses the response with Cheerio, instead of spinning up a Playwright/stealth-Chromium browser for each run.
+
+- **Faster and cheaper**: No browser process means dramatically lower CPU, memory, and cold-start cost per scrape.
+- **Preserved**: Selector extraction, HTML cleanup, link extraction, proxy and user-agent rotation, the headful → scrape cookie handoff, and the sandboxed extraction-worker script pipeline all still work exactly as before.
+- **Removed**: No screenshots and no video recordings in Scrape mode. There is no page to photograph. The Results panel's Screenshot pane now shows **"Scrape mode does not support screenshots"** instead of the misleading **"Waiting for Frame..."** placeholder. If you need visual evidence of the page, run the task in Agent mode.
+
+See [Captures & Storage](/captures-and-storage#screenshots) and [Architecture](/architecture) for the updated behavior.
+
+</Update>
+
+<Update label="2026-08-17" description="Earlier this week">
 
 ## Features
 

@@ -30,6 +30,19 @@ Beyond behavioral simulation, Figranium implements several technical anti-detect
 -   **DNS-over-HTTPS**: When no proxy is configured, DNS queries are routed through Cloudflare's encrypted DoH resolver, preventing DNS-based tracking and leaks.
 -   **WebRTC Leak Prevention**: WebRTC is configured to disallow non-proxied UDP connections, preventing IP address leaks through WebRTC channels.
 
+## **Cookie-Consent Auto-Dismissal**
+
+Every Agent-mode page automatically clicks through common cookie-consent banners so your task can interact with the real page immediately, without you having to author a Click block for every consent dialog you might hit.
+
+Figranium injects the community-maintained [`idcac-playwright`](https://www.npmjs.com/package/idcac-playwright) ruleset (a Playwright port of the "I don't care about cookies" browser extension) into every page in the Agent browser context. The script runs on the page's `domcontentloaded` event and looks for known consent-banner selectors from OneTrust, Cookiebot, TrustArc, Quantcast, and hundreds of other providers. When it finds one, it clicks the **reject** or **close** button — never **accept** — and lets your task continue.
+
+- **Scope**: Agent mode only. Headful and Scrape modes do not dismiss consent banners (Headful is for human interaction; Scrape doesn't render banners at all because there is no browser).
+- **Protocols**: Applies to `http://` and `https://` pages. `file://` and `data:` URLs are skipped by the underlying ruleset.
+- **Timing**: The click happens after the DOM is parsed but before your first action block runs against the page, so subsequent selectors don't need to account for the banner overlay.
+- **Failure mode**: If no matching banner is present, or the ruleset can't identify a reject button, the script no-ops silently and your task runs as usual. You can still add an explicit `Click` block if a site's banner isn't covered.
+
+There is no configuration flag for this feature — it is always on in Agent mode. If a site's consent dialog is not being dismissed, capture the banner's HTML from the headful browser and file an issue with the selector so it can be added upstream.
+
 ## **Best Practices**
 
 1.  **Enable Human Typing**: Always use this for login forms and search bars.
