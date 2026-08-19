@@ -6,11 +6,15 @@ Figranium automatically captures visual evidence and intercepted files from your
 
 ## **Screenshots**
 
-By default, every successful task execution (in `agent` or `scrape` mode) captures a final screenshot of the page.
+By default, every successful **Agent** task captures a final screenshot of the page.
 
 - **Format**: PNG
 - **Location**: `public/captures/<run_id>_screenshot.png`
 - **Accessibility**: View in **Captures** tab or via API.
+
+<Note>
+**Scrape mode does not produce screenshots.** Scrape mode runs an HTTP fetch through `got-scraping` and parses the response with Cheerio — no browser is launched, so there is no page to photograph. Opening a scrape execution in the editor shows a **"Scrape mode does not support screenshots"** placeholder in the Screenshot panel where the image would otherwise render. If you need visual evidence of the page, use Agent mode.
+</Note>
 
 ### **Custom Screenshots**
 
@@ -21,13 +25,13 @@ You can trigger additional screenshots during an `agent` task using the `screens
 
 ## **Video Recordings**
 
-Figranium can record full session videos (WebM format).
+Figranium can record full session videos (WebM format) for **Agent** tasks.
 
 - **Enable**: Set `disableRecording` to `false` in the task editor.
 - **Location**: `public/captures/<run_id>.webm`
 - **Playback**: View directly in the **Captures** tab.
 
-**Note**: Recording consumes more disk space and CPU. Disable it for high-volume scraping.
+**Note**: Recording consumes more disk space and CPU. Disable it for high-volume scraping. Scrape mode never records video for the same reason it doesn't take screenshots — it doesn't launch a browser.
 
 ## **File Downloads**
 

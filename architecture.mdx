@@ -31,18 +31,19 @@ Figranium is composed of three main layers:
 - **Key Modules**:
   - `server.js`: The main entry point, handling HTTP routes (`/api/*`) and WebSocket/SSE streams.
   - `agent.js`: The core logic for executing "Agent" mode tasks (complex flows with logic).
-  - `scrape.js`: A specialized runner for high-performance, single-page data extraction.
+  - `scrape.js`: A lightweight, browserless runner for high-performance, single-page data extraction. It fetches HTML with `got-scraping` (with proxy and user-agent rotation) and parses it with Cheerio — no Playwright browser is launched.
   - `headful.js`: Manages interactive, visible browser sessions for debugging and manual intervention.
   - `storage.js`: Handles file-based persistence for tasks, executions, and settings.
 
 ### **3. Browser Engine Layer**
 
-- **Technology**: Playwright (Chromium).
-- **Purpose**: Executes the actual browser interactions (clicking, typing, navigating).
+- **Technology**: Playwright (Chromium) for Agent and Headful modes; `got-scraping` + Cheerio for Scrape mode.
+- **Purpose**: Agent and Headful modes execute real browser interactions (clicking, typing, navigating). Scrape mode issues an HTTP request and parses the response DOM without a browser.
 - **Features**:
-  - **Context Isolation**: Each task runs in a fresh or persistent browser context, depending on configuration.
-  - **Stealth Plugin**: Integrates `puppeteer-extra-plugin-stealth` to evade bot detection.
-  - **Network Interception**: Captures network requests/responses for debugging and data extraction.
+  - **Context Isolation**: Each Agent task runs in a fresh or persistent Playwright context, depending on configuration.
+  - **Stealth Plugin**: Integrates `puppeteer-extra-plugin-stealth` in Agent mode to hide Playwright/Chromium fingerprints (`navigator.webdriver` and friends).
+  - **Cookie-Consent Auto-Dismissal**: Every Agent page injects the `idcac-playwright` community ruleset on `domcontentloaded` and automatically clicks the "reject" or "close" button on known consent banners (OneTrust, Cookiebot, TrustArc, and hundreds more). See [Stealth & Anti-Detection](/stealth-mode#cookie-consent-auto-dismissal).
+  - **Network Interception**: Captures network requests/responses for debugging and data extraction in Agent mode.
 
 ## **Figranite Engine**
 
