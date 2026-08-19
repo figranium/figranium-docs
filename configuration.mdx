@@ -44,6 +44,15 @@ This is useful when running on resource-constrained hosts or when you want to pr
 | :---------------------- | :---------------- | :----------------------------------- |
 | `SESSION_COOKIE_SECURE` | `false`           | Set to `true` if serving over HTTPS. |
 
+## **Browser Engine**
+
+| **Variable**                | **Default Value** | **Description**                                                                                                                     |
+| :-------------------------- | :---------------- | :---------------------------------------------------------------------------------------------------------------------------------- |
+| `USE_CLOAK_ENGINE`          | `false`           | Set to `true` to run tasks on CloakBrowser (a stealth-patched Chromium) instead of the default Playwright + stealth plugin engine.  |
+| `CLOAKBROWSER_LICENSE_KEY`  | —                 | License key for CloakBrowser's latest binary. Without a key, CloakBrowser falls back to its free legacy binary.                     |
+
+See [Stealth & Anti-Detection](/stealth-mode#cloakbrowser-engine) for when to switch engines and how the license key is picked up.
+
 ## **Database (PostgreSQL)**
 
 | **Variable** | **Default Value** | **Description** |
@@ -73,6 +82,10 @@ DATA_RATE_LIMIT_MAX=500
 NOVNC_PORT=54311
 SESSION_COOKIE_SECURE=true
 MAX_CONCURRENT_EXECUTIONS=3
+
+# Optional CloakBrowser engine
+USE_CLOAK_ENGINE=true
+CLOAKBROWSER_LICENSE_KEY=cb_xxxxxxxx
 
 # Optional PostgreSQL configuration (Recommended: Neon)
 DB_TYPE=postgres

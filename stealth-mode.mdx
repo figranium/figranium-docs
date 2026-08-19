@@ -30,6 +30,45 @@ Beyond behavioral simulation, Figranium implements several technical anti-detect
 -   **DNS-over-HTTPS**: When no proxy is configured, DNS queries are routed through Cloudflare's encrypted DoH resolver, preventing DNS-based tracking and leaks.
 -   **WebRTC Leak Prevention**: WebRTC is configured to disallow non-proxied UDP connections, preventing IP address leaks through WebRTC channels.
 
+## **CloakBrowser Engine**
+
+Figranium ships with two interchangeable browser engines behind the same Playwright API:
+
+- **Default** — stock Playwright Chromium patched at the JS level by `puppeteer-extra-plugin-stealth`. Ships with every install. No license required.
+- **CloakBrowser** — a stealth-patched Chromium binary from [CloakBrowser](https://github.com/CloakHQ/cloakbrowser). Evasions are applied at the browser level rather than injected as scripts, which holds up better against fingerprinting stacks that inspect for late-patched properties.
+
+Use CloakBrowser when target sites detect the default engine (for example, sites that fingerprint `navigator.webdriver` overrides or check for JS-level patches). For most workloads the default engine is enough — switch only if you see detection failures you can't work around with proxies, user-agent rotation, and the stealth flags above.
+
+### Enable CloakBrowser
+
+Set two environment variables on the Figranium server, then restart:
+
+```text
+USE_CLOAK_ENGINE=true
+CLOAKBROWSER_LICENSE_KEY=cb_xxxxxxxx
+```
+
+- `USE_CLOAK_ENGINE=true` switches every Agent, Headful, and CLI run over to CloakBrowser. Leave it unset (or `false`) to keep the default engine.
+- `CLOAKBROWSER_LICENSE_KEY` selects the latest patched binary. Without a key, CloakBrowser falls back to its free legacy binary.
+
+The CloakBrowser Chromium binary is downloaded automatically during `npm install` when `USE_CLOAK_ENGINE=true` is set at install time. If you flip the flag after installing, run `npx cloakbrowser install` once to fetch the binary. Running `npx cloakbrowser login` writes the license key to `~/.cloakbrowser/license.key`, which CloakBrowser also reads at launch.
+
+### Docker Compose
+
+Uncomment the engine block in your `docker-compose.yml` and rebuild:
+
+```yaml
+services:
+  figranium:
+    image: ghcr.io/figranium/figranium:latest
+    environment:
+      - SESSION_SECRET=your_secure_random_string
+      - USE_CLOAK_ENGINE=true
+      - CLOAKBROWSER_LICENSE_KEY=cb_xxxxxxxx
+```
+
+All existing task settings — proxies, storage state, recording, stealth flags, headful VNC — carry over unchanged. You do not need to edit individual tasks when switching engines.
+
 ## **Cookie-Consent Auto-Dismissal**
 
 Every Agent-mode page automatically clicks through common cookie-consent banners so your task can interact with the real page immediately, without you having to author a Click block for every consent dialog you might hit.
