@@ -44,6 +44,18 @@ This is useful when running on resource-constrained hosts or when you want to pr
 | :---------------------- | :---------------- | :----------------------------------- |
 | `SESSION_COOKIE_SECURE` | `false`           | Set to `true` if serving over HTTPS. |
 
+## **Browser Engine**
+
+| **Variable**                | **Default Value** | **Description** |
+| :-------------------------- | :---------------- | :--------------- |
+| `USE_CLOAK_ENGINE`          | `false`           | Set to `true` (or `1`) to run the browser engine on [CloakBrowser](https://github.com/CloakHQ/cloakbrowser) — a stealth-patched Chromium binary — instead of the default Playwright + `puppeteer-extra-plugin-stealth` stack. Applies to Agent and Headful runners. |
+| `CLOAKBROWSER_LICENSE_KEY`  | —                 | CloakBrowser license key for the latest stealth binary. Read natively by cloakbrowser; you can also run `npx cloakbrowser login` to write it to `~/.cloakbrowser/license.key`. Without a key, the free legacy binary is used. |
+
+<Tip>
+See [Stealth & Anti-Detection](/stealth-mode#browser-engine) for when to switch engines and what the CloakBrowser stack changes.
+</Tip>
+
+
 ## **Database (PostgreSQL)**
 
 | **Variable** | **Default Value** | **Description** |
@@ -82,6 +94,10 @@ DB_POSTGRESDB_USER=figranium_owner
 DB_POSTGRESDB_PASSWORD=your_neon_password
 DB_POSTGRESDB_DATABASE=neondb
 DB_POSTGRESDB_SSL=true
+
+# Optional CloakBrowser engine
+USE_CLOAK_ENGINE=true
+CLOAKBROWSER_LICENSE_KEY=your_cloakbrowser_license_key
 ```
 
 ## **Notes**
