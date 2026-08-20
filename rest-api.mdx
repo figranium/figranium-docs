@@ -202,6 +202,12 @@ Triggers an execution of a specific task.
 
 **Response**: Returns the execution result (JSON).
 
+<Note>
+The request body is optional. If you send the request without a body or without a `Content-Type: application/json` header, Figranium treats the body as `{}` and runs the task with its default variables. This lets tools that can't set request headers (for example, Clay's HTTP action) trigger a task with a bare `POST` to the endpoint URL.
+
+To pass `variables`, `webhookUrl`, `statelessExecution`, or `sessionId`, you must send `Content-Type: application/json` and a JSON body.
+</Note>
+
 #### Completion webhook
 
 When you include a `webhookUrl`, Figranium sends a `POST` request to that URL after the task finishes. The webhook URL is validated against the same SSRF rules as all other outbound requests (see [Security](/security)). If the URL points to a private network and `ALLOW_PRIVATE_NETWORKS` is `false`, the request returns `400 INVALID_WEBHOOK_URL`.
