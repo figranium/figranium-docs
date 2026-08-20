@@ -5,7 +5,25 @@ description: "Product updates and new features in Figranium."
 
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
-<Update label="2026-08-19" description="This week">
+<Update label="2026-08-20" description="This week">
+
+## Features
+
+### API trigger endpoint now accepts bodyless requests
+
+`POST /api/tasks/:id/api` no longer requires a JSON body or a `Content-Type: application/json` header. Requests without a parsed body are treated as `{}` and the task runs with its default variables. Tools that can't set request headers on outbound calls (for example, Clay's HTTP action) can now trigger a task with a bare `POST` to the endpoint URL.
+
+To pass `variables`, `webhookUrl`, `statelessExecution`, or `sessionId`, keep sending `Content-Type: application/json` with a JSON body — that path is unchanged.
+
+### Full endpoint URL and method in the API trigger panel
+
+The task editor's **Trigger via API** panel now shows the complete origin-aware endpoint URL (for example, `https://your-figranium.example.com/api/tasks/task_1/api`) with a `POST` method badge next to it. The copy button copies the same full URL, so you can paste it straight into external tools without prefixing your instance origin by hand.
+
+See [REST API Reference — `POST /api/tasks/:id/api`](/rest-api).
+
+</Update>
+
+<Update label="2026-08-19" description="Earlier this week">
 
 ## Features
 
