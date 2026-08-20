@@ -9,6 +9,22 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
 
 ## Features
 
+### Opt-in CloakBrowser browser engine
+
+Figranium now ships two interchangeable browser engines behind the same Playwright API, and you can switch between them with a single environment variable. Agent, Headful, and CLI-launched tasks all use whichever engine is active — no task edits required.
+
+- **Default (`USE_CLOAK_ENGINE` unset or `false`)**: Playwright Chromium patched at the JS level with `playwright-extra` and `puppeteer-extra-plugin-stealth`. Same behavior as previous releases.
+- **Opt-in (`USE_CLOAK_ENGINE=true`)**: the [CloakBrowser](https://github.com/CloakHQ/cloakbrowser) stealth-patched Chromium binary. Evasions are applied at the binary level rather than injected at runtime, which is harder for modern bot detectors to fingerprint. Use this when the default stack is being detected on a target site — typically CAPTCHA walls that trigger on Playwright/Chromium runtime tells.
+- **License key**: set `CLOAKBROWSER_LICENSE_KEY` to unlock the latest stealth binary. Without a key, CloakBrowser falls back to the free legacy binary. You can also run `npx cloakbrowser login` to write the key to `~/.cloakbrowser/license.key`, which `cloakbrowser` reads natively.
+- **Lean installs**: the CloakBrowser binary is only fetched during `postinstall` when the flag is enabled, so the default install stays the same size as before.
+
+```text .env
+USE_CLOAK_ENGINE=true
+CLOAKBROWSER_LICENSE_KEY=your_license_key_here
+```
+
+See [Stealth & Anti-Detection — Browser Engine](/stealth-mode#browser-engine) and [Configuration](/configuration) for the full switch behavior and env-var reference.
+
 ### Automatic cookie-consent dismissal in Agent mode
 
 Agent tasks now click through common cookie-consent banners for you before your first action block runs. Figranium injects the community-maintained [`idcac-playwright`](https://www.npmjs.com/package/idcac-playwright) ruleset (a port of the "I don't care about cookies" extension) into every page in the Agent browser context on `domcontentloaded`.
