@@ -198,3 +198,17 @@ After this block runs, `{$articleText}` contains the visible text of the `.artic
 Triggers another task to run from within the current task. Use this to create modular workflows by chaining tasks together.
 
 - **Task**: The ID of the task to run.
+
+### **Do Nothing (**`do_nothing`**)**
+
+Performs no operation and moves to the next block. Use this as a placeholder while drafting a task, or as the body of an `if` or `on_error` branch when you explicitly want the branch to fall through without side effects.
+
+The block takes no configuration. It logs `Do nothing` and completes successfully. The aliases `noop` and `pass` behave the same way.
+
+**Example — placeholder inside an `if` branch:**
+
+```json
+{
+  "type": "do_nothing"
+}
+```
