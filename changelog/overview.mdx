@@ -5,6 +5,38 @@ description: "Product updates and new features in Figranium."
 
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
+<Update label="2026-08-22" description="Today">
+
+## Features
+
+### Solve CAPTCHAs from Agent mode
+
+Agent mode can now solve reCAPTCHA v2, reCAPTCHA v3, hCaptcha, and Cloudflare Turnstile challenges without leaving the task flow. Figranium bundles the [`ohmycaptcha`](https://github.com/ohmycaptcha/ohmycaptcha) proxyless solver into the Docker image, so `solve_captcha` blocks work out of the box on any host with at least 2 GB of free memory (the solver runs its own headless browser).
+
+There are two ways to use it:
+
+- **Explicit `solve_captcha` action block**: drop it into a task at the step where you expect a challenge. Optionally pin a `captchaType`, scope with a `selector`, and capture `{ success, challenge, duration }` in a variable.
+- **Task-level Auto-Solve CAPTCHA setting**: toggle it on in the Behavior tab of Task Settings to run the same detection pass automatically after every `navigate`, `click`, and `type`. Off by default; silently no-ops when no challenge is present.
+
+```json
+{
+  "type": "solve_captcha",
+  "captchaType": "recaptcha_v2",
+  "varName": "captchaResult",
+  "timeout": 120000
+}
+```
+
+Point at an external `ohmycaptcha` instance instead of the embedded one via `OHMYCAPTCHA_URL` and `OHMYCAPTCHA_CLIENT_KEY`. reCAPTCHA v2 additionally requires `CLOUD_API_KEY`/`CLOUD_BASE_URL`/`CLOUD_MODEL` (OpenAI-compatible) for its audio-challenge fallback — without them, v2 challenges that need the fallback fail with `ERROR_CAPTCHA_UNSOLVABLE`. hCaptcha, Turnstile, and reCAPTCHA v3 don't need those variables.
+
+The default `solve_captcha` timeout is `120000` ms (up from `60000`), since real solves — especially reCAPTCHA v2 image challenges — commonly take over a minute.
+
+If you run Figranium from source instead of Docker, start the sidecar with `pnpm run captcha:dev` in a separate terminal before using the block.
+
+See [CAPTCHA Solving](/captcha-solving), [Action Blocks — Solve CAPTCHA](/action-blocks#solve-captcha-solve_captcha), and [Configuration — CAPTCHA Solving](/configuration#captcha-solving).
+
+</Update>
+
 <Update label="2026-08-21" description="This week">
 
 ## Features

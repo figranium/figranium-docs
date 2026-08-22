@@ -1,0 +1,134 @@
+---
+title: "CAPTCHA Solving"
+description: "Solve reCAPTCHA v2/v3, hCaptcha, and Cloudflare Turnstile challenges from Agent mode using the bundled ohmycaptcha service."
+---
+
+Agent mode can detect and solve CAPTCHA challenges without leaving the task flow. Figranium bundles the [`ohmycaptcha`](https://github.com/ohmycaptcha/ohmycaptcha) proxyless solver service directly into the Docker image, so `solve_captcha` blocks work out of the box against reCAPTCHA v2, reCAPTCHA v3, hCaptcha, and Cloudflare Turnstile.
+
+You have two ways to invoke it:
+
+- An explicit **Solve CAPTCHA** block that you drop at the exact step in your flow where a challenge appears.
+- A task-level **Auto-Solve CAPTCHA** toggle that runs the same detection pass after every `navigate`, `click`, and `type` action, for tasks that hit CAPTCHAs at unpredictable points.
+
+Both routes use the same underlying service and are only available in Agent mode.
+
+## **How solving works**
+
+When the block runs, Figranium:
+
+1. Scans the page (or the container you scoped it to) for a supported CAPTCHA widget and reads out its site key, action, and other parameters.
+2. Submits a task to `ohmycaptcha` over HTTP. The service spins up its own headless Chromium, walks through the challenge, and returns a token.
+3. Injects the token into the page's response field and fires the site's own callback so the form thinks a real user solved it.
+
+The solver runs in a sidecar process (`ohmycaptcha` on `127.0.0.1:8000` inside the container). The host needs at least **2 GB** of available memory since that process launches its own browser — otherwise the block throws before making a request.
+
+## **The `solve_captcha` block**
+
+Drop this block into a task at the step where you expect a challenge. See [Action Blocks — Solve CAPTCHA](/action-blocks#solve-captcha-solve_captcha) for the full field reference; the shape is:
+
+```json
+{
+  "type": "solve_captcha",
+  "captchaType": "recaptcha_v2",
+  "selector": "#recaptcha-container",
+  "varName": "captchaResult",
+  "timeout": 120000
+}
+```
+
+- `captchaType` is optional — omit it to auto-detect from the page.
+- `selector` is optional — omit it to scan the whole page.
+- `varName` stores `{ success, challenge, duration }` so you can log or branch on the outcome.
+- `timeout` defaults to `120000` ms. Real solving commonly takes over a minute; keep the timeout above one minute unless you're sure the challenge is trivial.
+
+**Example — submit a form, then solve the reCAPTCHA it renders:**
+
+```json
+[
+  { "type": "click", "value": "button[type='submit']" },
+  { "type": "wait_selector", "value": "iframe[src*='recaptcha']" },
+  {
+    "type": "solve_captcha",
+    "captchaType": "recaptcha_v2",
+    "varName": "captchaResult"
+  },
+  { "type": "click", "value": "button.continue" }
+]
+```
+
+## **Auto-Solve CAPTCHA (task setting)**
+
+Toggle **Auto-Solve CAPTCHA** in the task settings **Behavior** tab. When enabled, Figranium runs the same detection pass automatically after every `navigate`, `click`, and `type` action in that task.
+
+- Default: **off**. Tasks that don't need CAPTCHA handling pay no extra latency.
+- When no challenge is present on the page, the auto-pass silently no-ops.
+- Auto-solve and explicit `solve_captcha` blocks work together — turning auto-solve on doesn't disable your explicit blocks.
+
+Use this when you don't know exactly where a CAPTCHA will appear in a flow (for example, sites that rate-limit into a challenge only sometimes). If the CAPTCHA is always at the same step, prefer an explicit block for readability.
+
+## **Configuration**
+
+The embedded solver runs automatically inside the Docker image. If you want to point at an external `ohmycaptcha` instance, or if you need reCAPTCHA v2's audio fallback to work, set these environment variables.
+
+| **Variable** | **Default Value** | **Description** |
+| :----------- | :---------------- | :-------------- |
+| `OHMYCAPTCHA_URL` | `http://127.0.0.1:8000` | Base URL for the CAPTCHA-solving service. Leave unset to use the embedded instance; set this to point at an external one instead. |
+| `OHMYCAPTCHA_CLIENT_KEY` | auto-generated | Client key for the service. Auto-generated for the embedded instance; required when pointing `OHMYCAPTCHA_URL` at an external one. |
+| `CLOUD_API_KEY` | — | OpenAI-compatible API key. Forwarded to the embedded `ohmycaptcha` instance and used by reCAPTCHA v2's audio-challenge fallback. Without it, reCAPTCHA v2 challenges that require the fallback fail with `ERROR_CAPTCHA_UNSOLVABLE`. |
+| `CLOUD_BASE_URL` | — | OpenAI-compatible endpoint (for example, `https://api.openai.com/v1`). Required alongside `CLOUD_API_KEY` for the audio fallback. |
+| `CLOUD_MODEL` | — | Audio-capable model name (for example, `gpt-4o-audio-preview`). Required alongside `CLOUD_API_KEY` for the audio fallback. |
+
+<Note>
+The audio fallback only affects reCAPTCHA v2. hCaptcha, Cloudflare Turnstile, and reCAPTCHA v3 don't use it, so those work without any `CLOUD_*` configuration.
+</Note>
+
+**Docker Compose example:**
+
+```yaml docker-compose.yml
+services:
+  figranium:
+    environment:
+      # Optional: point at an external ohmycaptcha instance
+      # - OHMYCAPTCHA_URL=http://your-host:8000
+      # - OHMYCAPTCHA_CLIENT_KEY=your-client-key
+
+      # Required for reCAPTCHA v2's audio-challenge fallback
+      - CLOUD_API_KEY=sk-xxxxxxxx
+      - CLOUD_BASE_URL=https://api.openai.com/v1
+      - CLOUD_MODEL=gpt-4o-audio-preview
+```
+
+## **Running outside Docker**
+
+The embedded `ohmycaptcha` process is only started automatically inside the Docker image. If you're running Figranium from source with `pnpm run server` / `pnpm run dev`, start the solver in a separate terminal first:
+
+```bash
+pnpm run captcha:dev
+```
+
+This clones `ohmycaptcha`, resolves a Python 3.10+ interpreter into an isolated virtualenv (the solver uses `X | None` union syntax, which fails on Python 3.9 — including macOS's Command Line Tools default), installs it, and starts the service on `127.0.0.1:8000`. Leave it running while you use `solve_captcha` blocks. Without it, those blocks fail with a connection error.
+
+## **Return value**
+
+If you set `varName`, the variable holds:
+
+```json
+{
+  "success": true,
+  "challenge": "recaptcha_v2",
+  "duration": 42317
+}
+```
+
+- `success`: `true` when the token was injected, `false` otherwise.
+- `challenge`: The detected challenge type (`recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, or `turnstile`).
+- `duration`: Milliseconds the solve took end-to-end.
+
+Use this to log solve times, or to branch with an [If](/control-flow) block on `{$captchaResult.success}`.
+
+## **Troubleshooting**
+
+- **Block throws "requires at least 2 GB of memory"** — The solver runs its own headless browser. Free memory on the host, or move the workload to a larger instance.
+- **reCAPTCHA v2 always fails with `ERROR_CAPTCHA_UNSOLVABLE`** — The click-only solve wasn't enough and the audio fallback couldn't run. Set `CLOUD_API_KEY`, `CLOUD_BASE_URL`, and `CLOUD_MODEL` for an OpenAI-compatible endpoint.
+- **Connection error to `127.0.0.1:8000` outside Docker** — The embedded solver isn't running. Start it with `pnpm run captcha:dev` in a separate terminal, or point `OHMYCAPTCHA_URL` at an external instance.
+- **Solve times out at 60s** — Raise the block's `timeout` field (or leave it at the new default `120000`). reCAPTCHA v2 image challenges routinely take longer than a minute.
