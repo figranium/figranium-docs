@@ -62,6 +62,7 @@
           "data-extraction",
           "extraction-script-generation",
           "stealth-mode",
+          "captcha-solving",
           "csv-processing",
           "modular-workflows"
         ]

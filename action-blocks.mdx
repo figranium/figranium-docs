@@ -199,6 +199,33 @@ Triggers another task to run from within the current task. Use this to create mo
 
 - **Task**: The ID of the task to run.
 
+### **Solve CAPTCHA (**`solve_captcha`**)**
+
+Detects a CAPTCHA challenge on the current page, solves it through the bundled `ohmycaptcha` service, and injects the token back into the page so the site's own callback fires. Use this when a specific step reaches a challenge you already know about — for example, right after submitting a login form.
+
+Supported challenge types: reCAPTCHA v2, reCAPTCHA v3, hCaptcha, and Cloudflare Turnstile.
+
+- **CAPTCHA Type**: (Optional) One of `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, or `turnstile`. If empty, the type is auto-detected from the page.
+- **Selector**: (Optional) A CSS selector scoping the search to a specific container (for example, the widget's iframe wrapper). If empty, the whole page is scanned.
+- **Store In Variable**: (Optional) A variable name to store solve metadata (`{ success, challenge, duration }`).
+- **Timeout**: (Optional) Max time in milliseconds to wait for a solution. Defaults to `120000`. Real solving usually takes over a minute, especially for reCAPTCHA v2's image-challenge fallback.
+
+The block runs in Agent mode only. The bundled solver runs its own headless Chromium in a sidecar process, so the host must have at least 2 GB of free memory or the block throws. reCAPTCHA v2 additionally falls back to audio-challenge transcription against an OpenAI-compatible endpoint — that path requires `CLOUD_API_KEY`, `CLOUD_BASE_URL`, and `CLOUD_MODEL` to be set, or those specific challenges fail with `ERROR_CAPTCHA_UNSOLVABLE`. hCaptcha, Turnstile, and reCAPTCHA v3 don't need it.
+
+**Example — solve a reCAPTCHA v2 widget and store the result:**
+
+```json
+{
+  "type": "solve_captcha",
+  "captchaType": "recaptcha_v2",
+  "selector": "#recaptcha-container",
+  "varName": "captchaResult",
+  "timeout": 120000
+}
+```
+
+For tasks that hit CAPTCHAs at unpredictable points, you can turn on the task-level **Auto-Solve CAPTCHA** setting instead of scattering `solve_captcha` blocks through the flow — it runs the same detection pass after every `navigate`, `click`, and `type`, and no-ops when no challenge is present. See [CAPTCHA Solving](/captcha-solving) for the full setup, environment variables, and the auto-solve toggle.
+
 ### **Do Nothing (**`do_nothing`**)**
 
 Performs no operation and moves to the next block. Use this as a placeholder while drafting a task, or as the body of an `if` or `on_error` branch when you explicitly want the branch to fall through without side effects.
