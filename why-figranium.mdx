@@ -34,26 +34,7 @@ Instead of embedding browser actions directly into every integration, create a t
 
 ## Where Figranium fits
 
-A typical stack can look like this:
-
-```text
-                    ┌─────────────┐
-                    │    n8n      │
-                    └──────┬──────┘
-                           │
-                    REST / n8n node
-                           │
-┌──────────────┐     ┌─────▼──────┐     ┌──────────────┐
-│ Your app/API │────▶│ Figranium  │────▶│    Browser   │
-└──────────────┘     │  workflow  │     └──────────────┘
-                     └─────▲──────┘
-                           │
-                          MCP
-                           │
-                    ┌──────┴──────┐
-                    │ AI client   │
-                    └─────────────┘
-```
+Figranium sits between the systems that trigger automation and the browser that performs it. Your application or API can trigger a task directly through the REST API. n8n can trigger the same tasks through the Figranium community node. MCP-compatible clients can discover and operate Figranium through the MCP server.
 
 The important distinction is that Figranium is the **browser workflow layer**. Your application, n8n workflow, or MCP client can decide when a browser workflow should run and what inputs it receives.
 
