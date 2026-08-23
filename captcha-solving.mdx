@@ -5,6 +5,10 @@ description: "Solve reCAPTCHA v2/v3, hCaptcha, and Cloudflare Turnstile challeng
 
 Agent mode can detect and solve CAPTCHA challenges without leaving the task flow. Figranium bundles the [`ohmycaptcha`](https://github.com/ohmycaptcha/ohmycaptcha) proxyless solver service directly into the Docker image, so `solve_captcha` blocks work out of the box against reCAPTCHA v2, reCAPTCHA v3, hCaptcha, and Cloudflare Turnstile.
 
+<Warning>
+**CAPTCHA solving is currently broken.** As of the latest release, both the `solve_captcha` action block and the task-level **Auto-Solve CAPTCHA** setting are timing out on reCAPTCHA v2 and Cloudflare Turnstile — including the checkbox-only path, not just the audio fallback. The root cause is still under investigation. The Editor UI labels both entry points as **(Broken)** to reflect this. The block, task setting, and configuration variables are kept in place so existing tasks continue to load, but expect solve attempts to fail until this notice is removed.
+</Warning>
+
 You have two ways to invoke it:
 
 - An explicit **Solve CAPTCHA** block that you drop at the exact step in your flow where a challenge appears.
