@@ -152,5 +152,10 @@
   },
   "fonts": {
     "family": "Questrial"
+  },
+  "integrations": {
+    "telemetry": {
+      "enabled": true
+    }
   }
 }
