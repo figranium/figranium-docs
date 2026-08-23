@@ -130,8 +130,15 @@
       }
     ]
   },
-  "favicon": "/images/favicon.svg",
-  "logo": "/images/favicon.svg",
+  "favicon": {
+    "light": "/images/favicon.svg",
+    "dark": "/images/icon_light.svg"
+  },
+  "logo": {
+    "light": "/images/figranium_logo.svg",
+    "dark": "/images/figranium_logo.svg",
+    "href": "https://figranium.dev"
+  },
   "css": "/styles.css",
   "appearance": {
     "strict": true,
