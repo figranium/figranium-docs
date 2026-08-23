@@ -15,12 +15,12 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
 
   ### Solve CAPTCHAs from Agent mode
 
-  Agent mode can now solve reCAPTCHA v2, reCAPTCHA v3, hCaptcha, and Cloudflare Turnstile challenges without leaving the task flow. Figranium bundles the [`ohmycaptcha`](https://github.com/ohmycaptcha/ohmycaptcha) proxyless solver into the Docker image, so `solve_captcha` blocks work out of the box on any host with at least 2 GB of free memory (the solver runs its own headless browser).
+  Agent mode can now solve reCAPTCHA v2, reCAPTCHA v3, hCaptcha, and Cloudflare Turnstile challenges without leaving the task flow. Solves are routed through an optional YesCaptcha/AntiCaptcha-compatible remote endpoint first, then fall back to a built-in active-browser local model (OWL-ViT on 2–7.99 GiB hosts, Florence-2 at 8 GiB\+). Local weights are fetched on first use into persistent `data/captcha-model/`; nothing is bundled into the image.
 
   There are two ways to use it:
 
-  - **Explicit `solve_captcha` action block**: drop it into a task at the step where you expect a challenge. Optionally pin a `captchaType`, scope with a `selector`, and capture `{ success, challenge, duration }` in a variable.
-  - **Task-level Auto-Solve CAPTCHA setting**: toggle it on in the Behavior tab of Task Settings to run the same detection pass automatically after every `navigate`, `click`, and `type`. Off by default; silently no-ops when no challenge is present.
+  - **Explicit `solve_captcha` action block**: drop it into a task at the step where you expect a challenge. Optionally pin a `captchaType`, scope with a `selector`, and capture `{ success, challenge, duration, provider, model?, device?, attempts }` in a variable.
+  - **Task-level Auto-Solve Captchas setting**: toggle it on in the Behavior tab of Task Settings to run the same detection pass automatically after every `navigate`, `click`, and `type`. Off by default; silently no-ops when no challenge is present.
 
   ```json
   {
@@ -31,13 +31,11 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   }
   ```
 
-  Point at an external `ohmycaptcha` instance instead of the embedded one via `OHMYCAPTCHA_URL` and `OHMYCAPTCHA_CLIENT_KEY`. reCAPTCHA v2 additionally requires `CLOUD_API_KEY`/`CLOUD_BASE_URL`/`CLOUD_MODEL` (OpenAI-compatible) for its audio-challenge fallback — without them, v2 challenges that need the fallback fail with `ERROR_CAPTCHA_UNSOLVABLE`. hCaptcha, Turnstile, and reCAPTCHA v3 don't need those variables.
+  Configure a remote endpoint with `CAPTCHA_SOLVER_URL` and `CAPTCHA_SOLVER_KEY`. Local solving is on by default; set `SKIP_LOCAL_CAPTCHA_MODEL=true` to disable. Tune the tier with `CAPTCHA_MODEL_TIER` (`auto`, `owlvit`, `florence2`) and the deadline split between routes with `CAPTCHA_REMOTE_TIMEOUT_MS` and `CAPTCHA_LOCAL_FALLBACK_MIN_MS`. On Apple Silicon, an optional native companion (`npm run captcha:companion:start:docker`) offloads inference to CoreML/MLX.
 
-  The default `solve_captcha` timeout is `120000` ms (up from `60000`), since real solves — especially reCAPTCHA v2 image challenges — commonly take over a minute.
+  The default `solve_captcha` timeout is `120000` ms since real solves, especially reCAPTCHA v2 image challenges, commonly take over a minute.
 
-  If you run Figranium from source instead of Docker, start the sidecar with `pnpm run captcha:dev` in a separate terminal before using the block.
-
-  See [CAPTCHA Solving](/captcha-solving), [Action Blocks — Solve CAPTCHA](/action-blocks#solve-captcha-solve_captcha), and [Configuration — CAPTCHA Solving](/configuration#captcha-solving).
+  See [CAPTCHA Solving](/captcha-solving), [Action Blocks — Solve Captcha](/action-blocks#solve-captcha), and [Configuration — CAPTCHA Solving](/configuration#captcha-solving).
 </Update>
 
 <Update label="2026-08-21" description="This week">

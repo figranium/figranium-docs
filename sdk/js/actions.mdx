@@ -126,9 +126,11 @@ See [Variables and templates](/sdk/js/variables) for more.
   captchaType?: "recaptcha_v2" | "recaptcha_v3" | "hcaptcha" | "turnstile";
   selector?: string;
   varName?: string;
-  timeout?: number; // seconds
+  timeout?: number; // milliseconds; default 120000
 }
 ```
+
+Solve routing uses the configured remote endpoint first (if `CAPTCHA_SOLVER_URL` is set), then falls back to the built-in local model. See [CAPTCHA Solving](/captcha-solving) for setup and return-value shape.
 
 ## Typed one-off actions
 

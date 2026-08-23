@@ -1,21 +1,19 @@
 ---
 title: "CAPTCHA Solving"
-description: "Solve reCAPTCHA v2/v3, hCaptcha, and Cloudflare Turnstile challenges from Agent mode using the bundled ohmycaptcha service."
+description: "Solve reCAPTCHA v2/v3, hCaptcha, and Cloudflare Turnstile challenges from Agent mode using the built-in local solver, with an optional remote endpoint."
 sidebarTitle: "CAPTCHAs"
 ---
 
-Agent mode can detect and solve CAPTCHA challenges without leaving the task flow. Figranium bundles the [`ohmycaptcha`](https://github.com/ohmycaptcha/ohmycaptcha) proxyless solver service directly into the Docker image, so `solve_captcha` blocks work out of the box against reCAPTCHA v2, reCAPTCHA v3, hCaptcha, and Cloudflare Turnstile.
+Agent mode can detect and solve CAPTCHA challenges without leaving the task flow. Figranium ships a **resource-adaptive local solver** that runs an OWL-ViT or Florence-2 model against the task's own headless browser and injects the resulting token. If you configure a YesCaptcha/AntiCaptcha-compatible remote endpoint, the block tries it first and falls back to the local solver on failure.
 
-<Warning>
-  **CAPTCHA solving is currently broken.** As of the latest release, both the `solve_captcha` action block and the task-level **Auto-Solve CAPTCHA** setting are timing out on reCAPTCHA v2 and Cloudflare Turnstile — including the checkbox-only path, not just the audio fallback. The root cause is still under investigation. The Editor UI labels both entry points as **(Broken)** to reflect this. The block, task setting, and configuration variables are kept in place so existing tasks continue to load, but expect solve attempts to fail until this notice is removed.
-</Warning>
+Supported challenges: reCAPTCHA v2, reCAPTCHA v3, hCaptcha, Cloudflare Turnstile.
 
 You have two ways to invoke it:
 
-- An explicit **Solve CAPTCHA** block that you drop at the exact step in your flow where a challenge appears.
-- A task-level **Auto-Solve CAPTCHA** toggle that runs the same detection pass after every `navigate`, `click`, and `type` action, for tasks that hit CAPTCHAs at unpredictable points.
+- An explicit **Solve Captcha** block that you drop at the exact step in your flow where a challenge appears.
+- A task-level **Auto-Solve Captchas** toggle that runs the same detection pass after every `navigate`, `click`, and `type` action, for tasks that hit CAPTCHAs at unpredictable points.
 
-Both routes use the same underlying service and are only available in Agent mode.
+Both routes use the same underlying solver and are only available in Agent mode.
 
 ---
 
@@ -24,24 +22,27 @@ Both routes use the same underlying service and are only available in Agent mode
 When the block runs, Figranium:
 
 <Steps>
-  <Step title="Scan the page">
-    Scans the page (or the container you scoped it to) for a supported CAPTCHA widget and reads out its site key, action, and other parameters.
+  <Step title="Detect the challenge">
+    Scans the page (or the container you scoped it to) for a supported widget and reads its site key, action, and other parameters. If nothing is found, the block errors out with `no CAPTCHA challenge found on the page`.
   </Step>
-  <Step title="Submit to ohmycaptcha">
-    Submits a task to `ohmycaptcha` over HTTP. The service spins up its own headless Chromium, walks through the challenge, and returns a token.
+  <Step title="Try the remote endpoint (if configured)">
+    If `CAPTCHA_SOLVER_URL` is set, submits a task to that endpoint and waits up to `CAPTCHA_REMOTE_TIMEOUT_MS` for a token. Failures are logged and the block falls through to the local solver.
+  </Step>
+  <Step title="Run the local active-browser solver">
+    Solves the challenge inside the task's own browser session using the selected model tier. For reCAPTCHA v2 and hCaptcha image challenges, a grid engine handles 3×3 and 4×4 layouts and replacement tiles. Turnstile and checkbox-only test-key flows are model-free.
   </Step>
   <Step title="Inject the token">
-    Injects the token into the page's response field and fires the site's own callback so the form thinks a real user solved it.
+    Writes the token into the page's response field and fires the site's own callback so the form thinks a real user solved it.
   </Step>
 </Steps>
 
-The solver runs in a sidecar process (`ohmycaptcha` on `127.0.0.1:8000` inside the container). The host needs at least **2 GB** of available memory since that process launches its own browser — otherwise the block throws before making a request.
+Local image solving requires at least **2 GiB effective cgroup memory**. Hosts below that threshold can still use a configured remote endpoint; set `SKIP_LOCAL_CAPTCHA_MODEL=true` to disable local probing entirely.
 
 ---
 
 ## The `solve_captcha` block
 
-Drop this block into a task at the step where you expect a challenge. See [Action Blocks — Solve CAPTCHA](/action-blocks#solve-captcha-solve_captcha) for the full field reference; the shape is:
+Drop this block into a task at the step where you expect a challenge. See [Action Blocks — Solve Captcha](/action-blocks#solve-captcha) for the full field reference; the shape is:
 
 ```json
 {
@@ -53,10 +54,10 @@ Drop this block into a task at the step where you expect a challenge. See [Actio
 }
 ```
 
-- `captchaType` is optional — omit it to auto-detect from the page.
+- `captchaType` is optional — omit it to auto-detect from the page. Supported values: `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, `turnstile`.
 - `selector` is optional — omit it to scan the whole page.
-- `varName` stores `{ success, challenge, duration }` so you can log or branch on the outcome.
-- `timeout` defaults to `120000` ms. Real solving commonly takes over a minute; keep the timeout above one minute unless you're sure the challenge is trivial.
+- `varName` stores `{ success, challenge, duration, provider, model?, device?, attempts }` so you can log or branch on the outcome.
+- `timeout` is the terminal deadline in milliseconds (default `120000`). Provider errors are returned immediately rather than being reported as timeouts.
 
 **Example — submit a form, then solve the reCAPTCHA it renders:**
 
@@ -75,9 +76,9 @@ Drop this block into a task at the step where you expect a challenge. See [Actio
 
 ---
 
-## Auto-Solve CAPTCHA (task setting)
+## Auto-Solve Captchas (task setting)
 
-Toggle **Auto-Solve CAPTCHA** in the task settings **Behavior** tab. When enabled, Figranium runs the same detection pass automatically after every `navigate`, `click`, and `type` action in that task.
+Toggle **Auto-Solve Captchas** in the task settings **Behavior** tab. When enabled, Figranium runs the same detection pass automatically after every `navigate`, `click`, and `type` action in that task.
 
 - Default: **off**. Tasks that don't need CAPTCHA handling pay no extra latency.
 - When no challenge is present on the page, the auto-pass silently no-ops.
@@ -87,21 +88,62 @@ Use this when you don't know exactly where a CAPTCHA will appear in a flow (for 
 
 ---
 
-## Configuration
+## Local solver models
 
-The embedded solver runs automatically inside the Docker image. If you want to point at an external `ohmycaptcha` instance, or if you need reCAPTCHA v2's audio fallback to work, set these environment variables.
+The local solver auto-selects a model tier based on host memory. Weights are fetched on first use into persistent `data/captcha-model/`; nothing is bundled into the Docker image. Every artifact is pinned to an exact upstream commit, size, and SHA-256 digest, and inference loads with remote access disabled.
 
-| **Variable** | **Default Value** | **Description** |
+| **Tier** | **Auto-selected when** | **Artifact size** |
 | :-- | :-- | :-- |
-| `OHMYCAPTCHA_URL` | `http://127.0.0.1:8000` | Base URL for the CAPTCHA-solving service. Leave unset to use the embedded instance; set this to point at an external one instead. |
-| `OHMYCAPTCHA_CLIENT_KEY` | auto-generated | Client key for the service. Auto-generated for the embedded instance; required when pointing `OHMYCAPTCHA_URL` at an external one. |
-| `CLOUD_API_KEY` | — | OpenAI-compatible API key. Forwarded to the embedded `ohmycaptcha` instance and used by reCAPTCHA v2's audio-challenge fallback. Without it, reCAPTCHA v2 challenges that require the fallback fail with `ERROR_CAPTCHA_UNSOLVABLE`. |
-| `CLOUD_BASE_URL` | — | OpenAI-compatible endpoint (for example, `https://api.openai.com/v1`). Required alongside `CLOUD_API_KEY` for the audio fallback. |
-| `CLOUD_MODEL` | — | Audio-capable model name (for example, `gpt-4o-audio-preview`). Required alongside `CLOUD_API_KEY` for the audio fallback. |
+| **OWL-ViT** | 2–7.99 GiB effective memory | ~159 MB |
+| **Florence-2** | 8 GiB\+ effective memory | ~361 MB |
+
+Only the active tier is retained at steady state.
+
+### Optional Apple Silicon companion
+
+On Apple Silicon (Docker Desktop or native macOS), an optional companion process runs inference on Apple unified memory and CoreML/MLX acceleration, keeping model weights out of the container image:
+
+```bash
+npm run captcha:companion:install       # pinned Python 3.10+ venv + generated token
+npm run captcha:companion:start         # native Figranium, loopback only
+npm run captcha:companion:start:docker  # Docker Desktop, authenticated external bind
+```
+
+OWL-ViT uses ONNX Runtime's CoreML execution provider. Florence-2 stages a pinned 4-bit MLX build and probes it; if MLX inference fails, the companion falls back to a verified native ONNX build automatically. The companion exposes only authenticated `GET /v1/health` and `POST /v1/detect`, caps request and image sizes, serializes inference, and applies inference timeouts.
+
+Docker Desktop discovers the companion at `http://host.docker.internal:11438`; native macOS uses loopback. Override with `CAPTCHA_COMPANION_URL` if needed. The bearer token is shared through the `data/` mount by default, or set `CAPTCHA_COMPANION_TOKEN` explicitly.
+
+---
+
+## Optional remote endpoint
+
+The local solver works standalone. If you have a YesCaptcha/AntiCaptcha-compatible endpoint, set these variables to try it first and fall back to the local solver on failure.
+
+| **Variable** | **Default** | **Description** |
+| :-- | :-- | :-- |
+| `CAPTCHA_SOLVER_URL` | — | YesCaptcha/AntiCaptcha-compatible endpoint. When set, remote solving is attempted first. |
+| `CAPTCHA_SOLVER_KEY` | — | Client key for `CAPTCHA_SOLVER_URL`. |
+| `CAPTCHA_REMOTE_TIMEOUT_MS` | action deadline minus local reserve | Maximum time allocated to the remote route before falling back locally. |
+| `CAPTCHA_LOCAL_FALLBACK_MIN_MS` | `15000` | Portion of the action deadline reserved for the local route. |
+| `CAPTCHA_REMOTE_FORWARD_PROXY` | `false` | Send the active browser proxy and user agent to compatible proxy-backed remote tasks. Unsupported provider/task combinations fail over locally without changing IP. |
+| `CAPTCHA_REMOTE_FORWARD_CONTEXT` | `false` | Send origin-scoped cookies, locale, timezone, viewport, and user agent to a custom endpoint that advertises `browserContext` version 1. |
+| `OHMYCAPTCHA_URL` / `OHMYCAPTCHA_CLIENT_KEY` | — | Deprecated aliases for `CAPTCHA_SOLVER_URL` / `CAPTCHA_SOLVER_KEY`. |
 
 <Note>
-  The audio fallback only affects reCAPTCHA v2. hCaptcha, Cloudflare Turnstile, and reCAPTCHA v3 don't use it, so those work without any `CLOUD_*` configuration.
+  Standard AntiCaptcha/YesCaptcha payloads never receive cookies. Proxy and browser-context forwarding are disabled by default because they disclose sensitive connection and session data to the configured endpoint; both are separate explicit opt-ins. Context is only sent to custom endpoints advertising `browserContext` version 1, and cookies are filtered to the active page origin. Secrets are redacted from terminal errors and logs.
 </Note>
+
+---
+
+## Local solver tuning
+
+| **Variable** | **Default** | **Description** |
+| :-- | :-- | :-- |
+| `CAPTCHA_MODEL_TIER` | `auto` | Model selection: `auto`, `owlvit`, or `florence2`. Forcing `florence2` requires 8 GiB\+ effective memory and 2 GiB available. |
+| `CAPTCHA_MODEL_DEVICE` | `auto` | Inference device policy: `auto` or `cpu`. |
+| `SKIP_LOCAL_CAPTCHA_MODEL` | `false` | Unconditionally disable local model detection, download, startup, reconciliation, and fallback. Cached weights are retained. |
+| `CAPTCHA_OWLVIT_THRESHOLD` | calibrated `0.12` | Optional OWL-ViT confidence override in the range 0–1. |
+| `CAPTCHA_FLORENCE2_THRESHOLD` | calibrated `0.18` | Optional Florence-2 confidence override in the range 0–1. |
 
 **Docker Compose example:**
 
@@ -109,27 +151,19 @@ The embedded solver runs automatically inside the Docker image. If you want to p
 services:
   figranium:
     environment:
-      # Optional: point at an external ohmycaptcha instance
-      # - OHMYCAPTCHA_URL=http://your-host:8000
-      # - OHMYCAPTCHA_CLIENT_KEY=your-client-key
+      # Optional: try a remote solver first, fall back to the local model
+      # - CAPTCHA_SOLVER_URL=https://solver.example.com
+      # - CAPTCHA_SOLVER_KEY=your-client-key
 
-      # Required for reCAPTCHA v2's audio-challenge fallback
-      - CLOUD_API_KEY=sk-xxxxxxxx
-      - CLOUD_BASE_URL=https://api.openai.com/v1
-      - CLOUD_MODEL=gpt-4o-audio-preview
+      # Local model tuning (defaults work on most hosts)
+      # - CAPTCHA_MODEL_TIER=auto        # auto|owlvit|florence2
+      # - CAPTCHA_MODEL_DEVICE=auto      # auto|cpu
+      # - SKIP_LOCAL_CAPTCHA_MODEL=true  # disable local entirely
+
+      # Deadline budgeting between remote and local routes
+      # - CAPTCHA_REMOTE_TIMEOUT_MS=45000
+      # - CAPTCHA_LOCAL_FALLBACK_MIN_MS=15000
 ```
-
----
-
-## Running outside Docker
-
-The embedded `ohmycaptcha` process is only started automatically inside the Docker image. If you're running Figranium from source with `pnpm run server` / `pnpm run dev`, start the solver in a separate terminal first:
-
-```bash
-pnpm run captcha:dev
-```
-
-This clones `ohmycaptcha`, resolves a Python 3.10\+ interpreter into an isolated virtualenv (the solver uses `X | None` union syntax, which fails on Python 3.9 — including macOS's Command Line Tools default), installs it, and starts the service on `127.0.0.1:8000`. Leave it running while you use `solve_captcha` blocks. Without it, those blocks fail with a connection error.
 
 ---
 
@@ -141,13 +175,23 @@ If you set `varName`, the variable holds:
 {
   "success": true,
   "challenge": "recaptcha_v2",
-  "duration": 42317
+  "duration": 42317,
+  "provider": "local",
+  "model": "owlvit",
+  "device": "cpu",
+  "attempts": [
+    { "provider": "remote", "status": "unavailable", "duration": 0, "error": "CAPTCHA_SOLVER_URL is not configured" },
+    { "provider": "local", "status": "success", "duration": 42200 }
+  ]
 }
 ```
 
 - `success`: `true` when the token was injected, `false` otherwise.
 - `challenge`: The detected challenge type (`recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, or `turnstile`).
 - `duration`: Milliseconds the solve took end-to-end.
+- `provider`: Which route produced the token (`remote` or `local`).
+- `model`, `device`: Set when the local solver produced the token (`owlvit`/`florence2`, `cpu`/`coreml`/`companion`, ...).
+- `attempts`: Per-route routing outcomes (no credentials or tokens included).
 
 Use this to log solve times, or to branch with an [If](/control-flow) block on `{$captchaResult.success}`.
 
@@ -156,20 +200,24 @@ Use this to log solve times, or to branch with an [If](/control-flow) block on `
 ## Troubleshooting
 
 <AccordionGroup>
-  <Accordion title='Block throws "requires at least 2 GB of memory"' icon="triangle-exclamation">
-    The solver runs its own headless browser. Free memory on the host, or move the workload to a larger instance.
+  <Accordion title="Block errors with 'no solver route succeeded'" icon="triangle-exclamation">
+    Both the remote endpoint (if configured) and the local solver failed. Check `attempts` in the return value for the per-route error. Common causes: `CAPTCHA_SOLVER_URL` unreachable, host memory below 2 GiB with `SKIP_LOCAL_CAPTCHA_MODEL` implicitly disabling local, or a challenge variant not yet supported.
   </Accordion>
 
-  <Accordion title="reCAPTCHA v2 always fails with ERROR_CAPTCHA_UNSOLVABLE" icon="shield">
-    The click-only solve wasn't enough and the audio fallback couldn't run. Set `CLOUD_API_KEY`, `CLOUD_BASE_URL`, and `CLOUD_MODEL` for an OpenAI-compatible endpoint.
+  <Accordion title="Local solver never runs on a small host" icon="microchip">
+    Local image solving requires at least 2 GiB effective cgroup memory. On smaller hosts, configure a remote endpoint via `CAPTCHA_SOLVER_URL` / `CAPTCHA_SOLVER_KEY`.
   </Accordion>
 
-  <Accordion title="Connection error to 127.0.0.1:8000 outside Docker" icon="globe">
-    The embedded solver isn't running. Start it with `pnpm run captcha:dev` in a separate terminal, or point `OHMYCAPTCHA_URL` at an external instance.
+  <Accordion title="Forcing CAPTCHA_MODEL_TIER=florence2 fails to start" icon="chart-simple">
+    Florence-2 requires 8 GiB\+ effective memory and 2 GiB available. Drop back to `auto` or `owlvit`.
   </Accordion>
 
-  <Accordion title="Solve times out at 60s" icon="clock">
-    Raise the block's `timeout` field (or leave it at the new default `120000`). reCAPTCHA v2 image challenges routinely take longer than a minute.
+  <Accordion title="Solve times out at the default deadline" icon="clock">
+    Raise the block's `timeout` field (default `120000`). reCAPTCHA v2 image challenges routinely take longer than a minute. If you're mostly hitting the remote route, adjust `CAPTCHA_REMOTE_TIMEOUT_MS` and `CAPTCHA_LOCAL_FALLBACK_MIN_MS` to reallocate the budget.
+  </Accordion>
+
+  <Accordion title="Apple Silicon companion not detected" icon="apple">
+    Verify the companion is running (`npm run captcha:companion:start` or the `:docker` variant), that `data/captcha-companion-token` is shared between the container and the companion (or `CAPTCHA_COMPANION_TOKEN` is set on both sides), and that `CAPTCHA_COMPANION_URL` points at a reachable host — Docker Desktop uses `http://host.docker.internal:11438`.
   </Accordion>
 </AccordionGroup>
 

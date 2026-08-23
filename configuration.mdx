@@ -32,7 +32,7 @@ Figranium uses environment variables to configure key aspects of the server and 
   </Card>
 
   <Card title="CAPTCHA Solving" icon="key" href="#captcha-solving">
-    ohmycaptcha and audio-challenge fallback settings.
+    Remote provider, local model, and Apple companionRemote endpoint and local model solver settings.
   </Card>
 
   <Card title="PostgreSQL" icon="database" href="#database-postgresql">
@@ -97,11 +97,19 @@ This is useful when running on resource-constrained hosts or when you want to pr
 
 | **Variable** | **Default Value** | **Description** |
 | :-- | :-- | :-- |
-| `OHMYCAPTCHA_URL` | `http://127.0.0.1:8000` | Base URL for the `solve_captcha` action's CAPTCHA-solving service. An embedded `ohmycaptcha` instance runs inside the Docker image by default; set this to point at an external instance instead. |
-| `OHMYCAPTCHA_CLIENT_KEY` | auto-generated | Client key for the CAPTCHA-solving service. Auto-generated for the embedded instance; required when pointing `OHMYCAPTCHA_URL` at an external one. |
-| `CLOUD_API_KEY` | — | OpenAI-compatible API key, forwarded to the embedded `ohmycaptcha` instance. Required for reCAPTCHA v2's audio-challenge fallback; without it, those specific challenges fail with `ERROR_CAPTCHA_UNSOLVABLE`. hCaptcha, Turnstile, and reCAPTCHA v3 don't need it. |
-| `CLOUD_BASE_URL` | — | OpenAI-compatible endpoint (for example, `https://api.openai.com/v1`) for the audio-challenge fallback. |
-| `CLOUD_MODEL` | — | Audio-capable model name (for example, `gpt-4o-audio-preview`) for the audio-challenge fallback. |
+| `CAPTCHA_SOLVER_URL` | — | Optional YesCaptcha/AntiCaptcha-compatible endpoint. When set, remote solving is attempted first, then falls back to the built-in local model. |
+| `CAPTCHA_SOLVER_KEY` | — | Client key for `CAPTCHA_SOLVER_URL`. |
+| `CAPTCHA_MODEL_TIER` | `auto` | Local model selection: `auto`, `owlvit`, or `florence2`. `auto` selects OWL-ViT on 2–7.99 GiB hosts and Florence-2 at 8 GiB\+. |
+| `CAPTCHA_MODEL_DEVICE` | `auto` | Local inference device policy: `auto` or `cpu`. |
+| `SKIP_LOCAL_CAPTCHA_MODEL` | `false` | Disable local model detection, download, startup, reconciliation, and fallback. Cached weights are retained. |
+| `CAPTCHA_REMOTE_TIMEOUT_MS` | action deadline minus local reserve | Maximum time allocated to the remote route before falling back locally. |
+| `CAPTCHA_LOCAL_FALLBACK_MIN_MS` | `15000` | Portion of the action deadline reserved for the active-browser local route. |
+| `CAPTCHA_REMOTE_FORWARD_PROXY` | `false` | Opt in to sending the active browser proxy and user agent to compatible proxy-backed remote tasks. |
+| `CAPTCHA_REMOTE_FORWARD_CONTEXT` | `false` | Opt in to sending origin-scoped cookies, locale, timezone, viewport, and user agent to a custom endpoint advertising `browserContext` version 1. |
+| `CAPTCHA_OWLVIT_THRESHOLD` / `CAPTCHA_FLORENCE2_THRESHOLD` | `0.12` / `0.18` | Optional tier-specific confidence overrides in the range 0–1. |
+| `CAPTCHA_COMPANION_URL` | auto-detected | Optional Apple Silicon companion URL. Docker Desktop discovers `http://host.docker.internal:11438`; native macOS uses loopback. |
+| `CAPTCHA_COMPANION_TOKEN` | generated file | Bearer token for the Apple companion. If omitted, `data/captcha-companion-token` is used. |
+| `OHMYCAPTCHA_URL` / `OHMYCAPTCHA_CLIENT_KEY` | — | Deprecated aliases for `CAPTCHA_SOLVER_URL` / `CAPTCHA_SOLVER_KEY`. |
 
 <Tip>
   See [CAPTCHA Solving](/captcha-solving) for the full feature reference, including the task-level auto-solve toggle and troubleshooting.
@@ -150,10 +158,9 @@ DB_POSTGRESDB_SSL=true
 USE_CLOAK_ENGINE=true
 CLOAKBROWSER_LICENSE_KEY=your_cloakbrowser_license_key
 
-# Optional CAPTCHA solving (required for reCAPTCHA v2's audio fallback)
-CLOUD_API_KEY=sk-xxxxxxxx
-CLOUD_BASE_URL=https://api.openai.com/v1
-CLOUD_MODEL=gpt-4o-audio-preview
+# Optional CAPTCHA solving (remote endpoint; local model runs by default)
+CAPTCHA_SOLVER_URL=https://solver.example.com
+CAPTCHA_SOLVER_KEY=your-client-key
 ```
 
 ## Notes

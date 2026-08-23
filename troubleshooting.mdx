@@ -119,13 +119,14 @@ Common issues and their solutions when running Figranium.
 
 <AccordionGroup>
   <Accordion title="Page shows CAPTCHA or Access Denied">
-    - **Cause**: The target website detected automated browser behavior.
+    - **Cause**: The target website detected automated browser behavior, or served a CAPTCHA challenge.
     - **Fix**:
-      1. Enable **Stealth Mode** options in the Task Editor (natural typing, idle movements, etc.).
-      2. Use high-quality **Residential Proxies** rather than datacenter IPs.
-      3. Rotate **User Agents** in `Settings > System > User Agent`.
-      4. Add random `wait` actions (500–2000ms) between interactions.
-      5. Avoid actions that no human would do (instant form fill, no mouse movement).
+      1. If a supported CAPTCHA renders (reCAPTCHA v2/v3, hCaptcha, Cloudflare Turnstile), drop a **Solve Captcha** block at that step, or toggle **Auto-Solve Captchas** in the task's Behavior tab. Figranium routes solves through a configured YesCaptcha/AntiCaptcha-compatible endpoint first and falls back to the built-in local model. See [CAPTCHA Solving](/captcha-solving) for setup and environment variables.
+      2. Enable **Stealth Mode** options in the Task Editor (natural typing, idle movements, etc.).
+      3. Use high-quality **Residential Proxies** rather than datacenter IPs.
+      4. Rotate **User Agents** in `Settings > System > User Agent`.
+      5. Add random `wait` actions (500–2000ms) between interactions.
+      6. Avoid actions that no human would do (instant form fill, no mouse movement).
   </Accordion>
 </AccordionGroup>
 

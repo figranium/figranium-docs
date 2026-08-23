@@ -228,21 +228,17 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
     - **Task**: The ID of the task to run.
   </Accordion>
 
-  <Accordion title="Solve CAPTCHA (solve_captcha)" icon="shield">
-    <Warning>
-      **Currently broken.** `solve_captcha` and the task-level auto-solve setting are timing out against reCAPTCHA v2 and Cloudflare Turnstile pending further investigation. The Editor palette labels this block as **Solve Captcha (Broken)** to reflect that. See [CAPTCHA Solving](/captcha-solving) for the full status.
-    </Warning>
-
-    Detects a CAPTCHA challenge on the current page, solves it through the bundled `ohmycaptcha` service, and injects the token back into the page so the site's own callback fires. Use this when a specific step reaches a challenge you already know about — for example, right after submitting a login form.
+  <Accordion title="Solve Captcha (solve_captcha)" icon="shield" id="solve-captcha">
+    Detects a CAPTCHA challenge on the current page and solves it through a configured YesCaptcha/AntiCaptcha-compatible endpoint (tried first when set) or the built-in active-browser local solver, then injects the token back into the page so the site's own callback fires. Use this when a specific step reaches a challenge you already know about — for example, right after submitting a login form.
 
     Supported challenge types: reCAPTCHA v2, reCAPTCHA v3, hCaptcha, and Cloudflare Turnstile.
 
-    - **CAPTCHA Type**: (Optional) One of `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, or `turnstile`. If empty, the type is auto-detected from the page.
+    - **Captcha Type**: (Optional) One of `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, or `turnstile`. If empty, the type is auto-detected from the page.
     - **Selector**: (Optional) A CSS selector scoping the search to a specific container (for example, the widget's iframe wrapper). If empty, the whole page is scanned.
-    - **Store In Variable**: (Optional) A variable name to store solve metadata (`{ success, challenge, duration }`).
-    - **Timeout**: (Optional) Max time in milliseconds to wait for a solution. Defaults to `120000`. Real solving usually takes over a minute, especially for reCAPTCHA v2's image-challenge fallback.
+    - **Store In Variable**: (Optional) A variable name to store solve metadata (`{ success, challenge, duration, provider, model?, device?, attempts }`).
+    - **Timeout**: (Optional) Terminal deadline in milliseconds. Defaults to `120000`. Image challenges usually take over a minute. Provider errors are returned immediately rather than being reported as timeouts.
 
-    The block runs in Agent mode only. The bundled solver runs its own headless Chromium in a sidecar process, so the host must have at least 2 GB of free memory or the block throws. reCAPTCHA v2 additionally falls back to audio-challenge transcription against an OpenAI-compatible endpoint — that path requires `CLOUD_API_KEY`, `CLOUD_BASE_URL`, and `CLOUD_MODEL` to be set, or those specific challenges fail with `ERROR_CAPTCHA_UNSOLVABLE`. hCaptcha, Turnstile, and reCAPTCHA v3 don't need it.
+    The block runs in Agent mode only. Local image solving requires at least 2 GiB effective cgroup memory since the model runs in-process; lower-memory hosts can still use a configured remote endpoint. Set `SKIP_LOCAL_CAPTCHA_MODEL=true` to disable the local route entirely.
 
     **Example — solve a reCAPTCHA v2 widget and store the result:**
 
@@ -256,7 +252,7 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
     }
     ```
 
-    For tasks that hit CAPTCHAs at unpredictable points, you can turn on the task-level **Auto-Solve CAPTCHA** setting instead of scattering `solve_captcha` blocks through the flow — it runs the same detection pass after every `navigate`, `click`, and `type`, and no-ops when no challenge is present. See [CAPTCHA Solving](/captcha-solving) for the full setup, environment variables, and the auto-solve toggle.
+    For tasks that hit CAPTCHAs at unpredictable points, you can turn on the task-level **Auto-Solve Captchas** setting instead of scattering `solve_captcha` blocks through the flow — it runs the same detection pass after every `navigate`, `click`, and `type`, and no-ops when no challenge is present. See [CAPTCHA Solving](/captcha-solving) for the full setup, environment variables, and the auto-solve toggle.
   </Accordion>
 
   <Accordion title="Do Nothing (do_nothing)" icon="ban">
