@@ -1,0 +1,123 @@
+---
+title: "ExecutionResource: Direct Scrape, Agent, and Headful Runs"
+sidebarTitle: "Execution"
+description: "Run one-off browser automation with the Figranium JavaScript SDK. Use scrape, agent, and headful methods without creating a saved task."
+---
+
+The `ExecutionResource` provides direct, stateless endpoints for running browser automation without saving a task first. You can scrape a page, run an agent session, or launch a headful browser in a single call. The `Figranium` client also exposes these as top-level shortcuts: `figranium.scrape()`, `figranium.agent()`, and `figranium.headful()`.
+
+<Note>
+  `ExecutionResource` (singular) is for **direct runs**. For saved-task execution, see [`TasksResource`](/sdk/js/resources/tasks). For execution history and live streams, see [`ExecutionsResource`](/sdk/js/resources/executions).
+</Note>
+
+```ts
+import { Figranium } from "@figranium/sdk";
+
+const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
+```
+
+## scrape
+
+```ts
+scrape<T = unknown>(
+  input: UnknownRecord & {
+    url?: string;
+    selector?: string;
+    extractionScript?: string;
+    variables?: RuntimeVariables;
+    taskVariables?: RuntimeVariables;
+  },
+  options?: RequestOptions
+): Promise<ExecutionResult<T>>
+```
+
+Performs a one-off scrape by sending `POST /scrape`. Pass a `url`, a `selector` for DOM extraction, or an `extractionScript` for custom parsing. You can also inject runtime [variables](/sdk/js/variables) via `variables` or `taskVariables`.
+
+```ts scrape-by-selector.ts
+const result = await figranium.execution.scrape({
+  url: "https://news.ycombinator.com",
+  selector: ".titleline > a",
+  variables: { limit: 5 },
+});
+
+console.log(result.data);
+```
+
+```ts scrape-by-script.ts
+const result = await figranium.execution.scrape({
+  url: "https://example.com",
+  extractionScript: `
+    const items = Array.from(document.querySelectorAll('.item'));
+    return items.map(el => el.textContent?.trim());
+  `,
+});
+
+console.log(result.data);
+```
+
+## agent
+
+```ts
+agent<T = unknown>(
+  input: UnknownRecord & { runId?: string },
+  options?: RequestOptions
+): Promise<ExecutionResult<T>>
+```
+
+Runs a one-off agent session by sending `POST /agent`. The agent navigates and interacts autonomously based on the provided input. You can supply a `runId` to correlate or resume a specific run.
+
+```ts agent-run.ts
+const result = await figranium.execution.agent({
+  url: "https://example.com",
+  runId: "run-2024-001",
+});
+
+console.log(result.success, result.data);
+```
+
+## headful
+
+```ts
+headful<T = unknown>(
+  input: UnknownRecord & {
+    url?: string;
+    variables?: RuntimeVariables;
+    taskVariables?: RuntimeVariables;
+  },
+  options?: RequestOptions
+): Promise<ExecutionResult<T>>
+```
+
+Launches a headful (visible) browser session by sending `POST /headful`. Pass a starting `url` and optional runtime [variables](/sdk/js/variables). This is useful when you need to interact with a live browser window or debug visually.
+
+```ts headful-run.ts
+const result = await figranium.execution.headful({
+  url: "https://example.com/login",
+  variables: { username: "alice" },
+});
+
+console.log(result.runId, result.data);
+```
+
+## Top-level shortcuts
+
+`Figranium` mirrors these methods at the client root so you can call them directly without reaching into `execution`:
+
+```ts shortcuts.ts
+const scrapeResult = await figranium.scrape({ url: "https://example.com", selector: "h1" });
+const agentResult  = await figranium.agent({ url: "https://example.com" });
+const headfulResult = await figranium.headful({ url: "https://example.com" });
+```
+
+## Return type
+
+All three methods return `ExecutionResult<T>`, which extends `UnknownRecord` and includes:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `data` | `T` | The typed result payload from the run. |
+| `success` | `boolean` | Whether the execution completed successfully. |
+| `error` | `string` | Error message if the run failed. |
+| `runId` | `string` | Correlation ID for the execution. |
+
+For error handling, see [`/sdk/js/errors`](/sdk/js/errors). For request options such as `signal`, `timeoutMs`, and custom `headers`, see [`/sdk/js/request-options`](/sdk/js/request-options).

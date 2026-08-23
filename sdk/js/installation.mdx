@@ -1,0 +1,90 @@
+---
+title: "Install the Figranium JavaScript SDK"
+sidebarTitle: "Installation"
+description: "Install @figranium/sdk with npm, yarn, pnpm, or bun. Requirements, module formats, and CommonJS versus ESM guidance for the Figranium SDK."
+---
+
+The Figranium JavaScript SDK installs from npm as `@figranium/sdk`. It ships parallel ESM and CommonJS builds with bundled TypeScript declarations, so most projects need no additional configuration.
+
+## Requirements
+
+- Node.js `18` or newer (for the built-in global `fetch`), or a modern browser.
+- A running Figranium server that the client can reach at its `baseUrl`. Local installs default to `http://localhost:11345`.
+
+## Install
+
+<CodeGroup>
+
+```bash npm
+npm install @figranium/sdk
+```
+
+```bash pnpm
+pnpm add @figranium/sdk
+```
+
+```bash yarn
+yarn add @figranium/sdk
+```
+
+```bash bun
+bun add @figranium/sdk
+```
+
+</CodeGroup>
+
+The package has no runtime dependencies, so it adds nothing to your dependency tree beyond itself.
+
+## Import styles
+
+The SDK works with both `import` and `require`.
+
+<CodeGroup>
+
+```ts ESM / TypeScript
+import { Figranium } from "@figranium/sdk";
+
+const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
+```
+
+```js CommonJS
+const { Figranium } = require("@figranium/sdk");
+
+const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY });
+```
+
+</CodeGroup>
+
+## Verify the install
+
+Call `health.check()` to confirm the SDK can reach your Figranium server.
+
+```ts verify.ts
+import { Figranium } from "@figranium/sdk";
+
+const figranium = new Figranium({
+  baseUrl: "http://localhost:11345",
+  apiKey: process.env.FIGRANIUM_API_KEY!,
+});
+
+const status = await figranium.health.check();
+console.log(status);
+```
+
+A healthy Figranium instance returns a JSON object with `status: "ok"`.
+
+## Browsers and bundlers
+
+The SDK is `sideEffects: false`, so bundlers like Vite, webpack, esbuild, and Rollup tree-shake unused resources. In the browser, use a session-authenticated client (`{ session: true }`) so cookies are sent; see [Authentication](/sdk/js/authentication).
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/sdk/js/quickstart">
+    Save and run your first task with the SDK.
+  </Card>
+
+  <Card title="Client configuration" icon="sliders" href="/sdk/js/client-configuration">
+    Configure `baseUrl`, timeouts, custom `fetch`, and default headers.
+  </Card>
+</CardGroup>

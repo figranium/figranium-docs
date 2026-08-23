@@ -1,0 +1,214 @@
+---
+title: "BrowserResource: Open and Control Browser Sessions"
+sidebarTitle: "Browser"
+description: "Use the Figranium JavaScript SDK to open browser sessions, inspect headful instances, highlight selectors, and stream live selector events from the server."
+---
+
+The `BrowserResource` in the Figranium JavaScript SDK gives you programmatic control over browser sessions. You can open headless or headful sessions, inspect the current headful state, highlight candidate selectors on a page, and stream live selector events during an active headful session.
+
+```ts
+import { Figranium } from "@figranium/sdk";
+
+const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
+```
+
+## `open`
+
+Opens a browser session. You can run in headless mode, headful mode, scrape mode, or agent mode.
+
+**Signature**
+
+```ts
+open(
+  input: {
+    url?: string;
+    mode?: "headful" | "scrape" | "agent";
+    devTools?: boolean;
+    headless?: boolean;
+  } = {},
+  options?: RequestOptions
+): Promise<BrowserSession>
+```
+
+**HTTP endpoint**: `POST /api/browser/open`
+
+**Returns**: [`BrowserSession`](/sdk/js/resources/browser) with `sessionId`, `status`, and optionally `wsEndpoint`.
+
+```ts open-session.ts
+const session = await figranium.browser.open({
+  url: "https://example.com",
+  mode: "headful",
+  devTools: true,
+});
+
+console.log(session.sessionId, session.status);
+```
+
+## `highlight`
+
+Highlights candidate selectors on a page and returns a DOM snapshot. Useful for building or debugging selector-based tasks.
+
+**Signature**
+
+```ts
+highlight(
+  input: {
+    sessionId?: string;
+    url?: string;
+    targetHint?: string;
+  },
+  options?: RequestOptions
+): Promise<{ success: boolean; selectors: SelectorCandidate[]; snapshot: string | null }>
+```
+
+**HTTP endpoint**: `POST /api/inspector/highlight`
+
+**Returns**: An object with `success`, an array of [`SelectorCandidate`](/sdk/js/resources/browser) objects (`css`, optional `xpath` and `confidence`), and a `snapshot` string.
+
+```ts highlight.ts
+const result = await figranium.browser.highlight({
+  url: "https://example.com",
+  targetHint: "search input",
+});
+
+for (const candidate of result.selectors) {
+  console.log(candidate.css, candidate.confidence);
+}
+```
+
+## `stopHeadful`
+
+Stops the active headful browser session.
+
+**Signature**
+
+```ts
+stopHeadful(options?: RequestOptions): Promise<UnknownRecord>
+```
+
+**HTTP endpoint**: `POST /headful/stop`
+
+**Returns**: `UnknownRecord`
+
+```ts stop-headful.ts
+await figranium.browser.stopHeadful();
+```
+
+## `headfulStatus`
+
+Checks whether the headful session is configured to use noVNC.
+
+**Signature**
+
+```ts
+headfulStatus(options?: RequestOptions): Promise<{ useNovnc: boolean }>
+```
+
+**HTTP endpoint**: `GET /api/headful/status`
+
+**Returns**: `{ useNovnc: boolean }`
+
+```ts headful-status.ts
+const status = await figranium.browser.headfulStatus();
+console.log(status.useNovnc);
+```
+
+## `inspect`
+
+Inspects the current headful session and returns diagnostic information.
+
+**Signature**
+
+```ts
+inspect(options?: RequestOptions): Promise<UnknownRecord>
+```
+
+**HTTP endpoint**: `POST /api/headful/inspect`
+
+**Returns**: `UnknownRecord`
+
+```ts inspect.ts
+const info = await figranium.browser.inspect();
+console.log(info);
+```
+
+## `vncPassword`
+
+Retrieves the VNC password for the current headful session.
+
+**Signature**
+
+```ts
+vncPassword(options?: RequestOptions): Promise<{ password: string }>
+```
+
+**HTTP endpoint**: `GET /api/headful/vnc-password`
+
+**Returns**: `{ password: string }`
+
+```ts vnc-password.ts
+const { password } = await figranium.browser.vncPassword();
+```
+
+## `selectorStream`
+
+Streams live selector events from the headful session as an async iterable.
+
+**Signature**
+
+```ts
+selectorStream<T = UnknownRecord>(
+  options?: RequestOptions
+): AsyncIterable<StreamEvent<T>>
+```
+
+**HTTP endpoint**: `GET /api/headful/selector_stream`
+
+**Returns**: `AsyncIterable<StreamEvent<T>>`
+
+<Note>
+  This is a server-sent event stream. For details on aborting and iterating streams, see [Streaming](/sdk/js/streaming).
+</Note>
+
+```ts selector-stream.ts
+const controller = new AbortController();
+
+for await (const event of figranium.browser.selectorStream({
+  signal: controller.signal,
+})) {
+  console.log(event.event, event.data);
+}
+```
+
+## Headful debugging workflow
+
+A typical headful debugging session combines several `BrowserResource` methods to open a browser, inspect state, stream selector events, and clean up when finished.
+
+```ts headful-workflow.ts
+// 1. Open a headful session
+const session = await figranium.browser.open({
+  url: "https://example.com",
+  mode: "headful",
+});
+
+// 2. Check headful status and VNC access
+const status = await figranium.browser.headfulStatus();
+const { password } = await figranium.browser.vncPassword();
+
+// 3. Stream selector events while interacting with the page
+const controller = new AbortController();
+const stream = figranium.browser.selectorStream({ signal: controller.signal });
+
+for await (const event of stream) {
+  console.log("selector event:", event.data);
+}
+
+// 4. Stop the session when done
+await figranium.browser.stopHeadful();
+```
+
+## Related resources
+
+- [Streaming](/sdk/js/streaming) for details on `AsyncIterable<StreamEvent<T>>` and abort controllers
+- [Request options](/sdk/js/request-options) for `signal`, `timeoutMs`, and custom `headers`
+- [Errors](/sdk/js/errors) for `FigraniumError` handling

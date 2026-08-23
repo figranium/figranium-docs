@@ -1,0 +1,111 @@
+---
+title: "Stream Executions and Selector Events"
+sidebarTitle: "Streaming"
+description: "Consume Figranium Server-Sent Events with the JavaScript SDK. Execution and selector streams as AsyncIterable with AbortSignal, event names, and IDs."
+---
+
+Figranium exposes two Server-Sent Events endpoints, and the SDK surfaces both as `AsyncIterable<StreamEvent>`. You consume them with `for await`, cancel them with an `AbortSignal`, and read event names, IDs, and parsed data straight off each event.
+
+## Streams
+
+| Method | Endpoint | Purpose |
+| :-- | :-- | :-- |
+| `figranium.executions.stream()` | `/api/executions/stream` | Live execution lifecycle events |
+| `figranium.browser.selectorStream()` | `/api/headful/selector_stream` | Selector events from a headful browser session |
+
+Both take an optional `RequestOptions` argument (`signal`, `timeoutMs`, `headers`).
+
+## StreamEvent shape
+
+```ts
+interface StreamEvent<T = unknown> {
+  data: T;         // Parsed JSON payload; falls back to the raw string
+  event?: string;  // SSE `event:` name, when present
+  id?: string;     // SSE `id:` value, when present
+  retry?: number;  // SSE `retry:` value, when present
+  raw: string;     // Concatenated data lines exactly as received
+}
+```
+
+The SDK tries `JSON.parse` on the data lines. If parsing fails, `data` is the raw string and `raw` still contains the original payload.
+
+## Consume execution events
+
+```ts
+import { Figranium } from "@figranium/sdk";
+
+const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
+
+for await (const event of figranium.executions.stream()) {
+  console.log(event.event, event.data);
+}
+```
+
+Iteration ends when the server closes the connection or when your loop breaks. Breaking out of the loop cancels the underlying reader.
+
+## Cancel a stream
+
+Streams honor `AbortSignal`. Aborting cancels the reader and terminates iteration.
+
+```ts
+const controller = new AbortController();
+
+try {
+  for await (const event of figranium.executions.stream({ signal: controller.signal })) {
+    if (isTerminal(event)) controller.abort();
+    handle(event);
+  }
+} catch (error) {
+  // Aborted streams throw FigraniumError { code: "REQUEST_ABORTED" }.
+}
+```
+
+## Terminal timeouts
+
+Streams have no default timeout. Set `timeoutMs` only when you want a hard deadline; the stream aborts as soon as the timer fires:
+
+```ts
+for await (const event of figranium.executions.stream({ timeoutMs: 60_000 })) {
+  console.log(event.data);
+}
+```
+
+## Typed payloads
+
+`stream()` accepts a generic type parameter that types the parsed `data`:
+
+```ts
+type ExecutionEvent =
+  | { status: "queued"; runId: string }
+  | { status: "running"; runId: string; step: string }
+  | { status: "completed"; runId: string; result: unknown };
+
+for await (const event of figranium.executions.stream<ExecutionEvent>()) {
+  if (event.data.status === "completed") {
+    console.log(event.data.result);
+  }
+}
+```
+
+Because the server may add fields over time, keep type guards defensive and treat unknown `status` values as forward-compatible additions.
+
+## Selector stream from a headful browser
+
+The selector stream reports element highlights from a headful browser session. Use it to power visual inspectors:
+
+```ts
+for await (const event of figranium.browser.selectorStream()) {
+  console.log(event.event, event.data);
+}
+```
+
+See [Browser resource](/sdk/js/resources/browser) for opening, inspecting, and stopping headful sessions.
+
+## Errors
+
+Streams throw `FigraniumError` in the same conditions as regular requests, plus:
+
+- `EMPTY_STREAM`: the response arrived with no body.
+- `REQUEST_ABORTED`: the caller aborted, or the terminal `timeoutMs` fired.
+
+See [Errors](/sdk/js/errors) for the full error surface.

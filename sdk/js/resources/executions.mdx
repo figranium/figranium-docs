@@ -1,0 +1,143 @@
+---
+title: "ExecutionsResource: list, inspect, and stream runs"
+sidebarTitle: "Executions"
+description: "Manage Figranium task executions with the JavaScript SDK. List, get, delete, clear, stop, and stream execution events in real time."
+---
+
+The `ExecutionsResource` on the Figranium JavaScript SDK gives you full visibility and control over every task run. Use it to list past executions, inspect a single run, clean up history, stop active runs, and subscribe to a live Server-Sent Events stream of execution updates.
+
+```ts
+import { Figranium } from "@figranium/sdk";
+
+const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
+```
+
+## list
+
+```ts
+list(options?: RequestOptions & { apiKeyRoute?: boolean }): Promise<{ executions: Execution[] }>
+```
+
+Returns a paginated-style list of executions. By default it calls `GET /api/executions/list`, which is the route intended for API-key access. If you pass `apiKeyRoute: false`, the SDK switches to `GET /api/executions` instead.
+
+<Note>
+  Most callers should leave `apiKeyRoute` at its default (`true`). Only override it when your deployment requires the alternate route.
+</Note>
+
+```ts
+// Default route: GET /api/executions/list
+const { executions } = await figranium.executions.list();
+console.log(executions[0].runId, executions[0].status);
+
+// Alternate route: GET /api/executions
+const { executions: all } = await figranium.executions.list({ apiKeyRoute: false });
+```
+
+## get
+
+```ts
+get<T = unknown>(id: string, options?: RequestOptions): Promise<{ execution: Execution<T> }>
+```
+
+Fetches a single execution by its ID. Calls `GET /api/executions/:id`. You can supply a generic type parameter to narrow the typed `result` field.
+
+```ts
+const { execution } = await figranium.executions.get("exec_01JXYZ");
+console.log(execution.status, execution.durationMs);
+
+// Typed result
+interface Product {
+  name: string;
+  price: number;
+}
+const typed = await figranium.executions.get<Product>("exec_01JXYZ");
+console.log(typed.execution.result?.price);
+```
+
+## delete
+
+```ts
+delete(id: string, options?: RequestOptions): Promise<{ success: boolean }>
+```
+
+Removes a single execution record. Calls `DELETE /api/executions/:id`.
+
+```ts
+const { success } = await figranium.executions.delete("exec_01JXYZ");
+```
+
+## clear
+
+```ts
+clear(options?: RequestOptions): Promise<{ success: boolean }>
+```
+
+Deletes all executions in bulk. Calls `POST /api/executions/clear`.
+
+```ts
+const { success } = await figranium.executions.clear();
+```
+
+## stop
+
+```ts
+stop(input: { runId: string }, options?: RequestOptions): Promise<{ success: boolean }>
+```
+
+Sends a stop signal to an active run. Calls `POST /api/executions/stop`.
+
+```ts
+const { success } = await figranium.executions.stop({ runId: "run_abc123" });
+```
+
+## stream
+
+```ts
+stream<T = unknown>(options?: RequestOptions): AsyncIterable<StreamEvent<T>>
+```
+
+Opens a Server-Sent Events connection to `GET /api/executions/stream` and yields each event as it arrives. The iterable stays open until the server closes the stream, the client stops iterating, or the request is aborted.
+
+For details on the `StreamEvent` shape and how cancellation works, see [Streaming](/sdk/js/streaming). For error handling, see [Errors](/sdk/js/errors).
+
+```ts
+const controller = new AbortController();
+
+setTimeout(() => controller.abort(), 30000);
+
+try {
+  for await (const event of figranium.executions.stream({
+    signal: controller.signal,
+  })) {
+    console.log(event.event, event.data);
+  }
+} catch (error) {
+  // FigraniumError with code REQUEST_ABORTED when aborted
+  console.error(error);
+}
+```
+
+## End-to-end example
+
+This example lists recent executions, inspects the newest one, and stops it if it is still running.
+
+```ts
+// 1) List recent executions (default API-key route)
+const { executions } = await figranium.executions.list();
+
+if (executions.length === 0) {
+  console.log("No executions yet.");
+  return;
+}
+
+// 2) Inspect the most recent run
+const latest = executions[0];
+const { execution } = await figranium.executions.get(latest.id);
+console.log(`Run ${execution.runId} status: ${execution.status}`);
+
+// 3) Stop if still active
+if (execution.status === "running") {
+  const { success } = await figranium.executions.stop({ runId: execution.runId! });
+  console.log("Stop requested:", success);
+}
+```

@@ -84,6 +84,36 @@
         ]
       },
       {
+        "group": "JavaScript SDK",
+        "pages": [
+          "sdk/js/overview",
+          "sdk/js/installation",
+          "sdk/js/quickstart",
+          "sdk/js/client-configuration",
+          "sdk/js/authentication",
+          "sdk/js/request-options",
+          "sdk/js/errors",
+          "sdk/js/streaming",
+          "sdk/js/actions",
+          "sdk/js/variables",
+          {
+            "group": "Resources",
+            "pages": [
+              "sdk/js/resources/tasks",
+              "sdk/js/resources/executions",
+              "sdk/js/resources/schedules",
+              "sdk/js/resources/captures",
+              "sdk/js/resources/credentials",
+              "sdk/js/resources/browser",
+              "sdk/js/resources/execution",
+              "sdk/js/resources/settings",
+              "sdk/js/resources/auth",
+              "sdk/js/resources/health"
+            ]
+          }
+        ]
+      },
+      {
         "group": "Ops",
         "pages": [
           "performance",

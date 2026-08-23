@@ -1,0 +1,139 @@
+---
+title: "Figranium JavaScript SDK Quickstart"
+sidebarTitle: "Quickstart"
+description: "Build, save, and run a typed Figranium task with the SDK in a few minutes. Includes runtime variables and a full working TypeScript example."
+---
+
+This quickstart takes you from an empty project to running a saved Figranium task through the SDK. You'll construct a typed `Task`, save it to the server, and execute it with runtime variables.
+
+<Steps>
+  <Step title="Install the SDK">
+    Install `@figranium/sdk` in your project and make sure you're on Node.js 18 or newer.
+
+    ```bash
+    npm install @figranium/sdk
+    ```
+  </Step>
+  <Step title="Create the client">
+    Point the client at your Figranium server and pass your API key. `baseUrl` defaults to `http://localhost:11345`.
+
+    ```ts
+    import { Figranium } from "@figranium/sdk";
+    
+    const figranium = new Figranium({
+      baseUrl: "http://localhost:11345",
+      apiKey: process.env.FIGRANIUM_API_KEY!,
+    });
+    ```
+  </Step>
+  <Step title="Define and save a task">
+    Use the `actions` helpers and the `variable()` template helper to build a typed task, then save it with `tasks.save`.
+
+    ```ts
+    import { actions, variable, type Task } from "@figranium/sdk";
+    
+    const task: Task = {
+      name: "Search and extract",
+      description: "Runs a search and captures visible results",
+      url: "https://example.com",
+      mode: "agent",
+      variables: {
+        query: { type: "string", value: "figranium" },
+      },
+      actions: [
+        actions.waitFor("#search"),
+        actions.type("#search", variable("query")),
+        actions.press("Enter", "#search"),
+        actions.waitFor(".results"),
+        actions.getContent(".results", "resultText"),
+      ],
+    };
+    
+    const saved = await figranium.tasks.save(task);
+    ```
+
+    `variable("query")` produces Figranium's `{$query}` template token. Every action helper generates a stable, unique action ID.
+  </Step>
+  <Step title="Run the task">
+    Execute the saved task with runtime variables. `runTask` is a convenience wrapper around `tasks.run`.
+
+    ```ts
+    const result = await figranium.runTask(saved.id!, {
+      variables: { query: "browser automation" },
+    });
+    
+    console.log(result.data);
+    ```
+  </Step>
+</Steps>
+
+## Full example
+
+```ts basic.ts icon=square-js
+import { actions, Figranium, FigraniumError, variable, type Task } from "@figranium/sdk";
+
+const client = new Figranium({
+  ...(process.env.FIGRANIUM_BASE_URL ? { baseUrl: process.env.FIGRANIUM_BASE_URL } : {}),
+  apiKey: process.env.FIGRANIUM_API_KEY ?? "",
+});
+
+const task: Task = {
+  name: "Example search",
+  description: "Searches a page and extracts its visible content",
+  url: "https://example.com",
+  mode: "agent",
+  variables: { query: { type: "string", value: "figranium" } },
+  actions: [
+    actions.waitFor("body"),
+    actions.set("activeQuery", variable("query")),
+    actions.getContent("body", "pageText"),
+  ],
+};
+
+try {
+  const saved = await client.tasks.save(task);
+  const result = await client.runTask(saved.id!, {
+    variables: { query: "browser automation" },
+  });
+  console.log(result.data);
+} catch (error) {
+  if (error instanceof FigraniumError) {
+    console.error(error.status, error.code, error.message);
+  } else {
+    throw error;
+  }
+}
+```
+
+## Direct execution without saving
+
+You can also call `scrape`, `agent`, and `headful` directly for one-off runs:
+
+```ts
+const result = await figranium.scrape({
+  url: "https://example.com",
+  selector: "body",
+});
+```
+
+See [Execution resource](/sdk/js/resources/execution) for the full API.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Actions and variables" icon="wand-magic-sparkles" href="/sdk/js/actions">
+    Build task action lists with the typed helpers.
+  </Card>
+
+  <Card title="Streaming" icon="signal-stream" href="/sdk/js/streaming">
+    Subscribe to live execution events over Server-Sent Events.
+  </Card>
+
+  <Card title="Errors" icon="triangle-exclamation" href="/sdk/js/errors">
+    Handle `FigraniumError` and inspect status, code, and details.
+  </Card>
+
+  <Card title="Tasks resource" icon="list-check" href="/sdk/js/resources/tasks">
+    Full reference for creating, versioning, and running tasks.
+  </Card>
+</CardGroup>

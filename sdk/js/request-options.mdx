@@ -1,0 +1,84 @@
+---
+title: "Per-Request Options in the Figranium SDK"
+sidebarTitle: "Request Options"
+description: "Pass AbortSignal, timeoutMs, and headers per call in the Figranium JavaScript SDK. Cancel requests, override timeouts, and inject one-off headers."
+---
+
+Every SDK method accepts an optional final argument, `RequestOptions`, that controls cancellation, per-call timeouts, and one-off headers. The same object works for regular requests and for Server-Sent Events streams.
+
+## RequestOptions
+
+```ts
+interface RequestOptions {
+  signal?: AbortSignal;
+  timeoutMs?: number;
+  headers?: HeadersInit;
+}
+```
+
+### `signal`
+
+An `AbortSignal` that cancels the request. If the signal aborts before the response arrives, the SDK throws a `FigraniumError` with `code: "REQUEST_ABORTED"`.
+
+```ts
+const controller = new AbortController();
+setTimeout(() => controller.abort(), 5_000);
+
+await figranium.tasks.list({ signal: controller.signal });
+```
+
+For streams, aborting the signal ends iteration cleanly:
+
+```ts
+const controller = new AbortController();
+
+for await (const event of figranium.executions.stream({ signal: controller.signal })) {
+  console.log(event.data);
+  if (shouldStop(event)) controller.abort();
+}
+```
+
+### `timeoutMs`
+
+Overrides the client-wide default timeout for this call. The client default is `30_000` ms; you can set a shorter or longer bound per request.
+
+```ts
+await figranium.tasks.list({ timeoutMs: 5_000 });
+```
+
+Streams have no default timeout. Set `timeoutMs` on a stream only when you want a terminal deadline; the stream aborts and throws when it hits that limit.
+
+### `headers`
+
+Extra headers merged over the client's default headers for this call. Useful for request correlation IDs, feature flags, or overriding a default value once.
+
+```ts
+await figranium.tasks.list({
+  headers: { "x-correlation-id": "req-42" },
+});
+```
+
+## Combining options
+
+Pass all three together when needed:
+
+```ts
+const controller = new AbortController();
+
+await figranium.tasks.save(task, {
+  signal: controller.signal,
+  timeoutMs: 10_000,
+  headers: { "x-run-id": runId },
+  createVersion: true, // resource-specific options merge with RequestOptions
+});
+```
+
+Some methods extend `RequestOptions` with extra fields (for example `tasks.save` accepts `createVersion`). Those flags travel in the same options object.
+
+## Cancellation semantics
+
+- Aborting an `AbortSignal` before the response starts causes the fetch to reject; the SDK translates that into `FigraniumError { code: "REQUEST_ABORTED" }`.
+- The client-wide timeout, and any per-call `timeoutMs`, is implemented as an internal `AbortController` with a `DOMException` of type `TimeoutError`. It surfaces as the same `REQUEST_ABORTED` error.
+- Streams stop iterating when the signal aborts. Any pending reader is cancelled and the connection is closed.
+
+See [Errors](/sdk/js/errors) for the shape of the thrown error.

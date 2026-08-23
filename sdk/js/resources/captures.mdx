@@ -1,0 +1,222 @@
+---
+title: "CapturesResource - Manage recordings, screenshots, and cookies"
+description: "Use the Figranium JavaScript SDK to list captures, delete recordings, manage browser cookies, and clear screenshots. Covers every CapturesResource method with typed examples."
+sidebarTitle: "Captures"
+---
+
+The `CapturesResource` gives you access to recordings, screenshots, and browser cookies produced during task executions. You can list captures for a specific run, delete individual files, inspect stored cookies, and bulk-clear screenshots or cookies when you need to reclaim space or reset state.
+
+```ts
+import { Figranium } from "@figranium/sdk";
+
+const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
+```
+
+## `list`
+
+Returns all captures, including recordings and screenshots. Optionally filter by `runId`.
+
+**Signature**
+
+```ts
+captures.list(input: { runId?: string } = {}, options?: RequestOptions)
+```
+
+**HTTP endpoint**
+
+`GET /api/data/captures` (with `runId` query parameter when set)
+
+**Returns** `{ captures: Capture[] }`
+
+Each `Capture` has the following shape:
+
+```ts
+interface Capture {
+  name: string;
+  url: string;
+  size: number;
+  modified: number;
+  type: "recording" | "screenshot";
+}
+```
+
+**Example**
+
+```ts list-captures.ts
+const { captures } = await figranium.captures.list({ runId: "run_abc123" });
+
+for (const capture of captures) {
+  console.log(`${capture.type}: ${capture.name} (${capture.size} bytes)`);
+}
+```
+
+## `screenshots`
+
+Returns only screenshot captures, omitting recordings.
+
+**Signature**
+
+```ts
+captures.screenshots(options?: RequestOptions)
+```
+
+**HTTP endpoint**
+
+`GET /api/data/screenshots`
+
+**Returns** `{ screenshots: Capture[] }`
+
+**Example**
+
+```ts list-screenshots.ts
+const { screenshots } = await figranium.captures.screenshots();
+
+for (const shot of screenshots) {
+  console.log(`${shot.name}: ${shot.url}`);
+}
+```
+
+## `delete`
+
+Delete a single capture by its name.
+
+**Signature**
+
+```ts
+captures.delete(name: string, options?: RequestOptions)
+```
+
+**HTTP endpoint**
+
+`DELETE /api/data/captures/:name`
+
+**Returns** `{ success: boolean }`
+
+**Example**
+
+```ts delete-capture.ts
+const { success } = await figranium.captures.delete("run_abc123_recording.webm");
+```
+
+## `cookies`
+
+List stored browser cookies and their origins.
+
+**Signature**
+
+```ts
+captures.cookies(options?: RequestOptions)
+```
+
+**HTTP endpoint**
+
+`GET /api/data/cookies`
+
+**Returns** `{ cookies: UnknownRecord[]; origins: UnknownRecord[] }`
+
+**Example**
+
+```ts list-cookies.ts
+const { cookies, origins } = await figranium.captures.cookies();
+
+console.log(`Found ${cookies.length} cookies across ${origins.length} origins`);
+```
+
+## `deleteCookie`
+
+Remove a specific cookie by name, optionally scoped to a domain and path.
+
+**Signature**
+
+```ts
+captures.deleteCookie(
+  cookie: { name: string; domain?: string; path?: string },
+  options?: RequestOptions
+)
+```
+
+**HTTP endpoint**
+
+`POST /api/data/cookies/delete`
+
+**Returns** `{ success: boolean }`
+
+**Example**
+
+```ts delete-cookie.ts
+const { success } = await figranium.captures.deleteCookie({
+  name: "session_id",
+  domain: "example.com",
+  path: "/",
+});
+```
+
+## `clear`
+
+Delete all screenshots at once.
+
+**Signature**
+
+```ts
+captures.clear(options?: RequestOptions)
+```
+
+**HTTP endpoint**
+
+`POST /api/data/clear-screenshots`
+
+**Returns** `{ success: boolean }`
+
+**Example**
+
+```ts clear-screenshots.ts
+const { success } = await figranium.captures.clear();
+```
+
+## `clearCookies`
+
+Delete all stored cookies.
+
+**Signature**
+
+```ts
+captures.clearCookies(options?: RequestOptions)
+```
+
+**HTTP endpoint**
+
+`POST /api/data/clear-cookies`
+
+**Returns** `{ success: boolean }`
+
+**Example**
+
+```ts clear-cookies.ts
+const { success } = await figranium.captures.clearCookies();
+```
+
+## Working example: list captures for a run and delete cookies
+
+This example combines `list` and `deleteCookie` to clean up after a run: it lists captures for a specific run, then removes a session cookie for the target domain.
+
+```ts cleanup-after-run.ts
+const { captures } = await figranium.captures.list({ runId: "run_abc123" });
+
+const recording = captures.find((c) => c.type === "recording");
+if (recording) {
+  console.log(`Recording: ${recording.name} (${recording.size} bytes)`);
+}
+
+const { success } = await figranium.captures.deleteCookie({
+  name: "auth_token",
+  domain: "example.com",
+});
+
+console.log("Cookie deleted:", success);
+```
+
+## Related resources
+
+- [Request options](/sdk/js/request-options) for `signal`, `timeoutMs`, and custom headers
+- [Errors](/sdk/js/errors) for handling `FigraniumError` responses
+- [Executions](/sdk/js/resources/executions) to start runs that produce captures

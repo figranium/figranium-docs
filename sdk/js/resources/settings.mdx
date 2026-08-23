@@ -1,0 +1,314 @@
+---
+title: "SettingsResource: Manage Keys, Models, and Proxies"
+sidebarTitle: "Settings"
+description: "Read and update API keys, AI models, themes, user agents, and proxy lists with the Figranium JavaScript SDK. All settings endpoints require an authenticated session."
+---
+
+The `SettingsResource` on `figranium.settings` lets you read and update your Figranium instance configuration, including API keys, AI provider settings, themes, user agents, and proxy lists. Every method on this resource requires an authenticated browser session, not an API key.
+
+<Warning>
+  All `settings` endpoints require `new Figranium({ session: true })` and a cookie-aware `fetch` in Node. See [Authentication](/sdk/js/authentication) for setup details.
+</Warning>
+
+```ts
+import { Figranium } from "@figranium/sdk";
+
+const figranium = new Figranium({
+  baseUrl: "http://localhost:11345",
+  session: true,
+});
+```
+
+## API Key
+
+### `getApiKey`
+
+```ts
+getApiKey(options?: RequestOptions): Promise<{ apiKey: string | null }>
+```
+
+Returns the current API key if one exists, or `null` if none is configured.
+
+- **HTTP:** `GET /api/settings/api-key`
+
+```ts settings-get-api-key.ts
+const { apiKey } = await figranium.settings.getApiKey();
+console.log(apiKey);
+```
+
+### `setApiKey`
+
+```ts
+setApiKey(apiKey?: string, options?: RequestOptions): Promise<{ apiKey: string }>
+```
+
+Sets a new API key. If `apiKey` is omitted, the server generates one automatically. Returns the newly set key.
+
+- **HTTP:** `POST /api/settings/api-key`
+
+```ts settings-set-api-key.ts
+const { apiKey } = await figranium.settings.setApiKey();
+console.log(apiKey);
+```
+
+## User Agent
+
+### `getUserAgent`
+
+```ts
+getUserAgent(options?: RequestOptions): Promise<UnknownRecord>
+```
+
+Returns the current user agent configuration.
+
+- **HTTP:** `GET /api/settings/user-agent`
+
+```ts settings-get-user-agent.ts
+const ua = await figranium.settings.getUserAgent();
+console.log(ua);
+```
+
+### `setUserAgent`
+
+```ts
+setUserAgent(selection: string | null, options?: RequestOptions): Promise<UnknownRecord>
+```
+
+Sets the user agent to the given selection string, or clears it when `null`.
+
+- **HTTP:** `POST /api/settings/user-agent`
+
+```ts settings-set-user-agent.ts
+await figranium.settings.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)");
+```
+
+## AI Models
+
+### `getAiModels`
+
+```ts
+getAiModels(options?: RequestOptions): Promise<AiModels>
+```
+
+Returns the currently configured AI model overrides per provider.
+
+- **HTTP:** `GET /api/settings/ai-models`
+- **Return type:** `AiModels` is `Partial<Record<AiProvider, string>>`, where `AiProvider = "gemini" | "openai" | "claude" | "ollama"`
+
+```ts settings-get-ai-models.ts
+const models = await figranium.settings.getAiModels();
+console.log(models.openai);
+```
+
+### `setAiModels`
+
+```ts
+setAiModels(models: AiModels, options?: RequestOptions): Promise<AiModels>
+```
+
+Updates the AI model configuration. Pass only the providers you want to override.
+
+- **HTTP:** `POST /api/settings/ai-models`
+
+```ts settings-set-ai-models.ts
+await figranium.settings.setAiModels({
+  openai: "gpt-4o",
+  claude: "claude-3-5-sonnet",
+});
+```
+
+## Provider API Keys
+
+### `getProviderKeys`
+
+```ts
+getProviderKeys(provider: AiProvider, options?: RequestOptions): Promise<Record<string, string[]>>
+```
+
+Returns the stored API keys for a specific AI provider. The response shape uses `openAiApiKeys` for OpenAI and `${provider}ApiKeys` for other providers; the SDK normalizes this into a standard `Record<string, string[]>`.
+
+- **HTTP:** `GET /api/settings/{provider}-api-key` (OpenAI uses `/api/settings/openai-api-key`)
+
+```ts settings-get-provider-keys.ts
+const keys = await figranium.settings.getProviderKeys("openai");
+console.log(keys.openAiApiKeys);
+```
+
+### `setProviderKeys`
+
+```ts
+setProviderKeys(provider: AiProvider, keys: string[], options?: RequestOptions): Promise<Record<string, string[]>>
+```
+
+Replaces the stored API keys for the given provider.
+
+- **HTTP:** `POST /api/settings/{provider}-api-key`
+
+```ts settings-set-provider-keys.ts
+await figranium.settings.setProviderKeys("gemini", ["sk-gemini-1", "sk-gemini-2"]);
+```
+
+## Theme
+
+### `getTheme`
+
+```ts
+getTheme(options?: RequestOptions): Promise<{ theme: Theme }>
+```
+
+Returns the currently active UI theme.
+
+- **HTTP:** `GET /api/settings/theme`
+- **Return type:** `Theme = "dark" | "light" | "solarized-light" | "solarized-dark"`
+
+```ts settings-get-theme.ts
+const { theme } = await figranium.settings.getTheme();
+console.log(theme);
+```
+
+### `setTheme`
+
+```ts
+setTheme(theme: Theme, options?: RequestOptions): Promise<{ theme: Theme }>
+```
+
+Changes the active UI theme.
+
+- **HTTP:** `POST /api/settings/theme`
+
+```ts settings-set-theme.ts
+await figranium.settings.setTheme("solarized-dark");
+```
+
+## Proxies
+
+### `listProxies`
+
+```ts
+listProxies(options?: RequestOptions): Promise<ProxyList>
+```
+
+Returns the full proxy configuration, including the proxy list, rotation mode, and whether the default proxy is included in rotation.
+
+- **HTTP:** `GET /api/settings/proxies`
+- **Return type:** `ProxyList` contains `proxies?: Proxy[]`, `rotationMode?: "round-robin" | "random" | string`, and `includeDefaultInRotation?: boolean`
+
+```ts settings-list-proxies.ts
+const list = await figranium.settings.listProxies();
+console.log(list.proxies?.length, list.rotationMode);
+```
+
+### `addProxy`
+
+```ts
+addProxy(proxy: ProxyInput, options?: RequestOptions): Promise<ProxyList>
+```
+
+Adds a single proxy to the configuration.
+
+- **HTTP:** `POST /api/settings/proxies`
+
+```ts settings-add-proxy.ts
+const list = await figranium.settings.addProxy({
+  server: "http://proxy.example.com:8080",
+  username: "user",
+  password: "pass",
+  label: "Production proxy",
+});
+```
+
+### `importProxies`
+
+```ts
+importProxies(proxies: ProxyInput[], options?: RequestOptions): Promise<ProxyList>
+```
+
+Bulk imports an array of proxies.
+
+- **HTTP:** `POST /api/settings/proxies/import`
+
+```ts settings-import-proxies.ts
+const list = await figranium.settings.importProxies([
+  { server: "http://proxy-1.example.com:8080" },
+  { server: "http://proxy-2.example.com:8080", label: "Backup" },
+]);
+```
+
+### `updateProxy`
+
+```ts
+updateProxy(id: string, proxy: ProxyInput, options?: RequestOptions): Promise<ProxyList>
+```
+
+Updates an existing proxy by its ID.
+
+- **HTTP:** `PUT /api/settings/proxies/:id`
+
+```ts settings-update-proxy.ts
+const list = await figranium.settings.updateProxy("proxy-id-123", {
+  server: "http://proxy.example.com:9090",
+  label: "Updated label",
+});
+```
+
+### `deleteProxy`
+
+```ts
+deleteProxy(id: string, options?: RequestOptions): Promise<ProxyList>
+```
+
+Removes a single proxy by its ID.
+
+- **HTTP:** `DELETE /api/settings/proxies/:id`
+
+```ts settings-delete-proxy.ts
+const list = await figranium.settings.deleteProxy("proxy-id-123");
+```
+
+### `deleteProxies`
+
+```ts
+deleteProxies(ids: string[], options?: RequestOptions): Promise<ProxyList>
+```
+
+Removes multiple proxies at once by passing an array of IDs.
+
+- **HTTP:** `DELETE /api/settings/proxies` (body: `{ ids }`)
+
+```ts settings-delete-proxies.ts
+const list = await figranium.settings.deleteProxies(["proxy-id-123", "proxy-id-456"]);
+```
+
+### `setDefaultProxy`
+
+```ts
+setDefaultProxy(id: string | null, options?: RequestOptions): Promise<ProxyList>
+```
+
+Sets the default proxy to the given ID, or clears the default when `null`.
+
+- **HTTP:** `POST /api/settings/proxies/default`
+
+```ts settings-set-default-proxy.ts
+const list = await figranium.settings.setDefaultProxy("proxy-id-123");
+```
+
+### `setProxyRotation`
+
+```ts
+setProxyRotation(
+  input: { includeDefaultInRotation?: boolean; rotationMode?: "round-robin" | "random" },
+  options?: RequestOptions,
+): Promise<ProxyList>
+```
+
+Configures how the proxy pool rotates between requests.
+
+- **HTTP:** `POST /api/settings/proxies/rotation`
+
+```ts settings-set-proxy-rotation.ts
+const list = await figranium.settings.setProxyRotation({
+  rotationMode: "round-robin",
+  includeDefaultInRotation: true,
+});
+```

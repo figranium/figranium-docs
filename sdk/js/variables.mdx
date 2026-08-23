@@ -1,0 +1,99 @@
+---
+title: "Task Variables and Templates"
+sidebarTitle: "Variables"
+description: "Declare Figranium task variables, override them at runtime, and use the SDK variable() helper to build the {$name} template tokens actions expect."
+---
+
+Figranium tasks accept typed variables and reference them inside action values with a `{$name}` template. The SDK ships a `variable()` helper that produces the correct token, plus typed shapes for declaring variables on a `Task`.
+
+## Declare task variables
+
+Task variables live under `task.variables`. Each entry has a `type` and a default `value`.
+
+```ts
+import type { Task } from "@figranium/sdk";
+
+const task: Task = {
+  name: "Search",
+  url: "https://example.com",
+  mode: "agent",
+  variables: {
+    query: { type: "string", value: "figranium" },
+    limit: { type: "number", value: 10 },
+    strict: { type: "boolean", value: true },
+  },
+  actions: [
+    /* ... */
+  ],
+};
+```
+
+`VariableType` is `"string" | "number" | "boolean"`. Additional fields are allowed on each variable entry, and unknown fields are preserved by the SDK's flexible task type.
+
+## Reference variables in actions
+
+Anywhere an action expects a string value, use `variable(name)` to reference a task variable. The helper returns `{$name}`.
+
+```ts
+import { actions, variable } from "@figranium/sdk";
+
+actions.type("#search", variable("query"));
+actions.set("activeQuery", variable("query"));
+actions.request("https://api.example.com/search", {
+  method: "POST",
+  body: JSON.stringify({ q: variable("query") }),
+});
+```
+
+`variable("")` throws a `TypeError`; names must not be empty.
+
+## Override at runtime
+
+Pass `variables` when executing a task to override the defaults for a single run. Runtime variables use plain values, not the typed shape used at declaration time.
+
+```ts
+const result = await figranium.runTask(task.id!, {
+  variables: {
+    query: "browser automation",
+    limit: 25,
+  },
+});
+```
+
+You can also pass `taskVariables`, which sets task-scoped defaults for the run without changing the saved task.
+
+```ts
+await figranium.runTask(task.id!, {
+  variables: { query: "figranium" },
+  taskVariables: { userAgent: "custom" },
+});
+```
+
+## Direct execution
+
+`scrape`, `agent`, and `headful` accept the same runtime variable shape when called directly:
+
+```ts
+await figranium.scrape({
+  url: "https://example.com",
+  variables: { query: "figranium" },
+});
+```
+
+See [Execution resource](/sdk/js/resources/execution) for full input shapes.
+
+## Auto-created variables
+
+Some server-side flows auto-create variables (for example when a script writes a result to a new name). Those entries include `autoCreated: true`. The SDK preserves the flag on read and write.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Actions" icon="wand-magic-sparkles" href="/sdk/js/actions">
+    Every action helper that accepts a template value.
+  </Card>
+
+  <Card title="Tasks resource" icon="list-check" href="/sdk/js/resources/tasks">
+    Full reference for saving and running tasks.
+  </Card>
+</CardGroup>

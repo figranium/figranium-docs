@@ -1,0 +1,120 @@
+---
+title: "Configure the Figranium SDK Client"
+sidebarTitle: "Client Configuration"
+description: "Configure the Figranium JavaScript SDK: baseUrl, timeouts, custom fetch, default headers, and session versus API-key authentication."
+---
+
+The `Figranium` class takes a single options object. Every option is optional; the SDK falls back to sensible defaults so a local install works with `new Figranium({ apiKey })`.
+
+## FigraniumOptions
+
+```ts
+new Figranium({
+  baseUrl,        // string, defaults to "http://localhost:11345"
+  apiKey,         // string, sent as Authorization: Bearer by default
+  apiKeyHeader,   // "authorization" | "x-api-key"
+  session,        // true to send cookies; mutually exclusive with apiKey
+  timeoutMs,      // number, per-request timeout in milliseconds (default 30_000)
+  fetch,          // custom fetch implementation
+  headers,        // HeadersInit, default headers merged into every request
+});
+```
+
+### `baseUrl`
+
+Absolute URL of your Figranium server. Must use `http` or `https`. Trailing slashes are trimmed. Defaults to `http://localhost:11345`.
+
+```ts
+new Figranium({ baseUrl: "https://figranium.example" });
+```
+
+### `apiKey` and `apiKeyHeader`
+
+Pass `apiKey` to authenticate every request with an API key. By default the key is sent as `Authorization: Bearer <key>`. Set `apiKeyHeader: "x-api-key"` if your deployment expects that header.
+
+```ts
+new Figranium({ apiKey: "fig_...", apiKeyHeader: "x-api-key" });
+```
+
+`apiKey` and `session` are mutually exclusive. See [Authentication](/sdk/js/authentication).
+
+### `session`
+
+Set `session: true` to send credentials (`fetch(..., { credentials: "include" })`) so cookies are attached to every request. Required for `settings.*` endpoints, which are session-only.
+
+```ts
+new Figranium({ baseUrl: "https://figranium.example", session: true });
+```
+
+<Note>
+  Node's built-in `fetch` does not keep a cookie jar. For Node-based administration, provide a cookie-aware `fetch` implementation through the `fetch` option.
+</Note>
+
+### `timeoutMs`
+
+Client-wide default timeout for non-stream requests, in milliseconds. Defaults to `30_000` (30 seconds). Streams have no default timeout; set a per-call `timeoutMs` if you want a terminal deadline.
+
+```ts
+new Figranium({ apiKey: "fig_...", timeoutMs: 60_000 });
+```
+
+Individual requests can override this per call with `{ timeoutMs }`. See [Request options](/sdk/js/request-options).
+
+### `fetch`
+
+Provide any `fetch`-compatible implementation. Useful for tracing, retries, cookie jars, test doubles, or proxying through instrumented HTTP clients.
+
+```ts
+const figranium = new Figranium({
+  apiKey: "fig_...",
+  fetch: instrumentedFetch,
+});
+```
+
+### `headers`
+
+Default headers merged into every request. Per-call `headers` override these.
+
+```ts
+new Figranium({
+  apiKey: "fig_...",
+  headers: { "x-client-name": "my-service" },
+});
+```
+
+## Complete example
+
+```ts
+import { Figranium } from "@figranium/sdk";
+
+const figranium = new Figranium({
+  baseUrl: process.env.FIGRANIUM_BASE_URL,
+  apiKey: process.env.FIGRANIUM_API_KEY!,
+  timeoutMs: 45_000,
+  headers: { "x-client-name": "orders-worker" },
+});
+```
+
+## Client resources
+
+The `Figranium` instance exposes one property per resource, plus a few top-level convenience helpers.
+
+| Property | Purpose |
+| :-- | :-- |
+| [`tasks`](/sdk/js/resources/tasks) | Save, update, delete, version, generate, and execute tasks |
+| [`executions`](/sdk/js/resources/executions) | List, inspect, stop, delete, clear, and stream runs |
+| [`schedules`](/sdk/js/resources/schedules) | Configure, describe, disable, and inspect schedules |
+| [`captures`](/sdk/js/resources/captures) | List and delete recordings and screenshots; manage cookies |
+| [`credentials`](/sdk/js/resources/credentials) | Manage output credentials and browse Baserow metadata |
+| [`browser`](/sdk/js/resources/browser) | Open browser sessions, highlight selectors, inspect headful sessions |
+| [`execution`](/sdk/js/resources/execution) | Direct `scrape`, `agent`, and `headful` execution endpoints |
+| [`settings`](/sdk/js/resources/settings) | Session-protected API keys, AI providers, theme, user agent, proxies |
+| [`auth`](/sdk/js/resources/auth) | Initial setup and session login, logout, and current-user methods |
+| [`health`](/sdk/js/resources/health) | Service health check |
+
+Top-level shortcuts:
+
+- `figranium.runTask(id, input?)` proxies to `tasks.run`.
+- `figranium.scrape(input)` proxies to `execution.scrape`.
+- `figranium.agent(input)` proxies to `execution.agent`.
+- `figranium.headful(input)` proxies to `execution.headful`.

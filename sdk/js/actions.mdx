@@ -1,0 +1,166 @@
+---
+title: "Task Action Helpers"
+sidebarTitle: "Actions"
+description: "Build Figranium task action lists with typed helpers. Navigation, interaction, extraction, control flow, HTTP, and CAPTCHA action factories from the SDK."
+---
+
+Tasks are executed as ordered lists of actions. The SDK exports typed factories under the `actions` namespace that generate correctly shaped action objects with stable IDs, plus an `action()` helper for typed one-offs.
+
+## Import
+
+```ts
+import { action, actions, variable, type Task } from "@figranium/sdk";
+```
+
+Every helper returns a plain action object. Helpers assign a unique `id` if you don't pass one, so lists remain stable across saves.
+
+## Base options
+
+Every helper accepts an optional `base` argument with common fields:
+
+```ts
+interface ActionBase {
+  id?: string;
+  disabled?: boolean;
+}
+```
+
+Use `disabled: true` to keep an action in the list without executing it.
+
+## Navigation and interaction
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `actions.navigate(url, base?)` | `navigate` | Navigate the current tab to `url`. |
+| `actions.click(selector, base?)` | `click` | Click the element matched by `selector`. |
+| `actions.type(selector, value, mode?, base?)` | `type` | Type into `selector`. `mode` is `"replace"` (default) or `"append"`. |
+| `actions.press(key, selector?, base?)` | `press` | Press a keyboard `key`, optionally targeting `selector`. |
+| `actions.wait(seconds, base?)` | `wait` | Wait a fixed number of seconds. |
+| `actions.waitFor(selector, base?)` | `wait_selector` | Wait until `selector` matches an element. |
+| `actions.hover(selector, base?)` | `hover` | Hover over the element matched by `selector`. |
+| `actions.screenshot(name?, base?)` | `screenshot` | Capture a screenshot, optionally named. |
+
+## Extraction
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `actions.getContent(selector?, varName?, base?)` | `get_content` | Read visible text; store in `varName` when set. |
+| `actions.javascript(script, varName?, base?)` | `javascript` | Run `script` in the page; store the return value. |
+| `actions.request(url, input?, base?)` | `http_request` | Perform an HTTP request; store the response in `varName`. |
+
+`request` accepts `{ method, headers, body, varName }`. `method` defaults to `GET`.
+
+## Control flow
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `actions.if(condition, base?)` | `if` | Begin a conditional block. |
+| `actions.while(condition, base?)` | `while` | Begin a loop block. |
+| `actions.else(base?)` | `else` | Else branch of the preceding `if`. |
+| `actions.end(base?)` | `end` | Close the preceding block. |
+| `actions.repeat(count, base?)` | `repeat` | Repeat the following block `count` times. |
+| `actions.stop(status?, base?)` | `stop` | Stop the task with a status (default `"success"`). |
+| `actions.start(taskId, base?)` | `start` | Start a modular sub-task by ID. |
+
+Condition objects for `if` and `while` accept:
+
+```ts
+{
+  value?: string;              // Free-form expression, when supported
+  selector?: string;           // Selector to test with an operator like "exists"
+  conditionVar?: string;       // Variable name to test
+  conditionVarType?: "string" | "number" | "boolean";
+  conditionOp?: ConditionOperator;
+  conditionValue?: string;     // Comparison target
+}
+```
+
+`ConditionOperator` is one of:
+
+- Strings: `equals`, `not_equals`, `contains`, `starts_with`, `ends_with`, `matches`
+- Numbers: `equals`, `not_equals`, `gt`, `gte`, `lt`, `lte`
+- Booleans: `is_true`, `is_false`
+- Selectors: `exists`, `not_exists`
+
+## Variables
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `actions.set(varName, value, base?)` | `set` | Assign `value` to `varName`. |
+| `actions.merge(varName, value, base?)` | `merge` | Merge `value` into an existing `varName`. |
+
+The exported `variable(name)` helper produces the `{$name}` template token Figranium expects when a value should be substituted from a runtime variable:
+
+```ts
+actions.type("#search", variable("query"));
+```
+
+See [Variables and templates](/sdk/js/variables) for more.
+
+## CAPTCHA
+
+`actions.solveCaptcha(input?, base?)` produces a `solve_captcha` action. Fields:
+
+```ts
+{
+  captchaType?: "recaptcha_v2" | "recaptcha_v3" | "hcaptcha" | "turnstile";
+  selector?: string;
+  varName?: string;
+  timeout?: number; // seconds
+}
+```
+
+## Typed one-off actions
+
+For actions the helpers don't cover, use `action()` with a typed literal:
+
+```ts
+import { action } from "@figranium/sdk";
+
+const download = action({
+  type: "wait_downloads",
+  value: "10", // seconds
+});
+```
+
+`action()` assigns an ID if you don't provide one and preserves all valid fields.
+
+## Full task example
+
+```ts
+import { actions, variable, type Task } from "@figranium/sdk";
+
+const task: Task = {
+  name: "Search and screenshot",
+  url: "https://example.com",
+  mode: "agent",
+  variables: { query: { type: "string", value: "figranium" } },
+  actions: [
+    actions.navigate("https://example.com"),
+    actions.waitFor("#search"),
+    actions.type("#search", variable("query")),
+    actions.press("Enter", "#search"),
+    actions.waitFor(".results"),
+    actions.if({
+      selector: ".no-results",
+      conditionOp: "exists",
+    }),
+    actions.stop("no_results"),
+    actions.end(),
+    actions.getContent(".results", "resultText"),
+    actions.screenshot("results"),
+  ],
+};
+```
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Variables and templates" icon="dollar-sign" href="/sdk/js/variables">
+    Declare task variables and reference them with `variable()`.
+  </Card>
+
+  <Card title="Tasks resource" icon="list-check" href="/sdk/js/resources/tasks">
+    Save, version, and execute tasks that use these actions.
+  </Card>
+</CardGroup>

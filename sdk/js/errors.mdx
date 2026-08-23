@@ -1,0 +1,112 @@
+---
+title: "Handle Errors from the Figranium SDK"
+sidebarTitle: "Errors"
+description: "FigraniumError shape from the Figranium JavaScript SDK. HTTP status, server error code, details, request ID, and transport failure diagnostics."
+---
+
+Every SDK method that fails throws a `FigraniumError`. The class normalizes HTTP responses and transport failures into a single, inspectable error type so you can branch on status codes, error codes, or transport conditions without parsing raw responses.
+
+## FigraniumError
+
+```ts
+class FigraniumError extends Error {
+  readonly name: "FigraniumError";
+  readonly status: number;      // HTTP status, or 0 for transport failures
+  readonly code?: string;        // Server-provided error code, e.g. TASK_NOT_FOUND
+  readonly details?: unknown;    // Server-provided diagnostics
+  readonly requestId?: string;   // From the x-request-id response header
+  readonly response?: Response;  // Original Response, when available
+}
+```
+
+`FigraniumError` extends the standard `Error` class, so `.message`, `.stack`, and `.cause` are also available.
+
+## Basic handling
+
+```ts
+import { Figranium, FigraniumError } from "@figranium/sdk";
+
+const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
+
+try {
+  await figranium.runTask("missing-task");
+} catch (error) {
+  if (error instanceof FigraniumError) {
+    console.error(error.status);     // e.g. 404
+    console.error(error.code);       // e.g. "TASK_NOT_FOUND"
+    console.error(error.details);    // server diagnostics
+    console.error(error.requestId);  // when supplied by the server or proxy
+  }
+}
+```
+
+## Fields
+
+### `status`
+
+- The HTTP status returned by the Figranium server, if a response arrived.
+- `0` when the request never reached a status (network failure, DNS error, cancelled request).
+
+### `code`
+
+Server-provided machine-readable error code, taken from the response body's `error` field. Also used for SDK-generated conditions:
+
+| Code | Meaning |
+| :-- | :-- |
+| `REQUEST_ABORTED` | The request was aborted (client `AbortSignal` or timeout). |
+| `NETWORK_ERROR` | The request could not reach the server. |
+| `EMPTY_STREAM` | A streaming response had no body. |
+
+### `details`
+
+Free-form value from the response body's `details` or `detail` field. Typically an object describing which validation failed, which record was missing, or which field was invalid.
+
+### `requestId`
+
+Value of the `x-request-id` response header, when the server or a proxy sets one. Include this in bug reports to make server-side logs easier to correlate.
+
+### `response`
+
+The original `Response` object, when the error came from an HTTP response. Available for advanced consumers who need the raw headers or body.
+
+## Branching on status
+
+```ts
+try {
+  await figranium.tasks.get(id);
+} catch (error) {
+  if (!(error instanceof FigraniumError)) throw error;
+
+  switch (error.status) {
+    case 401:
+      // Reauthenticate or refresh the API key.
+      break;
+    case 404:
+      // Task is gone; treat as an empty result.
+      break;
+    case 429:
+      // Back off and retry.
+      break;
+    default:
+      throw error;
+  }
+}
+```
+
+## Transport failures
+
+When the request never gets a response (server unreachable, DNS failure, TLS error), `status` is `0` and `code` is `NETWORK_ERROR`. The `.cause` property carries the underlying error.
+
+```ts
+try {
+  await figranium.health.check();
+} catch (error) {
+  if (error instanceof FigraniumError && error.code === "NETWORK_ERROR") {
+    console.error("Figranium is unreachable", error.cause);
+  }
+}
+```
+
+## Cancellation
+
+Cancelled requests throw `FigraniumError { status: 0, code: "REQUEST_ABORTED" }`. The `.cause` reflects the underlying `AbortSignal.reason` when set. See [Request options](/sdk/js/request-options) for cancellation patterns.

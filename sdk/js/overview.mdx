@@ -1,0 +1,73 @@
+---
+title: "Figranium JavaScript SDK"
+sidebarTitle: "Overview"
+description: "Official TypeScript and JavaScript SDK for the Figranium API. Manage tasks, run executions, stream events, and administer settings from Node.js or the browser."
+---
+
+The `@figranium/sdk` package is the official TypeScript and JavaScript client for the Figranium API. It wraps every REST and Server-Sent Events endpoint the Figranium server exposes and adds typed action helpers, structured errors, and abortable streams.
+
+## Highlights
+
+<CardGroup cols={2}>
+  <Card title="TypeScript first" icon="code">
+    Complete `.d.ts` declarations, typed task and action shapes, and generics on execution results.
+  </Card>
+
+  <Card title="Node and browser" icon="globe">
+    Works in Node.js 18\+ and modern browsers with the built-in `fetch`. No runtime dependencies.
+  </Card>
+
+  <Card title="ESM and CommonJS" icon="boxes-stacked">
+    Ships parallel ESM and CommonJS builds so `import` and `require` both work out of the box.
+  </Card>
+
+  <Card title="Abortable streams" icon="signal-stream">
+    Execution and selector Server-Sent Events surface as `AsyncIterable` with `AbortSignal` support.
+  </Card>
+</CardGroup>
+
+## Package facts
+
+| Field | Value |
+| :-- | :-- |
+| Package | `@figranium/sdk` |
+| Current version | `0.1.0` |
+| Node engine | `>=18` |
+| Module formats | ESM (`./dist/index.js`) and CommonJS (`./dist/index.cjs`) |
+| Types | Bundled (`./dist/index.d.ts`, `./dist/index.d.cts`) |
+| Runtime dependencies | None |
+| License | Apache-2.0 |
+| Repository | [figranium/figranium-js](https://github.com/figranium/figranium-js) |
+
+## What you can do with the SDK
+
+- Save, update, version, and roll back tasks.
+- Run tasks with runtime variables, or call `scrape`, `agent`, and `headful` directly.
+- Stream live execution and selector events over Server-Sent Events.
+- Manage schedules, captures, cookies, and output credentials.
+- Open and inspect headful browser sessions.
+- Administer settings (API keys, AI providers, proxies, theme) with a browser session.
+
+## Where to go next
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/sdk/js/installation">
+    Install the package and confirm your Node or browser environment can reach Figranium.
+  </Card>
+
+  <Card title="Quickstart" icon="rocket" href="/sdk/js/quickstart">
+    Build, save, and run a typed task in a few minutes.
+  </Card>
+
+  <Card title="Client configuration" icon="sliders" href="/sdk/js/client-configuration">
+    Configure `baseUrl`, timeouts, custom `fetch`, and default headers.
+  </Card>
+
+  <Card title="Resources" icon="folder-tree" href="/sdk/js/resources/tasks">
+    Reference for every resource exposed on the `Figranium` client.
+  </Card>
+</CardGroup>
+
+## Compatibility
+
+This SDK release is modeled against Figranium API `0.14.4` and the accompanying `AGENT_SPEC.md`. Task and execution result types intentionally accept extra fields so newer server versions can add response data without breaking SDK consumers.
