@@ -162,5 +162,11 @@
     "404": {
       "redirect": false
     }
+  },
+  "api": {
+    "openapi": "openapi.json"
+  },
+  "markdown": {
+    "schema": true
   }
 }
