@@ -68,15 +68,6 @@
         ]
       },
       {
-        "group": "Integrations",
-        "pages": [
-          "n8n-integration",
-          "openclaw-integration",
-          "mcp-integration",
-          "community-presets"
-        ]
-      },
-      {
         "group": "API",
         "pages": [
           "rest-api",
@@ -111,6 +102,15 @@
               "sdk/js/resources/health"
             ]
           }
+        ]
+      },
+      {
+        "group": "Integrations",
+        "pages": [
+          "n8n-integration",
+          "openclaw-integration",
+          "mcp-integration",
+          "community-presets"
         ]
       },
       {
