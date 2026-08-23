@@ -6,71 +6,75 @@ description: "Authenticate the Figranium JavaScript SDK with an API key or a bro
 
 The Figranium SDK supports two authentication modes: an API key sent as an HTTP header, or a browser session cookie. Pick one; they are mutually exclusive.
 
-## API key
+<Steps>
+  <Step title="Choose an authentication mode">
+    Decide whether you want API key authentication (best for automation) or session authentication (required for settings management).
+  </Step>
+  <Step title="API key authentication">
+    The default and most common mode. Figranium sends the key as `Authorization: Bearer <key>`.
 
-The default and most common mode. Figranium sends the key as `Authorization: Bearer <key>`.
+    ```ts
+    import { Figranium } from "@figranium/sdk";
+    
+    const figranium = new Figranium({
+      baseUrl: "http://localhost:11345",
+      apiKey: process.env.FIGRANIUM_API_KEY!,
+    });
+    ```
 
-```ts
-import { Figranium } from "@figranium/sdk";
+    ### Switching headers
 
-const figranium = new Figranium({
-  baseUrl: "http://localhost:11345",
-  apiKey: process.env.FIGRANIUM_API_KEY!,
-});
-```
+    Some deployments expect `x-api-key` instead of the `Authorization` header. Set `apiKeyHeader: "x-api-key"`:
 
-### Switching headers
+    ```ts
+    new Figranium({
+      apiKey: process.env.FIGRANIUM_API_KEY!,
+      apiKeyHeader: "x-api-key",
+    });
+    ```
 
-Some deployments expect `x-api-key` instead of the `Authorization` header. Set `apiKeyHeader: "x-api-key"`:
+    Only `"authorization"` (default) and `"x-api-key"` are valid values.
 
-```ts
-new Figranium({
-  apiKey: process.env.FIGRANIUM_API_KEY!,
-  apiKeyHeader: "x-api-key",
-});
-```
+    ### What API keys can access
 
-Only `"authorization"` (default) and `"x-api-key"` are valid values.
+    API keys authenticate every task, execution, schedule, capture, credential, browser, and execution endpoint. They cannot call `settings.*` endpoints, which require a user session.
+  </Step>
+  <Step title="Browser session authentication">
+    Set `session: true` to authenticate with cookies. The SDK sets `credentials: "include"` so cookies are attached to every request.
 
-### What API keys can access
+    ```ts
+    const admin = new Figranium({
+      baseUrl: "https://figranium.example",
+      session: true,
+    });
+    
+    await admin.auth.login({ email: "you@example.com", password: "..." });
+    ```
 
-API keys authenticate every task, execution, schedule, capture, credential, browser, and execution endpoint. They cannot call `settings.*` endpoints, which require a user session.
+    Session mode is required for anything under [`settings`](/sdk/js/resources/settings) (API key management, AI providers, theme, user agent, and proxies).
 
-## Browser session
+    ### Node.js and cookie jars
 
-Set `session: true` to authenticate with cookies. The SDK sets `credentials: "include"` so cookies are attached to every request.
+    Node's built-in `fetch` does not persist cookies between requests. If you need to drive session endpoints from Node, provide a cookie-aware `fetch` implementation via the `fetch` option:
 
-```ts
-const admin = new Figranium({
-  baseUrl: "https://figranium.example",
-  session: true,
-});
+    ```ts
+    import { Figranium } from "@figranium/sdk";
+    import { fetch as cookieFetch } from "your-cookie-aware-fetch";
+    
+    const admin = new Figranium({
+      baseUrl: "https://figranium.example",
+      session: true,
+      fetch: cookieFetch,
+    });
+    ```
 
-await admin.auth.login({ email: "you@example.com", password: "..." });
-```
-
-Session mode is required for anything under [`settings`](/sdk/js/resources/settings) (API key management, AI providers, theme, user agent, and proxies).
-
-### Node.js and cookie jars
-
-Node's built-in `fetch` does not persist cookies between requests. If you need to drive session endpoints from Node, provide a cookie-aware `fetch` implementation via the `fetch` option:
-
-```ts
-import { Figranium } from "@figranium/sdk";
-import { fetch as cookieFetch } from "your-cookie-aware-fetch";
-
-const admin = new Figranium({
-  baseUrl: "https://figranium.example",
-  session: true,
-  fetch: cookieFetch,
-});
-```
-
-In the browser, cookies are handled natively; no extra setup is needed.
+    In the browser, cookies are handled natively; no extra setup is needed.
+  </Step>
+</Steps>
 
 ## First-time server setup
 
-If Figranium hasn't been initialized yet, use `auth.checkSetup()` and `auth.setup()` to create the first user. This does not require any credentials.
+If Figranium has not been initialized yet, use `auth.checkSetup()` and `auth.setup()` to create the first user. This does not require any credentials.
 
 ```ts
 const client = new Figranium({ baseUrl: "https://figranium.example", session: true });
@@ -94,6 +98,10 @@ const { apiKey } = await admin.settings.setApiKey(); // generates a new key
 ```
 
 Pass a string to `setApiKey` to set a specific value instead of generating one.
+
+<Warning>
+  Store API keys in environment variables or a secrets manager. Never commit keys to source control or expose them in client-side code.
+</Warning>
 
 ## Related
 

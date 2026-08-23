@@ -1,10 +1,12 @@
 ---
 title: "Data Extraction"
+sidebarTitle: "Extraction"
+description: "Extract structured data from web pages using visual field mapping, CSS selectors, XPath, or custom JavaScript in Figranium's flexible extraction system."
 ---
 
 Figranium offers powerful visual and script-based tools to extract structured data from web pages. The extraction process executes automatically **after** all visual action blocks complete.
 
-## **Visual Field Mapping (Default)**
+## Visual Field Mapping (Default)
 
 Every task opens its extraction editor in **Visual** mode by default. Instead of manually writing JavaScript parsers, you define the fields and repeating groups you want to capture and target elements directly on the page. Figranium automatically generates and maintains the underlying execution script.
 
@@ -17,19 +19,19 @@ Visual mode is ideal when:
 
 ---
 
-## **Field Configuration**
+## Field Configuration
 
 In **Visual** mode, click **Add Field** in the **Extraction Script** block on the canvas or the Extraction tab in **Task Settings**. Each field supports six configuration parameters:
 
 | Input | Description |
-|:---|:---|
+| :-- | :-- |
 | **Name** | The key name in the returned JSON object (e.g., `title`, `price`, `is_in_stock`). |
 | **Selector** | A standard CSS selector passed to `document.querySelector` / `document.querySelectorAll`. Supports dynamic template variables like `{$query}` or `{$itemId}`. |
 | **Attribute Type** | The DOM property or extraction logic to execute on matched elements (see below). |
 | **Attribute Name** | Visible only when **Attribute Type** is set to `Attribute`. Specifies the target attribute key (e.g., `data-sku`, `alt`, `aria-label`). |
 | **Multiple (List)** | Toggle **On** to query all matching elements on the page (`document.querySelectorAll`) and return an array of values. Toggle **Off** to extract the first match (`document.querySelector`) or `null`. |
 
-### **Supported Attribute Types**
+### Supported Attribute Types
 
 Figranium provides seven specialized attribute extraction types:
 
@@ -43,9 +45,9 @@ Figranium provides seven specialized attribute extraction types:
 
 ---
 
-## **Advanced Media Extraction Types**
+## Advanced Media Extraction Types
 
-### **Image URL Extraction (`image`)**
+### Image URL Extraction (`image`)
 
 Extracting image URLs from modern websites requires handling lazy loading, responsive `srcset` definitions, and CSS background images. When an attribute type is set to **Image URL**, Figranium executes an inline resolver that:
 
@@ -54,23 +56,23 @@ Extracting image URLs from modern websites requires handling lazy loading, respo
 3. Fallbacks to computed CSS background images (`getComputedStyle(el).backgroundImage`) by extracting `url(...)` declarations.
 4. Resolves relative paths against the current page context (`location.href`) to return a fully qualified absolute URL.
 
-### **Link URL Extraction (`link`)**
+### Link URL Extraction (`link`)
 
 When set to **Link URL**, Figranium checks `href`, `src`, or `data-href` attributes on the matched element and converts relative paths into canonical absolute URLs using the browser's `location.href`.
 
 ---
 
-## **Repeating Groups (`extractionGroups`)**
+## Repeating Groups (`extractionGroups`)
 
 Web pages frequently contain repeating structures such as product listings, search result cards, tabular rows, or comment feeds. Figranium supports **Repeating Groups** to extract nested, structured array data without requiring manual loops.
 
-### **How Repeating Groups Work**
+### How Repeating Groups Work
 
 1. **Container Selector**: Defines the parent repeating element on the page (e.g., `.product-card`, `table.results > tr`).
 2. **Sub-Fields**: Defines individual fields (e.g., `title`, `price`, `image_url`) scoped to each container instance.
 3. **Relative Scope**: Each sub-field selector is executed relative to its parent container element (`container.querySelector(...)`).
 
-### **Data Structure Example**
+### Data Structure Example
 
 Extracting a repeating group named `products` with container selector `.product-card` yields an array of structured objects:
 
@@ -95,11 +97,11 @@ Extracting a repeating group named `products` with container selector `.product-
 
 ---
 
-## **Under the Hood: Script Generation**
+## Under the Hood: Script Generation
 
 When running in **Visual** mode, Figranium translates field definitions and repeating groups into an optimized JavaScript extraction function executed via Playwright's `page.evaluate()`.
 
-### **Generated Script Example**
+### Generated Script Example
 
 For a task configured with top-level fields (`title`, `banner_image`, `is_sale`) and a repeating group (`items`), Figranium generates code equivalent to:
 
@@ -129,7 +131,7 @@ return {
 
 ---
 
-## **Picking Selectors with Headful Inspector**
+## Picking Selectors with Headful Inspector
 
 Next to selector inputs for both individual fields and repeating group containers is a target icon that launches the [Headful Browser](/headful-browser) element inspector.
 
@@ -144,7 +146,7 @@ Next to selector inputs for both individual fields and repeating group container
 
 ---
 
-## **Switching to JavaScript Mode**
+## Switching to JavaScript Mode
 
 The mode toggle at the top of the Extraction editor allows switching between **Visual** and **JavaScript** modes.
 
@@ -157,7 +159,7 @@ The mode toggle at the top of the Extraction editor allows switching between **V
 
 ---
 
-## **Extraction Script Environment (JavaScript Mode)**
+## Extraction Script Environment (JavaScript Mode)
 
 In **JavaScript** mode, the code executes inside the browser page context and has access to:
 
@@ -165,7 +167,7 @@ In **JavaScript** mode, the code executes inside the browser page context and ha
 - `$$data.html()`: A utility returning the cleaned page HTML string.
 - `variables`: Task runtime variables accessible as a key-value object.
 
-### **Example: Custom JavaScript Extraction**
+### Example: Custom JavaScript Extraction
 
 ```javascript
 // Extract all product cards and filter by price
@@ -188,16 +190,15 @@ return {
 
 ---
 
-## **DOM Cleaning and Shadow DOM**
+## DOM Cleaning and Shadow DOM
 
 Before extraction runs, Figranium optimizes page HTML to reduce payload size and eliminate noise.
 
-### **Stripped Elements**
+### Stripped Elements
 
-The following tags are removed during cleaning:
-`script`, `style`, `link`, `meta`, `noscript`, `svg`, `canvas`, `iframe`, `object`, `embed`, `applet`, `param`, `source`, `track`
+The following tags are removed during cleaning: `script`, `style`, `link`, `meta`, `noscript`, `svg`, `canvas`, `iframe`, `object`, `embed`, `applet`, `param`, `source`, `track`
 
-### **Preserved Attributes**
+### Preserved Attributes
 
 - Identification: `id`, `class`, `name`
 - Links & Media: `href`, `src`, `alt`, `title`, `value`, `placeholder`, `content`, `datetime`
@@ -205,32 +206,37 @@ The following tags are removed during cleaning:
 - Tables: `colspan`, `rowspan`, `scope`
 - Custom Data Attributes: All `data-*` attributes (e.g., `data-id`, `data-sku`, `data-price`)
 
-### **Shadow DOM Support**
+### Shadow DOM Support
 
 If a web page utilizes open Shadow DOM trees (common in Web Components), Figranium serializes shadow roots into `<template data-shadowroot="open">` elements inside cleaned HTML. Shadow DOM inclusion can be toggled on or off in **Task Settings**.
 
+<Tip>
+  When scraping pages built with Web Components, enable Shadow DOM support in **Task Settings** so selectors can traverse shadow boundaries through the serialized template elements.
+</Tip>
+
 ---
 
-## **AI Extraction Script Generation**
+## AI Extraction Script Generation
 
 Figranium includes AI assistance to write custom extraction scripts from natural language prompts. For detailed instructions on model settings and prompt guidelines, refer to the [AI Extraction Script Generation](/extraction-script-generation) guide.
 
 ---
 
-## **Output Formats and Dynamic Content**
+## Output Formats and Dynamic Content
 
-### **Handling Dynamic Content**
+### Handling Dynamic Content
 
 If a page loads data asynchronously via AJAX or client-side rendering, include `wait` or `wait_selector` action blocks prior to the extraction step to ensure all DOM elements are present before extraction runs.
 
-### **CSV Output Formatting**
+### CSV Output Formatting
 
 When setting the task output format to **CSV**:
+
 1. Ensure the extraction result returns an **Array of Objects** (or an object containing a single array property).
 2. Object keys in the array elements automatically become CSV header columns.
 3. Values are formatted, quoted, and escaped automatically according to RFC 4180 standards.
 
-#### **Single Repeating Group Unwrapping**
+#### Single Repeating Group Unwrapping
 
 When the extraction result is an object with a single key whose value is an array of objects (the shape produced by a lone repeating group), Figranium unwraps that array before serialization. Each group item becomes its own CSV row instead of a single row containing a stringified array in one cell.
 
@@ -254,3 +260,21 @@ Mechanical Keyboard,$149.00
 ```
 
 Add any top-level field alongside the repeating group to opt out of unwrapping and get one row containing all keys.
+
+<CardGroup cols={2}>
+  <Card title="Extraction Script Generation" icon="pen-ruler" href="/extraction-script-generation">
+    Generate custom extraction scripts with AI assistance.
+  </Card>
+
+  <Card title="JavaScript Execution" icon="code" href="/javascript-execution">
+    Write custom mid-flow logic and data transformation.
+  </Card>
+
+  <Card title="CSV Processing" icon="file-code" href="/csv-processing">
+    Parse and iterate over CSV data in your tasks.
+  </Card>
+
+  <Card title="Selectors" icon="eye" href="/selectors">
+    Learn how to target elements for extraction and actions.
+  </Card>
+</CardGroup>

@@ -1,10 +1,12 @@
 ---
 title: "OpenClaw Integration"
+sidebarTitle: "OpenClaw"
+description: "Enable OpenClaw agents to discover, trigger, and monitor Figranium browser automation tasks through the Figranium API Provider skill."
 ---
 
 Figranium can act as a powerful browser automation provider for **OpenClaw** agents, allowing them to execute complex web tasks autonomously.
 
-## **The Figranium Skill**
+## The Figranium Skill
 
 Integration is provided through the `Figranium API Provider` skill. This skill enables OpenClaw to:
 
@@ -13,19 +15,41 @@ Integration is provided through the `Figranium API Provider` skill. This skill e
 - Create new automation profiles on the fly.
 - Monitor execution logs and results.
 
-## **Setup Instructions**
+## Setup Instructions
 
-1. **Obtain API Key**: In Figranium, go to **Settings \> System** and copy your **API Key**.
-2. **Configure OpenClaw**: Add the Figranium skill to your OpenClaw agent and provide the base URL (e.g., `http://localhost:11345`) and your API Key.
-3. **Define Tasks**: Create tasks in the Figranium editor that represent common actions your agent needs to perform (e.g., "Extract LinkedIn Profile", "Post to Twitter").
+<Steps>
+  <Step title="Obtain your API key">
+    In Figranium, go to **Settings \> System** and copy your **API Key**.
+  </Step>
+  <Step title="Configure OpenClaw">
+    Add the Figranium skill to your OpenClaw agent and provide the base URL (e.g., `http://localhost:11345`) and your API Key.
+  </Step>
+  <Step title="Define tasks">
+    Create tasks in the Figranium editor that represent common actions your agent needs to perform (e.g., "Extract LinkedIn Profile", "Post to Twitter").
+  </Step>
+</Steps>
 
-## **Example Workflow**
+## Example Workflow
 
-1. **Agent Request**: An OpenClaw user asks: "Find the latest pricing for Acme Corp."
-2. **Skill Execution**: The OpenClaw agent identifies the appropriate Figranium task (or creates a new one) and triggers it via the API.
-3. **Automation**: Figranium launches a browser, navigates to the URL, extracts the data, and returns it to OpenClaw.
-4. **Response**: The agent summarizes the results for the user.
+<Steps>
+  <Step title="Agent Request">
+    An OpenClaw user asks: "Find the latest pricing for Acme Corp."
+  </Step>
+  <Step title="Skill Execution">
+    The OpenClaw agent identifies the appropriate Figranium task (or creates a new one) and triggers it via the API.
+  </Step>
+  <Step title="Automation">
+    Figranium launches a browser, navigates to the URL, extracts the data, and returns it to OpenClaw.
+  </Step>
+  <Step title="Response">
+    The agent summarizes the results for the user.
+  </Step>
+</Steps>
 
-## **Security Note**
+<Warning>
+  When using Figranium with external agents, always ensure your instance is protected by an **IP Allowlist** and that you rotate your **API Keys** regularly.
+</Warning>
 
-When using Figranium with external agents, always ensure your instance is protected by an **IP Allowlist** and that you rotate your **API Keys** regularly.
+<Tip>
+  Create descriptive task names and add task descriptions so OpenClaw can accurately choose the right automation for each user request.
+</Tip>

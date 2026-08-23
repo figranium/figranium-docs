@@ -1,24 +1,38 @@
 ---
 title: "AI Extraction Script Generation"
+sidebarTitle: "Script Generation"
+description: "Generate custom JavaScript extraction scripts from plain-language prompts using Figranium's built-in AI with multi-provider fallback support."
 ---
 
 Figranium includes built-in AI capabilities to generate custom JavaScript [extraction scripts](/data-extraction) directly from plain-language descriptions. Instead of manually writing DOM queries and array mapping functions, you can describe the data you want to extract, and Figranium will write a browser-ready script for you.
 
 ---
 
-## **UI Workflow**
+## UI Workflow
 
-You can trigger script generation directly from the task editor:
+<Steps>
+  <Step title="Open the task editor">
+    Open your task in the **Spatial Editor**.
+  </Step>
+  <Step title="Open the Extraction Script block">
+    Click the **Extraction Script** block at the bottom of the canvas.
+  </Step>
+  <Step title="Click Generate">
+    In the modal toolbar, click the **Generate** button (represented by a sparkle icon).
+  </Step>
+  <Step title="Enter your prompt">
+    Enter a plain-language prompt describing your target data. For example:
 
-1. Open your task in the **Spatial Editor**.
-2. Click the **Extraction Script** block at the bottom of the canvas.
-3. In the modal toolbar, click the **Generate** button (represented by a sparkle icon).
-4. Enter a plain-language prompt describing your target data — for example:
-   - *"Extract all product titles, current prices, original prices, and star ratings as an array of objects."*
-   - *"Get the article headline, author name, publication date, and main body text."*
-5. Click **Generate** or press **Enter**.
-6. The AI generates the JavaScript code and inserts it directly into the extraction script code editor.
-7. Review the generated script, edit if necessary, and save your task.
+    - "Extract all product titles, current prices, original prices, and star ratings as an array of objects."
+    - "Get the article headline, author name, publication date, and main body text."
+  </Step>
+  <Step title="Generate the script">
+    Click **Generate** or press **Enter**.
+  </Step>
+  <Step title="Review and save">
+    The AI generates the JavaScript code and inserts it directly into the extraction script code editor. Review the generated script, edit if necessary, and save your task.
+  </Step>
+</Steps>
 
 <Tip>
   Generated extraction scripts are standard JavaScript and run in the browser's DOM context. After generation, you have full ownership of the code and can edit, extend, or optimize it as needed.
@@ -26,11 +40,11 @@ You can trigger script generation directly from the task editor:
 
 ---
 
-## **API Endpoint: `POST /api/tasks/generate-script`**
+## API Endpoint: `POST /api/tasks/generate-script`
 
 You can also generate extraction scripts programmatically via the Figranium REST API.
 
-### **Request**
+### Request
 
 ```http
 POST /api/tasks/generate-script HTTP/1.1
@@ -43,10 +57,10 @@ Authorization: Bearer <your-api-key>
 ```
 
 | Parameter | Type | Required | Description |
-|:---|:---|:---|:---|
+| :-- | :-- | :-- | :-- |
 | `description` | string | Yes | Plain-language prompt describing the desired extraction output. |
 
-### **Response**
+### Response
 
 ```json
 {
@@ -54,14 +68,14 @@ Authorization: Bearer <your-api-key>
 }
 ```
 
-### **Error Responses**
+### Error Responses
 
 - **`400 Bad Request`**: Missing `description` parameter or no AI API keys configured.
 - **`502 Bad Gateway`**: All configured AI providers failed to generate a script.
 
 ---
 
-## **Prompt Rules and Execution Constraints**
+## Prompt Rules and Execution Constraints
 
 When generating an extraction script, Figranium enforces strict system prompt instructions to ensure the returned script runs reliably inside Playwright's `page.evaluate()` runtime:
 
@@ -69,16 +83,16 @@ When generating an extraction script, Figranium enforces strict system prompt in
 2. **Standard DOM APIs**: Uses standard browser DOM methods (`document.querySelector`, `document.querySelectorAll`, `getAttribute`, `textContent`, etc.).
 3. **No Function Definition Wrapping**: The script body is generated directly without being wrapped inside `function() { ... }` or `() => { ... }`.
 4. **No Top-Level Async/Await**: `page.evaluate()` executes synchronously within page scope; top-level `async`/`await` is omitted.
-5. **Clean Code Output**: Figranium automatically strips markdown code fences (` ```javascript `) from the AI provider's raw output before inserting it into the editor or API response.
+5. **Clean Code Output**: Figranium automatically strips markdown code fences (\`\`\`\`javascript\`) from the AI provider's raw output before inserting it into the editor or API response.
 
 ---
 
-## **AI Provider Architecture & Fallback Order**
+## AI Provider Architecture & Fallback Order
 
 Figranium uses a resilient multi-provider fallback strategy to ensure high availability for AI generation:
 
-```
-Gemini  ───►  OpenAI  ───►  Claude  ───►  Ollama
+```text
+Gemini  --->  OpenAI  --->  Claude  --->  Ollama
 (v1beta)     (gpt-4o)    (claude-3)    (local)
 ```
 
@@ -87,15 +101,20 @@ Gemini  ───►  OpenAI  ───►  Claude  ───►  Ollama
 3. **Anthropic Claude**: Used if OpenAI fails or is unconfigured (`claude-3-5-haiku` or custom Claude model).
 4. **Ollama**: Used as the final fallback for self-hosted, local LLM execution.
 
-### **Configuring AI Providers**
+### Configuring AI Providers
 
 To enable script generation:
-- Navigate to **Settings > System > API Keys** and add at least one provider key (Gemini, OpenAI, Claude, or Ollama endpoint).
-- Configure preferred default models in **Settings > System > AI Models**.
+
+- Navigate to **Settings \> System \> API Keys** and add at least one provider key (Gemini, OpenAI, Claude, or Ollama endpoint).
+- Configure preferred default models in **Settings \> System \> AI Models**.
+
+<Info>
+  You only need to configure one provider for script generation to work. Figranium will try the others automatically if your primary choice fails.
+</Info>
 
 ---
 
-## **DOM Context & Extraction Compatibility**
+## DOM Context & Extraction Compatibility
 
 When executing the generated script:
 
@@ -107,14 +126,16 @@ When executing the generated script:
 
 ---
 
-## **Examples of Prompts & Generated Output**
+## Examples of Prompts & Generated Output
 
-### **Example 1: E-Commerce Product List**
+### Example 1: E-Commerce Product List
 
 **Prompt:**
+
 > "Extract all product cards on the page into an array with title, price, image link, and product URL."
 
 **Generated Script:**
+
 ```javascript
 return Array.from(document.querySelectorAll('.product-card')).map(card => ({
   title: card.querySelector('.product-title')?.textContent?.trim() || '',
@@ -124,12 +145,14 @@ return Array.from(document.querySelectorAll('.product-card')).map(card => ({
 }));
 ```
 
-### **Example 2: Single Article Metadata**
+### Example 2: Single Article Metadata
 
 **Prompt:**
+
 > "Get the article title, author name, publish date, and full reading time."
 
 **Generated Script:**
+
 ```javascript
 return {
   title: document.querySelector('h1.article-title')?.textContent?.trim() || '',
@@ -141,8 +164,20 @@ return {
 
 ---
 
-## **Tips for Better Script Generation**
+## Tips for Better Script Generation
 
-1. **Be Specific About Selectors or Context**: If you know class names or IDs on the target page, mention them in your prompt (e.g., *"Extract rows inside `#results-table`"*).
-2. **Specify Target Data Types**: Clarify if you want clean text, attribute values (like `href` or `src`), or numbers.
-3. **Specify List vs. Single Object**: Indicate whether you are extracting a list (`"an array of objects..."`) or a single record (`"an object containing..."`).
+<Steps>
+  <Step title="Be specific about selectors">
+    If you know class names or IDs on the target page, mention them in your prompt (e.g., "Extract rows inside `#results-table`").
+  </Step>
+  <Step title="Specify target data types">
+    Clarify if you want clean text, attribute values (like `href` or `src`), or numbers.
+  </Step>
+  <Step title="Specify list vs. single object">
+    Indicate whether you are extracting a list ("an array of objects...") or a single record ("an object containing...").
+  </Step>
+</Steps>
+
+<Tip>
+  Start with a simple prompt and iterate. If the first generated script misses fields, refine your prompt with more specific selectors or clearer data type expectations.
+</Tip>

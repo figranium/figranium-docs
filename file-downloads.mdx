@@ -1,18 +1,20 @@
 ---
-title: "File Downloads"
+title: "Capture and Manage File Downloads in Figranium"
+sidebarTitle: "Downloads"
+description: "Learn how Figranium intercepts, stores, and exposes downloaded files during automation tasks. Includes wait strategies and API access."
 ---
 
 Figranium provides built-in support for capturing and managing files downloaded during automation tasks. Whether it's a PDF report, a CSV export, or an image, Figranium ensures these files are intercepted and made available for review or further processing.
 
-## **How it Works**
+## How it Works
 
-Figranium automatically monitors the browser session for download events. When a download is triggered—whether by clicking a download link, submitting a form, or a direct navigation—the system intercepts the file.
+Figranium automatically monitors the browser session for download events. When a download is triggered — whether by clicking a download link, submitting a form, or a direct navigation — the system intercepts the file.
 
-### **Automatic Interception**
+### Automatic Interception
 
 You don't need to configure specific selectors or listeners for downloads. Figranium's engine listens for the browser's download signal and handles the transfer of the file to the task's execution context.
 
-### **Waiting for Downloads**
+### Waiting for Downloads
 
 Since downloads often occur asynchronously and can take time depending on file size and network speed, it is important to ensure the task doesn't finish before the download is complete.
 
@@ -22,23 +24,38 @@ The **Wait for Downloads** (`wait_downloads`) action block is designed for this 
 - **Timeout**: You can specify a timeout (in seconds). The task will wait until all pending downloads have finished or the timeout is reached.
 - **Default**: If no timeout is specified, it defaults to 30 seconds.
 
-## **Accessing Downloaded Files**
+<Info>
+  Always place a **Wait for Downloads** block after the action that triggers the download. Without it, the task may complete before the file finishes transferring.
+</Info>
+
+## Accessing Downloaded Files
 
 Once a download is captured, it is associated with the specific task execution.
 
-### **The Results Drawer**
+### The Results Drawer
 
 In the task editor, you can access downloads directly from the **Results** drawer:
 
-1. Open the **Results** drawer after a task run.
-2. Switch to the **Downloads** tab.
-3. You will see a list of intercepted files with their original filenames.
-4. You can download these files to your local machine or delete them.
+<Steps>
+  <Step title="Open the Results drawer">
+    After a task run, open the **Results** drawer in the editor.
+  </Step>
+  <Step title="Switch to the Downloads tab">
+    Click the **Downloads** tab to see a list of intercepted files with their original filenames.
+  </Step>
+  <Step title="Download or delete files">
+    You can download these files to your local machine or delete them from the list.
+  </Step>
+</Steps>
 
-### **REST API**
+### REST API
 
 Downloads are also accessible via the Figranium API. When you fetch the status or results of a task execution, the response includes a `downloads` array containing metadata for each captured file.
 
-### **Integrations**
+### Integrations
 
 For automated workflows, such as those using the **n8n integration**, downloaded files can be passed as binary data to subsequent nodes, allowing for seamless document processing pipelines.
+
+<Tip>
+  For large files or slow connections, increase the **Wait for Downloads** timeout beyond the default 30 seconds to prevent premature task completion.
+</Tip>

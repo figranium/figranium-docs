@@ -1,28 +1,44 @@
 ---
 title: "Configure the Figranium SDK Client"
-sidebarTitle: "Client Configuration"
+sidebarTitle: "Client"
 description: "Configure the Figranium JavaScript SDK: baseUrl, timeouts, custom fetch, default headers, and session versus API-key authentication."
 ---
 
 The `Figranium` class takes a single options object. Every option is optional; the SDK falls back to sensible defaults so a local install works with `new Figranium({ apiKey })`.
 
-## FigraniumOptions
+## Constructor options
 
-```ts
-new Figranium({
-  baseUrl,        // string, defaults to "http://localhost:11345"
-  apiKey,         // string, sent as Authorization: Bearer by default
-  apiKeyHeader,   // "authorization" | "x-api-key"
-  session,        // true to send cookies; mutually exclusive with apiKey
-  timeoutMs,      // number, per-request timeout in milliseconds (default 30_000)
-  fetch,          // custom fetch implementation
-  headers,        // HeadersInit, default headers merged into every request
-});
-```
+<ParamField path="baseUrl" type="string">
+  Absolute URL of your Figranium server. Must use `http` or `https`. Trailing slashes are trimmed. Defaults to `http://localhost:11345`.
+</ParamField>
+
+<ParamField path="apiKey" type="string">
+  API key sent as `Authorization: Bearer <key>` by default. Mutually exclusive with `session`.
+</ParamField>
+
+<ParamField path="apiKeyHeader" type="string">
+  Header name for the API key. Either `"authorization"` (default) or `"x-api-key"`.
+</ParamField>
+
+<ParamField path="session" type="boolean">
+  Set to `true` to send credentials (`fetch(..., { credentials: "include" })`) so cookies are attached to every request. Required for `settings.*` endpoints. Mutually exclusive with `apiKey`.
+</ParamField>
+
+<ParamField path="timeoutMs" type="number">
+  Client-wide default timeout for non-stream requests, in milliseconds. Defaults to `30_000` (30 seconds). Streams have no default timeout.
+</ParamField>
+
+<ParamField path="fetch" type="function">
+  Any `fetch`-compatible implementation. Useful for tracing, retries, cookie jars, test doubles, or proxying through instrumented HTTP clients.
+</ParamField>
+
+<ParamField path="headers" type="HeadersInit">
+  Default headers merged into every request. Per-call `headers` override these.
+</ParamField>
+
+## Option details
 
 ### `baseUrl`
-
-Absolute URL of your Figranium server. Must use `http` or `https`. Trailing slashes are trimmed. Defaults to `http://localhost:11345`.
 
 ```ts
 new Figranium({ baseUrl: "https://figranium.example" });

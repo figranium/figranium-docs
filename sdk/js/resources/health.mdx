@@ -14,56 +14,60 @@ import { Figranium } from "@figranium/sdk";
 const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
 ```
 
-## `check`
+## Methods
 
-```ts
-check(options?: RequestOptions): Promise<HealthStatus>
-```
+<AccordionGroup>
+  <Accordion title="check">
+    ```ts
+    check(options?: RequestOptions): Promise<HealthStatus>
+    ```
 
-Performs a `GET /api/health` request and returns the server's health status. This is the fastest way to verify connectivity and SDK configuration.
+    Performs a `GET /api/health` request and returns the server's health status. This is the fastest way to verify connectivity and SDK configuration.
 
-### Returns
+    ### Returns
 
-`HealthStatus` extends `UnknownRecord` for forward compatibility, so newer servers can add fields without breaking existing consumers. Common fields include:
+    `HealthStatus` extends `UnknownRecord` for forward compatibility, so newer servers can add fields without breaking existing consumers. Common fields include:
 
-- `status`: a human-readable status string such as `"ok"`
-- `version`: the running Figranium server version
+    - `status`: a human-readable status string such as `"ok"`
+    - `version`: the running Figranium server version
 
-### Example: verify connectivity
+    ### Example: verify connectivity
 
-```ts
-const status = await figranium.health.check();
-console.log(status.status);   // "ok"
-console.log(status.version);  // "0.14.4"
-```
+    ```ts
+    const status = await figranium.health.check();
+    console.log(status.status);   // "ok"
+    console.log(status.version);  // "0.14.4"
+    ```
 
-### Example: browser usage
+    ### Example: browser usage
 
-Because `check()` requires no authentication, you can call it from a browser before the user has signed in or provided an API key:
+    Because `check()` requires no authentication, you can call it from a browser before the user has signed in or provided an API key:
 
-```ts
-const figranium = new Figranium({ baseUrl: "https://figranium.example" });
-const status = await figranium.health.check();
-```
+    ```ts
+    const figranium = new Figranium({ baseUrl: "https://figranium.example" });
+    const status = await figranium.health.check();
+    ```
 
-### Example: handle transport failures
+    ### Example: handle transport failures
 
-Wrap `check()` in a `try/catch` to detect network or DNS issues. Transport failures surface as [`FigraniumError`](/sdk/js/errors) with `code: "NETWORK_ERROR"`:
+    Wrap `check()` in a `try/catch` to detect network or DNS issues. Transport failures surface as [`FigraniumError`](/sdk/js/errors) with `code: "NETWORK_ERROR"`:
 
-```ts
-import { FigraniumError } from "@figranium/sdk";
+    ```ts
+    import { FigraniumError } from "@figranium/sdk";
+    
+    try {
+      const status = await figranium.health.check();
+      console.log("Server is up:", status.status);
+    } catch (error) {
+      if (error instanceof FigraniumError && error.code === "NETWORK_ERROR") {
+        console.error("Cannot reach the Figranium server. Check the baseUrl and network.");
+      }
+      throw error;
+    }
+    ```
 
-try {
-  const status = await figranium.health.check();
-  console.log("Server is up:", status.status);
-} catch (error) {
-  if (error instanceof FigraniumError && error.code === "NETWORK_ERROR") {
-    console.error("Cannot reach the Figranium server. Check the baseUrl and network.");
-  }
-  throw error;
-}
-```
-
-<Note>
-  The `check()` method accepts the standard [`RequestOptions`](/sdk/js/request-options) object as its final argument, so you can pass a custom `signal`, `timeoutMs`, or extra `headers` when needed.
-</Note>
+    <Note>
+      The `check()` method accepts the standard [`RequestOptions`](/sdk/js/request-options) object as its final argument, so you can pass a custom `signal`, `timeoutMs`, or extra `headers` when needed.
+    </Note>
+  </Accordion>
+</AccordionGroup>

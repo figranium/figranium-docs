@@ -1,10 +1,13 @@
 ---
-title: "Highlight Tool"
+title: "Highlight Tool for Interactive DOM Selection in Figranium"
+sidebarTitle: "Highlight Tool"
+description: "Use Figranium's Highlight Tool to visually pick elements from the headful browser and generate robust CSS selectors and XPaths automatically."
 ---
 
 The **Highlight Tool** (also known as Inspect Mode) provides interactive, visual DOM selection and element targeting in Figranium. It connects the visual headful browser directly to the workflow editor, allowing you to point, hover, and click on live webpage elements to automatically generate robust CSS selectors and XPaths.
 
 The Highlight Tool operates in two primary modes:
+
 1. **Action Block Targeting**: Selects elements directly into an action block's selector field.
 2. **Standalone Page Inspection**: Highlights elements on hover, displays selector candidate tooltips, and copies selected selectors to the clipboard.
 
@@ -12,20 +15,28 @@ In addition to interactive UI usage, Figranium exposes a REST API endpoint (`POS
 
 ---
 
-## **Action Block Targeting**
+## Action Block Targeting
 
 When building a task in the Spatial Editor, every action block that requires a target selector (such as `click`, `type`, `hover`, or `wait_selector`) includes a target/crosshair icon in its configuration modal or canvas item.
 
-### **How to Use Action Block Targeting**
+### How to Use Action Block Targeting
 
-1. Launch or open a live session in the [Headful Browser](/headful-browser).
-2. On any action block requiring a selector, click the **Inspect / Crosshair** icon next to the selector field.
-3. The editor activates targeted inspection mode for that specific action block.
-4. In the live Headful browser window, hover over the webpage element you want to interact with. A blue highlight overlay and floating tooltip will follow your cursor.
-5. Click the target element.
-6. The Highlight Tool calculates candidate selectors and sends the best selector directly back to the action block.
+<Steps>
+  <Step title="Open the Headful Browser">
+    Launch or open a live session in the [Headful Browser](/headful-browser).
+  </Step>
+  <Step title="Activate inspection for a block">
+    On any action block requiring a selector, click the **Inspect / Crosshair** icon next to the selector field.
+  </Step>
+  <Step title="Hover and highlight">
+    In the live Headful browser window, hover over the webpage element you want to interact with. A blue highlight overlay and floating tooltip will follow your cursor.
+  </Step>
+  <Step title="Click to select">
+    Click the target element. The Highlight Tool calculates candidate selectors and sends the best selector directly back to the action block.
+  </Step>
+</Steps>
 
-### **Selector Options and Alternatives**
+### Selector Options and Alternatives
 
 When you select an element, Figranium generates **up to five candidate selectors** ranked by stability and readability:
 
@@ -33,19 +44,31 @@ When you select an element, Figranium generates **up to five candidate selectors
 - The **alternative selectors** appear as selectable pill buttons below the input field in the action configuration drawer.
 - Click any alternative pill button to instantly swap the action block's target selector.
 
+<Tip>
+  If the auto-inserted selector breaks after a site update, reopen the Highlight Tool and try one of the alternative pills before writing a selector by hand.
+</Tip>
+
 ---
 
-## **Standalone Page Inspection**
+## Standalone Page Inspection
 
 Standalone inspection allows you to inspect elements on the live page without immediately binding them to a specific action block. This is useful for exploring DOM structure, testing element visibility, or grabbing selectors for JavaScript execution blocks.
 
-### **Toggling Standalone Inspect Mode**
+### Toggling Standalone Inspect Mode
 
-1. Open the **Headful Browser** modal toolbar at the top of the editor.
-2. Click the **Inspect UI** toggle button (or press the inspect shortcut).
-3. Inspect mode is enabled across all active pages in the browser context.
+<Steps>
+  <Step title="Open the toolbar">
+    Open the **Headful Browser** modal toolbar at the top of the editor.
+  </Step>
+  <Step title="Toggle inspect mode">
+    Click the **Inspect UI** toggle button (or press the inspect shortcut).
+  </Step>
+  <Step title="Inspect across pages">
+    Inspect mode is enabled across all active pages in the browser context.
+  </Step>
+</Steps>
 
-### **Interactive Visual Overlay**
+### Interactive Visual Overlay
 
 While standalone inspection is active:
 
@@ -56,17 +79,21 @@ While standalone inspection is active:
 
 To exit inspect mode, click **Stop Inspect** in the Headful modal toolbar. This destroys the overlay DOM elements (`__figraniumInspectDestroy`) and removes mouse event listeners.
 
+<Tip>
+  Use Standalone Page Inspection when you need a selector for a JavaScript execution block. It copies the selector to your clipboard without binding it to an action block.
+</Tip>
+
 ---
 
-## **Programmatic Highlighting via REST API**
+## Programmatic Highlighting via REST API
 
 Figranium provides a REST API endpoint to activate inspection mode or locate and highlight target elements programmatically.
 
-### **Endpoint: `POST /api/inspector/highlight`**
+### Endpoint: `POST /api/inspector/highlight`
 
 Activates inspect mode on an active session and returns verified selectors matching a target hint string.
 
-#### **Request Body**
+#### Request Body
 
 ```json
 {
@@ -77,12 +104,12 @@ Activates inspect mode on an active session and returns verified selectors match
 ```
 
 | Parameter | Type | Required | Description |
-|:---|:---|:---|:---|
+| :-- | :-- | :-- | :-- |
 | `sessionId` | string | Optional | ID of the active browser session. If omitted, the active running session is used. |
 | `url` | string | Optional | Target URL to navigate to if the session needs to be opened or redirected. |
 | `targetHint` | string | Optional | Text, CSS selector, or attribute value to locate and visually highlight on the page. |
 
-#### **Response Body**
+#### Response Body
 
 ```json
 {
@@ -103,19 +130,30 @@ Activates inspect mode on an active session and returns verified selectors match
 }
 ```
 
-#### **How API Highlighting Works**
+#### How API Highlighting Works
 
-1. **Session Attachment**: The API attaches to the running browser session or launches one if a `url` is provided.
-2. **Target Matching**: If `targetHint` is provided, the inspector evaluates:
-   - CSS selector queries matching `targetHint`.
-   - Attribute matches (`name`, `placeholder`, `aria-label`, `title`, `alt`, `value`, `data-testid`).
-   - Inner text matches across buttons, links, labels, and headings.
-3. **Visual Highlight**: The primary candidate match is visually highlighted on the live browser page via a fixed position overlay box (`#figranium-api-highlight`) and scrolled into view center.
-4. **Selector Generation**: Returns array of candidate CSS selectors and XPaths with confidence scores, along with an optional base64 JPEG screenshot snapshot.
+<Steps>
+  <Step title="Session Attachment">
+    The API attaches to the running browser session or launches one if a `url` is provided.
+  </Step>
+  <Step title="Target Matching">
+    If `targetHint` is provided, the inspector evaluates:
+
+    - CSS selector queries matching `targetHint`.
+    - Attribute matches (`name`, `placeholder`, `aria-label`, `title`, `alt`, `value`, `data-testid`).
+    - Inner text matches across buttons, links, labels, and headings.
+  </Step>
+  <Step title="Visual Highlight">
+    The primary candidate match is visually highlighted on the live browser page via a fixed position overlay box (`#figranium-api-highlight`) and scrolled into view center.
+  </Step>
+  <Step title="Selector Generation">
+    Returns array of candidate CSS selectors and XPaths with confidence scores, along with an optional base64 JPEG screenshot snapshot.
+  </Step>
+</Steps>
 
 ---
 
-## **Selector Generation Ranking Algorithm**
+## Selector Generation Ranking Algorithm
 
 Both UI inspect mode and API highlighting rely on Figranium's selector generation engine (`_figraniumGetSelectors` / `inspectTargetInPage`). When an element is selected or inspected, candidate selectors are prioritized using the following hierarchy:
 

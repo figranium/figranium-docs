@@ -1,5 +1,7 @@
 ---
-title: "Host Specifications"
+title: "Figranium Host Specifications and Resource Requirements"
+sidebarTitle: "Host Specs"
+description: "Recommended hardware specifications for self-hosting Figranium, including CPU, RAM, shared memory, and storage tiers for reliable browser automation."
 ---
 
 To run Figranium reliably, it is essential to provision your hosting environment with sufficient resources. Figranium runs in a containerized environment powered by Playwright and Chromium. While the backend Node.js application is highly efficient, browser automation and page rendering are resource-heavy tasks.
@@ -8,49 +10,59 @@ This guide outlines the recommended hardware specifications for self-hosting Fig
 
 ---
 
-## **Resource Tier Quick Reference**
+## Resource Tier Quick Reference
 
 | Metric | Sub-Minimum (Can run, not recommended) | Minimum Smooth (Baseline reliability) | Sweet Spot (Recommended production) |
-| :--- | :--- | :--- | :--- |
+| :-- | :-- | :-- | :-- |
 | **vCPU** | 0.5 Cores | 1 Core | 2 Cores or more |
 | **RAM** | 512 MB | 1 GB | 2 GB or more |
 | **Shared Memory (`/dev/shm`)** | 64 MB | 512 MB | 1 GB |
 | **Storage Type** | HDD / Low-performance | SSD | SSD / NVMe |
-| **Storage Space** | 2 GB free | 10 GB free | 20 GB+ (depending on captures) |
+| **Storage Space** | 2 GB free | 10 GB free | 20 GB\+ (depending on captures) |
 
 ---
 
-## **Hosting Tiers**
+## Hosting Tiers
 
-### **1. Sub-Minimum (Low-Spec Hosting)**
-Figranium is highly portable and *can* boot and run on lower specs than recommended—such as on 512 MB RAM environments, low-end VPS instances, or Raspberry Pi 3/4 devices.
+<CardGroup cols={3}>
+  <Card title="Sub-Minimum (Low-Spec Hosting)" icon="triangle-exclamation">
+    Figranium is highly portable and _can_ boot and run on lower specs than recommended, such as on 512 MB RAM environments, low-end VPS instances, or Raspberry Pi 3/4 devices.
 
-However, **this is not recommended** for production workloads:
-* **Memory Starvation**: Running Chromium with less than 512 MB RAM often triggers system out-of-memory errors (`ENOMEM`), leading to abrupt task terminations and browser context crashes.
-* **CPU Bottlenecks**: Single-core low-power processors will experience significant slowdowns during page load execution, script evaluation, and proxy negotiation.
-* **No Video/Screenshot Buffers**: Automating multiple concurrent browsers or capturing video logs under these conditions will likely result in heavy latency or failed executions.
+    However, **this is not recommended** for production workloads:
 
-### **2. Minimum Smooth (Baseline Reliability)**
-This is the recommended baseline for running single-threaded, scheduled workflows, lightweight data extraction, and periodic scraping tasks without performance issues.
+    - **Memory Starvation**: Running Chromium with less than 512 MB RAM often triggers system out-of-memory errors (`ENOMEM`), leading to abrupt task terminations and browser context crashes.
+    - **CPU Bottlenecks**: Single-core low-power processors will experience significant slowdowns during page load execution, script evaluation, and proxy negotiation.
+    - **No Video/Screenshot Buffers**: Automating multiple concurrent browsers or capturing video logs under these conditions will likely result in heavy latency or failed executions.
+  </Card>
 
-* **CPU**: 1 vCPU
-* **RAM**: 1 GB of RAM
-* **Shared Memory**: At least 512 MB of shared memory (`/dev/shm`) allocated to the Docker container.
-* **Workload Scope**: Suitable for executing a single task at a time, performing API extraction, or basic web scraping without extensive media capture.
+  <Card title="Minimum Smooth (Baseline Reliability)" icon="circle-check">
+    This is the recommended baseline for running single-threaded, scheduled workflows, lightweight data extraction, and periodic scraping tasks without performance issues.
 
-### **3. Sweet Spot (Recommended Production Environment)**
-This specification is highly recommended for production environments. It ensures snappy UI response times, smooth concurrent scheduling, and optimal browser execution.
+    - **CPU**: 1 vCPU
+    - **RAM**: 1 GB of RAM
+    - **Shared Memory**: At least 512 MB of shared memory (`/dev/shm`) allocated to the Docker container.
+    - **Workload Scope**: Suitable for executing a single task at a time, performing API extraction, or basic web scraping without extensive media capture.
+  </Card>
 
-* **CPU**: 2 vCPUs (or more)
-* **RAM**: 2 GB of RAM (or more)
-* **Shared Memory**: 1 GB of shared memory (`/dev/shm`) allocated to the Docker container.
-* **Workload Scope**: Highly stable. Handles multiple concurrent tasks, heavy workflows, extensive screenshots, high-resolution video recordings, and environments such as Headful Execution for troubleshooting or Headful Debugging.
+  <Card title="Sweet Spot (Recommended Production)" icon="rocket">
+    This specification is highly recommended for production environments. It ensures snappy UI response times, smooth concurrent scheduling, and optimal browser execution.
+
+    - **CPU**: 2 vCPUs (or more)
+    - **RAM**: 2 GB of RAM (or more)
+    - **Shared Memory**: 1 GB of shared memory (`/dev/shm`) allocated to the Docker container.
+    - **Workload Scope**: Highly stable. Handles multiple concurrent tasks, heavy workflows, extensive screenshots, high-resolution video recordings, and environments such as Headful Execution for troubleshooting or Headful Debugging.
+  </Card>
+</CardGroup>
 
 ---
 
-## **Why Shared Memory (`/dev/shm`) Matters**
+## Why Shared Memory (`/dev/shm`) Matters
 
-Chromium utilizes `/dev/shm` (shared memory) for rendering pages and passing frames. By default, Docker allocates only 64 MB to `/dev/shm`, which is insufficient for modern web pages and will lead to browser tab crashes (e.g., `Target closed` or `Session crashed` errors).
+Chromium utilizes `/dev/shm` (shared memory) for rendering pages and passing frames.
+
+<Warning>
+  By default, Docker allocates only 64 MB to `/dev/shm`, which is insufficient for modern web pages and will lead to browser tab crashes (e.g., `Target closed` or `Session crashed` errors).
+</Warning>
 
 For standard Docker Compose environments, ensure `shm_size` is configured appropriately:
 
@@ -65,7 +77,7 @@ For more details on resolving container resource exhaustion, see our [Troublesho
 
 ---
 
-## **Docker Resource Limits**
+## Docker Resource Limits
 
 If you are deploying Figranium on shared infrastructure or Kubernetes, we recommend setting CPU and Memory limits to protect your host while ensuring the containers do not get throttled:
 
@@ -86,9 +98,9 @@ services:
 
 ---
 
-## **Storage Considerations**
+## Storage Considerations
 
 Because Figranium captures screenshots, records videos of executions, and can store extensive database transaction history, storage speed and capacity should be matched to your usage:
 
-* **Use Solid State Drives (SSD)**: Figranium utilizes file-based persistent storage (by default) and heavily interacts with the disk during logging and browser state preservation. SSDs prevent disk-write bottlenecks.
-* **Video Recording & Captures**: Automated recordings consume more CPU and disk space. If you automate a large volume of tasks, we recommend disabling automated recording inside the General Settings panel of your tasks or setting up a regular cleanup schedule via API (`POST /api/clear-screenshots`) or through the Settings UI. See [Performance & Optimization](/performance) for instructions on maintaining a clean storage footprint.
+- **Use Solid State Drives (SSD)**: Figranium utilizes file-based persistent storage (by default) and heavily interacts with the disk during logging and browser state preservation. SSDs prevent disk-write bottlenecks.
+- **Video Recording & Captures**: Automated recordings consume more CPU and disk space. If you automate a large volume of tasks, we recommend disabling automated recording inside the General Settings panel of your tasks or setting up a regular cleanup schedule via API (`POST /api/clear-screenshots`) or through the Settings UI. See [Performance & Optimization](/performance) for instructions on maintaining a clean storage footprint.

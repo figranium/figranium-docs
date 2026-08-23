@@ -1,10 +1,16 @@
 ---
 title: "MCP Integration"
+sidebarTitle: "MCP"
+description: "Connect Claude Desktop, Cursor, and other MCP clients to Figranium via the official Model Context Protocol server for autonomous browser automation."
 ---
 
-The **Figranium MCP Server** is a Model Context Protocol (MCP) server for Figranium built using the official `@modelcontextprotocol/sdk`. This integration allows LLM clients—such as **Claude Desktop**, **Cursor**, and **Manus AI**—to seamlessly discover, execute, inspect, schedule, and programmatically construct Figranium browser automation tasks via standard STDIO transport.
+The **Figranium MCP Server** is a Model Context Protocol (MCP) server for Figranium built using the official `@modelcontextprotocol/sdk`. This integration allows LLM clients such as **Claude Desktop**, **Cursor**, and **Manus AI** to seamlessly discover, execute, inspect, schedule, and programmatically construct Figranium browser automation tasks via standard STDIO transport.
 
 With this server, your AI assistant or agent can autonomously navigate the web, scrape structured data, handle multi-step workflows, and manage automated schedules directly using Figranium.
+
+<Info>
+  The Model Context Protocol (MCP) is an open standard that lets AI applications securely connect to external data sources and tools. The Figranium MCP server exposes tasks, executions, and schedules as discoverable resources and callable tools.
+</Info>
 
 ---
 
@@ -26,65 +32,70 @@ docker pull ghcr.io/figranium/figranium-mcp:latest
 
 ## Client Integration
 
-### Claude Desktop
+<Tabs>
+  <Tab title="Claude Desktop">
+    To connect Claude Desktop to your Figranium MCP server, update your client configuration file:
 
-To connect Claude Desktop to your Figranium MCP server, update your client configuration file:
+    - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+    - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+    Add the following configuration block under `mcpServers`:
 
-Add the following configuration block under `mcpServers`:
-
-```json
-{
-  "mcpServers": {
-    "figranium": {
-      "command": "npx",
-      "args": ["-y", "figranium-mcp"],
-      "env": {
-        "FIGRANIUM_BASE_URL": "http://localhost:11345",
-        "FIGRANIUM_API_KEY": "[your_figranium_api_key_here]"
+    ```json
+    {
+      "mcpServers": {
+        "figranium": {
+          "command": "npx",
+          "args": ["-y", "figranium-mcp"],
+          "env": {
+            "FIGRANIUM_BASE_URL": "http://localhost:11345",
+            "FIGRANIUM_API_KEY": "[your_figranium_api_key_here]"
+          }
+        }
       }
     }
-  }
-}
-```
+    ```
 
-<Note>
-  **Note for Local Hosts**: If you run the server from within Docker, use `http://host.docker.internal:11345` so the container can route traffic back to your host system. For local `npx` execution, use `http://localhost:11345`.
-</Note>
+    <Note>
+      **Note for Local Hosts**: If you run the server from within Docker, use `http://host.docker.internal:11345` so the container can route traffic back to your host system. For local `npx` execution, use `http://localhost:11345`.
+    </Note>
+  </Tab>
+  <Tab title="Cursor IDE">
+    You can easily integrate Figranium into your Cursor environment as an MCP server:
 
----
+    <Steps>
+      <Step title="Open MCP settings">
+        Navigate to **Settings \> Features \> MCP**.
+      </Step>
+      <Step title="Add a new server">
+        Click **Add New MCP Server**.
+      </Step>
+      <Step title="Configure parameters">
+        Configure the following parameters:
 
-### Cursor IDE
+        - **Name**: `figranium`
+        - **Type**: `command`
+        - **Command**: `npx -y figranium-mcp`
+        - **Environment Variables**:
+          - `FIGRANIUM_BASE_URL=http://localhost:11345`
+          - `FIGRANIUM_API_KEY=[your_figranium_api_key_here]`
+      </Step>
+    </Steps>
 
-You can easily integrate Figranium into your Cursor environment as an MCP server:
+    <Note>
+      **Note for Local Hosts**: Use `http://localhost:11345` when running the MCP server locally via `npx`. If you choose to run the MCP server inside Docker instead, swap the base URL to `http://host.docker.internal:11345`.
+    </Note>
+  </Tab>
+  <Tab title="Manus AI / Registry Clients">
+    For platforms and clients that support automatic registry resolution, you can configure and register the MCP server using its official registry namespace:
 
-1. Navigate to **Settings \> Features \> MCP**.
-2. Click **Add New MCP Server**.
-3. Configure the following parameters:
-   - **Name**: `figranium`
-   - **Type**: `command`
-   - **Command**: `npx -y figranium-mcp`
-   - **Environment Variables**:
-     - `FIGRANIUM_BASE_URL=http://localhost:11345`
-     - `FIGRANIUM_API_KEY=[your_figranium_api_key_here]`
+    ```text
+    io.github.figranium/figranium-mcp
+    ```
 
-<Note>
-  **Note for Local Hosts**: Use `http://localhost:11345` when running the MCP server locally via `npx`. If you choose to run the MCP server inside Docker instead, swap the base URL to `http://host.docker.internal:11345`.
-</Note>
-
----
-
-### Manus AI / Registry Clients
-
-For platforms and clients that support automatic registry resolution, you can configure and register the MCP server using its official registry namespace:
-
-```text
-io.github.figranium/figranium-mcp
-```
-
-This namespace points to the official GHCR OCI identifier which compatible clients resolve and download automatically.
+    This namespace points to the official GHCR OCI identifier which compatible clients resolve and download automatically.
+  </Tab>
+</Tabs>
 
 ---
 
@@ -201,20 +212,25 @@ To build the Figranium MCP server locally from source:
 
 ### Build Steps
 
-1. Clone the repository and navigate into the folder:
-   ```bash
-   git clone https://github.com/figranium/figranium-mcp.git
-   cd figranium-mcp
-   ```
-2. Install dependencies and compile the TypeScript source:
-   ```bash
-   npm install
-   npm run build
-   ```
-3. Run the compiled server locally:
-   ```bash
-   npm start
-   ```
+<Steps>
+  <Step title="Clone the repository">
+    ```bash
+    git clone https://github.com/figranium/figranium-mcp.git
+    cd figranium-mcp
+    ```
+  </Step>
+  <Step title="Install and build">
+    ```bash
+    npm install
+    npm run build
+    ```
+  </Step>
+  <Step title="Run the server">
+    ```bash
+    npm start
+    ```
+  </Step>
+</Steps>
 
 You can also run the TypeScript compiler in watch-mode during active development:
 

@@ -1,19 +1,21 @@
 ---
 title: "Session State & TTL"
+sidebarTitle: "Session State"
+description: "Understand Figranium dashboard sessions, browser cookies, stateless execution, named session snapshots, and headful cookie sync. Configure session persistence and security."
 ---
 
 Figranium manages two distinct types of session state: **dashboard sessions** (your login to the Figranium UI) and **browser sessions** (the cookies and storage used by your automation tasks). Each has its own lifetime and storage mechanism.
 
 ---
 
-## **Dashboard Sessions**
+## Dashboard Sessions
 
 When you log in to the Figranium dashboard, a server-side session is created and stored in `data/sessions/`.
 
-### **Session Lifetime (TTL)**
+### Session Lifetime (TTL)
 
 | Property | Value |
-|:---|:---|
+| :-- | :-- |
 | **Session TTL** | **7 days** of inactivity |
 | **Rolling TTL** | Yes — every request resets the 7-day countdown |
 | **Session reaping** | Every 1 hour (expired session files are deleted) |
@@ -46,11 +48,12 @@ app.use(session({
 }));
 ```
 
-### **Session Secret and Persistence Across Restarts**
+### Session Secret and Persistence Across Restarts
 
 The session secret is used to sign session cookies. If it changes, all existing sessions are immediately invalidated.
 
 By default, Figranium:
+
 1. Reads the secret from `SESSION_SECRET` in your `.env` file.
 2. Falls back to reading from `data/session_secret.txt` (auto-generated on first run and persisted there).
 3. Generates a new random secret if neither exists.
@@ -63,10 +66,10 @@ SESSION_SECRET=your-long-random-secret-here
 
 Without this, restarting the server may generate a new secret and log out all users.
 
-### **Cookie Security**
+### Cookie Security
 
 | Setting | Env Variable | Default | Notes |
-|:---|:---|:---|:---|
+| :-- | :-- | :-- | :-- |
 | HTTPS-only cookie | `SESSION_COOKIE_SECURE` | `false` | Set `true` when running behind HTTPS |
 | SameSite policy | _(fixed)_ | `strict` | Protects against CSRF |
 
@@ -74,90 +77,91 @@ Set `SESSION_COOKIE_SECURE=true` in your `.env` when Figranium is served over HT
 
 ---
 
-## **Browser Session State (Cookies & Storage)**
+## Browser Session State (Cookies & Storage)
 
 Browser session state refers to the cookies, local storage, and other browser data accumulated during task automation. This is separate from the dashboard login session.
 
-### **Persistent Mode (Default)**
+<Tabs>
+  <Tab title="Persistent Mode (Default)">
+    Each execution mode maintains its own isolated browser profile directory on disk:
 
-Each execution mode maintains its own isolated browser profile directory on disk:
+    | Execution Mode | Profile Directory |
+    | :-- | :-- |
+    | Agent | `data/browser-profile` |
+    | Scrape | `data/browser-profile-scrape` |
+    | Headful/VNC | `data/browser-profile-headful` |
 
-| Execution Mode | Profile Directory |
-|:---|:---|
-| Agent | `data/browser-profile` |
-| Scrape | `data/browser-profile-scrape` |
-| Headful/VNC | `data/browser-profile-headful` |
+    Cookies in these profiles have **no platform-imposed TTL** — they persist indefinitely unless:
 
-Cookies in these profiles have **no platform-imposed TTL** — they persist indefinitely unless:
-- The cookie's own `Expires` / `Max-Age` attribute causes it to expire.
-- You manually clear cookies in **Settings > Data**.
-- You click **Clear Storage** to wipe all session data.
+    - The cookie's own `Expires` / `Max-Age` attribute causes it to expire.
+    - You manually clear cookies in **Settings \> Data**.
+    - You click **Clear Storage** to wipe all session data.
+  </Tab>
+  <Tab title="Stateless Mode">
+    When `statelessExecution: true` is set on a task, Figranium launches an ephemeral in-memory browser context. No profile directory is read from or written to. All cookies and storage generated during the run are **discarded immediately** when the task completes.
 
-### **Stateless Mode**
+    See [Stateless Execution](/stateless-execution) for full details.
+  </Tab>
+  <Tab title="Named Session Snapshots (`sessionId`)">
+    For workflows that need multiple isolated logged-in identities on the same target — for example, one automation per customer account, or a shared account per team — pass a `sessionId` on the run. Figranium stores that run's cookies and local storage in a dedicated snapshot file, keyed by name, and reloads it on every subsequent run that passes the same `sessionId`.
 
-When `statelessExecution: true` is set on a task, Figranium launches an ephemeral in-memory browser context. No profile directory is read from or written to. All cookies and storage generated during the run are **discarded immediately** when the task completes.
+    Snapshots are written to:
 
-See [Stateless Execution](/stateless-execution) for full details.
+    ```text
+    data/sessions/<sessionId>.json
+    ```
 
-### **Named Session Snapshots (`sessionId`)**
+    **How it works:**
 
-For workflows that need multiple isolated logged-in identities on the same target — for example, one automation per customer account, or a shared account per team — pass a `sessionId` on the run. Figranium stores that run's cookies and local storage in a dedicated snapshot file, keyed by name, and reloads it on every subsequent run that passes the same `sessionId`.
+    1. On task start, if `sessionId` is provided and a snapshot file exists, Figranium loads it into the browser context as the initial `storageState` (cookies \+ localStorage).
+    2. The task runs against that pre-loaded state — logged-in sessions from earlier runs with the same `sessionId` are already available.
+    3. On successful completion, the browser's current storage state is written back to the same snapshot file, so any new cookies or refreshed tokens are captured for next time.
 
-Snapshots are written to:
+    **Naming rules**: `sessionId` is sanitized to `[a-zA-Z0-9_-]` before use. Any other characters are stripped. If the sanitized name is empty, no snapshot is loaded or saved. Keep names short and predictable — for example `acct-alice`, `acct-bob`, `tenant_42`.
 
-```
-data/sessions/<sessionId>.json
-```
+    **When to use it vs. the default profile directory:**
 
-**How it works:**
+    | Situation | Use |
+    | :-- | :-- |
+    | A single logged-in identity per execution mode | Default profile directory (nothing to configure) |
+    | Multiple accounts on the same site, one per run | `sessionId` per account |
+    | Per-tenant or per-customer automations | `sessionId` per tenant |
+    | Fresh browser every time | `statelessExecution: true` |
 
-1. On task start, if `sessionId` is provided and a snapshot file exists, Figranium loads it into the browser context as the initial `storageState` (cookies + localStorage).
-2. The task runs against that pre-loaded state — logged-in sessions from earlier runs with the same `sessionId` are already available.
-3. On successful completion, the browser's current storage state is written back to the same snapshot file, so any new cookies or refreshed tokens are captured for next time.
+    **Example — trigger a task with a specific session identity:**
 
-**Naming rules**: `sessionId` is sanitized to `[a-zA-Z0-9_-]` before use. Any other characters are stripped. If the sanitized name is empty, no snapshot is loaded or saved. Keep names short and predictable — for example `acct-alice`, `acct-bob`, `tenant_42`.
+    ```bash
+    curl -X POST http://localhost:11345/api/tasks/task_1/api \
+      -H "Content-Type: application/json" \
+      -H "x-api-key: your_key" \
+      -d '{
+        "variables": { "search": "widgets" },
+        "sessionId": "acct-alice"
+      }'
+    ```
 
-**When to use it vs. the default profile directory:**
+    The first run signs Alice in and saves her cookies to `data/sessions/acct-alice.json`. Every future run that passes `"sessionId": "acct-alice"` starts already signed in as Alice. Passing `"sessionId": "acct-bob"` on the next run instead starts a completely separate session under Bob's cookies.
 
-| Situation | Use |
-|:---|:---|
-| A single logged-in identity per execution mode | Default profile directory (nothing to configure) |
-| Multiple accounts on the same site, one per run | `sessionId` per account |
-| Per-tenant or per-customer automations | `sessionId` per tenant |
-| Fresh browser every time | `statelessExecution: true` |
-
-**Example — trigger a task with a specific session identity:**
-
-```bash
-curl -X POST http://localhost:11345/api/tasks/task_1/api \
-  -H "Content-Type: application/json" \
-  -H "x-api-key: your_key" \
-  -d '{
-    "variables": { "search": "widgets" },
-    "sessionId": "acct-alice"
-  }'
-```
-
-The first run signs Alice in and saves her cookies to `data/sessions/acct-alice.json`. Every future run that passes `"sessionId": "acct-alice"` starts already signed in as Alice. Passing `"sessionId": "acct-bob"` on the next run instead starts a completely separate session under Bob's cookies.
-
-<Note>
-`sessionId` snapshots are independent of the persistent profile directories (`data/browser-profile*`). They are also independent of the headful cookie sync — a `sessionId`-driven run does not read from or write to `data/headful-storage-state.json`. If you set both `sessionId` and `statelessExecution: true`, the snapshot is still not persisted (stateless wins).
-</Note>
+    <Note>
+      `sessionId` snapshots are independent of the persistent profile directories (`data/browser-profile*`). They are also independent of the headful cookie sync — a `sessionId`-driven run does not read from or write to `data/headful-storage-state.json`. If you set both `sessionId` and `statelessExecution: true`, the snapshot is still not persisted (stateless wins).
+    </Note>
+  </Tab>
+</Tabs>
 
 ---
 
-## **Headful-to-Agent/Scrape Cookie Sync**
+## Headful-to-Agent/Scrape Cookie Sync
 
 Cookies accumulated during a **headful (VNC) browser session** are shared with agent and scrape runs automatically. This is done via a JSON snapshot file:
 
-```
+```text
 data/headful-storage-state.json
 ```
 
-### **Sync Interval**
+### Sync Interval
 
 | Event | Action |
-|:---|:---|
+| :-- | :-- |
 | Every **30 seconds** during an active headful session | Cookies written to `headful-storage-state.json` |
 | On headful **session close** | Final write before shutdown |
 | Agent / scrape **task startup** | Reads and injects cookies from `headful-storage-state.json` |
@@ -170,7 +174,7 @@ const syncInterval = setInterval(() => {
 }, 30000);
 ```
 
-### **Expired Cookie Filtering**
+### Expired Cookie Filtering
 
 Before writing or injecting cookies, Figranium filters out expired ones:
 
@@ -187,12 +191,12 @@ Only non-expired cookies are saved to the snapshot or injected into new contexts
 
 ---
 
-## **Internal Cache TTLs**
+## Internal Cache TTLs
 
 For performance, Figranium caches frequently-read data in memory with short TTLs:
 
 | Cache | TTL | What It Covers |
-|:---|:---|:---|
+| :-- | :-- | :-- |
 | Storage cache | **5 seconds** | Users, tasks, API keys read from disk/DB |
 | Allowed IPs cache | **5 seconds** | Contents of `data/allowed_ips.json` |
 
@@ -207,18 +211,18 @@ Changes to allowed IPs or tasks take effect within 5 seconds without a server re
 
 ---
 
-## **Rate Limit Windows**
+## Rate Limit Windows
 
 Authentication and data API endpoints use a sliding 15-minute window:
 
 | Endpoint Type | Env Variable | Default |
-|:---|:---|:---|
+| :-- | :-- | :-- |
 | Login attempts | `AUTH_RATE_LIMIT_MAX` | 10 per 15 min |
 | Data API requests | `DATA_RATE_LIMIT_MAX` | 100 per 15 min |
 
 ---
 
-## **Cookie Migration (v0.9.6 and Earlier)**
+## Cookie Migration (v0.9.6 and Earlier)
 
 Figranium previously stored cookies in a single `storage_state.json` file. As of v0.10.0, cookies are stored in persistent browser profile directories. On first startup after upgrading, Figranium automatically:
 
@@ -231,12 +235,22 @@ No manual action is required. If migration fails partway through, the file is re
 
 ---
 
-## **Clearing Session Data**
+## Clearing Session Data
 
 | Action | How |
-|:---|:---|
-| Clear all browser cookies | **Settings > Data > Clear Storage** |
-| Copy a cookie value | **Settings > Data > Cookies** — click **Copy** next to any cookie |
-| Delete an individual cookie | **Settings > Data > Cookies** — click **Delete** next to any cookie |
+| :-- | :-- |
+| Clear all browser cookies | **Settings \> Data \> Clear Storage** |
+| Copy a cookie value | **Settings \> Data \> Cookies** — click **Copy** next to any cookie |
+| Delete an individual cookie | **Settings \> Data \> Cookies** — click **Delete** next to any cookie |
 | Invalidate dashboard sessions | Restart server with a new `SESSION_SECRET` |
-| Clear execution logs | **Settings > Data** (up to `MAX_EXECUTIONS` entries retained) |
+| Clear execution logs | **Settings \> Data** (up to `MAX_EXECUTIONS` entries retained) |
+
+<CardGroup cols={2}>
+  <Card title="Stateless Execution" icon="bolt" href="/stateless-execution">
+    Run tasks in a clean browser context with no saved cookies.
+  </Card>
+
+  <Card title="Security" icon="shield" href="/security">
+    Session secrets, cookie security, and access control settings.
+  </Card>
+</CardGroup>

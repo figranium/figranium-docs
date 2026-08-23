@@ -1,5 +1,5 @@
 ---
-title: "ExecutionsResource: list, inspect, and stream runs"
+title: "ExecutionsResource: List, Inspect, and Stream Runs"
 sidebarTitle: "Executions"
 description: "Manage Figranium task executions with the JavaScript SDK. List, get, delete, clear, stop, and stream execution events in real time."
 ---
@@ -12,110 +12,114 @@ import { Figranium } from "@figranium/sdk";
 const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
 ```
 
-## list
+## Methods
 
-```ts
-list(options?: RequestOptions & { apiKeyRoute?: boolean }): Promise<{ executions: Execution[] }>
-```
+<AccordionGroup>
+  <Accordion title="list">
+    ```ts
+    list(options?: RequestOptions & { apiKeyRoute?: boolean }): Promise<{ executions: Execution[] }>
+    ```
 
-Returns a paginated-style list of executions. By default it calls `GET /api/executions/list`, which is the route intended for API-key access. If you pass `apiKeyRoute: false`, the SDK switches to `GET /api/executions` instead.
+    Returns a paginated-style list of executions. By default it calls `GET /api/executions/list`, which is the route intended for API-key access. If you pass `apiKeyRoute: false`, the SDK switches to `GET /api/executions` instead.
 
-<Note>
-  Most callers should leave `apiKeyRoute` at its default (`true`). Only override it when your deployment requires the alternate route.
-</Note>
+    <Note>
+      Most callers should leave `apiKeyRoute` at its default (`true`). Only override it when your deployment requires the alternate route.
+    </Note>
 
-```ts
-// Default route: GET /api/executions/list
-const { executions } = await figranium.executions.list();
-console.log(executions[0].runId, executions[0].status);
+    ```ts
+    // Default route: GET /api/executions/list
+    const { executions } = await figranium.executions.list();
+    console.log(executions[0].runId, executions[0].status);
+    
+    // Alternate route: GET /api/executions
+    const { executions: all } = await figranium.executions.list({ apiKeyRoute: false });
+    ```
+  </Accordion>
 
-// Alternate route: GET /api/executions
-const { executions: all } = await figranium.executions.list({ apiKeyRoute: false });
-```
+  <Accordion title="get">
+    ```ts
+    get<T = unknown>(id: string, options?: RequestOptions): Promise<{ execution: Execution<T> }>
+    ```
 
-## get
+    Fetches a single execution by its ID. Calls `GET /api/executions/:id`. You can supply a generic type parameter to narrow the typed `result` field.
 
-```ts
-get<T = unknown>(id: string, options?: RequestOptions): Promise<{ execution: Execution<T> }>
-```
+    ```ts
+    const { execution } = await figranium.executions.get("exec_01JXYZ");
+    console.log(execution.status, execution.durationMs);
+    
+    // Typed result
+    interface Product {
+      name: string;
+      price: number;
+    }
+    const typed = await figranium.executions.get<Product>("exec_01JXYZ");
+    console.log(typed.execution.result?.price);
+    ```
+  </Accordion>
 
-Fetches a single execution by its ID. Calls `GET /api/executions/:id`. You can supply a generic type parameter to narrow the typed `result` field.
+  <Accordion title="delete">
+    ```ts
+    delete(id: string, options?: RequestOptions): Promise<{ success: boolean }>
+    ```
 
-```ts
-const { execution } = await figranium.executions.get("exec_01JXYZ");
-console.log(execution.status, execution.durationMs);
+    Removes a single execution record. Calls `DELETE /api/executions/:id`.
 
-// Typed result
-interface Product {
-  name: string;
-  price: number;
-}
-const typed = await figranium.executions.get<Product>("exec_01JXYZ");
-console.log(typed.execution.result?.price);
-```
+    ```ts
+    const { success } = await figranium.executions.delete("exec_01JXYZ");
+    ```
+  </Accordion>
 
-## delete
+  <Accordion title="clear">
+    ```ts
+    clear(options?: RequestOptions): Promise<{ success: boolean }>
+    ```
 
-```ts
-delete(id: string, options?: RequestOptions): Promise<{ success: boolean }>
-```
+    Deletes all executions in bulk. Calls `POST /api/executions/clear`.
 
-Removes a single execution record. Calls `DELETE /api/executions/:id`.
+    ```ts
+    const { success } = await figranium.executions.clear();
+    ```
+  </Accordion>
 
-```ts
-const { success } = await figranium.executions.delete("exec_01JXYZ");
-```
+  <Accordion title="stop">
+    ```ts
+    stop(input: { runId: string }, options?: RequestOptions): Promise<{ success: boolean }>
+    ```
 
-## clear
+    Sends a stop signal to an active run. Calls `POST /api/executions/stop`.
 
-```ts
-clear(options?: RequestOptions): Promise<{ success: boolean }>
-```
+    ```ts
+    const { success } = await figranium.executions.stop({ runId: "run_abc123" });
+    ```
+  </Accordion>
 
-Deletes all executions in bulk. Calls `POST /api/executions/clear`.
+  <Accordion title="stream">
+    ```ts
+    stream<T = unknown>(options?: RequestOptions): AsyncIterable<StreamEvent<T>>
+    ```
 
-```ts
-const { success } = await figranium.executions.clear();
-```
+    Opens a Server-Sent Events connection to `GET /api/executions/stream` and yields each event as it arrives. The iterable stays open until the server closes the stream, the client stops iterating, or the request is aborted.
 
-## stop
+    For details on the `StreamEvent` shape and how cancellation works, see [Streaming](/sdk/js/streaming). For error handling, see [Errors](/sdk/js/errors).
 
-```ts
-stop(input: { runId: string }, options?: RequestOptions): Promise<{ success: boolean }>
-```
-
-Sends a stop signal to an active run. Calls `POST /api/executions/stop`.
-
-```ts
-const { success } = await figranium.executions.stop({ runId: "run_abc123" });
-```
-
-## stream
-
-```ts
-stream<T = unknown>(options?: RequestOptions): AsyncIterable<StreamEvent<T>>
-```
-
-Opens a Server-Sent Events connection to `GET /api/executions/stream` and yields each event as it arrives. The iterable stays open until the server closes the stream, the client stops iterating, or the request is aborted.
-
-For details on the `StreamEvent` shape and how cancellation works, see [Streaming](/sdk/js/streaming). For error handling, see [Errors](/sdk/js/errors).
-
-```ts
-const controller = new AbortController();
-
-setTimeout(() => controller.abort(), 30000);
-
-try {
-  for await (const event of figranium.executions.stream({
-    signal: controller.signal,
-  })) {
-    console.log(event.event, event.data);
-  }
-} catch (error) {
-  // FigraniumError with code REQUEST_ABORTED when aborted
-  console.error(error);
-}
-```
+    ```ts
+    const controller = new AbortController();
+    
+    setTimeout(() => controller.abort(), 30000);
+    
+    try {
+      for await (const event of figranium.executions.stream({
+        signal: controller.signal,
+      })) {
+        console.log(event.event, event.data);
+      }
+    } catch (error) {
+      // FigraniumError with code REQUEST_ABORTED when aborted
+      console.error(error);
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
 
 ## End-to-end example
 

@@ -1,5 +1,7 @@
 ---
 title: "Troubleshooting"
+sidebarTitle: "Troubleshooting"
+description: "Diagnose and fix common Figranium issues: browser launch failures, proxy errors, element timeouts, session expiry, CAPTCHAs, and more."
 ---
 
 <Warning>
@@ -8,218 +10,263 @@ title: "Troubleshooting"
 
 Common issues and their solutions when running Figranium.
 
-## **1. Browser fails to launch**
+## Browser fails to launch
 
-**Error**: `Failed to launch browser: Chromium revision is not downloaded.`
+<AccordionGroup>
+  <Accordion title="Chromium revision is not downloaded">
+    **Error**: `Failed to launch browser: Chromium revision is not downloaded.`
 
-- **Cause**: Playwright needs specific browser binaries that aren't installed.
-- **Fix (Docker)**: Rebuild the image to re-download browsers:
-  ```bash
-  docker compose build --no-cache
-  docker compose up -d
-  ```
-- **Fix (NPM)**:
-  ```bash
-  npx playwright install chromium
-  ```
+    - **Cause**: Playwright needs specific browser binaries that aren't installed.
+    - **Fix (Docker)**: Rebuild the image to re-download browsers:
+      ```bash
+      docker compose build --no-cache
+      docker compose up -d
+      ```
+    - **Fix (NPM)**:
+      ```bash
+      npx playwright install chromium
+      ```
+  </Accordion>
 
----
+  <Accordion title="Target closed or detached">
+    **Error**: `Protocol error (Target.detachFromTarget): Target closed.`
 
-**Error**: `Protocol error (Target.detachFromTarget): Target closed.`
+    - **Cause**: The browser crashed, usually due to insufficient memory or shared memory limits.
+    - **Fix**:
+      - Increase Docker memory limits in `docker-compose.yml`:
+        ```yaml
+        deploy:
+          resources:
+            limits:
+              memory: 2g
+        shm_size: '1g'
+        ```
+      - Figranium already passes `--disable-dev-shm-usage` by default, which helps on constrained systems.
+  </Accordion>
 
-- **Cause**: The browser crashed, usually due to insufficient memory or shared memory limits.
-- **Fix**:
-  - Increase Docker memory limits in `docker-compose.yml`:
-    ```yaml
-    deploy:
-      resources:
-        limits:
-          memory: 2g
-    shm_size: '1g'
-    ```
-  - Figranium already passes `--disable-dev-shm-usage` by default, which helps on constrained systems.
+  <Accordion title="Out of memory (ENOMEM)">
+    **Error**: `spawn ENOMEM` or `Cannot allocate memory`
 
----
-
-**Error**: `spawn ENOMEM` or `Cannot allocate memory`
-
-- **Cause**: The host machine is out of RAM.
-- **Fix**: Restart Docker, increase swap space, or upgrade your instance.
-
----
-
-## **2. Proxies not working**
-
-**Error**: `ERR_PROXY_CONNECTION_FAILED` or `net::ERR_TUNNEL_CONNECTION_FAILED`
-
-- **Cause**: Invalid proxy credentials, wrong format, or network firewall blocking the connection.
-- **Fix**:
-  1. Verify the proxy format: `http://user:pass@host:port` or `socks5://host:port`.
-  2. Test the proxy from your server: `curl --proxy "http://host:port" https://ifconfig.me`.
-  3. Check your server's outbound firewall rules.
+    - **Cause**: The host machine is out of RAM.
+    - **Fix**: Restart Docker, increase swap space, or upgrade your instance.
+  </Accordion>
+</AccordionGroup>
 
 ---
 
-**Error**: Proxy is set but traffic is still going through your direct IP.
+## Proxies not working
 
-- **Cause**: The proxy is configured but the task doesn't have it enabled.
-- **Fix**:
-  - Open the task in the **Editor \> Settings \> Proxy** tab and confirm proxy use is toggled on.
-  - Check `Settings > Proxies` to ensure at least one proxy is marked as active/default.
+<AccordionGroup>
+  <Accordion title="Proxy connection failed">
+    **Error**: `ERR_PROXY_CONNECTION_FAILED` or `net::ERR_TUNNEL_CONNECTION_FAILED`
 
----
+    - **Cause**: Invalid proxy credentials, wrong format, or network firewall blocking the connection.
+    - **Fix**:
+      1. Verify the proxy format: `http://user:pass@host:port` or `socks5://host:port`.
+      2. Test the proxy from your server: `curl --proxy "http://host:port" https://ifconfig.me`.
+      3. Check your server's outbound firewall rules.
+  </Accordion>
 
-## **3. Element not found**
-
-**Error**: `Timeout 30000ms exceeded while waiting for selector ".foo"`
-
-- **Cause 1**: The selector is wrong — the element doesn't match the CSS you provided.
-  - **Fix**: Use [Headful Debugging](/headful-browser) to open the browser and inspect the live page. Right-click \> Inspect to find the correct selector.
-- **Cause 2**: The element loads asynchronously after the page renders.
-  - **Fix**: Add a `wait` action (e.g., 2000ms) before the failing action, or use a `wait_selector` action explicitly targeting the element.
-- **Cause 3**: The element is inside a `<iframe>`.
-  - **Note**: Figranium does not currently support cross-origin iframes. Same-origin iframes may work via JavaScript execution.
-- **Cause 4**: The element is inside a Shadow DOM.
-  - **Fix**: Enable **Shadow DOM** support in task settings, then use deep selectors.
-- **Cause 5**: The element is only visible on desktop and the viewport is too small.
-  - **Fix**: In task settings, set a larger viewport width (e.g., 1920x1080).
+  <Accordion title="Traffic still goes through direct IP">
+    - **Cause**: The proxy is configured but the task doesn't have it enabled.
+    - **Fix**:
+      - Open the task in the **Editor \> Settings \> Proxy** tab and confirm proxy use is toggled on.
+      - Check `Settings > Proxies` to ensure at least one proxy is marked as active/default.
+  </Accordion>
+</AccordionGroup>
 
 ---
 
-## **4. Figranium dashboard session expires frequently**
+## Element not found
 
-**Error**: You are logged out from the Figranium dashboard repeatedly.
+<AccordionGroup>
+  <Accordion title="Timeout waiting for selector">
+    **Error**: `Timeout 30000ms exceeded while waiting for selector ".foo"`
 
-- **Cause 1**: Sessions expire after 7 days. This is expected behavior — log in again to start a new session.
-- **Cause 2**: `SESSION_SECRET` changes on every server restart (auto-generated secret).
-  - **Fix**: Set a static `SESSION_SECRET` in your `.env` file:
-    ```env
-    SESSION_SECRET=your-long-random-secret-here
-    ```
-- **Cause 3**: `SESSION_COOKIE_SECURE=true` is set but you're accessing via HTTP.
-  - **Fix**: Either access via HTTPS, or set `SESSION_COOKIE_SECURE=false` for HTTP-only setups.
-
----
-
-## **5. CAPTCHA / Bot Detection**
-
-**Error**: Page shows a CAPTCHA, "Access Denied", or redirects to a block page.
-
-- **Cause**: The target website detected automated browser behavior.
-- **Fix**:
-  1. Enable **Stealth Mode** options in the Task Editor (natural typing, idle movements, etc.).
-  2. Use high-quality **Residential Proxies** rather than datacenter IPs.
-  3. Rotate **User Agents** in `Settings > System > User Agent`.
-  4. Add random `wait` actions (500–2000ms) between interactions.
-  5. Avoid actions that no human would do (instant form fill, no mouse movement).
+    - **Cause 1**: The selector is wrong — the element doesn't match the CSS you provided.
+      - **Fix**: Use [Headful Debugging](/headful-browser) to open the browser and inspect the live page. Right-click \> Inspect to find the correct selector.
+    - **Cause 2**: The element loads asynchronously after the page renders.
+      - **Fix**: Add a `wait` action (e.g., 2000ms) before the failing action, or use a `wait_selector` action explicitly targeting the element.
+    - **Cause 3**: The element is inside a `<iframe>`.
+      - **Note**: Figranium does not currently support cross-origin iframes. Same-origin iframes may work via JavaScript execution.
+    - **Cause 4**: The element is inside a Shadow DOM.
+      - **Fix**: Enable **Shadow DOM** support in task settings, then use deep selectors.
+    - **Cause 5**: The element is only visible on desktop and the viewport is too small.
+      - **Fix**: In task settings, set a larger viewport width (e.g., 1920x1080).
+  </Accordion>
+</AccordionGroup>
 
 ---
 
-## **6. Task runs successfully in headful mode but fails headless**
+## Dashboard session expires frequently
 
-- **Cause**: Some sites detect headless browsers via JavaScript (e.g., `navigator.webdriver`).
-- **Fix**:
-  - Ensure **Stealth Plugin** is active (it is by default in Figranium).
-  - Check if the failure is viewport-related (some sites show different content at different sizes). Set a realistic viewport in task settings.
-  - Compare the page HTML in both modes using `javascript` blocks that return `document.documentElement.outerHTML`.
-
----
-
-## **7. Data extraction returns empty or wrong results**
-
-- **Cause 1**: The extraction script runs before dynamic content finishes loading.
-  - **Fix**: Add `wait` or `wait_selector` actions before your final extraction step.
-- **Cause 2**: The extraction script has a bug.
-  - **Fix**: Use a `javascript` action in the middle of your task to `return document.querySelector(".target")?.innerText` and inspect the result in the execution logs.
-- **Cause 3**: The page structure changed.
-  - **Fix**: Open the page in headful mode and re-inspect the selectors.
+<AccordionGroup>
+  <Accordion title="Logged out repeatedly">
+    - **Cause 1**: Sessions expire after 7 days. This is expected behavior — log in again to start a new session.
+    - **Cause 2**: `SESSION_SECRET` changes on every server restart (auto-generated secret).
+      - **Fix**: Set a static `SESSION_SECRET` in your `.env` file:
+        ```env
+        SESSION_SECRET=your-long-random-secret-here
+        ```
+    - **Cause 3**: `SESSION_COOKIE_SECURE=true` is set but you're accessing via HTTP.
+      - **Fix**: Either access via HTTPS, or set `SESSION_COOKIE_SECURE=false` for HTTP-only setups.
+  </Accordion>
+</AccordionGroup>
 
 ---
 
-## **8. Execution hangs and never completes**
+## CAPTCHA / Bot Detection
 
-- **Cause 1**: A `while` loop with a condition that's always true.
-  - **Fix**: Add a counter variable and a `stop` condition to break the loop.
-- **Cause 2**: A `wait_selector` waiting for an element that never appears.
-  - **Fix**: Wrap it in an `on_error` block with a fallback, or reduce the timeout.
-- **Cause 3**: A download action waiting for a file that never triggers.
-  - **Fix**: Check that the target element actually initiates a download.
-
----
-
-## **9. PostgreSQL connection fails**
-
-**Error**: `ECONNREFUSED` or `password authentication failed for user`
-
-- **Cause**: Database connection environment variables are wrong or the database is unreachable.
-- **Fix**:
-  - Verify `DB_POSTGRESDB_HOST`, `DB_POSTGRESDB_PORT`, `DB_POSTGRESDB_USER`, `DB_POSTGRESDB_PASSWORD` in your `.env`.
-  - Test connectivity: `psql -h $DB_POSTGRESDB_HOST -U $DB_POSTGRESDB_USER`.
-  - Check that the database and user exist with correct permissions.
-  - Figranium will **fall back to file-based storage** if the DB is unavailable — check server logs for the fallback warning.
+<AccordionGroup>
+  <Accordion title="Page shows CAPTCHA or Access Denied">
+    - **Cause**: The target website detected automated browser behavior.
+    - **Fix**:
+      1. Enable **Stealth Mode** options in the Task Editor (natural typing, idle movements, etc.).
+      2. Use high-quality **Residential Proxies** rather than datacenter IPs.
+      3. Rotate **User Agents** in `Settings > System > User Agent`.
+      4. Add random `wait` actions (500–2000ms) between interactions.
+      5. Avoid actions that no human would do (instant form fill, no mouse movement).
+  </Accordion>
+</AccordionGroup>
 
 ---
 
-## **10. API requests return 401 or 403**
+## Task runs successfully in headful mode but fails headless
 
-- **401 Unauthorized**: Missing or invalid API key.
-  - **Fix**: Include the API key in the `X-API-Key` header. Retrieve it from `Settings > API Keys`.
-- **403 Forbidden**: Your IP is not in the allowlist.
-  - **Fix**: Add your IP to `Settings > System > Allowed IPs`, or clear the allowlist to allow all IPs.
-
----
-
-## **11. API key save returns 400 (`API_KEY_TOO_LONG`)**
-
-- **Cause**: The API key you provided exceeds the 512-character limit. This applies to the system API key and all AI provider keys (Gemini, Claude).
-- **Fix**: Use a shorter key. Standard provider keys are well under this limit — if you hit it, check for accidental whitespace or extra characters in your input.
+<AccordionGroup>
+  <Accordion title="Headless detection or viewport mismatch">
+    - **Cause**: Some sites detect headless browsers via JavaScript (e.g., `navigator.webdriver`).
+    - **Fix**:
+      - Ensure **Stealth Plugin** is active (it is by default in Figranium).
+      - Check if the failure is viewport-related (some sites show different content at different sizes). Set a realistic viewport in task settings.
+      - Compare the page HTML in both modes using `javascript` blocks that return `document.documentElement.outerHTML`.
+  </Accordion>
+</AccordionGroup>
 
 ---
 
-## **12. Headful viewer shows "Connecting…" then "Disconnected" on Apple Silicon Macs**
+## Data extraction returns empty or wrong results
 
-- **Cause**: An older Figranium image was published as `linux/amd64` only. On Apple Silicon (M1–M4) Macs, Docker Desktop pulls that image and runs it under QEMU emulation, where Xvfb and x11vnc are prone to crashing seconds after start. The noVNC viewer connects briefly, then drops. The selector-picker SSE stream fails the same way because it depends on the same headful browser session.
-- **Fix**: Update to the latest image. Figranium is now published as a true multi-architecture image (`linux/amd64` and `linux/arm64`), so Apple Silicon pulls a native ARM64 build:
-
-  ```bash
-  docker compose pull
-  docker compose up -d
-  ```
-
-  Confirm the pulled architecture matches your host:
-
-  ```bash
-  docker image inspect ghcr.io/figranium/figranium:latest \
-    --format '{{.Architecture}}'
-  ```
-
-  On Apple Silicon this should print `arm64`. If it prints `amd64`, your Docker client is not selecting the ARM variant — run `docker compose pull --platform linux/arm64` to force it.
-
-- **If the viewer still drops**: Xvfb, x11vnc, and websockify each run inside a restart loop, and the noVNC page auto-reconnects with backoff. Look at the per-process logs to see which component is crashing:
-
-  ```bash
-  docker compose exec figranium tail -f data/xvfb.log data/x11vnc.log data/novnc.log
-  ```
-
-  A quick post-connect drop is labeled **"Browser session crashed, retrying…"** in the viewer, distinguishing a real crash from a routine reconnect.
+<AccordionGroup>
+  <Accordion title="Empty or incorrect extraction output">
+    - **Cause 1**: The extraction script runs before dynamic content finishes loading.
+      - **Fix**: Add `wait` or `wait_selector` actions before your final extraction step.
+    - **Cause 2**: The extraction script has a bug.
+      - **Fix**: Use a `javascript` action in the middle of your task to `return document.querySelector(".target")?.innerText` and inspect the result in the execution logs.
+    - **Cause 3**: The page structure changed.
+      - **Fix**: Open the page in headful mode and re-inspect the selectors.
+  </Accordion>
+</AccordionGroup>
 
 ---
 
-## **13. Server crashes on Render with `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR`**
+## Execution hangs and never completes
 
-- **Cause**: When Figranium runs behind a reverse proxy (such as Render's edge), incoming requests carry an `X-Forwarded-For` header. The rate limiter rejects this header unless the server is explicitly told to trust the proxy, causing the process to crash on the first authenticated request.
-- **Fix**: On Render, no action is needed — the server detects the platform-provided `RENDER=true` environment variable and enables `trust proxy` automatically. On other proxied deployments (Nginx, Caddy, AWS ALB, Fly.io), set `TRUST_PROXY=true` in your environment:
-
-  ```bash
-  TRUST_PROXY=true
-  ```
-
-  See [Reverse proxy and `TRUST_PROXY`](/security#6-reverse-proxy-and-trust-proxy) for the security implications of trusting forwarded headers.
+<AccordionGroup>
+  <Accordion title="Task hangs indefinitely">
+    - **Cause 1**: A `while` loop with a condition that's always true.
+      - **Fix**: Add a counter variable and a `stop` condition to break the loop.
+    - **Cause 2**: A `wait_selector` waiting for an element that never appears.
+      - **Fix**: Wrap it in an `on_error` block with a fallback, or reduce the timeout.
+    - **Cause 3**: A download action waiting for a file that never triggers.
+      - **Fix**: Check that the target element actually initiates a download.
+  </Accordion>
+</AccordionGroup>
 
 ---
 
-## **Getting More Help**
+## PostgreSQL connection fails
 
-- Check the execution logs in the **Executions** tab for detailed error messages.
-- Use the **Headful Browser** to observe your task running in real time.
-- File issues at the [Figranium GitHub repository](https://github.com/figranium/figranium/issues).
+<AccordionGroup>
+  <Accordion title="ECONNREFUSED or password authentication failed">
+    - **Cause**: Database connection environment variables are wrong or the database is unreachable.
+    - **Fix**:
+      - Verify `DB_POSTGRESDB_HOST`, `DB_POSTGRESDB_PORT`, `DB_POSTGRESDB_USER`, `DB_POSTGRESDB_PASSWORD` in your `.env`.
+      - Test connectivity: `psql -h $DB_POSTGRESDB_HOST -U $DB_POSTGRESDB_USER`.
+      - Check that the database and user exist with correct permissions.
+      - Figranium will **fall back to file-based storage** if the DB is unavailable — check server logs for the fallback warning.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## API requests return 401 or 403
+
+<AccordionGroup>
+  <Accordion title="401 Unauthorized or 403 Forbidden">
+    - **401 Unauthorized**: Missing or invalid API key.
+      - **Fix**: Include the API key in the `X-API-Key` header. Retrieve it from `Settings > API Keys`.
+    - **403 Forbidden**: Your IP is not in the allowlist.
+      - **Fix**: Add your IP to `Settings > System > Allowed IPs`, or clear the allowlist to allow all IPs.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## API key save returns 400 (`API_KEY_TOO_LONG`)
+
+<AccordionGroup>
+  <Accordion title="Key exceeds 512 characters">
+    - **Cause**: The API key you provided exceeds the 512-character limit. This applies to the system API key and all AI provider keys (Gemini, Claude).
+    - **Fix**: Use a shorter key. Standard provider keys are well under this limit — if you hit it, check for accidental whitespace or extra characters in your input.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Headful viewer shows "Connecting…" then "Disconnected" on Apple Silicon Macs
+
+<AccordionGroup>
+  <Accordion title="VNC viewer disconnects on Apple Silicon">
+    - **Cause**: An older Figranium image was published as `linux/amd64` only. On Apple Silicon (M1–M4) Macs, Docker Desktop pulls that image and runs it under QEMU emulation, where Xvfb and x11vnc are prone to crashing seconds after start. The noVNC viewer connects briefly, then drops. The selector-picker SSE stream fails the same way because it depends on the same headful browser session.
+    - **Fix**: Update to the latest image. Figranium is now published as a true multi-architecture image (`linux/amd64` and `linux/arm64`), so Apple Silicon pulls a native ARM64 build:
+      ```bash
+      docker compose pull
+      docker compose up -d
+      ```
+      Confirm the pulled architecture matches your host:
+      ```bash
+      docker image inspect ghcr.io/figranium/figranium:latest \
+        --format '{{.Architecture}}'
+      ```
+      On Apple Silicon this should print `arm64`. If it prints `amd64`, your Docker client is not selecting the ARM variant — run `docker compose pull --platform linux/arm64` to force it.
+    - **If the viewer still drops**: Xvfb, x11vnc, and websockify each run inside a restart loop, and the noVNC page auto-reconnects with backoff. Look at the per-process logs to see which component is crashing:
+      ```bash
+      docker compose exec figranium tail -f data/xvfb.log data/x11vnc.log data/novnc.log
+      ```
+      A quick post-connect drop is labeled **"Browser session crashed, retrying…"** in the viewer, distinguishing a real crash from a routine reconnect.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Server crashes on Render with `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR`
+
+<AccordionGroup>
+  <Accordion title="Rate limiter crash behind Render proxy">
+    - **Cause**: When Figranium runs behind a reverse proxy (such as Render's edge), incoming requests carry an `X-Forwarded-For` header. The rate limiter rejects this header unless the server is explicitly told to trust the proxy, causing the process to crash on the first authenticated request.
+    - **Fix**: On Render, no action is needed — the server detects the platform-provided `RENDER=true` environment variable and enables `trust proxy` automatically. On other proxied deployments (Nginx, Caddy, AWS ALB, Fly.io), set `TRUST_PROXY=true` in your environment:
+      ```bash
+      TRUST_PROXY=true
+      ```
+      See [Reverse proxy and `TRUST_PROXY`](/security#reverse-proxy-and-trust_proxy) for the security implications of trusting forwarded headers.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Getting More Help
+
+<CardGroup cols={2}>
+  <Card title="Execution Logs" icon="book" href="/rest-api">
+    Check the execution logs in the **Executions** tab for detailed error messages.
+  </Card>
+
+  <Card title="Headful Browser" icon="globe" href="/headful-browser">
+    Use the **Headful Browser** to observe your task running in real time.
+  </Card>
+
+  <Card title="GitHub Issues" icon="code" href="https://github.com/figranium/figranium/issues">
+    File issues at the Figranium GitHub repository.
+  </Card>
+</CardGroup>

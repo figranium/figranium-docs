@@ -1,35 +1,55 @@
 ---
 title: "n8n Integration"
+sidebarTitle: "n8n"
+description: "Connect Figranium to n8n workflows with the official community node. Install, authenticate, and trigger tasks or schedules from any n8n automation."
 ---
 
 The official Figranium n8n community node (`n8n-nodes-figranium`) lets you trigger tasks, inspect execution history, and manage schedules from within any n8n workflow.
 
 ## Installation
 
-1. In n8n, go to **Settings > Community Nodes**.
-2. Click **Install a community node**.
-3. Enter `n8n-nodes-figranium` and agree to the risks.
-4. Restart n8n if prompted.
+<Steps>
+  <Step title="Open Community Nodes">
+    In n8n, go to **Settings \> Community Nodes**.
+  </Step>
+  <Step title="Install the node">
+    Click **Install a community node**.
+  </Step>
+  <Step title="Enter the package name">
+    Enter `n8n-nodes-figranium` and agree to the risks.
+  </Step>
+  <Step title="Restart n8n">
+    Restart n8n if prompted.
+  </Step>
+</Steps>
 
 ## Credentials
 
 The node authenticates using a **Figranium API** credential.
 
-1. Go to **Credentials** and click **Add Credential**.
-2. Search for **Figranium API**.
-3. Fill in the two fields:
+<Steps>
+  <Step title="Add a new credential">
+    Go to **Credentials** and click **Add Credential**.
+  </Step>
+  <Step title="Search for Figranium">
+    Search for **Figranium API**.
+  </Step>
+  <Step title="Fill in the fields">
+    Fill in the two fields:
 
-| Field | Description |
-|---|---|
-| **Base URL** | The URL of your Figranium instance, e.g. `http://localhost:11345`. No trailing slash. |
-| **API Key** | Your API key from Figranium **Settings > System**. Sent as the `x-api-key` header on every request. |
+    | Field | Description |
+    | --- | --- |
+    | **Base URL** | The URL of your Figranium instance, e.g. `http://localhost:11345`. No trailing slash. |
+    | **API Key** | Your API key from Figranium **Settings \> System**. Sent as the `x-api-key` header on every request. |
+  </Step>
+</Steps>
 
 ## Node Overview
 
 The **Figranium** node exposes three top-level resources, each with one or more operations.
 
 | Resource | Operations |
-|---|---|
+| --- | --- |
 | **Task** | Execute, List |
 | **Execution** | List |
 | **Schedule** | List, Get Status, Set Schedule, Delete Schedule, Describe Schedule, Get Scheduler Status |
@@ -38,173 +58,173 @@ The **Figranium** node exposes three top-level resources, each with one or more 
 
 ## Task
 
-### Execute
+<AccordionGroup>
+  <Accordion title="Execute">
+    Runs a saved task and returns its result as JSON.
 
-Runs a saved task and returns its result as JSON.
+    **Parameters**
 
-**Parameters**
+    | Parameter | Type | Required | Description |
+    | --- | --- | --- | --- |
+    | **Task** | Dropdown | Yes | The task to run. Populated automatically from your Figranium server. |
+    | **Variables** | Key-value collection | No | Runtime variable overrides. Each entry has a **Name** and a **Value**. These override any defaults defined in the task itself. |
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| **Task** | Dropdown | Yes | The task to run. Populated automatically from your Figranium server. |
-| **Variables** | Key-value collection | No | Runtime variable overrides. Each entry has a **Name** and a **Value**. These override any defaults defined in the task itself. |
+    **API call:** `POST /api/tasks/{taskId}/api`
 
-**API call:** `POST /api/tasks/{taskId}/api`
+    **Output:** The full JSON response from the task execution — typically includes result data, status, and metadata.
 
-**Output:** The full JSON response from the task execution — typically includes result data, status, and metadata.
+    **Example use case:** A webhook fires when a new order arrives. The Figranium node executes a "Scrape Competitor Price" task, passing `product_url` as a variable extracted from the webhook payload. The result flows into a database insert node.
+  </Accordion>
 
-**Example use case:** A webhook fires when a new order arrives. The Figranium node executes a "Scrape Competitor Price" task, passing `product_url` as a variable extracted from the webhook payload. The result flows into a database insert node.
+  <Accordion title="List">
+    Returns all tasks available on the connected Figranium server.
 
----
+    **Parameters:** None beyond the credential.
 
-### List
+    **API call:** `GET /api/tasks/list`
 
-Returns all tasks available on the connected Figranium server.
-
-**Parameters:** None beyond the credential.
-
-**API call:** `GET /api/tasks/list`
-
-**Output:** One item per task, each containing at minimum a `name` and `id` field.
+    **Output:** One item per task, each containing at minimum a `name` and `id` field.
+  </Accordion>
+</AccordionGroup>
 
 ---
 
 ## Execution
 
-### List
+<AccordionGroup>
+  <Accordion title="List">
+    Returns a summary of all past task executions recorded by Figranium.
 
-Returns a summary of all past task executions recorded by Figranium.
+    **Parameters:** None beyond the credential.
 
-**Parameters:** None beyond the credential.
+    **API call:** `GET /api/executions/list`
 
-**API call:** `GET /api/executions/list`
-
-**Output:** An array of execution records. Each record typically includes the task ID, execution timestamp, status, and a result summary.
+    **Output:** An array of execution records. Each record typically includes the task ID, execution timestamp, status, and a result summary.
+  </Accordion>
+</AccordionGroup>
 
 ---
 
 ## Schedule
 
-### List
+<AccordionGroup>
+  <Accordion title="List">
+    Returns all tasks that currently have a schedule configured.
 
-Returns all tasks that currently have a schedule configured.
+    **Parameters:** None beyond the credential.
 
-**Parameters:** None beyond the credential.
+    **API call:** `GET /api/schedules`
 
-**API call:** `GET /api/schedules`
+    **Output:** An array of schedule objects, one per scheduled task.
+  </Accordion>
 
-**Output:** An array of schedule objects, one per scheduled task.
+  <Accordion title="Get Status">
+    Returns the schedule configuration and the next calculated run time for a specific task.
 
----
+    **Parameters**
 
-### Get Status
+    | Parameter | Type | Required | Description |
+    | --- | --- | --- | --- |
+    | **Task ID** | String | Yes | The ID of the task whose schedule you want to inspect. |
 
-Returns the schedule configuration and the next calculated run time for a specific task.
+    **API call:** `GET /api/schedules/{taskId}/status`
 
-**Parameters**
+    **Output:** A single object containing the schedule definition and the `nextRun` timestamp.
+  </Accordion>
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| **Task ID** | String | Yes | The ID of the task whose schedule you want to inspect. |
+  <Accordion title="Set Schedule">
+    Creates or updates the schedule for a task. Two scheduling modes are available: **Frequency** (a structured picker) or **Cron Expression** (a raw cron string).
 
-**API call:** `GET /api/schedules/{taskId}/status`
+    **Parameters**
 
-**Output:** A single object containing the schedule definition and the `nextRun` timestamp.
+    | Parameter | Type | Required | Description |
+    | --- | --- | --- | --- |
+    | **Task ID** | String | Yes | The ID of the task to schedule. |
+    | **Enabled** | Boolean | Yes | Whether the schedule should be active immediately. Default: `true`. |
+    | **Schedule Mode** | Options | Yes | `Frequency (Interval)` or `Cron Expression`. |
 
----
+    **When Schedule Mode is "Frequency"**
 
-### Set Schedule
+    | Parameter | Type | Shown when | Description |
+    | --- | --- | --- | --- |
+    | **Frequency** | Options | Always | `Every N Minutes`, `Daily`, `Weekly`, or `Monthly`. |
+    | **Interval (Minutes)** | Number | Frequency = Every N Minutes | How often to run, in minutes. Default: `60`. |
+    | **Hour** | Number | Frequency = Daily / Weekly / Monthly | Hour of day to run (0–23). Default: `9`. |
+    | **Minute** | Number | Frequency = Daily / Weekly / Monthly | Minute of hour to run (0–59). Default: `0`. |
+    | **Days of Week** | Multi-select | Frequency = Weekly | One or more days (Sunday–Saturday). Default: Monday. |
+    | **Day of Month** | Number | Frequency = Monthly | Day of the month to run (1–31). Default: `1`. |
 
-Creates or updates the schedule for a task. Two scheduling modes are available: **Frequency** (a structured picker) or **Cron Expression** (a raw cron string).
+    **When Schedule Mode is "Cron Expression"**
 
-**Parameters**
+    | Parameter | Type | Description |
+    | --- | --- | --- |
+    | **Cron Expression** | String | A standard 5-field cron expression: `minute hour day month weekday`. Example: `0 9 * * 1` runs every Monday at 09:00. |
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| **Task ID** | String | Yes | The ID of the task to schedule. |
-| **Enabled** | Boolean | Yes | Whether the schedule should be active immediately. Default: `true`. |
-| **Schedule Mode** | Options | Yes | `Frequency (Interval)` or `Cron Expression`. |
+    **API call:** `POST /api/schedules/{taskId}`
 
-**When Schedule Mode is "Frequency"**
+    **Output:** The saved schedule object.
+  </Accordion>
 
-| Parameter | Type | Shown when | Description |
-|---|---|---|---|
-| **Frequency** | Options | Always | `Every N Minutes`, `Daily`, `Weekly`, or `Monthly`. |
-| **Interval (Minutes)** | Number | Frequency = Every N Minutes | How often to run, in minutes. Default: `60`. |
-| **Hour** | Number | Frequency = Daily / Weekly / Monthly | Hour of day to run (0–23). Default: `9`. |
-| **Minute** | Number | Frequency = Daily / Weekly / Monthly | Minute of hour to run (0–59). Default: `0`. |
-| **Days of Week** | Multi-select | Frequency = Weekly | One or more days (Sunday–Saturday). Default: Monday. |
-| **Day of Month** | Number | Frequency = Monthly | Day of the month to run (1–31). Default: `1`. |
+  <Accordion title="Delete Schedule">
+    Disables and removes the schedule from a task. The task itself is not deleted.
 
-**When Schedule Mode is "Cron Expression"**
+    **Parameters**
 
-| Parameter | Type | Description |
-|---|---|---|
-| **Cron Expression** | String | A standard 5-field cron expression: `minute hour day month weekday`. Example: `0 9 * * 1` runs every Monday at 09:00. |
+    | Parameter | Type | Required | Description |
+    | --- | --- | --- | --- |
+    | **Task ID** | String | Yes | The ID of the task whose schedule should be removed. |
 
-**API call:** `POST /api/schedules/{taskId}`
+    **API call:** `DELETE /api/schedules/{taskId}`
 
-**Output:** The saved schedule object.
+    **Output:** A confirmation object.
+  </Accordion>
 
----
+  <Accordion title="Describe Schedule">
+    Validates a schedule configuration and returns a human-readable preview (e.g. next run times) without saving anything. Useful for testing cron expressions before committing them.
 
-### Delete Schedule
+    **Parameters**
 
-Disables and removes the schedule from a task. The task itself is not deleted.
+    | Parameter | Type | Required | Description |
+    | --- | --- | --- | --- |
+    | **Task ID** | String | Yes | The task context for the preview. |
+    | **Schedule Mode** | Options | Yes | `Frequency (Interval)` or `Cron Expression`. Same sub-fields as [Set Schedule](#set-schedule). |
 
-**Parameters**
+    **API call:** `POST /api/schedules/{taskId}/describe`
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| **Task ID** | String | Yes | The ID of the task whose schedule should be removed. |
+    **Output:** A preview object describing when the schedule would fire.
+  </Accordion>
 
-**API call:** `DELETE /api/schedules/{taskId}`
+  <Accordion title="Get Scheduler Status">
+    Returns the overall health and status of the Figranium task scheduler — not tied to any specific task.
 
-**Output:** A confirmation object.
+    **Parameters:** None beyond the credential.
 
----
+    **API call:** `GET /api/schedules/status/all`
 
-### Describe Schedule
-
-Validates a schedule configuration and returns a human-readable preview (e.g. next run times) without saving anything. Useful for testing cron expressions before committing them.
-
-**Parameters**
-
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| **Task ID** | String | Yes | The task context for the preview. |
-| **Schedule Mode** | Options | Yes | `Frequency (Interval)` or `Cron Expression`. Same sub-fields as [Set Schedule](#set-schedule). |
-
-**API call:** `POST /api/schedules/{taskId}/describe`
-
-**Output:** A preview object describing when the schedule would fire.
-
----
-
-### Get Scheduler Status
-
-Returns the overall health and status of the Figranium task scheduler — not tied to any specific task.
-
-**Parameters:** None beyond the credential.
-
-**API call:** `GET /api/schedules/status/all`
-
-**Output:** A status object for the scheduler engine (e.g. running, paused, number of active schedules).
+    **Output:** A status object for the scheduler engine (e.g. running, paused, number of active schedules).
+  </Accordion>
+</AccordionGroup>
 
 ---
 
 ## Troubleshooting
 
-### Task dropdown is empty
+<AccordionGroup>
+  <Accordion title="Task dropdown is empty">
+    - Confirm your **Base URL** is reachable from the n8n host (not just from your browser).
+    - Verify the **API Key** is valid.
+    - Check n8n logs for `401 Unauthorized` or `404 Not Found` errors during the "load options" phase.
+  </Accordion>
 
-- Confirm your **Base URL** is reachable from the n8n host (not just from your browser).
-- Verify the **API Key** is valid.
-- Check n8n logs for `401 Unauthorized` or `404 Not Found` errors during the "load options" phase.
+  <Accordion title="Connection refused in Docker">
+    If both n8n and Figranium run in Docker on the same machine, `localhost` in the Base URL will resolve to the n8n container itself. Use your host machine's internal IP or the Docker bridge IP (e.g. `http://172.17.0.1:11345`) instead.
+  </Accordion>
 
-### Connection refused in Docker
+  <Accordion title="Variables not overriding task defaults">
+    Variable **Name** values are case-sensitive and must match the variable names defined in the task exactly.
+  </Accordion>
+</AccordionGroup>
 
-If both n8n and Figranium run in Docker on the same machine, `localhost` in the Base URL will resolve to the n8n container itself. Use your host machine's internal IP or the Docker bridge IP (e.g. `http://172.17.0.1:11345`) instead.
-
-### Variables not overriding task defaults
-
-Variable **Name** values are case-sensitive and must match the variable names defined in the task exactly.
+<Tip>
+  If you need to pass dynamic values from earlier n8n nodes, use n8n expressions in the **Variables** fields. For example, set a variable value to `{{ $json.product_url }}` to forward data from a webhook trigger.
+</Tip>

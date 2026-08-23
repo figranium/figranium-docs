@@ -35,6 +35,10 @@ bun add @figranium/sdk
 
 The package has no runtime dependencies, so it adds nothing to your dependency tree beyond itself.
 
+<Tip>
+  Use Node.js 18 or newer so the SDK can rely on the built-in global `fetch`. Older Node versions require a polyfill.
+</Tip>
+
 ## Import styles
 
 The SDK works with both `import` and `require`.
@@ -75,7 +79,7 @@ A healthy Figranium instance returns a JSON object with `status: "ok"`.
 
 ## Browsers and bundlers
 
-The SDK is `sideEffects: false`, so bundlers like Vite, webpack, esbuild, and Rollup tree-shake unused resources. In the browser, use a session-authenticated client (`{ session: true }`) so cookies are sent; see [Authentication](/sdk/js/authentication).
+The SDK is `sideEffects: false`, so bundlers like Vite, webpack, esbuild, and Rollup tree-shake unused resources. In the browser, use a session-authenticated client (`{ session: true }`) so cookies are sent. See [Authentication](/sdk/js/authentication).
 
 ## Next steps
 

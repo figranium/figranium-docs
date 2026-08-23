@@ -31,17 +31,28 @@ The SDK tries `JSON.parse` on the data lines. If parsing fails, `data` is the ra
 
 ## Consume execution events
 
-```ts
-import { Figranium } from "@figranium/sdk";
+<Steps>
+  <Step title="Create a client">
+    Initialize the SDK with your API key.
 
-const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
+    ```ts
+    import { Figranium } from "@figranium/sdk";
+    
+    const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
+    ```
+  </Step>
+  <Step title="Iterate the stream">
+    Use `for await` to consume events as they arrive.
 
-for await (const event of figranium.executions.stream()) {
-  console.log(event.event, event.data);
-}
-```
+    ```ts
+    for await (const event of figranium.executions.stream()) {
+      console.log(event.event, event.data);
+    }
+    ```
 
-Iteration ends when the server closes the connection or when your loop breaks. Breaking out of the loop cancels the underlying reader.
+    Iteration ends when the server closes the connection or when your loop breaks. Breaking out of the loop cancels the underlying reader.
+  </Step>
+</Steps>
 
 ## Cancel a stream
 
@@ -109,3 +120,7 @@ Streams throw `FigraniumError` in the same conditions as regular requests, plus:
 - `REQUEST_ABORTED`: the caller aborted, or the terminal `timeoutMs` fired.
 
 See [Errors](/sdk/js/errors) for the full error surface.
+
+<Tip>
+  For long-running streams, prefer `AbortSignal` over `timeoutMs` so you can stop cleanly when your application state changes.
+</Tip>

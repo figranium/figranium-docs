@@ -1,5 +1,7 @@
 ---
 title: "CLI Tool & Standalone Scripts"
+sidebarTitle: "CLI"
+description: "Run Figranium from the command line for one-off scrapes, agent tasks, or headful debugging. Reference all flags, modes, and environment variables."
 ---
 
 <Warning>
@@ -8,113 +10,117 @@ title: "CLI Tool & Standalone Scripts"
 
 Figranium can be run entirely from the command line, either as a persistent web server or in standalone modes for one-off scraping and automation tasks.
 
-## **Global Installation**
+## Installation
 
-```bash
+<CodeGroup>
+
+```bash Global install
 npm install -g figranium
 ```
 
-Or use without installing globally via `npx`:
-
-```bash
+```bash npx (no install)
 npx figranium
 ```
 
-## **Usage**
+</CodeGroup>
 
-```text
+## Usage
+
+```bash
 figranium [options]
 figranium --scrape --url <url> [--selector <css>]
 figranium --agent --task <id>
 figranium --headful --url <url>
 ```
 
-## **Modes**
+## Modes
 
-### **Start Web Dashboard (Default)**
+<AccordionGroup>
+  <Accordion title="Start Web Dashboard (Default)">
+    Running `figranium` with no arguments starts the full web dashboard at `http://localhost:11345`.
 
-Running `figranium` with no arguments starts the full web dashboard at `http://localhost:11345`.
+    ```bash
+    figranium
+    figranium --port 8080   # Start on a custom port
+    ```
+  </Accordion>
 
-```bash
-figranium
-figranium --port 8080   # Start on a custom port
-```
+  <Accordion title="Scraper Mode (--scrape)">
+    Runs a fast, one-off page scrape without full agent logic. Ideal for simple text extraction tasks.
 
-### **Scraper Mode (`--scrape`)**
+    ```bash
+    figranium --scrape --url "https://example.com" --selector ".product-price"
+    ```
 
-Runs a fast, one-off page scrape without full agent logic. Ideal for simple text extraction tasks.
+    **Flags for `--scrape`:**
 
-```bash
-figranium --scrape --url "https://example.com" --selector ".product-price"
-```
+    | Flag | Description |
+    | :-- | :-- |
+    | `--url <url>` | **Required.** Target URL to scrape. |
+    | `--selector <css>` | CSS selector to extract text from. |
+    | `--output <file>` | Optional file path to write the JSON result. |
+    | `--wait <seconds>` | Seconds to wait after page load before extracting. |
+    | `--task <id>` | Load a saved scrape task by ID (merged with other flags). |
 
-**Flags for `--scrape`**:
+    **Example — Save to file:**
 
-| Flag | Description |
-| :-- | :-- |
-| `--url <url>` | **Required.** Target URL to scrape. |
-| `--selector <css>` | CSS selector to extract text from. |
-| `--output <file>` | Optional file path to write the JSON result. |
-| `--wait <seconds>` | Seconds to wait after page load before extracting. |
-| `--task <id>` | Load a saved scrape task by ID (merged with other flags). |
+    ```bash
+    figranium --scrape --url "https://quotes.toscrape.com" --selector ".quote" --output quotes.json
+    ```
+  </Accordion>
 
-**Example — Save to file:**
+  <Accordion title="Agent Mode (--agent)">
+    Executes the full block-based automation engine for a saved task.
 
-```bash
-figranium --scrape --url "https://quotes.toscrape.com" --selector ".quote" --output quotes.json
-```
+    ```bash
+    figranium --agent --task "my-task-id"
+    ```
 
-### **Agent Mode (`--agent`)**
+    **Flags for `--agent`:**
 
-Executes the full block-based automation engine for a saved task.
+    | Flag | Description |
+    | :-- | :-- |
+    | `--task <id>` | **Required.** Run a saved task by its ID. |
+    | `--url <url>` | Override the task's starting URL. |
 
-```bash
-figranium --agent --task "my-task-id"
-```
+    **What gets printed:**
 
-**Flags for `--agent`**:
+    - All step-by-step execution logs
+    - Final data output as formatted JSON
 
-| Flag | Description |
-| :-- | :-- |
-| `--task <id>` | **Required.** Run a saved task by its ID. |
-| `--url <url>` | Override the task's starting URL. |
+    **Example output:**
 
-**What gets printed:**
+    ```bash
+    Figranium: Initializing standalone execution...
+    Loaded task: Scrape Products (agent)
+    Mode: Agent | URL: https://shop.example.com
+    
+    --- Agent Execution Finished ---
+    Logs:
+      Navigated to https://shop.example.com
+      Clicked #accept-cookies
+      Found 24 product cards
+    
+    Data Output:
+    [
+      { "name": "Widget A", "price": "$9.99" },
+      ...
+    ]
+    ```
+  </Accordion>
 
-- All step-by-step execution logs
-- Final data output as formatted JSON
+  <Accordion title="Headful Mode (--headful)">
+    Launches a visible Chromium browser for manual inspection and debugging.
 
-**Example output:**
+    ```bash
+    figranium --headful --url "https://example.com"
+    ```
 
-```text
-Figranium: Initializing standalone execution...
-Loaded task: Scrape Products (agent)
-Mode: Agent | URL: https://shop.example.com
+    The browser opens on your display (requires a graphical environment). On a headless server, use the VNC integration instead — see [Headful Browser](/headful-browser).
+  </Accordion>
+</AccordionGroup>
 
---- Agent Execution Finished ---
-Logs:
-  Navigated to https://shop.example.com
-  Clicked #accept-cookies
-  Found 24 product cards
-
-Data Output:
-[
-  { "name": "Widget A", "price": "$9.99" },
-  ...
-]
-```
-
-### **Headful Mode (`--headful`)**
-
-Launches a visible Chromium browser for manual inspection and debugging.
-
-```bash
-figranium --headful --url "https://example.com"
-```
-
-The browser opens on your display (requires a graphical environment). On a headless server, use the VNC integration instead — see [Headful Browser](/headful-browser).
-
-## **All Flags Reference**
+## All Flags Reference
 
 | Flag | Default | Description |
 | :-- | :-- | :-- |
@@ -128,7 +134,7 @@ The browser opens on your display (requires a graphical environment). On a headl
 | `--port <number>` | `11345` | Web server port |
 | `--help`, `-h` | — | Show help message |
 
-## **Environment Variables**
+## Environment Variables
 
 All CLI modes respect the same environment variables as the server. Set them in your shell or a `.env` file:
 
@@ -144,11 +150,13 @@ All CLI modes respect the same environment variables as the server. Set them in 
 | `LOG_LEVEL` | Logging verbosity | — |
 | `DB_TYPE` | Set to `postgres` for PostgreSQL storage | — |
 
-## **Scripting and Automation**
+## Scripting and Automation
 
 Combine CLI modes with shell scripts for automated pipelines:
 
-```bash
+<CodeGroup>
+
+```bash Shell pipeline
 #!/bin/bash
 # Run a scrape and pipe results to a processor
 figranium --scrape --url "https://api.example.com/data" \
@@ -158,34 +166,50 @@ figranium --scrape --url "https://api.example.com/data" \
 python3 process_data.py /tmp/scraped.json
 ```
 
-**Run on a schedule with cron:**
-
-```bash
+```bash Cron schedule
 # Crontab: run every hour at the top of the hour
 0 * * * * /usr/local/bin/figranium --agent --task "my-hourly-task"
 ```
 
-## **Exit Codes**
+</CodeGroup>
+
+## Exit Codes
 
 | Code | Meaning |
 | :-- | :-- |
 | `0` | Success |
 | `1` | Error (task not found, scrape/agent failed) |
 
-## **Troubleshooting**
+## Troubleshooting
 
-**Task not found:**
+<AccordionGroup>
+  <Accordion title="Task not found">
+    ```bash
+    Error: Task "my-task-id" not found.
+    ```
 
-```text
-Error: Task "my-task-id" not found.
-```
+    The task ID must match exactly as stored in `data/tasks.json`. Retrieve the correct ID from the web dashboard URL or the REST API (`GET /api/tasks`).
+  </Accordion>
 
-The task ID must match exactly as stored in `data/tasks.json`. Retrieve the correct ID from the web dashboard URL or the REST API (`GET /api/tasks`).
+  <Accordion title="Playwright browsers not installed">
+    ```bash
+    Error: browserType.launch: Failed to launch chromium
+    ```
 
-**Playwright browsers not installed:**
+    Run `npx playwright install chromium` to download the required browser binaries.
+  </Accordion>
+</AccordionGroup>
 
-```text
-Error: browserType.launch: Failed to launch chromium
-```
+<CardGroup cols={2}>
+  <Card title="REST API" icon="code" href="/rest-api">
+    Programmatically trigger tasks and manage executions via HTTP.
+  </Card>
 
-Run `npx playwright install chromium` to download the required browser binaries.
+  <Card title="Task Scheduling" icon="clock" href="/task-scheduling">
+    Automate recurring runs with cron and frequency-based schedules.
+  </Card>
+
+  <Card title="Configuration" icon="terminal" href="/configuration">
+    Environment variables and server configuration reference.
+  </Card>
+</CardGroup>

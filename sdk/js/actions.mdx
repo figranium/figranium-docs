@@ -12,7 +12,7 @@ Tasks are executed as ordered lists of actions. The SDK exports typed factories 
 import { action, actions, variable, type Task } from "@figranium/sdk";
 ```
 
-Every helper returns a plain action object. Helpers assign a unique `id` if you don't pass one, so lists remain stable across saves.
+Every helper returns a plain action object. Helpers assign a unique `id` if you do not pass one, so lists remain stable across saves.
 
 ## Base options
 
@@ -26,6 +26,26 @@ interface ActionBase {
 ```
 
 Use `disabled: true` to keep an action in the list without executing it.
+
+## Action types
+
+<CardGroup cols={2}>
+  <Card title="Navigation and interaction" icon="arrow-right" href="#navigation-and-interaction">
+    Navigate, click, type, press keys, wait, hover, and capture screenshots.
+  </Card>
+
+  <Card title="Extraction" icon="database" href="#extraction">
+    Read content, run JavaScript, and make HTTP requests.
+  </Card>
+
+  <Card title="Control flow" icon="shuffle" href="#control-flow">
+    Conditionals, loops, branches, repeats, and sub-task starts.
+  </Card>
+
+  <Card title="Variables and CAPTCHA" icon="lock" href="#variables">
+    Set and merge variables, plus CAPTCHA solving actions.
+  </Card>
+</CardGroup>
 
 ## Navigation and interaction
 
@@ -112,7 +132,7 @@ See [Variables and templates](/sdk/js/variables) for more.
 
 ## Typed one-off actions
 
-For actions the helpers don't cover, use `action()` with a typed literal:
+For actions the helpers do not cover, use `action()` with a typed literal:
 
 ```ts
 import { action } from "@figranium/sdk";
@@ -123,7 +143,7 @@ const download = action({
 });
 ```
 
-`action()` assigns an ID if you don't provide one and preserves all valid fields.
+`action()` assigns an ID if you do not provide one and preserves all valid fields.
 
 ## Full task example
 

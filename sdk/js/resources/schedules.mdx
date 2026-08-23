@@ -29,13 +29,13 @@ type Schedule = {
 };
 ```
 
-- `enabled` — whether the schedule is active.
-- `frequency` — the recurrence pattern. Use `"interval"` for a simple minute-based timer, `"hourly"` / `"daily"` / `"weekly"` / `"monthly"` for calendar-based runs, or omit it and supply `cron` directly.
-- `intervalMinutes` — required when `frequency` is `"interval"`.
-- `hour` and `minute` — used with `"daily"`, `"weekly"`, and `"monthly"` to set the time of day.
-- `daysOfWeek` — array of weekday numbers (`0` = Sunday) for `"weekly"`.
-- `dayOfMonth` — day number (`1`–`31`) for `"monthly"`.
-- `cron` — a raw cron string when you need full control.
+- `enabled` : whether the schedule is active.
+- `frequency` : the recurrence pattern. Use `"interval"` for a simple minute-based timer, `"hourly"` / `"daily"` / `"weekly"` / `"monthly"` for calendar-based runs, or omit it and supply `cron` directly.
+- `intervalMinutes` : required when `frequency` is `"interval"`.
+- `hour` and `minute` : used with `"daily"`, `"weekly"`, and `"monthly"` to set the time of day.
+- `daysOfWeek` : array of weekday numbers (`0` = Sunday) for `"weekly"`.
+- `dayOfMonth` : day number (`1` to `31`) for `"monthly"`.
+- `cron` : a raw cron string when you need full control.
 
 ### Examples
 
@@ -65,194 +65,109 @@ const weeklySchedule = {
 await figranium.schedules.set("task-123", weeklySchedule);
 ```
 
-## list
+## Methods
 
-Retrieve all tasks that currently have a schedule configured.
+<AccordionGroup>
+  <Accordion title="list">
+    Retrieve all tasks that currently have a schedule configured.
 
-**Signature**
+    - **HTTP endpoint:** `GET /api/schedules`
+    - **Signature:** `schedules.list(options?: RequestOptions): Promise<{ schedules: ScheduleEntry[] }>`
 
-```ts
-schedules.list(options?: RequestOptions): Promise<{ schedules: ScheduleEntry[] }>
-```
+    ```ts list-schedules.ts
+    const { schedules } = await figranium.schedules.list();
+    
+    for (const entry of schedules) {
+      console.log(entry.taskId, entry.taskName, entry.schedule.enabled);
+    }
+    ```
 
-**HTTP endpoint**
+    Returns an object with a `schedules` array. Each `ScheduleEntry` contains `taskId`, `taskName`, `mode`, and the attached `Schedule` object.
+  </Accordion>
 
-```text
-GET /api/schedules
-```
+  <Accordion title="set">
+    Attach or update a schedule for a specific task.
 
-**Example**
+    - **HTTP endpoint:** `POST /api/schedules/:taskId`
+    - **Signature:** `schedules.set(taskId: string, schedule: Schedule, options?: RequestOptions): Promise<{ schedule: Schedule; description: string | null; nextRun: number | null }>`
 
-```ts list-schedules.ts
-const { schedules } = await figranium.schedules.list();
+    ```ts set-schedule.ts
+    const result = await figranium.schedules.set("task-123", {
+      enabled: true,
+      frequency: "daily",
+      hour: 7,
+      minute: 0,
+    });
+    
+    console.log(result.nextRun); // Unix timestamp of the next scheduled run
+    ```
 
-for (const entry of schedules) {
-  console.log(entry.taskId, entry.taskName, entry.schedule.enabled);
-}
-```
+    Returns an object containing the saved `schedule`, a human-readable `description`, and the `nextRun` timestamp (or `null` if the schedule is disabled or invalid).
+  </Accordion>
 
-**Return type**
+  <Accordion title="delete">
+    Remove a task's schedule entirely.
 
-Returns an object with a `schedules` array. Each `ScheduleEntry` contains `taskId`, `taskName`, `mode`, and the attached `Schedule` object.
+    - **HTTP endpoint:** `DELETE /api/schedules/:taskId`
+    - **Signature:** `schedules.delete(taskId: string, options?: RequestOptions): Promise<{ success: boolean }>`
 
-## set
+    ```ts delete-schedule.ts
+    const { success } = await figranium.schedules.delete("task-123");
+    ```
 
-Attach or update a schedule for a specific task.
+    Returns `{ success: boolean }` indicating whether the schedule was removed.
+  </Accordion>
 
-**Signature**
+  <Accordion title="status">
+    Inspect the current schedule for a single task, including its computed cron expression and validity.
 
-```ts
-schedules.set(
-  taskId: string,
-  schedule: Schedule,
-  options?: RequestOptions
-): Promise<{ schedule: Schedule; description: string | null; nextRun: number | null }>
-```
+    - **HTTP endpoint:** `GET /api/schedules/:taskId/status`
+    - **Signature:** `schedules.status(taskId: string, options?: RequestOptions): Promise<{ schedule: Schedule; cron: string | null; description: string | null; isValid: boolean }>`
 
-**HTTP endpoint**
+    ```ts schedule-status.ts
+    const status = await figranium.schedules.status("task-123");
+    
+    console.log(status.isValid, status.cron, status.description);
+    ```
 
-```text
-POST /api/schedules/:taskId
-```
+    Returns an object with the current `schedule`, the resolved `cron` string, a human-readable `description`, and an `isValid` flag.
+  </Accordion>
 
-**Example**
+  <Accordion title="describe">
+    Validate a schedule payload for a task without saving it. This is useful for previewing the next run time and confirming a cron expression before you call `set`.
 
-```ts set-schedule.ts
-const result = await figranium.schedules.set("task-123", {
-  enabled: true,
-  frequency: "daily",
-  hour: 7,
-  minute: 0,
-});
+    - **HTTP endpoint:** `POST /api/schedules/:taskId/describe`
+    - **Signature:** `schedules.describe(taskId: string, schedule: Schedule, options?: RequestOptions): Promise<{ valid: boolean; description: string | null; cron: string | null; nextRun: number | null }>`
 
-console.log(result.nextRun); // Unix timestamp of the next scheduled run
-```
+    ```ts describe-schedule.ts
+    const preview = await figranium.schedules.describe("task-123", {
+      enabled: true,
+      frequency: "monthly",
+      dayOfMonth: 1,
+      hour: 6,
+      minute: 0,
+    });
+    
+    console.log(preview.valid, preview.cron, preview.nextRun);
+    ```
 
-**Return type**
+    Returns an object with `valid`, `description`, `cron`, and `nextRun`. If `valid` is `false`, the schedule will not be accepted by `set`.
+  </Accordion>
 
-An object containing the saved `schedule`, a human-readable `description`, and the `nextRun` timestamp (or `null` if the schedule is disabled or invalid).
+  <Accordion title="overallStatus">
+    Get a high-level view of the scheduler state across all tasks.
 
-## delete
+    - **HTTP endpoint:** `GET /api/schedules/status/all`
+    - **Signature:** `schedules.overallStatus(options?: RequestOptions): Promise<UnknownRecord>`
 
-Remove a task's schedule entirely.
+    ```ts overall-status.ts
+    const status = await figranium.schedules.overallStatus();
+    console.log(status);
+    ```
 
-**Signature**
-
-```ts
-schedules.delete(taskId: string, options?: RequestOptions): Promise<{ success: boolean }>
-```
-
-**HTTP endpoint**
-
-```text
-DELETE /api/schedules/:taskId
-```
-
-**Example**
-
-```ts delete-schedule.ts
-const { success } = await figranium.schedules.delete("task-123");
-```
-
-**Return type**
-
-`{ success: boolean }` indicating whether the schedule was removed.
-
-## status
-
-Inspect the current schedule for a single task, including its computed cron expression and validity.
-
-**Signature**
-
-```ts
-schedules.status(
-  taskId: string,
-  options?: RequestOptions
-): Promise<{ schedule: Schedule; cron: string | null; description: string | null; isValid: boolean }>
-```
-
-**HTTP endpoint**
-
-```text
-GET /api/schedules/:taskId/status
-```
-
-**Example**
-
-```ts schedule-status.ts
-const status = await figranium.schedules.status("task-123");
-
-console.log(status.isValid, status.cron, status.description);
-```
-
-**Return type**
-
-An object with the current `schedule`, the resolved `cron` string, a human-readable `description`, and an `isValid` flag.
-
-## describe
-
-Validate a schedule payload for a task without saving it. This is useful for previewing the next run time and confirming a cron expression before you call `set`.
-
-**Signature**
-
-```ts
-schedules.describe(
-  taskId: string,
-  schedule: Schedule,
-  options?: RequestOptions
-): Promise<{ valid: boolean; description: string | null; cron: string | null; nextRun: number | null }>
-```
-
-**HTTP endpoint**
-
-```text
-POST /api/schedules/:taskId/describe
-```
-
-**Example**
-
-```ts describe-schedule.ts
-const preview = await figranium.schedules.describe("task-123", {
-  enabled: true,
-  frequency: "monthly",
-  dayOfMonth: 1,
-  hour: 6,
-  minute: 0,
-});
-
-console.log(preview.valid, preview.cron, preview.nextRun);
-```
-
-**Return type**
-
-An object with `valid`, `description`, `cron`, and `nextRun`. If `valid` is `false`, the schedule will not be accepted by `set`.
-
-## overallStatus
-
-Get a high-level view of the scheduler state across all tasks.
-
-**Signature**
-
-```ts
-schedules.overallStatus(options?: RequestOptions): Promise<UnknownRecord>
-```
-
-**HTTP endpoint**
-
-```text
-GET /api/schedules/status/all
-```
-
-**Example**
-
-```ts overall-status.ts
-const status = await figranium.schedules.overallStatus();
-console.log(status);
-```
-
-**Return type**
-
-An `UnknownRecord` (a plain object with `Record<string, unknown>` shape). The exact fields depend on the server version; inspect the response to discover available keys.
+    Returns an `UnknownRecord` (a plain object with `Record<string, unknown>` shape). The exact fields depend on the server version; inspect the response to discover available keys.
+  </Accordion>
+</AccordionGroup>
 
 ## Error handling
 
@@ -260,6 +175,20 @@ Schedule methods throw `FigraniumError` on failure. Common cases include a missi
 
 ## Related resources
 
-- [Tasks](/sdk/js/resources/tasks) — create and manage the tasks you schedule
-- [Executions](/sdk/js/resources/executions) — inspect the runs produced by scheduled tasks
-- [Request options](/sdk/js/request-options) — `signal`, `timeoutMs`, and custom headers
+<CardGroup cols={2}>
+  <Card title="Tasks" icon="list-check" href="/sdk/js/resources/tasks">
+    Create and manage the tasks you schedule.
+  </Card>
+
+  <Card title="Executions" icon="bolt" href="/sdk/js/resources/executions">
+    Inspect the runs produced by scheduled tasks.
+  </Card>
+
+  <Card title="Request options" icon="sliders" href="/sdk/js/request-options">
+    Pass `signal`, `timeoutMs`, and custom headers.
+  </Card>
+
+  <Card title="Errors" icon="triangle-exclamation" href="/sdk/js/errors">
+    Handle `FigraniumError` responses.
+  </Card>
+</CardGroup>

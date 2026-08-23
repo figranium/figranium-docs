@@ -1,106 +1,133 @@
 ---
-title: "CSS Selectors"
+title: "CSS, XPath, and Playwright Selectors in Figranium"
+sidebarTitle: "Selectors"
+description: "Learn how Figranium finds and interacts with page elements using CSS selectors, Playwright extensions, XPath, and Shadow DOM traversal."
 ---
 
-Selectors are the "coordinates" Figranium uses to find and interact with elements on a webpage. Figranium relies primarily on **CSS Selectors**, with additional Playwright-specific extensions for text-based and visibility-based matching.
+Selectors are the "coordinates" Figranium uses to find and interact with elements on a webpage. Figranium relies primarily on CSS Selectors, with additional Playwright-specific extensions for text-based and visibility-based matching.
 
-## **Basic Selectors**
+<Tabs>
+  <Tab title="CSS Selectors">
+    ## Basic Selectors
 
-| Selector | Example | Matches |
-|:---|:---|:---|
-| ID | `#login-button` | Element with `id="login-button"` |
-| Class | `.btn-primary` | Elements with `class="btn-primary"` |
-| Tag | `button` | All `<button>` elements |
-| Attribute | `[type="submit"]` | Elements with `type="submit"` |
-| Attribute contains | `[class*="error"]` | Elements where class contains "error" |
-| Attribute starts with | `[href^="https"]` | Elements where href starts with "https" |
+    | Selector | Example | Matches |
+    | :-- | :-- | :-- |
+    | ID | `#login-button` | Element with `id="login-button"` |
+    | Class | `.btn-primary` | Elements with `class="btn-primary"` |
+    | Tag | `button` | All `<button>` elements |
+    | Attribute | `[type="submit"]` | Elements with `type="submit"` |
+    | Attribute contains | `[class*="error"]` | Elements where class contains "error" |
+    | Attribute starts with | `[href^="https"]` | Elements where href starts with "https" |
 
-## **Combining Selectors**
+    ## Combining Selectors
 
-| Pattern | Example | Matches |
-|:---|:---|:---|
-| Descendant | `.form-group input` | `input` anywhere inside `.form-group` |
-| Direct child | `.menu > li` | `li` elements that are direct children of `.menu` |
-| Adjacent sibling | `h2 + p` | `p` immediately after an `h2` |
-| Group | `button, a.btn` | Both `button` and `a.btn` elements |
+    | Pattern | Example | Matches |
+    | :-- | :-- | :-- |
+    | Descendant | `.form-group input` | `input` anywhere inside `.form-group` |
+    | Direct child | `.menu > li` | `li` elements that are direct children of `.menu` |
+    | Adjacent sibling | `h2 + p` | `p` immediately after an `h2` |
+    | Group | `button, a.btn` | Both `button` and `a.btn` elements |
 
-## **Playwright Extensions**
+    ## Pseudo-Classes
 
-Figranium uses Playwright under the hood, which adds useful CSS pseudo-classes beyond standard CSS:
+    | Selector | Description |
+    | :-- | :-- |
+    | `li:nth-child(3)` | The 3rd child element |
+    | `li:first-child` | The first child |
+    | `li:last-child` | The last child |
+    | `input:checked` | Checked checkboxes and radio buttons |
+    | `input:disabled` | Disabled form inputs |
+    | `input:focus` | Currently focused element |
+    | `a:empty` | Elements with no children |
 
-| Selector | Example | Description |
-|:---|:---|:---|
-| `:has-text()` | `button:has-text("Submit")` | Elements whose text content includes the string |
-| `:text()` | `:text("Accept")` | Shorthand for exact/partial text match |
-| `:visible` | `button:visible` | Only visible elements (not hidden via CSS) |
-| `:nth-match()` | `:nth-match(.item, 2)` | The Nth element matching a selector |
-| `:has()` | `li:has(img)` | Elements that contain a child matching the inner selector |
-| `:is()` | `:is(h1, h2, h3)` | Matches any of the given selectors |
-| `:not()` | `input:not([disabled])` | Elements that do NOT match |
+    <Tip>
+      Prefer IDs and `data-*` attributes for the most stable selectors. Avoid long descendant chains that break when the DOM structure changes.
+    </Tip>
+  </Tab>
+  <Tab title="Playwright Extensions">
+    Figranium uses Playwright under the hood, which adds useful CSS pseudo-classes beyond standard CSS:
 
-## **Pseudo-Classes**
+    | Selector | Example | Description |
+    | :-- | :-- | :-- |
+    | `:has-text()` | `button:has-text("Submit")` | Elements whose text content includes the string |
+    | `:text()` | `:text("Accept")` | Shorthand for exact/partial text match |
+    | `:visible` | `button:visible` | Only visible elements (not hidden via CSS) |
+    | `:nth-match()` | `:nth-match(.item, 2)` | The Nth element matching a selector |
+    | `:has()` | `li:has(img)` | Elements that contain a child matching the inner selector |
+    | `:is()` | `:is(h1, h2, h3)` | Matches any of the given selectors |
+    | `:not()` | `input:not([disabled])` | Elements that do NOT match |
 
-| Selector | Description |
-|:---|:---|
-| `li:nth-child(3)` | The 3rd child element |
-| `li:first-child` | The first child |
-| `li:last-child` | The last child |
-| `input:checked` | Checked checkboxes and radio buttons |
-| `input:disabled` | Disabled form inputs |
-| `input:focus` | Currently focused element |
-| `a:empty` | Elements with no children |
+    <Tip>
+      Use `:has-text()` when a button's text is the most stable thing about it, rather than a brittle class like `.btn-blue-v2`.
+    </Tip>
+  </Tab>
+  <Tab title="XPath">
+    While CSS selectors are preferred, XPath is available for cases where CSS is insufficient — for example, selecting an element by its exact text content or navigating upward to a parent.
 
-## **Shadow DOM**
+    Use the `xpath=` prefix to indicate an XPath selector:
 
-Modern web applications often use Shadow DOM (Web Components). Standard CSS selectors cannot pierce shadow boundaries.
+    ```text
+    xpath=//button[text()='Submit']
+    xpath=//td[contains(text(),'Total')]/following-sibling::td
+    xpath=//label[text()='Username']/following-sibling::input
+    ```
 
-**To enable Shadow DOM traversal:**
+    **Common XPath patterns:**
 
-1. Open the task in the **Editor**.
-2. In **Settings > Advanced**, enable **Shadow DOM support**.
-3. Use the `>>` combinator (Playwright's shadow-piercing separator):
+    | Pattern | Description |
+    | :-- | :-- |
+    | `//div[@class='box']` | Div with exact class "box" |
+    | `//button[contains(text(),'OK')]` | Button whose text contains "OK" |
+    | `//input[@name='email']` | Input with name attribute "email" |
+    | `(//li)[3]` | The 3rd `li` element on the page |
+    | `//p/parent::div` | The parent `div` of a `p` element |
 
-```css
-/* Click a button inside a shadow root */
-my-component >> button.submit
-```
+    <Tip>
+      XPath is especially useful for navigating up the DOM tree (e.g., `parent::`) or matching exact text content, which CSS cannot do natively.
+    </Tip>
+  </Tab>
+  <Tab title="Shadow DOM">
+    Modern web applications often use Shadow DOM (Web Components). Standard CSS selectors cannot pierce shadow boundaries.
 
-Alternatively, use a JavaScript block to query shadow DOM manually:
+    **To enable Shadow DOM traversal:**
 
-```js
-return document.querySelector("my-component")
-  .shadowRoot
-  .querySelector(".submit-btn")
-  .innerText;
-```
+    <Steps>
+      <Step title="Open the Editor">
+        Open the task in the **Editor**.
+      </Step>
+      <Step title="Enable Shadow DOM support">
+        In **Settings \> Advanced**, enable **Shadow DOM support**.
+      </Step>
+      <Step title="Use the shadow-piercing combinator">
+        Use the `>>` combinator (Playwright's shadow-piercing separator):
 
-## **XPath**
+        ```css
+        /* Click a button inside a shadow root */
+        my-component >> button.submit
+        ```
+      </Step>
+    </Steps>
 
-While CSS selectors are preferred, XPath is available for cases where CSS is insufficient — for example, selecting an element by its exact text content or navigating upward to a parent.
+    Alternatively, use a JavaScript block to query shadow DOM manually:
 
-Use the `xpath=` prefix to indicate an XPath selector:
+    ```js
+    return document.querySelector("my-component")
+      .shadowRoot
+      .querySelector(".submit-btn")
+      .innerText;
+    ```
 
-```
-xpath=//button[text()='Submit']
-xpath=//td[contains(text(),'Total')]/following-sibling::td
-xpath=//label[text()='Username']/following-sibling::input
-```
+    <Tip>
+      Enable Shadow DOM support only for pages that use Web Components. Standard pages work fine without it.
+    </Tip>
+  </Tab>
+</Tabs>
 
-**Common XPath patterns:**
-
-| Pattern | Description |
-|:---|:---|
-| `//div[@class='box']` | Div with exact class "box" |
-| `//button[contains(text(),'OK')]` | Button whose text contains "OK" |
-| `//input[@name='email']` | Input with name attribute "email" |
-| `(//li)[3]` | The 3rd `li` element on the page |
-| `//p/parent::div` | The parent `div` of a `p` element |
-
-## **Testing Selectors**
+## Testing Selectors
 
 Figranium provides multiple tools for finding and verifying selectors:
 
-### **Built-in Highlight Tool**
+### Built-in Highlight Tool
 
 Click the selector/crosshair icon in any action block's selector field. This activates a visual picker in the [headful browser](/headful-browser) that lets you hover over and click elements on the live page.
 
@@ -119,20 +146,30 @@ The selector generation algorithm prioritizes selectors in this order:
 
 This priority order means you get human-readable, resilient selectors by default, with structural fallbacks only when no better option exists.
 
-### **AI Selector Generator**
+### AI Selector Generator
 
 Uses AI (Gemini or Claude) to generate robust, semantically meaningful selectors. It analyzes the page structure and suggests selectors that are more resilient to minor HTML changes.
 
-Configure your AI provider keys in **Settings > System > API Keys** and choose the preferred model in **Settings > System > AI Models**. Set your preferred default selector tool in **Settings > System > Selector Finder**.
+Configure your AI provider keys in **Settings \> System \> API Keys** and choose the preferred model in **Settings \> System \> AI Models**. Set your preferred default selector tool in **Settings \> System \> Selector Finder**.
 
-### **Browser Developer Tools**
+### Browser Developer Tools
 
-1. Right-click an element > **Inspect**.
-2. In the Elements panel, press `Ctrl+F` (or `Cmd+F` on Mac).
-3. Type a CSS selector or XPath to see highlighted matches in real-time.
-4. Right-click the element in the Elements tree > **Copy > Copy selector** for an auto-generated selector.
+<Steps>
+  <Step title="Inspect the element">
+    Right-click an element \> **Inspect**.
+  </Step>
+  <Step title="Search for matches">
+    In the Elements panel, press `Ctrl+F` (or `Cmd+F` on Mac).
+  </Step>
+  <Step title="Type and verify">
+    Type a CSS selector or XPath to see highlighted matches in real-time.
+  </Step>
+  <Step title="Copy the selector">
+    Right-click the element in the Elements tree \> **Copy \> Copy selector** for an auto-generated selector.
+  </Step>
+</Steps>
 
-### **Testing in the Browser Console**
+### Testing in the Browser Console
 
 Verify a selector in DevTools console:
 
@@ -148,16 +185,15 @@ document.evaluate(
 ).singleNodeValue
 ```
 
-## **Best Practices**
+## Best Practices
 
 1. **Prefer IDs and `data-*` attributes**: IDs (`#submit`) and test attributes (`[data-testid="submit"]`) are the most stable because they are explicitly set by developers and less likely to change with styling updates.
-
 2. **Avoid long chains**: `body > div > div > section > ul > li > span` breaks as soon as the HTML structure changes. Use a more specific class or attribute closer to the element.
-
 3. **Use `:has-text()` for dynamic buttons**: When a button's text is the most stable thing about it, use `button:has-text("Add to Cart")` rather than a brittle class like `.btn-blue-v2`.
-
 4. **Scope your selectors**: Instead of `.item`, use `.product-list .item` to avoid accidentally matching elements in other parts of the page.
-
 5. **Avoid nth-child on large lists**: `li:nth-child(7)` breaks when items are added/removed. Use a data attribute or text match instead.
-
 6. **Test after site updates**: Websites change. Pin important selectors to stable attributes and review them periodically.
+
+<Tip>
+  When a selector feels brittle, switch to the Highlight Tool or AI Selector Generator to find a more stable alternative before it breaks in production.
+</Tip>

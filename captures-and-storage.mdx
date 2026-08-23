@@ -1,10 +1,30 @@
 ---
-title: "Captures & Storage"
+title: "Captures, Recordings, and Storage Management"
+sidebarTitle: "Captures"
+description: "Learn how Figranium captures screenshots, videos, and downloads during automation runs. Manage storage, cookies, and cleanup."
 ---
 
 Figranium automatically captures visual evidence and intercepted files from your automation runs. This is crucial for debugging, auditing, and ensuring quality.
 
-## **Screenshots**
+<CardGroup cols={2}>
+  <Card title="Screenshots" icon="camera" href="#screenshots">
+    View full-page or viewport captures saved as PNG files.
+  </Card>
+
+  <Card title="Video Recordings" icon="video" href="#video-recordings">
+    Watch full-session WebM recordings of Agent task runs.
+  </Card>
+
+  <Card title="File Downloads" icon="download" href="#file-downloads">
+    Access intercepted files from browser download events.
+  </Card>
+
+  <Card title="Cookie Persistence" icon="cookie" href="#cookie-persistence">
+    Manage persistent browser profiles and session state.
+  </Card>
+</CardGroup>
+
+## Screenshots
 
 By default, every successful **Agent** task captures a final screenshot of the page.
 
@@ -13,17 +33,17 @@ By default, every successful **Agent** task captures a final screenshot of the p
 - **Accessibility**: View in **Captures** tab or via API.
 
 <Note>
-**Scrape mode does not produce screenshots.** Scrape mode runs an HTTP fetch through `got-scraping` and parses the response with Cheerio — no browser is launched, so there is no page to photograph. Opening a scrape execution in the editor shows a **"Scrape mode does not support screenshots"** placeholder in the Screenshot panel where the image would otherwise render. If you need visual evidence of the page, use Agent mode.
+  **Scrape mode does not produce screenshots.** Scrape mode runs an HTTP fetch through `got-scraping` and parses the response with Cheerio — no browser is launched, so there is no page to photograph. Opening a scrape execution in the editor shows a **"Scrape mode does not support screenshots"** placeholder in the Screenshot panel where the image would otherwise render. If you need visual evidence of the page, use Agent mode.
 </Note>
 
-### **Custom Screenshots**
+### Custom Screenshots
 
 You can trigger additional screenshots during an `agent` task using the `screenshot` action block.
 
 - **Filename**: `<run_id>_<timestamp>_<custom_suffix>.png`
 - **Full Page**: (Optional) Capture the entire scrollable area.
 
-## **Video Recordings**
+## Video Recordings
 
 Figranium can record full session videos (WebM format) for **Agent** tasks.
 
@@ -31,13 +51,15 @@ Figranium can record full session videos (WebM format) for **Agent** tasks.
 - **Location**: `public/captures/<run_id>.webm`
 - **Playback**: View directly in the **Captures** tab.
 
-**Note**: Recording consumes more disk space and CPU. Disable it for high-volume scraping. Scrape mode never records video for the same reason it doesn't take screenshots — it doesn't launch a browser.
+<Note>
+  Recording consumes more disk space and CPU. Disable it for high-volume scraping. Scrape mode never records video for the same reason it doesn't take screenshots — it doesn't launch a browser.
+</Note>
 
-## **File Downloads**
+## File Downloads
 
 Figranium automatically intercepts files downloaded during an automation run. For more details on how to manage and access these files, see the [File Downloads](/file-downloads) documentation.
 
-## **Cookie Persistence**
+## Cookie Persistence
 
 Figranium stores cookies and browser session state in persistent profile directories on disk — one per execution mode:
 
@@ -51,32 +73,35 @@ Each mode has its own isolated profile. Cookies from a headful login are bridged
 - **Management**: View, copy, and delete individual cookies in **Settings \> Data**. Click the **Copy** button next to any cookie to copy its value to your clipboard.
 - **Clear All**: Use the "Clear Storage" button in Settings to wipe all session data.
 
-### **Upgrading from v0.9.6 or Earlier**
+### Upgrading from v0.9.6 or Earlier
 
 If you are upgrading from a version that used `storage_state.json`, Figranium will automatically migrate your existing cookies into all three profile directories on first startup. The `storage_state.json` file is then deleted. No manual action is required.
 
-### **Stateless Execution**
+### Stateless Execution
 
 If you enable `statelessExecution` in a task, it will launch a fully ephemeral in-memory browser session (no cookies, no disk profile written) and discard any changes upon completion. This is ideal for testing login flows or anonymous scraping.
 
-## **Storage Management**
+## Storage Management
 
-### **File Cleanup**
+### File Cleanup
 
 Screenshots, videos, and downloaded files accumulate in `public/captures`. Video recordings are stored separately in `data/recordings`. You can delete or download them:
 
 <Note>
-Agent runs write captures to `src/public/captures`, while scrape runs write to `public/captures`. Figranium serves and reads from both paths, so captures always surface in the **Captures** tab regardless of which mode produced them. If you run Figranium in Docker, mount the same host directory to both `/app/public/captures` and `/app/src/public/captures` so no captures are lost. See [Installation with Docker Compose](/docker-compose) for the recommended volume configuration.
+  Agent runs write captures to `src/public/captures`, while scrape runs write to `public/captures`. Figranium serves and reads from both paths, so captures always surface in the **Captures** tab regardless of which mode produced them. If you run Figranium in Docker, mount the same host directory to both `/app/public/captures` and `/app/src/public/captures` so no captures are lost. See [Installation with Docker Compose](/docker-compose) for the recommended volume configuration.
 </Note>
-
 
 1. **Download**: Click the download icon on any capture card to save the file to your device.
 2. **Single delete**: Click the delete icon on a capture card in the **Captures** tab, or remove it from the **Results** drawer.
-3. **Clear all**: Click the trash icon in the **Captures** tab header to delete every screenshot and recording at once. You can also clear all captures from **Settings > Data**.
+3. **Clear all**: Click the trash icon in the **Captures** tab header to delete every screenshot and recording at once. You can also clear all captures from **Settings \> Data**.
 4. **API**: Use `DELETE /api/data/captures/:name` to remove individual files programmatically.
 
-When you clear captures — whether from the **Captures** tab or from **Settings > Data** — both screenshots in `public/captures` and video recordings in `data/recordings` are deleted.
+When you clear captures — whether from the **Captures** tab or from **Settings \> Data** — both screenshots in `public/captures` and video recordings in `data/recordings` are deleted.
 
-### **Execution Logs**
+### Execution Logs
 
 Execution metadata is stored in `data/executions.json`. Browser session profiles are stored separately in `data/browser-profile*` directories and are not affected by execution log rotation. This file grows over time. Figranium automatically rotates logs (configurable via `MAX_EXECUTIONS` in `server/constants.js`, default 500) to prevent unlimited growth.
+
+<Note>
+  Screenshots, videos, and downloaded files accumulate over time. Monitor disk usage on your host and clear old captures regularly, or automate cleanup outside Figranium if you run high-volume tasks.
+</Note>

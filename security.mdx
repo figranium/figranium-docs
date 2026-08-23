@@ -1,10 +1,12 @@
 ---
 title: "Security Best Practices"
+sidebarTitle: "Security"
+description: "Secure your Figranium instance with authentication, IP allowlists, SSRF protection, TLS, session hardening, and rate limiting. Reference all security settings and headers."
 ---
 
 Securing your Figranium instance is critical, especially when running on a public server.
 
-## **1. Authentication**
+## Authentication
 
 By default, the Figranium UI requires an account. When you create your account during initial setup, Figranium enforces the following requirements:
 
@@ -33,8 +35,8 @@ This means:
 The endpoint distinguishes two failure modes via separate error codes:
 
 | Error code | Status | When |
-| :--- | :--- | :--- |
-| `API_KEY_NOT_SET` | `403` | The server has no API key configured. Set one in **Settings > System** before calling protected endpoints. |
+| :-- | :-- | :-- |
+| `API_KEY_NOT_SET` | `403` | The server has no API key configured. Set one in **Settings \> System** before calling protected endpoints. |
 | `INVALID_API_KEY` | `401` | A key was sent (or omitted) and did not match the configured key. The same code is returned for missing, malformed, and incorrect keys to avoid leaking which case applied. |
 
 No configuration is required — this protection is always active on every endpoint that uses API key authentication, including `requireApiKey` and `requireAuthOrApiKey` routes.
@@ -49,7 +51,7 @@ After setup, you should also:
 
 Every route under `/api/settings/*` — including API key management, proxy configuration, AI model selection, and the Gemini, OpenAI, Claude, and Ollama key endpoints — requires a logged-in session regardless of `NODE_ENV`. There is no development mode that bypasses this check, so unauthenticated requests to settings routes always return `401 UNAUTHORIZED`, even on a local `npm run dev` instance. This prevents accidental exposure of credentials if a development instance is reachable from the network.
 
-## **2. IP Allowlist (**`ALLOWED_IPS`**)**
+## IP Allowlist (`ALLOWED_IPS`)
 
 The most effective way to secure a deployment is to restrict access to trusted IP addresses.
 
@@ -59,7 +61,7 @@ The most effective way to secure a deployment is to restrict access to trusted I
 
 This blocks unauthorized traffic at the network level before it reaches the application logic.
 
-## **3. SSRF Protection (**`ALLOW_PRIVATE_NETWORKS`**)**
+## SSRF Protection (`ALLOW_PRIVATE_NETWORKS`)
 
 Server-Side Request Forgery (SSRF) is a risk when allowing users to trigger scrapes of arbitrary URLs.
 
@@ -72,7 +74,7 @@ Server-Side Request Forgery (SSRF) is a risk when allowing users to trigger scra
 When `ALLOW_PRIVATE_NETWORKS` is `false`, the following addresses are blocked:
 
 | Category | Blocked ranges |
-| :--- | :--- |
+| :-- | :-- |
 | **IPv4 private** | `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16` (RFC 1918) |
 | **IPv4 special** | `0.0.0.0/8` (current network), `127.0.0.0/8` (loopback), `169.254.0.0/16` (link-local), `100.64.0.0/10` (shared/CGN) |
 | **IPv4 reserved** | `192.0.0.0/24` (IETF protocol assignments), `192.0.2.0/24` (TEST-NET-1), `198.18.0.0/15` (benchmarking), `198.51.100.0/24` (TEST-NET-2), `203.0.113.0/24` (TEST-NET-3), `224.0.0.0/4` (multicast), `240.0.0.0/4` (reserved) |
@@ -80,7 +82,7 @@ When `ALLOW_PRIVATE_NETWORKS` is `false`, the following addresses are blocked:
 | **Hostnames** | `localhost`, `*.localhost`, `host.docker.internal` |
 
 <Note>
-`host.docker.internal` is blocked because it resolves to the Docker host machine, which could expose internal services. This includes Ollama connections — both Ollama configuration URLs and API calls are validated against the SSRF blocklist. If you need to reach Ollama on the Docker host, set `ALLOW_PRIVATE_NETWORKS=true`.
+  `host.docker.internal` is blocked because it resolves to the Docker host machine, which could expose internal services. This includes Ollama connections — both Ollama configuration URLs and API calls are validated against the SSRF blocklist. If you need to reach Ollama on the Docker host, set `ALLOW_PRIVATE_NETWORKS=true`.
 </Note>
 
 **Protocol validation** is always enforced regardless of the `ALLOW_PRIVATE_NETWORKS` setting. Only `http:` and `https:` URLs are allowed. Schemes such as `file://`, `ftp://`, and `javascript:` are blocked even when private network access is enabled.
@@ -89,7 +91,7 @@ SSRF protection also applies to **output provider credentials**. When you add or
 
 ### Proxy server validation
 
-Proxy server addresses are validated against the same SSRF blocklist when you add, import, or update proxies in **Settings > Proxies** or through the API. If a proxy server URL points to a private or internal address, the request is rejected with an `INVALID_URL` error.
+Proxy server addresses are validated against the same SSRF blocklist when you add, import, or update proxies in **Settings \> Proxies** or through the API. If a proxy server URL points to a private or internal address, the request is rejected with an `INVALID_URL` error.
 
 This prevents an attacker (or a misconfiguration) from routing scrape traffic through a proxy that resolves to your internal network. The validation applies to all proxy management endpoints:
 
@@ -103,7 +105,7 @@ If you need to use a proxy on your local network (for example, a SOCKS5 proxy ru
 
 ### Ollama URL validation
 
-Ollama base URLs are validated against the same SSRF blocklist when you save them in **Settings > System > API Keys**. If an Ollama URL points to a private or internal address (such as `localhost` or `host.docker.internal`), the save is rejected with an `INVALID_URL` error.
+Ollama base URLs are validated against the same SSRF blocklist when you save them in **Settings \> System \> API Keys**. If an Ollama URL points to a private or internal address (such as `localhost` or `host.docker.internal`), the save is rejected with an `INVALID_URL` error.
 
 Figranium also validates Ollama URLs at request time, not just when they are saved. Every outbound call to an Ollama instance — including AI-powered selector generation and extraction script generation — goes through redirect-safe fetching. This means:
 
@@ -114,7 +116,7 @@ Figranium also validates Ollama URLs at request time, not just when they are sav
 This defense-in-depth approach protects against cases where an Ollama URL was saved before stricter validation was introduced, or where DNS resolution changes between save time and request time.
 
 <Note>
-Other AI providers (Gemini, OpenAI, Claude) connect to fixed public API endpoints and do not require this additional validation. Only Ollama uses user-supplied URLs, so only Ollama calls go through request-time SSRF checks.
+  Other AI providers (Gemini, OpenAI, Claude) connect to fixed public API endpoints and do not require this additional validation. Only Ollama uses user-supplied URLs, so only Ollama calls go through request-time SSRF checks.
 </Note>
 
 ### Gemini API key transport
@@ -129,7 +131,7 @@ x-goog-api-key: <your key>
 ```
 
 <Note>
-If you previously relied on the `?key=` query-parameter form for log inspection or proxy filtering, update your tooling — the key only appears in the `x-goog-api-key` header now.
+  If you previously relied on the `?key=` query-parameter form for log inspection or proxy filtering, update your tooling — the key only appears in the `x-goog-api-key` header now.
 </Note>
 
 ### Redirect protection
@@ -183,14 +185,14 @@ sourceData.customField = "value"; // silently ignored
 ```
 
 <Note>
-If you have existing extraction scripts that modify proxied data objects, update them to copy values into new objects instead of mutating the originals.
+  If you have existing extraction scripts that modify proxied data objects, update them to copy values into new objects instead of mutating the originals.
 </Note>
 
 ### DNS validation caching
 
 To reduce the overhead of repeated DNS lookups during URL validation, Figranium caches hostname resolution results for 30 seconds. Both allowed and blocked hostnames are cached, so subsequent requests to the same host resolve instantly. The cache is cleared automatically after the TTL expires.
 
-## **4. Session Security**
+## Session Security
 
 - **Session Lifetime**: Dashboard sessions expire after 7 days of inactivity. You will need to log in again after this period.
 - **HTTPS**: Always run Figranium behind a reverse proxy (Nginx, Caddy) that handles TLS/SSL.
@@ -205,30 +207,30 @@ Figranium does not currently mask variable values, typed input, or `javascript` 
 Because Figranium is self-hosted, this data never leaves your machine, but anyone with filesystem or database access to the host can read it. To limit exposure:
 
 - Pass secrets as **runtime variables** via `POST /api/tasks/:id/api` instead of saving them as task defaults — see [Variables & Templating](/variables#handling-sensitive-values).
-- Clear runs that contain sensitive values from **Settings > Data > Clear Execution History**.
-- Restrict who can reach the host with the [`ALLOWED_IPS`](#2-ip-allowlist-allowed-ips) allowlist and require API key auth on all endpoints.
+- Clear runs that contain sensitive values from **Settings \> Data \> Clear Execution History**.
+- Restrict who can reach the host with the [`ALLOWED_IPS`](#ip-allowlist-allowed_ips) allowlist and require API key auth on all endpoints.
 
 Saved output provider credentials (Baserow tokens, Gemini/OpenAI/Claude keys) are a separate store and are redacted in the `GET /api/credentials` response — see [REST API](/rest-api).
 
-## **5. Content Security Policy**
+## Content Security Policy
 
 Figranium sets a `Content-Security-Policy` (CSP) header on every HTTP response. This header tells browsers which origins are allowed to load scripts, styles, fonts, images, and network connections — providing defense-in-depth against cross-site scripting (XSS) and code injection attacks.
 
 The policy is applied automatically with no configuration required. The default directives are:
 
-| Directive      | Allowed sources |
-| :------------- | :-------------- |
-| `default-src`  | `'self'` |
-| `script-src`   | `'self'`, inline scripts, eval (required by the editor runtime) |
-| `style-src`    | `'self'`, inline styles, Google Fonts |
-| `font-src`     | `'self'`, Google Fonts static assets |
-| `img-src`      | `'self'`, `data:`, `blob:`, Google, jsDelivr CDN, GitHub raw content |
-| `connect-src`  | `'self'`, GitHub API, Google Generative Language API, OpenAI API, Anthropic API, Baserow API, Ollama (local) |
-| `media-src`    | `'self'`, `blob:` |
-| `frame-src`    | `'self'` |
+| Directive | Allowed sources |
+| :-- | :-- |
+| `default-src` | `'self'` |
+| `script-src` | `'self'`, inline scripts, eval (required by the editor runtime) |
+| `style-src` | `'self'`, inline styles, Google Fonts |
+| `font-src` | `'self'`, Google Fonts static assets |
+| `img-src` | `'self'`, `data:`, `blob:`, Google, jsDelivr CDN, GitHub raw content |
+| `connect-src` | `'self'`, GitHub API, Google Generative Language API, OpenAI API, Anthropic API, Baserow API, Ollama (local) |
+| `media-src` | `'self'`, `blob:` |
+| `frame-src` | `'self'` |
 
 <Note>
-If you integrate a third-party service whose domain is not in the allow-list above, the browser will block those requests. Check the browser console for CSP violation reports to diagnose connectivity issues with external services. Ollama requests are made server-side, so CSP does not affect connectivity to your Ollama instance.
+  If you integrate a third-party service whose domain is not in the allow-list above, the browser will block those requests. Check the browser console for CSP violation reports to diagnose connectivity issues with external services. Ollama requests are made server-side, so CSP does not affect connectivity to your Ollama instance.
 </Note>
 
 Figranium also sets the following security headers on every response:
@@ -238,16 +240,16 @@ Figranium also sets the following security headers on every response:
 - **`X-XSS-Protection: 1; mode=block`** — enables legacy XSS filters in older browsers.
 - **`Referrer-Policy: strict-origin-when-cross-origin`** — limits referrer information sent to external sites.
 
-## **6. Reverse proxy and `TRUST_PROXY`**
+## Reverse proxy and `TRUST_PROXY`
 
 If you run Figranium behind a reverse proxy (Nginx, Caddy, AWS ALB), you should set `TRUST_PROXY=true` so the server can read the real client IP from proxy headers for logging and rate limiting.
 
 <Note>
-On Render, `trust proxy` is enabled automatically when the platform-provided `RENDER=true` environment variable is present, so you do not need to set `TRUST_PROXY` yourself. This prevents the server from crashing with `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR` when the rate limiter receives the platform's `X-Forwarded-For` header.
+  On Render, `trust proxy` is enabled automatically when the platform-provided `RENDER=true` environment variable is present, so you do not need to set `TRUST_PROXY` yourself. This prevents the server from crashing with `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR` when the rate limiter receives the platform's `X-Forwarded-For` header.
 </Note>
 
 <Warning>
-When `TRUST_PROXY` is enabled, headers like `X-Forwarded-For` are trusted for general request metadata such as logging and rate limiting. Your reverse proxy must be configured to overwrite (not append to) the `X-Forwarded-For` header so that untrusted client-supplied values are stripped.
+  When `TRUST_PROXY` is enabled, headers like `X-Forwarded-For` are trusted for general request metadata such as logging and rate limiting. Your reverse proxy must be configured to overwrite (not append to) the `X-Forwarded-For` header so that untrusted client-supplied values are stripped.
 </Warning>
 
 ### Loopback bypass hardening
@@ -255,6 +257,7 @@ When `TRUST_PROXY` is enabled, headers like `X-Forwarded-For` are trusted for ge
 The internal task-execution bypass (used by the `x-internal-run` header) requires **both** the proxy-resolved client IP and the direct TCP connection address to be loopback addresses. This dual validation prevents an external attacker from bypassing API key authentication by spoofing the `X-Forwarded-For` header — even when `TRUST_PROXY` is enabled, the raw socket address must also resolve to `127.0.0.1` or `::1`.
 
 In practice this means:
+
 - **Local processes** calling the API from the same machine pass both checks automatically.
 - **Remote requests** that spoof a loopback `X-Forwarded-For` value are still rejected because the TCP connection originates from an external address.
 
@@ -264,16 +267,16 @@ To stay secure with `TRUST_PROXY` enabled:
 - Configure your proxy to overwrite (not append to) the `X-Forwarded-For` header so untrusted values from clients are stripped.
 - Combine with `ALLOWED_IPS` to restrict which addresses can reach the server.
 
-## **7. Headful / VNC access control**
+## Headful / VNC access control
 
-The [headful browser](/headful-browser) is powered by an embedded VNC stack (`x11vnc` + noVNC + `websockify`). Figranium hardens this stack against unauthenticated access with three layers of protection:
+The [headful browser](/headful-browser) is powered by an embedded VNC stack (`x11vnc` \+ noVNC \+ `websockify`). Figranium hardens this stack against unauthenticated access with three layers of protection:
 
 - **VNC bound to localhost, websockify gated by auth**: `x11vnc` (port `5900`) listens on `127.0.0.1` inside the container and is not reachable from outside. `websockify` (port `NOVNC_PORT`, default `54311`) listens on `0.0.0.0` so it can be reached over a Docker port forward — required for Apple Silicon hosts and other setups that need port forwarding to work — but every WebSocket upgrade is validated against the checks below before it is proxied to `x11vnc`. Do not publish `54311` on a public interface: rely on the main Figranium port (default `11345`) and the authenticated `/websockify` endpoint instead.
 - **Password-protected VNC**: `x11vnc` is launched with `-passwd`, using a random password generated on first start and persisted at `data/vnc_password.txt`. The embedded viewer fetches this password from `GET /api/headful/vnc-password` (auth required) before connecting.
-- **Authenticated WebSocket upgrades**: every upgrade request to `/websockify` must pass the [`ALLOWED_IPS`](#2-ip-allowlist-allowed-ips) check, an Origin/Host match (CSWSH protection), and either a valid session cookie or an API key (`x-api-key` header or `?apiKey=` query parameter). Failed attempts are dropped and logged with a `[SECURITY]` prefix.
+- **Authenticated WebSocket upgrades**: every upgrade request to `/websockify` must pass the [`ALLOWED_IPS`](#ip-allowlist-allowed_ips) check, an Origin/Host match (CSWSH protection), and either a valid session cookie or an API key (`x-api-key` header or `?apiKey=` query parameter). Failed attempts are dropped and logged with a `[SECURITY]` prefix.
 
 <Note>
-No configuration is required. All three protections are always active. Connect through the Figranium UI, or proxy through `wss://<host>:11345/websockify` with a session cookie or API key. Direct connections to `<host>:54311` still require a valid session cookie or API key on the upgrade request, so an exposed `54311` without credentials will be rejected.
+  No configuration is required. All three protections are always active. Connect through the Figranium UI, or proxy through `wss://<host>:11345/websockify` with a session cookie or API key. Direct connections to `<host>:54311` still require a valid session cookie or API key on the upgrade request, so an exposed `54311` without credentials will be rejected.
 </Note>
 
 To retrieve the VNC password for a custom client:
@@ -285,7 +288,7 @@ curl -H "x-api-key: $FIGRANIUM_API_KEY" \
 
 See [Headful browser — Access control](/headful-browser#access-control) for the full walkthrough.
 
-## **8. Rate Limiting**
+## Rate Limiting
 
 Figranium includes built-in rate limiting to prevent abuse.
 
@@ -296,7 +299,7 @@ Figranium includes built-in rate limiting to prevent abuse.
 
 Adjust these values in `.env` if legitimate traffic is being blocked.
 
-## **9. Sanitized error responses**
+## Sanitized error responses
 
 API error responses return generic error codes instead of detailed internal messages. This prevents information disclosure that could help an attacker map your infrastructure or discover implementation details.
 
@@ -305,7 +308,7 @@ For example, a failed credential URL validation returns `INVALID_BASE_URL` with 
 Each error response includes a structured error code you can match on programmatically:
 
 | Error code | Endpoint | Meaning |
-| :--- | :--- | :--- |
+| :-- | :-- | :-- |
 | `INVALID_INPUT_TYPE` | `POST /api/auth/setup`, `POST /api/auth/login` | One or more required fields is not a string |
 | `MISSING_FIELDS` | `POST /api/auth/setup` | `name`, `email`, or `password` was empty after trimming |
 | `INVALID_EMAIL` | `POST /api/auth/setup` | The `email` field is malformed or exceeds 255 characters |
@@ -321,10 +324,10 @@ Each error response includes a structured error code you can match on programmat
 | `INVALID_URL` | `POST /api/settings/proxies`, `POST /api/settings/proxies/import`, `PUT /api/settings/proxies/:id` | Proxy server address failed SSRF validation |
 | `INVALID_DATABASE_ID` | `GET /api/credentials/:id/proxy/baserow/databases/:dbId/tables` | Database ID is not a valid numeric identifier |
 | `Invalid task id.` | `start` action (in-task) | A task ID supplied to the `start` action contained characters outside `[A-Za-z0-9_-]` and was rejected before the internal request was issued. See [Modular workflows](/modular-workflows#task-id-validation). |
-| `API_KEY_NOT_SET` | Any API-key-protected endpoint (`403`) | The server has no API key configured in **Settings > System** |
+| `API_KEY_NOT_SET` | Any API-key-protected endpoint (`403`) | The server has no API key configured in **Settings \> System** |
 | `INVALID_API_KEY` | Any API-key-protected endpoint (`401`) | The provided API key was missing, malformed, or did not match the configured key |
 | `INTERNAL_ERROR` | Various | An unexpected server-side error occurred |
 
 <Tip>
-Use the error code field (not the message) for programmatic error handling in your integrations. The message text may change between releases, but error codes are stable.
+  Use the error code field (not the message) for programmatic error handling in your integrations. The message text may change between releases, but error codes are stable.
 </Tip>

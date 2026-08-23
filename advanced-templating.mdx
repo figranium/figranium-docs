@@ -1,47 +1,97 @@
 ---
 title: "Advanced Templating & Logic"
+sidebarTitle: "Templating"
+description: "Combine variables with JavaScript expressions and helper functions to build complex, dynamic automation logic in Figranium tasks."
 ---
 
 Figranium's templating system allows for complex, dynamic automation by combining variables with JavaScript expressions and specialized helper functions.
 
-## **JS Expression Support**
+## JS Expression Support
 
 In many action fields (like `if` conditions or `set` values), you can use full JavaScript expressions. These expressions have access to the current task's state and variables.
 
 **Example**:
--   **Condition**: `vars.count > 10 && exists('.next-page')`
--   **Calculation**: `{$index} * 100`
 
-## **Built-in JS Helpers**
+- **Condition**: `vars.count > 10 && exists('.next-page')`
+- **Calculation**: `{$index} * 100`
+
+## Built-in JS Helpers
 
 Inside JS expressions, Figranium provides several convenient helper functions:
 
-| **Function** | **Description** |
-| :--- | :--- |
-| **`exists(selector)`** | Returns `true` if the CSS selector matches any element on the page. |
-| **`text(selector)`** | Returns the inner text of the first element matching the selector. |
-| **`url()`** | Returns the current browser URL. |
-| **`vars`** | A global object containing all defined task variables. |
-| **`block.output`** | Contains the return value of the immediately preceding action. |
+<CardGroup cols={2}>
+  <Card title="exists(selector)" icon="eye">
+    Returns `true` if the CSS selector matches any element on the page.
+  </Card>
 
-## **Nested Variables**
+  <Card title="text(selector)" icon="font">
+    Returns the inner text of the first element matching the selector.
+  </Card>
+
+  <Card title="url()" icon="link">
+    Returns the current browser URL.
+  </Card>
+
+  <Card title="vars" icon="code">
+    A global object containing all defined task variables.
+  </Card>
+
+  <Card title="block.output" icon="arrow-right">
+    Contains the return value of the immediately preceding action.
+  </Card>
+
+  <Card title="html" icon="file-code">
+    The full page HTML as a string.
+  </Card>
+</CardGroup>
+
+<Tip>
+  These helpers run in the browser page context, so they have access to the live DOM. Use `exists()` for quick element checks before clicks or waits.
+</Tip>
+
+## Nested Variables
 
 You can reference nested properties within objects or arrays using dot notation.
 
 **Example**:
--   **Variable**: `user = { "profile": { "name": "Ada" } }`
--   **Template**: `Hello {$user.profile.name}`
 
-## **Loop Context Variables**
+- **Variable**: `user = { "profile": { "name": "Ada" } }`
+- **Template**: `Hello {$user.profile.name}`
+
+## Loop Context Variables
 
 Inside a `foreach` loop, the following special variables are available:
 
--   **`{$loop.index}`**: The current iteration index (starts at 0).
--   **`{$loop.count}`**: The total number of items being iterated.
--   **`{$loop.item}`**: The data object for the current row (if iterating over an array).
--   **`{$loop.text}`**: The text content of the current DOM element.
--   **`{$loop.html}`**: The inner HTML of the current DOM element.
+<CardGroup cols={2}>
+  <Card title="{$loop.index}" icon="code">
+    The current iteration index (starts at 0).
+  </Card>
 
-## **Handling Errors**
+  <Card title="{$loop.count}" icon="cube">
+    The total number of items being iterated.
+  </Card>
+
+  <Card title="{$loop.item}" icon="arrow-right">
+    The data object for the current row (if iterating over an array).
+  </Card>
+
+  <Card title="{$loop.text}" icon="book">
+    The text content of the current DOM element.
+  </Card>
+
+  <Card title="{$loop.html}" icon="code">
+    The inner HTML of the current element.
+  </Card>
+</CardGroup>
+
+## Handling Errors
 
 Use the `on_error` block to define fallback logic. You can inspect the error message using `{$block.output}` inside the error handler to decide how to proceed.
+
+<Warning>
+  JavaScript expressions are evaluated in the browser context. Avoid injecting user-controlled data directly into expressions to prevent unintended code execution.
+</Warning>
+
+<Tip>
+  Combine `block.output` with `if` conditions to create branching logic. For example, check `block.output` after a JavaScript block and route the task down different paths based on the returned value.
+</Tip>

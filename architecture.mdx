@@ -1,20 +1,32 @@
 ---
-title: "Architecture"
+title: "Figranium Architecture: Frontend, Backend & Browser Engine"
+sidebarTitle: "Architecture"
+description: "Explore Figranium's three-layer architecture, the Figranite execution engine, and how tasks flow from trigger to result."
 ---
 
 Figranium is a modular, event-driven automation platform built on top of the NodeJS ecosystem. It is designed to be self-contained and run on a single server, with optional scalability via container orchestration.
 
 At the heart of Figranium lies **Figranite**, a high-performance, deterministic workflow interpreter designed for sophisticated, stateful browser automation. It serves as the primary execution kernel, responsible for translating abstract block definitions into complex, human-like browser behaviors.
 
-## **High-Level Overview**
+## High-Level Overview
 
 Figranium is composed of three main layers:
 
-1. **Frontend (UI)**
-2. **Backend (API & Runner)**
-3. **Browser Engine (Playwright)**
+<CardGroup cols={3}>
+  <Card title="Frontend (UI)" icon="desktop" href="/ui-tour">
+    React-based visual editor for building tasks, managing settings, and inspecting captures.
+  </Card>
 
-### **1. Frontend Layer**
+  <Card title="Backend (API & Runner)" icon="server" href="/rest-api">
+    Node.js and Express.js API that orchestrates execution and manages data persistence.
+  </Card>
+
+  <Card title="Browser Engine (Playwright)" icon="globe" href="/headful-browser">
+    Playwright and got-scraping power real browser interactions and lightweight scraping.
+  </Card>
+</CardGroup>
+
+### Frontend Layer
 
 - **Technology**: React, TypeScript, Vite, Tailwind CSS.
 - **Purpose**: Provides the visual interface for creating tasks, managing settings, viewing execution logs, and inspecting captured data.
@@ -24,20 +36,20 @@ Figranium is composed of three main layers:
   - **Settings**: Configuration panels for proxies, API keys, and system preferences.
   - **Captures**: Visual gallery for screenshots and video recordings.
 
-### **2. Backend Layer**
+### Backend Layer
 
 - **Technology**: Node.js, Express.js.
 - **Purpose**: Serves the API, manages data persistence, and orchestrates browser automation.
 - **Key Modules**:
   - `server.js`: The main entry point, handling HTTP routes (`/api/*`) and WebSocket/SSE streams.
   - `agent.js`: The core logic for executing "Agent" mode tasks (complex flows with logic).
-  - `scrape.js`: A lightweight, browserless runner for high-performance, single-page data extraction. It fetches HTML with `got-scraping` (with proxy and user-agent rotation) and parses it with Cheerio — no Playwright browser is launched.
+  - `scrape.js`: A lightweight, browserless runner for high-performance, single-page data extraction. It fetches HTML with `got-scraping` (with proxy and user-agent rotation) and parses it with Cheerio. No Playwright browser is launched.
   - `headful.js`: Manages interactive, visible browser sessions for debugging and manual intervention.
   - `storage.js`: Handles file-based persistence for tasks, executions, and settings.
 
-### **3. Browser Engine Layer**
+### Browser Engine Layer
 
-- **Technology**: Playwright (Chromium) for Agent and Headful modes; `got-scraping` + Cheerio for Scrape mode.
+- **Technology**: Playwright (Chromium) for Agent and Headful modes; `got-scraping` \+ Cheerio for Scrape mode.
 - **Purpose**: Agent and Headful modes execute real browser interactions (clicking, typing, navigating). Scrape mode issues an HTTP request and parses the response DOM without a browser.
 - **Features**:
   - **Context Isolation**: Each Agent task runs in a fresh or persistent Playwright context, depending on configuration.
@@ -45,11 +57,11 @@ Figranium is composed of three main layers:
   - **Cookie-Consent Auto-Dismissal**: Every Agent page injects the `idcac-playwright` community ruleset on `domcontentloaded` and automatically clicks the "reject" or "close" button on known consent banners (OneTrust, Cookiebot, TrustArc, and hundreds more). See [Stealth & Anti-Detection](/stealth-mode#cookie-consent-auto-dismissal).
   - **Network Interception**: Captures network requests/responses for debugging and data extraction in Agent mode.
 
-## **Figranite Engine**
+## Figranite Engine
 
 Unlike simple script-based runners, Figranite is a structured execution environment that manages task state, variable resolution, and environmental interaction through a modular architecture. It is built to handle everything from simple scraping to multi-step agentic workflows that require logic, looping, and error recovery.
 
-### **Core Components**
+### Core Components
 
 The engine is divided into several specialized modules:
 
@@ -58,68 +70,115 @@ The engine is divided into several specialized modules:
 - **Human Interaction Layer**: Simulates organic user behavior, including non-linear mouse movements (Bezier curves), varying typing speeds, and "dead clicks" to evade bot detection.
 - **Workflow Orchestrator**: Manages the execution flow, including block mapping, jump logic (for loops and conditionals), and error handling state.
 
-### **Key Features**
+### Key Features
 
-#### **1. Advanced Variable Templating**
+<CardGroup cols={2}>
+  <Card title="Advanced Variable Templating" icon="code">
+    Figranite features a powerful template engine that allows for dynamic injection of data into any action property.
 
-Figranite features a powerful template engine that allows for dynamic injection of data into any action property.
+    - Syntax: `{$variable_name}`
+    - Supports global variables, task-specific variables, and loop-local variables (e.g., `loop.index`, `loop.item`).
+    - Built-in helpers like `{$now}` for timestamps.
+  </Card>
 
-- Syntax: `{$variable_name}`
-- Supports global variables, task-specific variables, and loop-local variables (e.g., `loop.index`, `loop.item`).
-- Built-in helpers like `{$now}` for timestamps.
+  <Card title="Stealth & Humanization" icon="shield">
+    One of Figranite's standout features is its "sentient-like" interaction model. Instead of mechanical automation, it implements:
 
-#### **2. Stealth & Humanization**
+    - **Human Typing**: Simulates keystrokes with realistic delays and optional typos.
+    - **Cursor Glide**: Moves the mouse across the page using natural paths rather than instant jumps.
+    - **Restlessness**: Simulates idle cursor movements and scrolling during "wait" periods.
+    - **Randomized Target Selection**: Clicks on slightly different parts of an element each time to avoid signature patterns.
+  </Card>
 
-One of Figranite's standout features is its "sentient-like" interaction model. Instead of mechanical automation, it implements:
+  <Card title="Flow Control & Logic" icon="arrow-right">
+    The engine supports complex control structures that allow for non-linear execution:
 
-- **Human Typing**: Simulates keystrokes with realistic delays and optional typos.
-- **Cursor Glide**: Moves the mouse across the page using natural paths rather than instant jumps.
-- **Restlessness**: Simulates idle cursor movements and scrolling during "wait" periods.
-- **Randomized Target Selection**: Clicks on slightly different parts of an element each time to avoid signature patterns.
+    - **Conditionals**: `if` / `else` blocks based on page state or variable values.
+    - **Loops**: `while`, `repeat`, and `foreach` (iterating over lists or DOM elements).
+    - **Error Handling**: `on_error` blocks that allow workflows to recover gracefully from failures.
+  </Card>
 
-#### **3. Flow Control & Logic**
+  <Card title="Intelligent Data Extraction" icon="database">
+    Figranite integrates tightly with a sandboxed extraction worker to parse DOM content. It supports:
 
-The engine supports complex control structures that allow for non-linear execution:
+    - **Structured Extraction**: Defining JSON schemas for data capture.
+    - **Shadow DOM Support**: Seamlessly penetrating shadow roots to access encapsulated content.
+    - **Auto-Formatting**: Converting results into JSON or CSV formats automatically.
+  </Card>
+</CardGroup>
 
-- **Conditionals**: `if` / `else` blocks based on page state or variable values.
-- **Loops**: `while`, `repeat`, and `foreach` (iterating over lists or DOM elements).
-- **Error Handling**: `on_error` blocks that allow workflows to recover gracefully from failures.
+### Execution Lifecycle
 
-#### **4. Intelligent Data Extraction**
+<Steps>
+  <Step title="Initialization">
+    The engine loads the action sequence and initializes the `runtimeVars`.
+  </Step>
+  <Step title="Browser Setup">
+    A new Playwright context is created with specific stealth configurations and user-agent rotation.
+  </Step>
+  <Step title="Block Mapping">
+    The engine builds a jump map to handle control flow (e.g., finding the end of a loop or an else branch).
+  </Step>
+  <Step title="Step Execution">
+    Each block is processed sequentially. For each step, the engine:
 
-Figranite integrates tightly with a sandboxed extraction worker to parse DOM content. It supports:
+    - Resolves templates.
+    - Reports progress via WebSockets/SSE.
+    - Executes the specific action or logic.
+    - Updates the `block.output` for the next step.
+  </Step>
+  <Step title="Finalization">
+    The engine performs final data extraction, captures a terminal screenshot, and closes the browser context before returning the output payload.
+  </Step>
+</Steps>
 
-- **Structured Extraction**: Defining JSON schemas for data capture.
-- **Shadow DOM Support**: Seamlessly penetrating shadow roots to access encapsulated content.
-- **Auto-Formatting**: Converting results into JSON or CSV formats automatically.
-
-### **Execution Lifecycle**
-
-1. **Initialization**: The engine loads the action sequence and initializes the `runtimeVars`.
-2. **Browser Setup**: A new Playwright context is created with specific stealth configurations and user-agent rotation.
-3. **Block Mapping**: The engine builds a jump map to handle control flow (e.g., finding the end of a loop or an else branch).
-4. **Step Execution**: Each block is processed sequentially. For each step, the engine:
-   - Resolves templates.
-   - Reports progress via WebSockets/SSE.
-   - Executes the specific action or logic.
-   - Updates the `block.output` for the next step.
-5. **Finalization**: The engine performs final data extraction, captures a terminal screenshot, and closes the browser context before returning the output payload.
-
-## **Data Storage**
+## Data Storage
 
 Figranium uses a **file-based storage system** by default, keeping all data local to the deployment directory. This simplifies backup and migration.
 
-- `data/tasks.json`: Stores task definitions.
-- `data/executions.json`: Logs execution history and metadata.
-- `data/proxies.json`: Stores proxy configurations.
-- `data/settings.json`: Stores system settings (API keys, user agents).
-- `public/captures/`: Stores screenshots and video recordings.
-- `storage_state.json`: Stores browser cookies and local storage state (if persistence is enabled).
+| File / Directory | Purpose |
+| :-- | :-- |
+| `data/tasks.json` | Stores task definitions. |
+| `data/executions.json` | Logs execution history and metadata. |
+| `data/proxies.json` | Stores proxy configurations. |
+| `data/settings.json` | Stores system settings (API keys, user agents). |
+| `public/captures/` | Stores screenshots and video recordings. |
+| `storage_state.json` | Stores browser cookies and local storage state (if persistence is enabled). |
 
-## **Execution Flow**
+## Execution Flow
 
-1. **Trigger**: A task is triggered via the UI or API (`POST /api/tasks/:id/api`).
-2. **Orchestration**: The backend validates the request and spawns a new browser context.
-3. **Execution**: The `agent.js` or `scrape.js` module executes the defined actions step-by-step.
-4. **Result**: The browser captures screenshots, extracts data, and returns a JSON payload.
-5. **Persistence**: The backend saves the execution log and any captured files to disk.
+<Steps>
+  <Step title="Trigger">
+    A task is triggered via the UI or API (`POST /api/tasks/:id/api`).
+  </Step>
+  <Step title="Orchestration">
+    The backend validates the request and spawns a new browser context.
+  </Step>
+  <Step title="Execution">
+    The `agent.js` or `scrape.js` module executes the defined actions step-by-step.
+  </Step>
+  <Step title="Result">
+    The browser captures screenshots, extracts data, and returns a JSON payload.
+  </Step>
+  <Step title="Persistence">
+    The backend saves the execution log and any captured files to disk.
+  </Step>
+</Steps>
+
+<CardGroup cols={2}>
+  <Card title="Action Blocks" icon="cube" href="/action-blocks">
+    Learn about the reusable blocks that power Figranite workflows.
+  </Card>
+
+  <Card title="Variables" icon="code" href="/variables">
+    Understand how dynamic data flows through tasks at runtime.
+  </Card>
+
+  <Card title="Control Flow" icon="arrow-right" href="/control-flow">
+    Explore conditionals, loops, and error recovery in workflows.
+  </Card>
+
+  <Card title="Data Extraction" icon="database" href="/data-extraction">
+    See how structured data is captured from pages and shadow DOM.
+  </Card>
+</CardGroup>

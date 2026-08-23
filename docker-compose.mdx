@@ -1,100 +1,105 @@
 ---
-title: "Installation with Docker Compose (Recommended)"
+title: "Install with Docker Compose"
+sidebarTitle: "Docker Compose"
+description: "Deploy Figranium using Docker Compose. Follow step-by-step instructions to create your compose file, start the container, and access the application."
 ---
 
 This guide covers the recommended installation method using Docker Compose. This ensures a consistent environment across different platforms (Linux, macOS, Windows) and simplifies dependency management.
 
-## **Prerequisites**
+## Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) installed and running.
 - [Docker Compose](https://docs.docker.com/compose/install/) (usually included with Docker Desktop).
 
-## **Step-by-Step Installation**
+## Step-by-Step Installation
 
-### 1. Create a Project Directory
+<Steps>
+  <Step title="Create a Project Directory">
+    Create a directory for your Figranium installation and navigate into it:
 
-Create a directory for your Figranium installation and navigate into it:
+    ```bash
+    mkdir figranium-server
+    cd figranium-server
+    ```
+  </Step>
+  <Step title="Create docker-compose.yml">
+    Create a `docker-compose.yml` file in your project directory:
 
-```text
-mkdir figranium-server
-cd figranium-server
-```
+    ```yaml
+    services:
+      figranium:
+        image: ghcr.io/figranium/figranium:latest
+        container_name: figranium
+        ports:
+          - "11345:11345"
+          - "54311:54311"
+        volumes:
+          - ./data:/app/data
+          # Mount the same host directory to both container paths so captures from
+          # agent runs (which write to /app/src/public/captures) and scrape runs
+          # (which write to /app/public/captures) both land on the host.
+          - ./captures:/app/public/captures
+          - ./captures:/app/src/public/captures
+        environment:
+          - PORT=11345
+          - SESSION_SECRET=your_secure_random_string
+        restart: unless-stopped
+    ```
 
-### 2. Create docker-compose.yml
+    <Note>
+      Mount the same host directory to both container paths so captures from agent runs (which write to `/app/src/public/captures`) and scrape runs (which write to `/app/public/captures`) both land on the host.
+    </Note>
+  </Step>
+  <Step title="Start with Docker Compose">
+    Run the following command to start the application in detached mode:
 
-Create a docker-compose.yml file in your project directory:
+    ```bash
+    docker compose up -d
+    ```
 
-```text
-services:
-  figranium:
-    image: ghcr.io/figranium/figranium:latest
-    container_name: figranium
-    ports:
-      - "11345:11345"
-      - "54311:54311"
-    volumes:
-      - ./data:/app/data
-      # Mount the same host directory to both container paths so captures from
-      # agent runs (which write to /app/src/public/captures) and scrape runs
-      # (which write to /app/public/captures) both land on the host.
-      - ./captures:/app/public/captures
-      - ./captures:/app/src/public/captures
-    environment:
-      - PORT=11345
-      - SESSION_SECRET=your_secure_random_string
-    restart: unless-stopped
-```
+    This command will:
 
-### 3. Start with Docker Compose
+    1. Pull the Figranium Docker image from GHCR.
+    2. Start the container and map the necessary ports.
+    3. Mount local directories to persist your tasks, settings, and captures.
+  </Step>
+  <Step title="Access the Application">
+    Once the container is running, open your browser and navigate to:
 
-Run the following command to start the application in detached mode:
+    [http://localhost:11345](http://localhost:11345)
 
-```text
-docker compose up -d
-```
+    You should see the setup screen.
+  </Step>
+</Steps>
 
-###  This command will:
+## Managing the Container
 
-1. Pull the Figranium Docker image from GHCR.
-2. Start the container and map the necessary ports.
-3. Mount local directories to persist your tasks, settings, and captures.
-
-### **4. Access the Application**
-
-Once the container is running, open your browser and navigate to:
-
-[http://localhost:11345](http://localhost:11345)
-
-You should see the setup screen.
-
-## **Managing the Container**
-
-### **View Logs**
+### View Logs
 
 To view the application logs:
 
-```text
+```bash
 docker compose logs -f
 ```
 
-### **Stop the Application**
+### Stop the Application
 
 To stop the container:
 
-```text
+```bash
 docker compose down
 ```
 
-### **Update the Application**
+### Update the Application
 
 To update to the latest version, pull the latest image and restart:
 
-```text
+```bash
 docker compose pull
 docker compose up -d
 ```
 
-## **Volume Persistence**
+## Volume Persistence
 
 Figranium uses volume mounts to ensure your data persists even if you delete the container.
 
@@ -102,3 +107,23 @@ Figranium uses volume mounts to ensure your data persists even if you delete the
 - `./captures`: Stores screenshots and recordings. Mount this host directory to **both** `/app/public/captures` and `/app/src/public/captures` inside the container. Agent runs write to the `src/public/captures` path, while scrape runs write to `public/captures`. Mounting both to the same host directory ensures every capture is persisted and visible in the **Captures** tab.
 
 If you need to backup your data, simply copy these folders.
+
+---
+
+<CardGroup cols={2}>
+  <Card title="Host Specs" icon="server" href="/host-specs">
+    Review recommended CPU, RAM, and shared memory requirements before deploying.
+  </Card>
+
+  <Card title="Configuration" icon="gear" href="/configuration">
+    Explore environment variables for customizing your Figranium instance.
+  </Card>
+
+  <Card title="Multi-Arch Install" icon="cube" href="/multi-arch">
+    Build from source for architectures beyond linux/amd64 and linux/arm64.
+  </Card>
+
+  <Card title="Troubleshooting" icon="wrench" href="/troubleshooting">
+    Resolve common deployment and runtime issues.
+  </Card>
+</CardGroup>

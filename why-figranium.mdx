@@ -1,7 +1,8 @@
 ---
-title: "Why Figranium"
+title: "Why Choose Figranium for Browser Automation"
 description: "Understand what Figranium is, who it is for, and how it fits into modern browser automation stacks."
 keywords: ["browser automation", "visual browser workflows", "self-hosted browser automation", "n8n browser automation", "MCP browser automation"]
+sidebarTitle: "Why Figranium"
 ---
 
 Figranium is a **self-hosted visual browser automation platform** for building complex browser workflows without writing the workflow itself as Playwright code.
@@ -16,21 +17,23 @@ Figranium is especially useful when a website does not provide the API you need,
 
 ## Why use Figranium?
 
-### Build visually
+<CardGroup cols={2}>
+  <Card title="Build visually" icon="cube">
+    Compose browser tasks from reusable action blocks such as navigation, waiting, clicking, typing, JavaScript, extraction, and control flow. The visual editor makes the workflow itself inspectable instead of hiding it inside application code.
+  </Card>
 
-Compose browser tasks from reusable action blocks such as navigation, waiting, clicking, typing, JavaScript, extraction, and control flow. The visual editor makes the workflow itself inspectable instead of hiding it inside application code.
+  <Card title="Self-host the automation layer" icon="server">
+    Figranium is designed to run on your own infrastructure. Task definitions, browser state, and execution data can remain under your control rather than being sent to a third-party browser automation SaaS.
+  </Card>
 
-### Self-host the automation layer
+  <Card title="Execute the same workflow multiple ways" icon="bolt">
+    A workflow does not have to stay inside the editor. Use the visual editor for building and debugging, the REST API for application integrations, the CLI for headless operation, the scheduler for recurring jobs, n8n for larger automation pipelines, or MCP for AI clients that support the Model Context Protocol.
+  </Card>
 
-Figranium is designed to run on your own infrastructure. Task definitions, browser state, and execution data can remain under your control rather than being sent to a third-party browser automation SaaS.
-
-### Execute the same workflow multiple ways
-
-A workflow does not have to stay inside the editor. Use the visual editor for building and debugging, the REST API for application integrations, the CLI for headless operation, the scheduler for recurring jobs, n8n for larger automation pipelines, or MCP for AI clients that support the Model Context Protocol.
-
-### Keep browser automation reusable
-
-Instead of embedding browser actions directly into every integration, create a task once and expose it as an executable capability. Variables can be supplied at runtime, making the same task useful for different inputs.
+  <Card title="Keep browser automation reusable" icon="rotate">
+    Instead of embedding browser actions directly into every integration, create a task once and expose it as an executable capability. Variables can be supplied at runtime, making the same task useful for different inputs.
+  </Card>
+</CardGroup>
 
 ## Where Figranium fits
 
@@ -43,14 +46,16 @@ The important distinction is that Figranium is the **browser workflow layer**. Y
 - You need to automate a website that has no suitable API.
 - You want a visual workflow rather than handwritten browser-control code.
 - You need reusable tasks that can be triggered by other systems.
-- You want browser automation alongside n8n workflows.
+- You need browser automation alongside n8n workflows.
 - You want to expose browser workflows to MCP-compatible AI clients.
 - You want to self-host the browser automation infrastructure.
 - You need scheduling, execution history, session state, proxies, or other operational features around browser workflows.
 
 ## When another tool may be a better fit
 
-Figranium is not intended to replace every browser-automation use case.
+<Note>
+  Figranium is not intended to replace every browser-automation use case.
+</Note>
 
 Choose a code-first browser framework when your team wants browser control embedded directly into a software test suite or application and prefers writing and reviewing the automation as source code.
 
@@ -60,10 +65,32 @@ Choose a general-purpose workflow platform when your workflow does not actually 
 
 ## Go deeper
 
-- [Getting started](overview)
-- [Action Blocks](action-blocks)
-- [REST API](rest-api)
-- [n8n Integration](n8n-integration)
-- [MCP Integration](mcp-integration)
-- [Task Scheduling](task-scheduling)
-- [Task Versioning & Rollback](task-versioning)
+<CardGroup cols={2}>
+  <Card title="Getting started" icon="rocket" href="/overview">
+    Learn the basics and get up and running with Figranium.
+  </Card>
+
+  <Card title="Action Blocks" icon="cube" href="/action-blocks">
+    Explore the building blocks of browser workflows.
+  </Card>
+
+  <Card title="REST API" icon="code" href="/rest-api">
+    Integrate Figranium tasks into your applications.
+  </Card>
+
+  <Card title="n8n Integration" icon="plug" href="/n8n-integration">
+    Connect Figranium to larger automation pipelines.
+  </Card>
+
+  <Card title="MCP Integration" icon="robot" href="/mcp-integration">
+    Expose workflows to AI clients via the Model Context Protocol.
+  </Card>
+
+  <Card title="Task Scheduling" icon="clock" href="/task-scheduling">
+    Set up recurring jobs and timed executions.
+  </Card>
+
+  <Card title="Task Versioning & Rollback" icon="rotate" href="/task-versioning">
+    Manage changes and recover previous task versions.
+  </Card>
+</CardGroup>

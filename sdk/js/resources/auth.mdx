@@ -12,111 +12,115 @@ import { Figranium } from "@figranium/sdk";
 const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
 ```
 
-## checkSetup
+## Methods
 
-```ts
-figranium.auth.checkSetup(options?: RequestOptions): Promise<{ setupRequired: boolean }>
-```
+<AccordionGroup>
+  <Accordion title="checkSetup">
+    ```ts
+    figranium.auth.checkSetup(options?: RequestOptions): Promise<{ setupRequired: boolean }>
+    ```
 
-Checks whether the Figranium server has been initialized with a first-time admin account. This endpoint does not require authentication.
+    Checks whether the Figranium server has been initialized with a first-time admin account. This endpoint does not require authentication.
 
-**HTTP endpoint:** `GET /api/auth/check-setup`
+    - **HTTP endpoint:** `GET /api/auth/check-setup`
 
-```ts check-setup.ts
-const { setupRequired } = await figranium.auth.checkSetup();
+    ```ts check-setup.ts
+    const { setupRequired } = await figranium.auth.checkSetup();
+    
+    if (setupRequired) {
+      console.log("Server needs first-time setup");
+    }
+    ```
+  </Accordion>
 
-if (setupRequired) {
-  console.log("Server needs first-time setup");
-}
-```
+  <Accordion title="setup">
+    ```ts
+    figranium.auth.setup(
+      input: { name: string; email: string; password: string },
+      options?: RequestOptions
+    ): Promise<{ success: boolean }>
+    ```
 
-## setup
+    Creates the first admin account on a fresh Figranium server. Call this only when `checkSetup` returns `{ setupRequired: true }`. No credentials are required for this call.
 
-```ts
-figranium.auth.setup(
-  input: { name: string; email: string; password: string },
-  options?: RequestOptions
-): Promise<{ success: boolean }>
-```
+    - **HTTP endpoint:** `POST /api/auth/setup`
 
-Creates the first admin account on a fresh Figranium server. Call this only when `checkSetup` returns `{ setupRequired: true }`. No credentials are required for this call.
+    ```ts first-setup.ts
+    const result = await figranium.auth.setup({
+      name: "Admin User",
+      email: "admin@example.com",
+      password: "secure-password-123",
+    });
+    
+    console.log(result.success);
+    ```
+  </Accordion>
 
-**HTTP endpoint:** `POST /api/auth/setup`
+  <Accordion title="login">
+    ```ts
+    figranium.auth.login(
+      input: { email: string; password: string },
+      options?: RequestOptions
+    ): Promise<{ success: boolean }>
+    ```
 
-```ts first-setup.ts
-const result = await figranium.auth.setup({
-  name: "Admin User",
-  email: "admin@example.com",
-  password: "secure-password-123",
-});
+    Authenticates with email and password and establishes a session cookie. This method requires a session-enabled client (`new Figranium({ session: true })`). In Node.js, supply a cookie-aware `fetch` implementation because the default `fetch` does not preserve cookies.
 
-console.log(result.success);
-```
+    - **HTTP endpoint:** `POST /api/auth/login`
 
-## login
+    ```ts session-login.ts
+    import { Figranium } from "@figranium/sdk";
+    
+    const sessionClient = new Figranium({
+      baseUrl: "http://localhost:11345",
+      session: true,
+    });
+    
+    const result = await sessionClient.auth.login({
+      email: "admin@example.com",
+      password: "secure-password-123",
+    });
+    
+    console.log(result.success);
+    ```
 
-```ts
-figranium.auth.login(
-  input: { email: string; password: string },
-  options?: RequestOptions
-): Promise<{ success: boolean }>
-```
+    <Note>
+      Session-only endpoints like `login`, `logout`, and `me` require `session: true`. API key clients should not call these methods.
+    </Note>
+  </Accordion>
 
-Authenticates with email and password and establishes a session cookie. This method requires a session-enabled client (`new Figranium({ session: true })`). In Node.js, supply a cookie-aware `fetch` implementation because the default `fetch` does not preserve cookies.
+  <Accordion title="logout">
+    ```ts
+    figranium.auth.logout(options?: RequestOptions): Promise<{ success: boolean }>
+    ```
 
-**HTTP endpoint:** `POST /api/auth/login`
+    Ends the current session and invalidates the session cookie. Requires a session-enabled client.
 
-```ts session-login.ts
-import { Figranium } from "@figranium/sdk";
+    - **HTTP endpoint:** `POST /api/auth/logout`
 
-const sessionClient = new Figranium({
-  baseUrl: "http://localhost:11345",
-  session: true,
-});
+    ```ts logout.ts
+    const result = await sessionClient.auth.logout();
+    console.log(result.success);
+    ```
+  </Accordion>
 
-const result = await sessionClient.auth.login({
-  email: "admin@example.com",
-  password: "secure-password-123",
-});
+  <Accordion title="me">
+    ```ts
+    figranium.auth.me(options?: RequestOptions): Promise<{ user: User }>
+    ```
 
-console.log(result.success);
-```
+    Returns the currently authenticated user. Requires a session-enabled client. The `User` type is `{ id?: string; name: string; email: string }`.
 
-<Note>
-  Session-only endpoints like `login`, `logout`, and `me` require `session: true`. API key clients should not call these methods.
-</Note>
+    - **HTTP endpoint:** `GET /api/auth/me`
 
-## logout
-
-```ts
-figranium.auth.logout(options?: RequestOptions): Promise<{ success: boolean }>
-```
-
-Ends the current session and invalidates the session cookie. Requires a session-enabled client.
-
-**HTTP endpoint:** `POST /api/auth/logout`
-
-```ts logout.ts
-const result = await sessionClient.auth.logout();
-console.log(result.success);
-```
-
-## me
-
-```ts
-figranium.auth.me(options?: RequestOptions): Promise<{ user: User }>
-```
-
-Returns the currently authenticated user. Requires a session-enabled client. The `User` type is `{ id?: string; name: string; email: string }`.
-
-**HTTP endpoint:** `GET /api/auth/me`
-
-```ts me.ts
-const { user } = await sessionClient.auth.me();
-
-console.log(user.name);
-console.log(user.email);
-```
+    ```ts me.ts
+    const { user } = await sessionClient.auth.me();
+    
+    console.log(user.name);
+    console.log(user.email);
+    ```
+  </Accordion>
+</AccordionGroup>
 
 ## Return types
 

@@ -1,40 +1,46 @@
 ---
-title: "Stateless Execution"
+title: "Run Tasks with Stateless Execution for Clean Browser Sessions"
+sidebarTitle: "Stateless Mode"
+description: "Learn how Figranium's stateless execution mode isolates each run with no cookies or storage persistence. Compare with stateful mode and enable via UI or API."
 ---
 
 By default, Figranium maintains persistent browser profiles on disk across task runs. **Stateless Execution** allows you to bypass this for tasks that require a clean, isolated browser environment.
 
-## **What is Stateless Execution?**
+## What is Stateless Execution?
 
 When enabled, Figranium launches the browser context **without loading** any existing cookies, local storage, IndexedDB, or session data. Once the task completes, all session data generated during the run is **discarded** and not saved back to the global storage state.
 
 Think of it as opening a private/incognito window for each task run.
 
-## **Default Behavior (Stateful)**
+## Stateful vs Stateless
 
-Without stateless mode, Figranium:
+<CardGroup cols={2}>
+  <Card title="Stateful (default)" icon="database">
+    Without stateless mode, Figranium:
 
-1. Launches the browser using a persistent profile directory on disk (`data/browser-profile` for agent mode, `data/browser-profile-scrape` for scrape mode).
-2. Runs the task with the full browser context available (logged-in sessions, preferences, etc.).
-3. The browser profile is updated automatically — cookies and storage persist to disk as the session progresses.
-4. The next task run starts with those saved cookies already loaded from the profile directory.
+    1. Launches the browser using a persistent profile directory on disk (`data/browser-profile` for agent mode, `data/browser-profile-scrape` for scrape mode).
+    2. Runs the task with the full browser context available (logged-in sessions, preferences, etc.).
+    3. The browser profile is updated automatically — cookies and storage persist to disk as the session progresses.
+    4. The next task run starts with those saved cookies already loaded from the profile directory.
 
-This is ideal for tasks that require a persistent login — you log in once, and subsequent runs reuse the session without re-authenticating.
+    This is ideal for tasks that require a persistent login — you log in once, and subsequent runs reuse the session without re-authenticating.
+  </Card>
 
-## **Stateless Behavior**
+  <Card title="Stateless" icon="shield">
+    With stateless mode enabled:
 
-With stateless mode enabled:
+    1. The browser starts as a true incognito session — launched in-memory with no disk profile directory at all (no cookies, no local storage, no session).
+    2. After execution, all generated cookies and storage are **thrown away** — nothing is written to disk.
+    3. No persistent browser profile is ever read from or written to.
 
-1. The browser starts as a true incognito session — launched in-memory with no disk profile directory at all (no cookies, no local storage, no session).
-2. After execution, all generated cookies and storage are **thrown away** — nothing is written to disk.
-3. No persistent browser profile is ever read from or written to.
+    Each run is completely independent and isolated from every other run.
+  </Card>
+</CardGroup>
 
-Each run is completely independent and isolated from every other run.
-
-## **Use Cases**
+## Use Cases
 
 | Scenario | Recommended Mode |
-|:---|:---|
+| :-- | :-- |
 | Persistent login session reuse | Stateful (default) |
 | Testing a login flow from scratch | **Stateless** |
 | Multi-account automation | **Stateless** |
@@ -49,14 +55,21 @@ Each run is completely independent and isolated from every other run.
 - **Scraping Public Data**: Avoid being served personalized content based on previous browsing history stored in cookies.
 - **Privacy**: Prevent cross-task data leakage when automating sensitive workflows for different users or organizations.
 
-## **How to Enable in the Editor**
+## How to Enable in the Editor
 
-1. Open your task in the **Task Editor**.
-2. Click the **Settings** panel (gear icon, top-right of the editor).
-3. Under the **General** tab, toggle on **Stateless execution**.
-4. Save the task.
+<Steps>
+  <Step title="Open task settings">
+    Open your task in the **Task Editor** and click the **Settings** panel (gear icon, top-right of the editor).
+  </Step>
+  <Step title="Toggle stateless execution">
+    Under the **General** tab, toggle on **Stateless execution**.
+  </Step>
+  <Step title="Save the task">
+    Save the task to apply the change.
+  </Step>
+</Steps>
 
-## **How to Enable via API**
+## How to Enable via API
 
 Pass `statelessExecution: true` in the request body when triggering a run:
 
@@ -74,27 +87,34 @@ Content-Type: application/json
 
 You can also bake `statelessExecution: true` into the saved task definition itself, so every run — whether triggered from the UI, API, or scheduler — always runs stateless.
 
-## **Combining with Proxy Rotation**
+## Combining with Proxy Rotation
 
 Stateless execution pairs naturally with proxy rotation. Each run:
+
 - Starts fresh with no cookies (looks like a brand-new visitor)
 - Routes through a different proxy IP (looks like a different device/location)
 
 This combination is effective for tasks that need to avoid rate limiting or per-account blocking.
 
 To enable both:
-1. Toggle **Stateless execution** on in task settings.
-2. Configure **Proxy Rotation** in `Settings > Proxies` and enable it for the task.
 
-## **Isolating Multiple Identities Instead**
+<Steps>
+  <Step title="Enable stateless execution">
+    Toggle **Stateless execution** on in task settings.
+  </Step>
+  <Step title="Configure proxy rotation">
+    Configure **Proxy Rotation** in **Settings \> Proxies** and enable it for the task.
+  </Step>
+</Steps>
+
+## Isolating Multiple Identities Instead
 
 If your goal is not a clean browser but rather **separate cookies per account or tenant**, stateless execution is the wrong tool — every run would have to log in from scratch. Use a **named session snapshot** instead: pass `sessionId` with the run to persist cookies into `data/sessions/<sessionId>.json` and restore them on the next run with the same name.
 
 See [Named Session Snapshots](/session-state#named-session-snapshots-sessionid) for details.
 
-## **Performance Consideration**
+## Performance Consideration
 
-Stateless tasks take slightly longer per run when they require authentication, because they must log in from scratch every time. For tasks that run frequently and need a logged-in state:
-
-- **Use stateful mode** (default) and implement a separate "Refresh Login" task on a schedule to keep cookies fresh.
-- **Use stateless mode** only when each run truly requires an isolated environment.
+<Tip>
+  Stateless tasks take slightly longer per run when they require authentication, because they must log in from scratch every time. For tasks that run frequently and need a logged-in state, use stateful mode (default) and implement a separate "Refresh Login" task on a schedule to keep cookies fresh. Use stateless mode only when each run truly requires an isolated environment.
+</Tip>

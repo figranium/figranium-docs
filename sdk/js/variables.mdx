@@ -86,6 +86,10 @@ See [Execution resource](/sdk/js/resources/execution) for full input shapes.
 
 Some server-side flows auto-create variables (for example when a script writes a result to a new name). Those entries include `autoCreated: true`. The SDK preserves the flag on read and write.
 
+<Tip>
+  Use `variable()` for every template reference so your code stays type-safe and refactorable. Hard-coding `{$name}` strings is brittle when variable names change.
+</Tip>
+
 ## Related
 
 <CardGroup cols={2}>

@@ -1,31 +1,37 @@
 ---
 title: "CSV Data Processing"
+sidebarTitle: "CSV Processing"
+description: "Parse and iterate over CSV data in Figranium tasks to drive bulk automations with datasets from files, URLs, or previous action outputs."
 ---
 
 Figranium provides built-in support for parsing and utilizing CSV data, making it easy to drive automations with bulk datasets.
 
-## **The CSV Action**
+## The CSV Action
 
 The `csv` action block parses CSV-formatted text into an array of objects.
 
--   **Input**: Takes a raw CSV string in the `value` field. If empty, it uses `block.output` from the previous step.
--   **Output**: The resulting array is stored in a variable of your choice (via `varName`).
--   **Header Mapping**: Automatically uses the first row of the CSV as keys for the objects.
+- **Input**: Takes a raw CSV string in the `value` field. If empty, it uses `block.output` from the previous step.
+- **Output**: The resulting array is stored in a variable of your choice (via `varName`).
+- **Header Mapping**: Automatically uses the first row of the CSV as keys for the objects.
 
-## **Common Use Cases**
+## Common Use Cases
 
--   **Bulk Registration**: Drive a signup task with a CSV list of user details.
--   **Automated Search**: Perform searches for a list of keywords or product SKUs.
--   **Data Enrichment**: Update a local dataset by visiting URLs and extracting information.
+- **Bulk Registration**: Drive a signup task with a CSV list of user details.
+- **Automated Search**: Perform searches for a list of keywords or product SKUs.
+- **Data Enrichment**: Update a local dataset by visiting URLs and extracting information.
 
-## **Workflow Example**
+## Workflow Example
 
-1.  **Extract Data**: Use a `javascript` block to read a CSV file's content or fetch it from a URL.
-2.  **Parse CSV**: Add a `csv` action, setting the `varName` to `bulkData`.
-3.  **Iterate**: Use a `foreach` action with the selector `bulkData` (or a variable reference).
-4.  **Execute**: Inside the loop, use `{$loop.item.column_name}` to access specific fields for each row.
+1. **Extract Data**: Use a `javascript` block to read a CSV file's content or fetch it from a URL.
+2. **Parse CSV**: Add a `csv` action, setting the `varName` to `bulkData`.
+3. **Iterate**: Use a `foreach` action with the selector `bulkData` (or a variable reference).
+4. **Execute**: Inside the loop, use `{$loop.item.column_name}` to access specific fields for each row.
 
-## **Tips**
+## Tips
 
--   **Quoting**: Ensure your CSV data uses standard quoting if fields contain commas or newlines.
--   **Empty Rows**: Figranium automatically filters out empty rows to prevent execution errors.
+- **Quoting**: Ensure your CSV data uses standard quoting if fields contain commas or newlines.
+- **Empty Rows**: Figranium automatically filters out empty rows to prevent execution errors.
+
+<Tip>
+  Combine the `csv` action with [Variables](/variables) and [Foreach Loops](/control-flow) to build powerful bulk-processing workflows that scale across hundreds of rows.
+</Tip>

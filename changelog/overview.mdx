@@ -1,371 +1,350 @@
 ---
 title: "Changelog"
-description: "Product updates and new features in Figranium."
+description: "Product updates and new features in Figranium. See release notes for CAPTCHA solving, MCP server, visual extraction, multi-theme support, and more."
+sidebarTitle: "Changelog"
 ---
 
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
+<Note>
+  Figranium releases continuously. Major features are announced here as they ship. Check back weekly for new capabilities.
+</Note>
+
 <Update label="2026-08-22" description="Today">
+  ## Features
 
-## Features
+  ### Solve CAPTCHAs from Agent mode
 
-### Solve CAPTCHAs from Agent mode
+  Agent mode can now solve reCAPTCHA v2, reCAPTCHA v3, hCaptcha, and Cloudflare Turnstile challenges without leaving the task flow. Figranium bundles the [`ohmycaptcha`](https://github.com/ohmycaptcha/ohmycaptcha) proxyless solver into the Docker image, so `solve_captcha` blocks work out of the box on any host with at least 2 GB of free memory (the solver runs its own headless browser).
 
-Agent mode can now solve reCAPTCHA v2, reCAPTCHA v3, hCaptcha, and Cloudflare Turnstile challenges without leaving the task flow. Figranium bundles the [`ohmycaptcha`](https://github.com/ohmycaptcha/ohmycaptcha) proxyless solver into the Docker image, so `solve_captcha` blocks work out of the box on any host with at least 2 GB of free memory (the solver runs its own headless browser).
+  There are two ways to use it:
 
-There are two ways to use it:
+  - **Explicit `solve_captcha` action block**: drop it into a task at the step where you expect a challenge. Optionally pin a `captchaType`, scope with a `selector`, and capture `{ success, challenge, duration }` in a variable.
+  - **Task-level Auto-Solve CAPTCHA setting**: toggle it on in the Behavior tab of Task Settings to run the same detection pass automatically after every `navigate`, `click`, and `type`. Off by default; silently no-ops when no challenge is present.
 
-- **Explicit `solve_captcha` action block**: drop it into a task at the step where you expect a challenge. Optionally pin a `captchaType`, scope with a `selector`, and capture `{ success, challenge, duration }` in a variable.
-- **Task-level Auto-Solve CAPTCHA setting**: toggle it on in the Behavior tab of Task Settings to run the same detection pass automatically after every `navigate`, `click`, and `type`. Off by default; silently no-ops when no challenge is present.
+  ```json
+  {
+    "type": "solve_captcha",
+    "captchaType": "recaptcha_v2",
+    "varName": "captchaResult",
+    "timeout": 120000
+  }
+  ```
 
-```json
-{
-  "type": "solve_captcha",
-  "captchaType": "recaptcha_v2",
-  "varName": "captchaResult",
-  "timeout": 120000
-}
-```
+  Point at an external `ohmycaptcha` instance instead of the embedded one via `OHMYCAPTCHA_URL` and `OHMYCAPTCHA_CLIENT_KEY`. reCAPTCHA v2 additionally requires `CLOUD_API_KEY`/`CLOUD_BASE_URL`/`CLOUD_MODEL` (OpenAI-compatible) for its audio-challenge fallback — without them, v2 challenges that need the fallback fail with `ERROR_CAPTCHA_UNSOLVABLE`. hCaptcha, Turnstile, and reCAPTCHA v3 don't need those variables.
 
-Point at an external `ohmycaptcha` instance instead of the embedded one via `OHMYCAPTCHA_URL` and `OHMYCAPTCHA_CLIENT_KEY`. reCAPTCHA v2 additionally requires `CLOUD_API_KEY`/`CLOUD_BASE_URL`/`CLOUD_MODEL` (OpenAI-compatible) for its audio-challenge fallback — without them, v2 challenges that need the fallback fail with `ERROR_CAPTCHA_UNSOLVABLE`. hCaptcha, Turnstile, and reCAPTCHA v3 don't need those variables.
+  The default `solve_captcha` timeout is `120000` ms (up from `60000`), since real solves — especially reCAPTCHA v2 image challenges — commonly take over a minute.
 
-The default `solve_captcha` timeout is `120000` ms (up from `60000`), since real solves — especially reCAPTCHA v2 image challenges — commonly take over a minute.
+  If you run Figranium from source instead of Docker, start the sidecar with `pnpm run captcha:dev` in a separate terminal before using the block.
 
-If you run Figranium from source instead of Docker, start the sidecar with `pnpm run captcha:dev` in a separate terminal before using the block.
-
-See [CAPTCHA Solving](/captcha-solving), [Action Blocks — Solve CAPTCHA](/action-blocks#solve-captcha-solve_captcha), and [Configuration — CAPTCHA Solving](/configuration#captcha-solving).
-
+  See [CAPTCHA Solving](/captcha-solving), [Action Blocks — Solve CAPTCHA](/action-blocks#solve-captcha-solve_captcha), and [Configuration — CAPTCHA Solving](/configuration#captcha-solving).
 </Update>
 
 <Update label="2026-08-21" description="This week">
+  ## Features
 
-## Features
+  ### `Do Nothing` action block
 
-### `Do Nothing` action block
+  A new `do_nothing` action block is available in the block picker. Drop it onto the canvas as a placeholder while you're drafting a task, or use it as the body of an `If` or `On Error` branch when you want the branch to fall through without side effects.
 
-A new `do_nothing` action block is available in the block picker. Drop it onto the canvas as a placeholder while you're drafting a task, or use it as the body of an `If` or `On Error` branch when you want the branch to fall through without side effects.
+  - The block takes no configuration. It logs `Do nothing` and completes successfully.
+  - `noop` and `pass` are accepted as aliases and behave identically.
 
-- The block takes no configuration. It logs `Do nothing` and completes successfully.
-- `noop` and `pass` are accepted as aliases and behave identically.
-
-See [Action Blocks — Do Nothing](/action-blocks#do-nothing-do_nothing).
-
+  See [Action Blocks — Do Nothing](/action-blocks#do-nothing-do_nothing).
 </Update>
 
 <Update label="2026-08-20" description="Earlier this week">
+  ## Features
 
-## Features
+  ### API trigger endpoint now accepts bodyless requests
 
-### API trigger endpoint now accepts bodyless requests
+  `POST /api/tasks/:id/api` no longer requires a JSON body or a `Content-Type: application/json` header. Requests without a parsed body are treated as `{}` and the task runs with its default variables. Tools that can't set request headers on outbound calls (for example, Clay's HTTP action) can now trigger a task with a bare `POST` to the endpoint URL.
 
-`POST /api/tasks/:id/api` no longer requires a JSON body or a `Content-Type: application/json` header. Requests without a parsed body are treated as `{}` and the task runs with its default variables. Tools that can't set request headers on outbound calls (for example, Clay's HTTP action) can now trigger a task with a bare `POST` to the endpoint URL.
+  To pass `variables`, `webhookUrl`, `statelessExecution`, or `sessionId`, keep sending `Content-Type: application/json` with a JSON body — that path is unchanged.
 
-To pass `variables`, `webhookUrl`, `statelessExecution`, or `sessionId`, keep sending `Content-Type: application/json` with a JSON body — that path is unchanged.
+  ### Full endpoint URL and method in the API trigger panel
 
-### Full endpoint URL and method in the API trigger panel
+  The task editor's **Trigger via API** panel now shows the complete origin-aware endpoint URL (for example, `https://your-figranium.example.com/api/tasks/task_1/api`) with a `POST` method badge next to it. The copy button copies the same full URL, so you can paste it straight into external tools without prefixing your instance origin by hand.
 
-The task editor's **Trigger via API** panel now shows the complete origin-aware endpoint URL (for example, `https://your-figranium.example.com/api/tasks/task_1/api`) with a `POST` method badge next to it. The copy button copies the same full URL, so you can paste it straight into external tools without prefixing your instance origin by hand.
-
-See [REST API Reference — `POST /api/tasks/:id/api`](/rest-api).
-
+  See [REST API Reference — `POST /api/tasks/:id/api`](/rest-api).
 </Update>
 
 <Update label="2026-08-19" description="Earlier this week">
+  ## Features
 
-## Features
+  ### Opt-in CloakBrowser browser engine
 
-### Opt-in CloakBrowser browser engine
+  Figranium now ships two interchangeable browser engines behind the same Playwright API, and you can switch between them with a single environment variable. Agent, Headful, and CLI-launched tasks all use whichever engine is active — no task edits required.
 
-Figranium now ships two interchangeable browser engines behind the same Playwright API, and you can switch between them with a single environment variable. Agent, Headful, and CLI-launched tasks all use whichever engine is active — no task edits required.
+  - **Default (`USE_CLOAK_ENGINE` unset or `false`)**: Playwright Chromium patched at the JS level with `playwright-extra` and `puppeteer-extra-plugin-stealth`. Same behavior as previous releases.
+  - **Opt-in (`USE_CLOAK_ENGINE=true`)**: the [CloakBrowser](https://github.com/CloakHQ/cloakbrowser) stealth-patched Chromium binary. Evasions are applied at the binary level rather than injected at runtime, which is harder for modern bot detectors to fingerprint. Use this when the default stack is being detected on a target site — typically CAPTCHA walls that trigger on Playwright/Chromium runtime tells.
+  - **License key**: set `CLOAKBROWSER_LICENSE_KEY` to unlock the latest stealth binary. Without a key, CloakBrowser falls back to the free legacy binary. You can also run `npx cloakbrowser login` to write the key to `~/.cloakbrowser/license.key`, which `cloakbrowser` reads natively.
+  - **Lean installs**: the CloakBrowser binary is only fetched during `postinstall` when the flag is enabled, so the default install stays the same size as before.
 
-- **Default (`USE_CLOAK_ENGINE` unset or `false`)**: Playwright Chromium patched at the JS level with `playwright-extra` and `puppeteer-extra-plugin-stealth`. Same behavior as previous releases.
-- **Opt-in (`USE_CLOAK_ENGINE=true`)**: the [CloakBrowser](https://github.com/CloakHQ/cloakbrowser) stealth-patched Chromium binary. Evasions are applied at the binary level rather than injected at runtime, which is harder for modern bot detectors to fingerprint. Use this when the default stack is being detected on a target site — typically CAPTCHA walls that trigger on Playwright/Chromium runtime tells.
-- **License key**: set `CLOAKBROWSER_LICENSE_KEY` to unlock the latest stealth binary. Without a key, CloakBrowser falls back to the free legacy binary. You can also run `npx cloakbrowser login` to write the key to `~/.cloakbrowser/license.key`, which `cloakbrowser` reads natively.
-- **Lean installs**: the CloakBrowser binary is only fetched during `postinstall` when the flag is enabled, so the default install stays the same size as before.
+  ```text .env
+  USE_CLOAK_ENGINE=true
+  CLOAKBROWSER_LICENSE_KEY=your_license_key_here
+  ```
 
-```text .env
-USE_CLOAK_ENGINE=true
-CLOAKBROWSER_LICENSE_KEY=your_license_key_here
-```
+  See [Stealth & Anti-Detection — Browser Engine](/stealth-mode#browser-engine) and [Configuration](/configuration) for the full switch behavior and env-var reference.
 
-See [Stealth & Anti-Detection — Browser Engine](/stealth-mode#browser-engine) and [Configuration](/configuration) for the full switch behavior and env-var reference.
+  ### Automatic cookie-consent dismissal in Agent mode
 
-### Automatic cookie-consent dismissal in Agent mode
+  Agent tasks now click through common cookie-consent banners for you before your first action block runs. Figranium injects the community-maintained [`idcac-playwright`](https://www.npmjs.com/package/idcac-playwright) ruleset (a port of the "I don't care about cookies" extension) into every page in the Agent browser context on `domcontentloaded`.
 
-Agent tasks now click through common cookie-consent banners for you before your first action block runs. Figranium injects the community-maintained [`idcac-playwright`](https://www.npmjs.com/package/idcac-playwright) ruleset (a port of the "I don't care about cookies" extension) into every page in the Agent browser context on `domcontentloaded`.
+  - Covers hundreds of providers (OneTrust, Cookiebot, TrustArc, Quantcast, and more). The script always clicks **reject** or **close** — never **accept**.
+  - Always on in Agent mode. Headful mode is unchanged (it's for human interaction), and Scrape mode doesn't render banners because it no longer launches a browser.
+  - If no matching banner is present, the script silently no-ops so your task runs as usual. If a specific site's dialog isn't covered, you can still author an explicit `Click` block.
 
-- Covers hundreds of providers (OneTrust, Cookiebot, TrustArc, Quantcast, and more). The script always clicks **reject** or **close** — never **accept**.
-- Always on in Agent mode. Headful mode is unchanged (it's for human interaction), and Scrape mode doesn't render banners because it no longer launches a browser.
-- If no matching banner is present, the script silently no-ops so your task runs as usual. If a specific site's dialog isn't covered, you can still author an explicit `Click` block.
+  See [Stealth & Anti-Detection — Cookie-Consent Auto-Dismissal](/stealth-mode#cookie-consent-auto-dismissal) for details.
 
-See [Stealth & Anti-Detection — Cookie-Consent Auto-Dismissal](/stealth-mode#cookie-consent-auto-dismissal) for details.
+  ## Changes
 
-## Changes
+  ### Scrape mode is now browserless (no screenshots or video)
 
-### Scrape mode is now browserless (no screenshots or video)
+  Scrape mode has been rewritten as a lightweight HTTP fetch. It now issues the request through `got-scraping` (with the same proxy pool and user-agent rotation as before) and parses the response with Cheerio, instead of spinning up a Playwright/stealth-Chromium browser for each run.
 
-Scrape mode has been rewritten as a lightweight HTTP fetch. It now issues the request through `got-scraping` (with the same proxy pool and user-agent rotation as before) and parses the response with Cheerio, instead of spinning up a Playwright/stealth-Chromium browser for each run.
+  - **Faster and cheaper**: No browser process means dramatically lower CPU, memory, and cold-start cost per scrape.
+  - **Preserved**: Selector extraction, HTML cleanup, link extraction, proxy and user-agent rotation, the headful → scrape cookie handoff, and the sandboxed extraction-worker script pipeline all still work exactly as before.
+  - **Removed**: No screenshots and no video recordings in Scrape mode. There is no page to photograph. The Results panel's Screenshot pane now shows **"Scrape mode does not support screenshots"** instead of the misleading **"Waiting for Frame..."** placeholder. If you need visual evidence of the page, run the task in Agent mode.
 
-- **Faster and cheaper**: No browser process means dramatically lower CPU, memory, and cold-start cost per scrape.
-- **Preserved**: Selector extraction, HTML cleanup, link extraction, proxy and user-agent rotation, the headful → scrape cookie handoff, and the sandboxed extraction-worker script pipeline all still work exactly as before.
-- **Removed**: No screenshots and no video recordings in Scrape mode. There is no page to photograph. The Results panel's Screenshot pane now shows **"Scrape mode does not support screenshots"** instead of the misleading **"Waiting for Frame..."** placeholder. If you need visual evidence of the page, run the task in Agent mode.
-
-See [Captures & Storage](/captures-and-storage#screenshots) and [Architecture](/architecture) for the updated behavior.
-
+  See [Captures & Storage](/captures-and-storage#screenshots) and [Architecture](/architecture) for the updated behavior.
 </Update>
 
 <Update label="2026-08-17" description="Earlier this week">
+  ## Features
 
-## Features
+  ### Visual field-mapping mode for extraction scripts
 
-### Visual field-mapping mode for extraction scripts
+  The Extraction Script editor (both the canvas block and the Extraction tab in Task Settings) now opens in a new **Visual** mode by default. You describe the data you want as a list of named fields with a selector, an attribute type (`Text`, `HTML`, `Input Value`, or `Attribute`), and an optional **Multiple (list)** toggle. Figranium generates the underlying JavaScript for you and keeps it in sync as you edit — no raw code required for typical scraping tasks.
 
-The Extraction Script editor (both the canvas block and the Extraction tab in Task Settings) now opens in a new **Visual** mode by default. You describe the data you want as a list of named fields with a selector, an attribute type (`Text`, `HTML`, `Input Value`, or `Attribute`), and an optional **Multiple (list)** toggle. Figranium generates the underlying JavaScript for you and keeps it in sync as you edit — no raw code required for typical scraping tasks.
+  - The mode toggle at the top of the editor flips between **Visual** and **JavaScript**. The selected mode now has a solid fill so it's obvious which one is active.
+  - Every field has a target icon that hands off to the [Headful Browser](/headful-browser) inspector. Click an element on the page and the selector, plus a row of alternative candidates, get written back into the field.
+  - Playwright-only `:has-text(...)` selector candidates are filtered out of the pick list **for extraction fields only**. Extraction scripts run through native `document.querySelector`, which does not understand that pseudo-selector, so surfacing it would have produced selectors that returned `null` at extraction time. Action blocks (Click, Type, etc.) still receive the full candidate list because Playwright runs those.
+  - Switching to **JavaScript** mode surfaces the auto-generated script in the code editor, still fully editable. Existing hand-written extraction scripts open in JavaScript mode automatically so your code is never hidden behind an empty field list.
+  - The canvas Extraction Script modal no longer closes when you click the backdrop, so a stray click on the dimmed area outside the modal will not throw away in-progress edits. Use the **Done** button or the close icon in the header to save and dismiss.
 
-- The mode toggle at the top of the editor flips between **Visual** and **JavaScript**. The selected mode now has a solid fill so it's obvious which one is active.
-- Every field has a target icon that hands off to the [Headful Browser](/headful-browser) inspector. Click an element on the page and the selector, plus a row of alternative candidates, get written back into the field.
-- Playwright-only `:has-text(...)` selector candidates are filtered out of the pick list **for extraction fields only**. Extraction scripts run through native `document.querySelector`, which does not understand that pseudo-selector, so surfacing it would have produced selectors that returned `null` at extraction time. Action blocks (Click, Type, etc.) still receive the full candidate list because Playwright runs those.
-- Switching to **JavaScript** mode surfaces the auto-generated script in the code editor, still fully editable. Existing hand-written extraction scripts open in JavaScript mode automatically so your code is never hidden behind an empty field list.
-- The canvas Extraction Script modal no longer closes when you click the backdrop, so a stray click on the dimmed area outside the modal will not throw away in-progress edits. Use the **Done** button or the close icon in the header to save and dismiss.
-
-See [Extraction Scripts — Visual field mapping](/data-extraction#visual-field-mapping-default) for the full field reference and an end-to-end example.
-
+  See [Extraction Scripts — Visual field mapping](/data-extraction#visual-field-mapping-default) for the full field reference and an end-to-end example.
 </Update>
 
 <Update label="2026-08-16" description="Earlier update">
+  ## Updates
 
-## Updates
+  ### Agent Mode description clarified in Task Settings
 
-### Agent Mode description clarified in Task Settings
+  The mode picker in the Task Settings cabinet previously described **Agent Mode** as "Autonomous decision making," which suggested the runner would decide steps on its own at execution time. That was misleading: Agent Mode runs a fixed sequence of action blocks that you author, and any branching comes from explicit control-flow blocks (`If`, `While`, `Loop`, etc.) on the canvas.
 
-The mode picker in the Task Settings cabinet previously described **Agent Mode** as "Autonomous decision making," which suggested the runner would decide steps on its own at execution time. That was misleading: Agent Mode runs a fixed sequence of action blocks that you author, and any branching comes from explicit control-flow blocks (`If`, `While`, `Loop`, etc.) on the canvas.
-
-- The label under **Agent Mode** now reads **"Custom action sequence with logic."**
-- No behavior change. If you were choosing Scraper Mode because you didn't want the runner making its own decisions, you can safely use Agent Mode — the same author-defined blocks execute in the same order on every run.
-- If you want an actual AI-driven, decision-making runner, that lives in [MCP Integration](/mcp-integration), not in Agent Mode.
-
+  - The label under **Agent Mode** now reads **"Custom action sequence with logic."**
+  - No behavior change. If you were choosing Scraper Mode because you didn't want the runner making its own decisions, you can safely use Agent Mode — the same author-defined blocks execute in the same order on every run.
+  - If you want an actual AI-driven, decision-making runner, that lives in [MCP Integration](/mcp-integration), not in Agent Mode.
 </Update>
 
 <Update label="2026-08-15" description="Earlier update">
+  ## Updates
 
-## Updates
+  ### `headless` flag and automatic fallback for `POST /api/browser/open`
 
-### `headless` flag and automatic fallback for `POST /api/browser/open`
+  The programmatic browser launch endpoint now accepts a `headless` boolean and recovers automatically when no display server is available.
 
-The programmatic browser launch endpoint now accepts a `headless` boolean and recovers automatically when no display server is available.
+  - Pass `"headless": true` in the request body to launch Chromium without a display. This is the right choice when you run Figranium directly on a Mac (outside Docker) or on a headless CI runner. The `HEADLESS` environment variable is also honored.
+  - If you don't set `headless` and the initial headful launch fails because there is no display, Figranium retries once in headless mode and returns the running session. External orchestrators no longer have to detect `HEADFUL_DISPLAY_UNAVAILABLE` and reissue the call themselves.
+  - The display-unavailable detector now also matches `no display server`, `X11 connection failed`, `cannot open display`, and unexpected `target closed` errors during launch, so the fallback triggers on Mac hosts where the underlying error text differs from Linux.
 
-- Pass `"headless": true` in the request body to launch Chromium without a display. This is the right choice when you run Figranium directly on a Mac (outside Docker) or on a headless CI runner. The `HEADLESS` environment variable is also honored.
-- If you don't set `headless` and the initial headful launch fails because there is no display, Figranium retries once in headless mode and returns the running session. External orchestrators no longer have to detect `HEADFUL_DISPLAY_UNAVAILABLE` and reissue the call themselves.
-- The display-unavailable detector now also matches `no display server`, `X11 connection failed`, `cannot open display`, and unexpected `target closed` errors during launch, so the fallback triggers on Mac hosts where the underlying error text differs from Linux.
+  ```bash
+  curl -X POST http://localhost:11345/api/browser/open \
+    -H "x-api-key: $FIGRANIUM_API_KEY" \
+    -H "Content-Type: application/json" \
+    -d '{"url": "https://example.com", "headless": true}'
+  ```
 
-```bash
-curl -X POST http://localhost:11345/api/browser/open \
-  -H "x-api-key: $FIGRANIUM_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"url": "https://example.com", "headless": true}'
-```
+  See [REST API — `POST /api/browser/open`](/rest-api#post-apibrowseropen) for the full request and error schema.
 
-See [REST API — `POST /api/browser/open`](/rest-api#post-apibrowseropen) for the full request and error schema.
+  ## Bug fixes
 
-## Bug fixes
-
-- **Headful VNC viewer no longer gets stuck on "Reconnecting…"** — `start-vnc.sh` was embedding literal double-quote characters into the `x11vnc -passwd` argument because of unquoted shell word-splitting, so the password `x11vnc` actually enforced never matched the one served to the noVNC client. Every connection attempt failed authentication and dropped immediately, which showed up in the UI as an endless reconnect loop. The password is now passed through a bash array as a single unmodified argument. If you were affected, pull the latest image and reopen the headful session — no config change is required.
-- **Proxy credentials pasted as a full URL are now split out on add** — Pasting `http://user:pass@host:port` into **Settings > Proxies > Add Proxy > Server** previously stored the whole URL (credentials included) as the `server` value, which surfaced as a duplicate-looking entry in the list and failed upstream authentication in rotation pools. `normalizeProxy` now extracts embedded credentials into `username` and `password` on both the add and bulk-import paths. Existing broken entries self-heal on next read — no manual cleanup needed. See [Proxy Rotation — Adding a proxy](/proxy-rotation#adding-a-proxy).
-- **Backdrop blur restored on modals and overlay panels in Dark and Solarized Dark themes** — A dark-theme CSS override was force-replacing translucent `bg-black/NN` backgrounds with a fully opaque color, defeating `backdrop-blur` on the Task Settings panel, the confirm modal, and other overlays. The override has been removed, and the confirm modal now uses a translucent theme-aware background instead of a hardcoded opaque one.
-- **Browser open and inspector highlight on Mac** — Launching the managed browser session from `POST /api/browser/open` and resolving a `targetHint` through `POST /api/inspector/highlight` now work when Figranium runs on macOS. Chromium is launched without the `--disable-gpu`, `--window-position=0,0`, and `--start-maximized` flags on Darwin, which were causing the process to exit before the first page was ready. The CDP `Browser.setWindowBounds` maximize call is also skipped on Darwin. Selector generation, XPath resolution, and the top-match highlight overlay for `/api/inspector/highlight` now run in a single in-page evaluation, so they don't lose the element handle to a mid-flight page navigation.
-- **GitHub star prompt no longer appears on first run** — The in-app prompt asking you to star the Figranium repo is now gated on both **3+ successful task runs** and **3 days since your first run** (tracked locally in the browser). It also uses a quick slide-in animation instead of the previous fade so it's easier to notice when it does appear. Dismissing or clicking through still permanently silences it.
-
+  - **Headful VNC viewer no longer gets stuck on "Reconnecting…"** — `start-vnc.sh` was embedding literal double-quote characters into the `x11vnc -passwd` argument because of unquoted shell word-splitting, so the password `x11vnc` actually enforced never matched the one served to the noVNC client. Every connection attempt failed authentication and dropped immediately, which showed up in the UI as an endless reconnect loop. The password is now passed through a bash array as a single unmodified argument. If you were affected, pull the latest image and reopen the headful session — no config change is required.
+  - **Proxy credentials pasted as a full URL are now split out on add** — Pasting `http://user:pass@host:port` into **Settings \> Proxies \> Add Proxy \> Server** previously stored the whole URL (credentials included) as the `server` value, which surfaced as a duplicate-looking entry in the list and failed upstream authentication in rotation pools. `normalizeProxy` now extracts embedded credentials into `username` and `password` on both the add and bulk-import paths. Existing broken entries self-heal on next read — no manual cleanup needed. See [Proxy Rotation — Adding a proxy](/proxy-rotation#adding-a-proxy).
+  - **Backdrop blur restored on modals and overlay panels in Dark and Solarized Dark themes** — A dark-theme CSS override was force-replacing translucent `bg-black/NN` backgrounds with a fully opaque color, defeating `backdrop-blur` on the Task Settings panel, the confirm modal, and other overlays. The override has been removed, and the confirm modal now uses a translucent theme-aware background instead of a hardcoded opaque one.
+  - **Browser open and inspector highlight on Mac** — Launching the managed browser session from `POST /api/browser/open` and resolving a `targetHint` through `POST /api/inspector/highlight` now work when Figranium runs on macOS. Chromium is launched without the `--disable-gpu`, `--window-position=0,0`, and `--start-maximized` flags on Darwin, which were causing the process to exit before the first page was ready. The CDP `Browser.setWindowBounds` maximize call is also skipped on Darwin. Selector generation, XPath resolution, and the top-match highlight overlay for `/api/inspector/highlight` now run in a single in-page evaluation, so they don't lose the element handle to a mid-flight page navigation.
+  - **GitHub star prompt no longer appears on first run** — The in-app prompt asking you to star the Figranium repo is now gated on both **3\+ successful task runs** and **3 days since your first run** (tracked locally in the browser). It also uses a quick slide-in animation instead of the previous fade so it's easier to notice when it does appear. Dismissing or clicking through still permanently silences it.
 </Update>
 
 <Update label="2026-08-12" description="Earlier update">
+  ## Updates
 
-## Updates
+  ### Single self-theming brand icon
 
-### Single self-theming brand icon
+  The Figranium mark at `public/figranium_icon.svg` is now a single SVG that adapts to the viewer's color scheme, instead of shipping as separate dark and light variants.
 
-The Figranium mark at `public/figranium_icon.svg` is now a single SVG that adapts to the viewer's color scheme, instead of shipping as separate dark and light variants.
+  - The mark fills black by default and switches to white inside `@media (prefers-color-scheme: dark)`, so it stays legible on both light and dark surfaces.
+  - Use this file when you can only supply one logo URL — for example, third-party integrations, README embeds, or partner directories that accept a single `<img src>`.
+  - No configuration change is required. Existing embeds keep working; you can drop the separate dark/light variants from your integration if you were maintaining both.
 
-- The mark fills black by default and switches to white inside `@media (prefers-color-scheme: dark)`, so it stays legible on both light and dark surfaces.
-- Use this file when you can only supply one logo URL — for example, third-party integrations, README embeds, or partner directories that accept a single `<img src>`.
-- No configuration change is required. Existing embeds keep working; you can drop the separate dark/light variants from your integration if you were maintaining both.
+  ```html
+  <img src="https://<your-figranium-host>/figranium_icon.svg" alt="Figranium" width="32" height="32" />
+  ```
 
-```html
-<img src="https://<your-figranium-host>/figranium_icon.svg" alt="Figranium" width="32" height="32" />
-```
-
-If your embedding surface forces a fixed background and ignores the OS color scheme, keep pointing at whichever variant matches that background.
-
+  If your embedding surface forces a fixed background and ignores the OS color scheme, keep pointing at whichever variant matches that background.
 </Update>
 
 <Update label="2026-08-10" description="Earlier update">
+  ## Features
 
-## Features
+  ### Multi-theme support
 
-### Multi-theme support
+  Figranium now ships with four selectable UI themes: **Dark** (default), **Light**, **Solarized Light**, and **Solarized Dark**.
 
-Figranium now ships with four selectable UI themes: **Dark** (default), **Light**, **Solarized Light**, and **Solarized Dark**.
+  - Switch themes from **Settings → System → Theme**. Each option shows a preview image plus a surface and accent color swatch.
+  - The choice is stored in the browser's local storage (`figranium.theme`), so it persists across reloads on the same device.
+  - The first time you open Figranium after upgrading, a one-time picker prompts you to choose a theme. Dismissing it also persists locally and it will not appear again.
+  - Themes are implemented as CSS custom properties (`--app-bg`, `--app-surface`, `--app-accent`, and the full syntax-highlight palette), so the whole UI — including code blocks — retunes for readability under each background.
 
-- Switch themes from **Settings → System → Theme**. Each option shows a preview image plus a surface and accent color swatch.
-- The choice is stored in the browser's local storage (`figranium.theme`), so it persists across reloads on the same device.
-- The first time you open Figranium after upgrading, a one-time picker prompts you to choose a theme. Dismissing it also persists locally and it will not appear again.
-- Themes are implemented as CSS custom properties (`--app-bg`, `--app-surface`, `--app-accent`, and the full syntax-highlight palette), so the whole UI — including code blocks — retunes for readability under each background.
+  See [UI Tour — System settings](/ui-tour) for the switcher location.
 
-See [UI Tour — System settings](/ui-tour) for the switcher location.
+  ### Authenticated programmatic browser & inspector API
 
-### Authenticated programmatic browser & inspector API
+  The programmatic browser endpoints introduced in the previous release now require authentication and are safe to expose to external orchestrators (MCP servers, custom agents, CLIs).
 
-The programmatic browser endpoints introduced in the previous release now require authentication and are safe to expose to external orchestrators (MCP servers, custom agents, CLIs).
+  - `POST /api/browser/open` launches or reattaches a managed headful session and returns `{ sessionId, status, wsEndpoint }`.
+  - `POST /api/inspector/highlight` activates the inspect overlay on the active session and, given a `targetHint`, returns up to five candidate elements with CSS selectors, XPath, confidence scores, and an optional base64 JPEG snapshot of the viewport.
+  - `PATCH /api/tasks/:id` performs a partial update on a task. Figranium snapshots the current task into the version history before applying the change.
+  - `DELETE /api/tasks/:id` now also removes any in-process schedule registered for the task, so a scheduled run cannot fire after deletion.
 
-- `POST /api/browser/open` launches or reattaches a managed headful session and returns `{ sessionId, status, wsEndpoint }`.
-- `POST /api/inspector/highlight` activates the inspect overlay on the active session and, given a `targetHint`, returns up to five candidate elements with CSS selectors, XPath, confidence scores, and an optional base64 JPEG snapshot of the viewport.
-- `PATCH /api/tasks/:id` performs a partial update on a task. Figranium snapshots the current task into the version history before applying the change.
-- `DELETE /api/tasks/:id` now also removes any in-process schedule registered for the task, so a scheduled run cannot fire after deletion.
+  Every endpoint accepts either a signed-in dashboard session or an API key (`x-api-key`, `Authorization: Bearer`, or an `apiKey` body field). External callers should use the API-key path.
 
-Every endpoint accepts either a signed-in dashboard session or an API key (`x-api-key`, `Authorization: Bearer`, or an `apiKey` body field). External callers should use the API-key path.
+  ```bash
+  curl -X POST http://localhost:11345/api/inspector/highlight \
+    -H "x-api-key: $FIGRANIUM_API_KEY" \
+    -H "Content-Type: application/json" \
+    -d '{"url": "https://example.com", "targetHint": "Sign in"}'
+  ```
 
-```bash
-curl -X POST http://localhost:11345/api/inspector/highlight \
-  -H "x-api-key: $FIGRANIUM_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"url": "https://example.com", "targetHint": "Sign in"}'
-```
+  See [REST API — Browser](/rest-api#browser) and [REST API — Inspector](/rest-api#inspector) for full request and error schemas.
 
-See [REST API — Browser](/rest-api#browser) and [REST API — Inspector](/rest-api#inspector) for full request and error schemas.
+  ## Security
 
-## Security
+  ### VNC and websockify path hardening
 
-### VNC and websockify path hardening
+  - The noVNC/websockify proxy path now requires authentication before it will accept an upgrade or serve `public/novnc.html`. Unauthenticated attempts are dropped.
+  - `websockify` binds to the IPv4 loopback (`127.0.0.1`) explicitly, closing a mismatch where Docker on macOS could bind unpredictably across IPv4/IPv6 loopback and leave the VNC stream unreachable or unexpectedly reachable.
+  - `sessionId` and `taskId` are strictly validated before they are used to look up files on disk, closing a path-traversal edge case.
+  - Raw cron ranges are now validated for correct ordering as well as bounds, so a malformed field cannot slip past the scheduler.
 
-- The noVNC/websockify proxy path now requires authentication before it will accept an upgrade or serve `public/novnc.html`. Unauthenticated attempts are dropped.
-- `websockify` binds to the IPv4 loopback (`127.0.0.1`) explicitly, closing a mismatch where Docker on macOS could bind unpredictably across IPv4/IPv6 loopback and leave the VNC stream unreachable or unexpectedly reachable.
-- `sessionId` and `taskId` are strictly validated before they are used to look up files on disk, closing a path-traversal edge case.
-- Raw cron ranges are now validated for correct ordering as well as bounds, so a malformed field cannot slip past the scheduler.
+  If you built a custom client that reached `/websockify` directly, update it to authenticate with a session cookie or an API key. See [Headful browser — Access control](/headful-browser#access-control) and [Security — Headful / VNC access control](/security#headful-vnc-access-control).
 
-If you built a custom client that reached `/websockify` directly, update it to authenticate with a session cookie or an API key. See [Headful browser — Access control](/headful-browser#access-control) and [Security — Headful / VNC access control](/security#7-headful-vnc-access-control).
+  ## Bug fixes
 
-## Bug fixes
+  - **Captures now surface reliably** — Runs no longer produce screenshots or recordings that fail to appear in the UI. The capture read path in `server.js` and `src/server/routes/data.js` now matches the actual write path, and captures are also served from the alternate `public/captures` location used inside Docker.
+  - **Captures survive container restarts** — Runtime capture artifacts persist to a host volume instead of being lost when the container is recreated.
+  - **Persistent browser session ID** — Session IDs are stored across reconnects instead of being regenerated on every new session, so external tooling that pins to a `sessionId` stays valid.
+  - **Mac/Docker WebSocket disconnects** — Loopback WebSocket connections used by the headful viewer no longer drop on Mac hosts, and the `HeadfulModal` no longer flashes its loading state during a normal reconnect.
+  - **Apple Silicon headful browser "Connecting… Disconnected" loop** — The GHCR publish workflow now builds and pushes a true multi-architecture image (`linux/amd64` and `linux/arm64`). Apple Silicon Macs pull the native ARM64 image instead of running the AMD64 image under Docker Desktop's QEMU emulation, where Xvfb and x11vnc were prone to crashing seconds after start. That crash also silently broke the selector-picker SSE stream, which shares the same headful browser session.
+  - **Headful viewer auto-reconnect** — Xvfb, x11vnc, and websockify each now run inside restart loops (with per-process logs under `data/xvfb.log`, `data/x11vnc.log`, and `data/novnc.log`), and the noVNC page auto-reconnects with backoff on RFB disconnect. A quick post-connect drop is now surfaced as **"Browser session crashed, retrying…"** instead of a plain **"Reconnecting…"** so a genuine crash is visually distinguishable from a normal reconnect.
+  - **Theme contrast fixes** — Dot-grid canvas background, theme-accent buttons, and previously hardcoded blue accent text (API keys, **Add API Key** button) are readable across all four themes; syntax-highlight colors were retuned to meet WCAG AA contrast on every theme's actual code background.
 
-- **Captures now surface reliably** — Runs no longer produce screenshots or recordings that fail to appear in the UI. The capture read path in `server.js` and `src/server/routes/data.js` now matches the actual write path, and captures are also served from the alternate `public/captures` location used inside Docker.
-- **Captures survive container restarts** — Runtime capture artifacts persist to a host volume instead of being lost when the container is recreated.
-- **Persistent browser session ID** — Session IDs are stored across reconnects instead of being regenerated on every new session, so external tooling that pins to a `sessionId` stays valid.
-- **Mac/Docker WebSocket disconnects** — Loopback WebSocket connections used by the headful viewer no longer drop on Mac hosts, and the `HeadfulModal` no longer flashes its loading state during a normal reconnect.
-- **Apple Silicon headful browser "Connecting… Disconnected" loop** — The GHCR publish workflow now builds and pushes a true multi-architecture image (`linux/amd64` and `linux/arm64`). Apple Silicon Macs pull the native ARM64 image instead of running the AMD64 image under Docker Desktop's QEMU emulation, where Xvfb and x11vnc were prone to crashing seconds after start. That crash also silently broke the selector-picker SSE stream, which shares the same headful browser session.
-- **Headful viewer auto-reconnect** — Xvfb, x11vnc, and websockify each now run inside restart loops (with per-process logs under `data/xvfb.log`, `data/x11vnc.log`, and `data/novnc.log`), and the noVNC page auto-reconnects with backoff on RFB disconnect. A quick post-connect drop is now surfaced as **"Browser session crashed, retrying…"** instead of a plain **"Reconnecting…"** so a genuine crash is visually distinguishable from a normal reconnect.
-- **Theme contrast fixes** — Dot-grid canvas background, theme-accent buttons, and previously hardcoded blue accent text (API keys, **Add API Key** button) are readable across all four themes; syntax-highlight colors were retuned to meet WCAG AA contrast on every theme's actual code background.
+  ## Updates
 
-## Updates
+  ### Exported task filename
 
-### Exported task filename
+  Exported task bundles are now named `figranium-tasks-<date>.json` (previously `doppelganger-tasks-...`).
 
-Exported task bundles are now named `figranium-tasks-<date>.json` (previously `doppelganger-tasks-...`).
+  ### Font change
 
-### Font change
+  The UI now uses **Space Mono** in place of JetBrains Mono. Custom stylesheets that referenced the old font family should be updated.
 
-The UI now uses **Space Mono** in place of JetBrains Mono. Custom stylesheets that referenced the old font family should be updated.
+  ### Under the hood: CAPTCHA detection scaffolding
 
-### Under the hood: CAPTCHA detection scaffolding
+  Figranium 0.14.0 lands the foundation for a future human-handoff CAPTCHA workflow. This release includes only the internal engine layer — a DOM/shadow-DOM/iframe observer that classifies interactive elements (slider, audio, grid, rotational, distorted-text, widget-frame, form), a 2 GB memory guardrail (`os.totalmem()` plus cgroup v1/v2 limits), and typed handoff interfaces (`onCaptchaDetected`, `pauseForHuman`, `submitSolution`) that pipe an externally supplied solution into the existing human-like mouse trajectory generator.
 
-Figranium 0.14.0 lands the foundation for a future human-handoff CAPTCHA workflow. This release includes only the internal engine layer — a DOM/shadow-DOM/iframe observer that classifies interactive elements (slider, audio, grid, rotational, distorted-text, widget-frame, form), a 2 GB memory guardrail (`os.totalmem()` plus cgroup v1/v2 limits), and typed handoff interfaces (`onCaptchaDetected`, `pauseForHuman`, `submitSolution`) that pipe an externally supplied solution into the existing human-like mouse trajectory generator.
-
-There is no automated solver and no user-facing API for this yet — the module ships as internal scaffolding only. Tasks continue to pause for manual intervention through the [headful browser](/headful-browser) as they do today.
-
+  There is no automated solver and no user-facing API for this yet — the module ships as internal scaffolding only. Tasks continue to pause for manual intervention through the [headful browser](/headful-browser) as they do today.
 </Update>
 
 <Update label="2026-08-05" description="Earlier update">
+  ## Features
 
-## Features
+  ### Model Context Protocol (MCP) server
 
-### Model Context Protocol (MCP) server
+  Figranium now ships an official **MCP server** so LLM clients like Claude Desktop, Cursor, and Manus AI can discover, run, inspect, and schedule Figranium tasks directly.
 
-Figranium now ships an official **MCP server** so LLM clients like Claude Desktop, Cursor, and Manus AI can discover, run, inspect, and schedule Figranium tasks directly.
+  - **Prebuilt image**: pull `ghcr.io/figranium/figranium-mcp:latest` — no Node.js install or local clone required.
+  - **STDIO transport**: works with any MCP-compatible client over the standard STDIO transport.
+  - **Point at your instance**: configure `FIGRANIUM_BASE_URL` and `FIGRANIUM_API_KEY` in the client's MCP server config. Use `http://host.docker.internal:11345` when Figranium runs on the same host.
+  - **Registry namespace**: clients that support automatic registry resolution can install it as `io.github.figranium/figranium-mcp`.
 
-- **Prebuilt image**: pull `ghcr.io/figranium/figranium-mcp:latest` — no Node.js install or local clone required.
-- **STDIO transport**: works with any MCP-compatible client over the standard STDIO transport.
-- **Point at your instance**: configure `FIGRANIUM_BASE_URL` and `FIGRANIUM_API_KEY` in the client's MCP server config. Use `http://host.docker.internal:11345` when Figranium runs on the same host.
-- **Registry namespace**: clients that support automatic registry resolution can install it as `io.github.figranium/figranium-mcp`.
-
-See [MCP Integration](/mcp-integration) for client-by-client setup, the available tools, and local development instructions.
-
+  See [MCP Integration](/mcp-integration) for client-by-client setup, the available tools, and local development instructions.
 </Update>
 
 <Update label="2026-07-30" description="Earlier update">
+  ## Features
 
-## Features
+  ### Named session snapshots (`sessionId`)
 
-### Named session snapshots (`sessionId`)
+  Tasks and API-triggered runs now accept a `sessionId` field that persists browser cookies and local storage to a dedicated snapshot file per name.
 
-Tasks and API-triggered runs now accept a `sessionId` field that persists browser cookies and local storage to a dedicated snapshot file per name.
+  - Pass `sessionId: "acct-alice"` on a run and Figranium loads `data/sessions/acct-alice.json` as the browser's initial storage state. After the run, the current state is written back to the same file.
+  - Different `sessionId` values give you fully isolated logged-in identities on the same target — one per customer, tenant, or account, without touching the shared profile directories.
+  - `sessionId` is sanitized to `[a-zA-Z0-9_-]`; other characters are stripped for path safety.
+  - Combining `sessionId` with `statelessExecution: true` keeps the run stateless — the snapshot is not written.
 
-- Pass `sessionId: "acct-alice"` on a run and Figranium loads `data/sessions/acct-alice.json` as the browser's initial storage state. After the run, the current state is written back to the same file.
-- Different `sessionId` values give you fully isolated logged-in identities on the same target — one per customer, tenant, or account, without touching the shared profile directories.
-- `sessionId` is sanitized to `[a-zA-Z0-9_-]`; other characters are stripped for path safety.
-- Combining `sessionId` with `statelessExecution: true` keeps the run stateless — the snapshot is not written.
+  See [Named Session Snapshots](/session-state#named-session-snapshots-sessionid) for the full walkthrough and [`POST /api/tasks/:id/api`](/rest-api#tasks) for the API field.
 
-See [Named Session Snapshots](/session-state#named-session-snapshots-sessionid) for the full walkthrough and [`POST /api/tasks/:id/api`](/rest-api#tasks) for the API field.
+  ## Updates
 
-## Updates
+  ### Async and top-level `return` in **Run JavaScript**
 
-### Async and top-level `return` in **Run JavaScript**
+  The **Run JavaScript** action block now wraps your code in an async function, so top-level `await` and top-level `return` work directly. Existing scripts that used plain expressions or `return` from `eval` continue to work — the block falls back to the previous behavior if the async wrapper cannot compile the code.
 
-The **Run JavaScript** action block now wraps your code in an async function, so top-level `await` and top-level `return` work directly. Existing scripts that used plain expressions or `return` from `eval` continue to work — the block falls back to the previous behavior if the async wrapper cannot compile the code.
-
-See [JavaScript Execution](/javascript-execution) for examples.
-
+  See [JavaScript Execution](/javascript-execution) for examples.
 </Update>
 
 <Update label="2026-07-29" description="Earlier update">
+  ## Security
 
-## Security
+  ### Hardened VNC and websockify access
 
-### Hardened VNC and websockify access
+  Unauthenticated access to the headful browser's VNC stack is now closed. This affects anyone who was reaching the VNC or noVNC ports directly (for example, from a custom client or an exposed Docker port).
 
-Unauthenticated access to the headful browser's VNC stack is now closed. This affects anyone who was reaching the VNC or noVNC ports directly (for example, from a custom client or an exposed Docker port).
+  - **Localhost-only binding**: both `x11vnc` (port `5900`) and `websockify`/noVNC (`NOVNC_PORT`, default `54311`) now listen on `127.0.0.1` only. Publishing these ports on the Docker host no longer exposes them.
+  - **Password-protected VNC**: `x11vnc` requires a random password generated on first start and stored at `data/vnc_password.txt`. The embedded viewer fetches it automatically from the new authenticated endpoint `GET /api/headful/vnc-password`.
+  - **Authenticated `/websockify` upgrades**: every WebSocket upgrade to `/websockify` on the main Figranium port must pass the IP allowlist, an Origin/Host match (CSWSH protection), and present either a session cookie or an API key. Unauthenticated attempts are dropped and logged.
 
-- **Localhost-only binding**: both `x11vnc` (port `5900`) and `websockify`/noVNC (`NOVNC_PORT`, default `54311`) now listen on `127.0.0.1` only. Publishing these ports on the Docker host no longer exposes them.
-- **Password-protected VNC**: `x11vnc` requires a random password generated on first start and stored at `data/vnc_password.txt`. The embedded viewer fetches it automatically from the new authenticated endpoint `GET /api/headful/vnc-password`.
-- **Authenticated `/websockify` upgrades**: every WebSocket upgrade to `/websockify` on the main Figranium port must pass the IP allowlist, an Origin/Host match (CSWSH protection), and present either a session cookie or an API key. Unauthenticated attempts are dropped and logged.
+  **What this means for you**: if you use the headful browser through the Figranium UI, nothing changes — the embedded viewer authenticates automatically. If you built a custom VNC client that connected directly to port `54311` or `5900`, update it to proxy through `wss://<host>:11345/websockify` with an API key (`?apiKey=...` or `x-api-key` header). Retrieve the VNC password from `GET /api/headful/vnc-password`.
 
-**What this means for you**: if you use the headful browser through the Figranium UI, nothing changes — the embedded viewer authenticates automatically. If you built a custom VNC client that connected directly to port `54311` or `5900`, update it to proxy through `wss://<host>:11345/websockify` with an API key (`?apiKey=...` or `x-api-key` header). Retrieve the VNC password from `GET /api/headful/vnc-password`.
-
-See [Headful browser — Access control](/headful-browser#access-control) and [Security — Headful / VNC access control](/security#7-headful-vnc-access-control) for the full details.
-
+  See [Headful browser — Access control](/headful-browser#access-control) and [Security — Headful / VNC access control](/security#headful-vnc-access-control) for the full details.
 </Update>
 
 <Update label="2026-06-29" description="Earlier update">
+  ## Updates
 
-## Updates
+  ### Expanded PostgreSQL storage
 
-### Expanded PostgreSQL storage
+  PostgreSQL is now a first-class backend for nearly all Figranium configuration, not just tasks and logs.
 
-PostgreSQL is now a first-class backend for nearly all Figranium configuration, not just tasks and logs.
+  - **More data in Postgres**: proxy configuration, saved credentials, AI model selections, and Ollama API keys are now persisted in the database when `DB_TYPE=postgres`.
+  - **SSL support**: a new `DB_POSTGRESDB_SSL=true` environment variable enables encrypted connections to managed Postgres providers (RDS, Cloud SQL, Supabase, Neon, etc.).
+  - **Longer API keys**: API key columns are now `TEXT` instead of `VARCHAR(255)`, and existing tables are migrated automatically on startup.
+  - **Graceful fallback**: if the database is unreachable at startup, Figranium falls back to file-based storage.
 
-- **More data in Postgres**: proxy configuration, saved credentials, AI model selections, and Ollama API keys are now persisted in the database when `DB_TYPE=postgres`.
-- **SSL support**: a new `DB_POSTGRESDB_SSL=true` environment variable enables encrypted connections to managed Postgres providers (RDS, Cloud SQL, Supabase, Neon, etc.).
-- **Longer API keys**: API key columns are now `TEXT` instead of `VARCHAR(255)`, and existing tables are migrated automatically on startup.
-- **Graceful fallback**: if the database is unreachable at startup, Figranium falls back to file-based storage.
+  See [PostgreSQL Support](/database-support) for the full configuration reference.
 
-See [PostgreSQL Support](/database-support) for the full configuration reference.
+  ### Expanded SSRF protection
 
-### Expanded SSRF protection
+  The default SSRF blocklist now covers a much broader set of internal and reserved network addresses, hardening Figranium against requests that target internal infrastructure.
 
-The default SSRF blocklist now covers a much broader set of internal and reserved network addresses, hardening Figranium against requests that target internal infrastructure.
+  - **More IPv4 ranges blocked by default**: in addition to RFC 1918 private ranges and loopback, Figranium now blocks IETF protocol assignments (`192.0.0.0/24`), TEST-NET ranges, benchmarking (`198.18.0.0/15`), shared CGN space (`100.64.0.0/10`), multicast, and other reserved space.
+  - **Full IPv6 coverage**: loopback (`::1/128`), unique local (`fc00::/7`), link-local (`fe80::/10`), unspecified, and multicast ranges are blocked.
+  - **Hostname blocking**: `localhost`, `*.localhost`, and `host.docker.internal` are blocked unless `ALLOW_PRIVATE_NETWORKS=true`.
+  - **Proxy server validation**: proxy URLs added through Settings or the API are validated against the same blocklist. Invalid entries are rejected with `INVALID_URL`, and bulk imports fail atomically if any entry is unsafe.
+  - **Ollama URL validation**: Ollama base URLs are validated both at save time and again at request time, with every redirect hop re-checked and sensitive headers stripped on cross-origin redirects.
+  - **Output provider credentials**: `baseUrl` values (e.g. Baserow) are validated when credentials are saved, rejecting unsafe URLs with `INVALID_BASE_URL`.
+  - **Redirect protection**: outbound webhook and output provider requests now validate every hop in an HTTP 3xx chain (up to 5 redirects).
 
-- **More IPv4 ranges blocked by default**: in addition to RFC 1918 private ranges and loopback, Figranium now blocks IETF protocol assignments (`192.0.0.0/24`), TEST-NET ranges, benchmarking (`198.18.0.0/15`), shared CGN space (`100.64.0.0/10`), multicast, and other reserved space.
-- **Full IPv6 coverage**: loopback (`::1/128`), unique local (`fc00::/7`), link-local (`fe80::/10`), unspecified, and multicast ranges are blocked.
-- **Hostname blocking**: `localhost`, `*.localhost`, and `host.docker.internal` are blocked unless `ALLOW_PRIVATE_NETWORKS=true`.
-- **Proxy server validation**: proxy URLs added through Settings or the API are validated against the same blocklist. Invalid entries are rejected with `INVALID_URL`, and bulk imports fail atomically if any entry is unsafe.
-- **Ollama URL validation**: Ollama base URLs are validated both at save time and again at request time, with every redirect hop re-checked and sensitive headers stripped on cross-origin redirects.
-- **Output provider credentials**: `baseUrl` values (e.g. Baserow) are validated when credentials are saved, rejecting unsafe URLs with `INVALID_BASE_URL`.
-- **Redirect protection**: outbound webhook and output provider requests now validate every hop in an HTTP 3xx chain (up to 5 redirects).
+  What this means for you: if you previously pointed Figranium at a service on `localhost`, `host.docker.internal`, or any private network, you'll need to set `ALLOW_PRIVATE_NETWORKS=true` for local development. Production deployments are protected by default with no configuration required.
 
-What this means for you: if you previously pointed Figranium at a service on `localhost`, `host.docker.internal`, or any private network, you'll need to set `ALLOW_PRIVATE_NETWORKS=true` for local development. Production deployments are protected by default with no configuration required.
+  See [Security](/security) for the full list of blocked ranges and configuration details.
 
-See [Security](/security) for the full list of blocked ranges and configuration details.
+  ### Gemini API key transport
 
-### Gemini API key transport
+  Gemini API keys are now sent via the `x-goog-api-key` HTTP header instead of the `?key=` query parameter, preventing keys from leaking through server access logs, reverse-proxy logs, or `Referer` headers. No configuration is required.
 
-Gemini API keys are now sent via the `x-goog-api-key` HTTP header instead of the `?key=` query parameter, preventing keys from leaking through server access logs, reverse-proxy logs, or `Referer` headers. No configuration is required.
-
-If you previously relied on the `?key=` form for log inspection or proxy filtering, update your tooling accordingly.
-
+  If you previously relied on the `?key=` form for log inspection or proxy filtering, update your tooling accordingly.
 </Update>

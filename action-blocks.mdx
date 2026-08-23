@@ -1,245 +1,293 @@
 ---
-title: "Action Blocks"
+title: "Action Blocks Reference for Figranium Automation"
+sidebarTitle: "Action Blocks"
+description: "Complete reference for Figranium action blocks. Browse navigation, interaction, logic, data, and advanced blocks to build deterministic browser automation flows."
 ---
 
 In "Agent" mode, tasks are built from a sequence of actions. These actions are executed sequentially by the browser.
 
-## **Basic Actions**
+<CardGroup cols={2}>
+  <Card title="Navigation & Interaction" icon="mouse-pointer" href="#basic-actions">
+    Click, type, scroll, hover, press keys, and navigate between pages.
+  </Card>
 
-### **Click**
+  <Card title="Logic & Flow Control" icon="shuffle" href="#logic--flow-control">
+    Conditionals, loops, repeats, and error handling.
+  </Card>
 
-Simulates a left-click on an element. Use this to interact with buttons, links, or any clickable item.
+  <Card title="Data & Variables" icon="database" href="#data--variables">
+    Set variables, parse CSV, merge data, and extract content.
+  </Card>
 
-- **Selector**: The CSS selector of the target element (e.g., `#btn`, `.link`).
-- **Wait**: Optional delay (in seconds) after clicking.
+  <Card title="Advanced Actions" icon="code" href="#advanced-actions">
+    JavaScript execution, HTTP requests, CAPTCHA solving, and screenshots.
+  </Card>
+</CardGroup>
 
-### **Type**
+## Basic Actions
 
-Types text into an input field. Use this for filling out forms or search bars.
+<AccordionGroup>
+  <Accordion title="Click" icon="mouse-pointer">
+    Simulates a left-click on an element. Use this to interact with buttons, links, or any clickable item.
 
-- **Selector**: The target input (e.g., `input[name="q"]`).
-- **Value**: The text to type. Can include `{$variables}`.
-- **Mode**: `Replace` (clears existing text) or `Append` (adds to end).
+    - **Selector**: The CSS selector of the target element (e.g., `#btn`, `.link`).
+    - **Wait**: Optional delay (in seconds) after clicking.
+  </Accordion>
 
-### **Wait**
+  <Accordion title="Type" icon="keyboard">
+    Types text into an input field. Use this for filling out forms or search bars.
 
-Pauses execution for a fixed duration. Use this when you need a simple delay, though **Wait for Element** is often more reliable.
+    - **Selector**: The target input (e.g., `input[name="q"]`).
+    - **Value**: The text to type. Can include `{$variables}`.
+    - **Mode**: `Replace` (clears existing text) or `Append` (adds to end).
+  </Accordion>
 
-- **Value**: Duration in seconds (e.g., `2.5`).
+  <Accordion title="Wait" icon="clock">
+    Pauses execution for a fixed duration. Use this when you need a simple delay, though **Wait for Element** is often more reliable.
 
-### **Wait for Selector (**`wait_selector`**)**
+    - **Value**: Duration in seconds (e.g., `2.5`).
+  </Accordion>
 
-Waits until a specific element appears in the DOM. Use this to ensure the page has loaded the content you need before proceeding.
+  <Accordion title="Wait for Selector (wait_selector)" icon="eye">
+    Waits until a specific element appears in the DOM. Use this to ensure the page has loaded the content you need before proceeding.
 
-- **Selector**: The element to wait for.
-- **Value**: Timeout in seconds (default: 30).
+    - **Selector**: The element to wait for.
+    - **Value**: Timeout in seconds (default: 30).
+  </Accordion>
 
-### **Press (**`press`**)**
+  <Accordion title="Press (press)" icon="arrow-right">
+    Simulates a keyboard key press. Use this for navigation keys like `Enter`, `Tab`, or `Escape`.
 
-Simulates a keyboard key press. Use this for navigation keys like `Enter`, `Tab`, or `Escape`.
+    - **Key**: The key name (e.g., `Enter`, `Tab`, `Escape`, `ArrowDown`).
+    - **Selector**: (Optional) Focus this element before pressing.
+  </Accordion>
 
-- **Key**: The key name (e.g., `Enter`, `Tab`, `Escape`, `ArrowDown`).
-- **Selector**: (Optional) Focus this element before pressing.
+  <Accordion title="Scroll" icon="arrow-down">
+    Scrolls the page or a specific element. Use this to reveal content that loads on scroll (lazy loading).
 
-### **Scroll**
+    - **Selector**: (Optional) The element to scroll. If empty, scrolls the window.
+    - **Value**: Pixels to scroll (e.g., `500`) or specific commands (`bottom`, `top`).
+  </Accordion>
 
-Scrolls the page or a specific element. Use this to reveal content that loads on scroll (lazy loading).
+  <Accordion title="Hover" icon="hand">
+    Moves the mouse cursor over an element. Use this to trigger dropdown menus or tooltips.
 
-- **Selector**: (Optional) The element to scroll. If empty, scrolls the window.
-- **Value**: Pixels to scroll (e.g., `500`) or specific commands (`bottom`, `top`).
+    - **Selector**: The target element.
+  </Accordion>
 
-### **Hover**
+  <Accordion title="Navigate To" icon="globe">
+    Redirects the browser to a new URL. Use this to start a flow or move to a different page.
 
-Moves the mouse cursor over an element. Use this to trigger dropdown menus or tooltips.
+    - **Value**: The full URL (e.g., `https://example.com/login`).
+  </Accordion>
+</AccordionGroup>
 
-- **Selector**: The target element.
+## Logic & Flow Control
 
-### **Navigate To**
+<AccordionGroup>
+  <Accordion title="If / else / end" icon="shuffle">
+    Conditional execution block. Use this to handle dynamic situations, like closing a popup only if it appears.
 
-Redirects the browser to a new URL. Use this to start a flow or move to a different page.
+    - **Condition**: A JavaScript expression (e.g., `exists('.error')`).
+    - **Selector**: (Structured mode) Target element.
+    - **Operator**: `equals`, `contains`, `exists`, etc.
+  </Accordion>
 
-- **Value**: The full URL (e.g., `https://example.com/login`).
+  <Accordion title="While / end" icon="rotate">
+    Repeats a block of actions while a condition is true. Use this for pagination or waiting for a specific state change.
 
-## **Logic & Flow Control**
+    - **Condition**: Same as `if`.
+    - **Value**: (Optional) Max iterations to prevent infinite loops.
+  </Accordion>
 
-### **If (**`if` **/** `else` **/** `end`**)**
+  <Accordion title="For Each / end" icon="list">
+    Iterates over a list of elements. Use this to scrape lists of items, like search results or product cards.
 
-Conditional execution block. Use this to handle dynamic situations, like closing a popup only if it appears.
+    - **Selector**: The elements to iterate (e.g., `.product-item`).
+    - **Var Name**: Variable to store the current element index/data.
+  </Accordion>
 
-- **Condition**: A JavaScript expression (e.g., `exists('.error')`).
-- **Selector**: (Structured mode) Target element.
-- **Operator**: `equals`, `contains`, `exists`, etc.
+  <Accordion title="Repeat N / end" icon="repeat">
+    Repeats a block N times. Use this when you know exactly how many times an action needs to happen.
 
-### **While (**`while` **/** `end`**)**
+    - **Value**: Number of repetitions.
+  </Accordion>
+</AccordionGroup>
 
-Repeats a block of actions while a condition is true. Use this for pagination or waiting for a specific state change.
+## Data & Variables
 
-- **Condition**: Same as `if`.
-- **Value**: (Optional) Max iterations to prevent infinite loops.
+<AccordionGroup>
+  <Accordion title="Set Variable (set)" icon="pen">
+    Updates a runtime variable. Use this to store calculations or flags for later use.
 
-### **For Each (**`foreach` **/** `end`**)**
+    - **Var Name**: The variable to update (e.g., `counter`).
+    - **Value**: The new value (can be a JS expression).
+  </Accordion>
 
-Iterates over a list of elements. Use this to scrape lists of items, like search results or product cards.
+  <Accordion title="CSV (csv)" icon="file-csv">
+    Parses CSV formatted text into rows (an array of objects). Use this to extract data out of comma separated text for further processing.
 
-- **Selector**: The elements to iterate (e.g., `.product-item`).
-- **Var Name**: Variable to store the current element index/data.
+    - **Value**: The CSV text to parse. If left blank, it will attempt to use the output of the previous block (`block.output`).
+  </Accordion>
 
-### **Repeat N (**`repeat` **/** `end`**)**
+  <Accordion title="Merge (merge)" icon="object-group">
+    Merges multiple arrays, objects, or primitive values into a single output. Use this when you have collected data from different steps and need to combine them into one payload.
 
-Repeats a block N times. Use this when you know exactly how many times an action needs to happen.
+    - **Value**: Comma-separated list of values or variables to merge (e.g., `items, extraItems, {$block.output}`).
+    - **Target Variable**: (Optional) The name of a new or existing variable to store the merged result (e.g., `allItems`).
+  </Accordion>
 
-- **Value**: Number of repetitions.
+  <Accordion title="Get Content (get_content)" icon="file-lines">
+    Extracts the text content of the current page or a specific element. Use this to capture visible text without writing a custom JavaScript block — for example, grabbing an article body, a table's contents, or the entire page text for downstream processing.
 
-## **Advanced Actions**
+    - **Selector**: (Optional) A CSS selector targeting the element to read. If empty, the full page text is returned.
+    - **Store In Variable**: (Optional) A variable name to store the extracted text for use in later blocks.
 
-### **JavaScript (**`javascript`**)**
+    The action returns the `innerText` of the matched element (or `document.body` when no selector is provided). If the selector matches no element, the result is `null`.
 
-Executes custom JavaScript in the browser context. Use this for complex logic, data extraction, or interactions not supported by other blocks.
+    **Example — store the main article text in a variable:**
 
-- **Value**: The JS code (e.g., `return document.title;`).
-- **Output**: The return value is stored in `block.output` for subsequent steps.
+    ```json
+    {
+      "type": "get_content",
+      "selector": ".article-body",
+      "varName": "articleText"
+    }
+    ```
 
-### **Screenshot**
+    After this block runs, `{$articleText}` contains the visible text of the `.article-body` element.
+  </Accordion>
+</AccordionGroup>
 
-Takes a screenshot at the current state. Use this for debugging or keeping records of the task execution.
+## Advanced Actions
 
-- **Value**: (Optional) Filename suffix.
-- **Selector**: (Optional) Capture only this element.
+<AccordionGroup>
+  <Accordion title="JavaScript (javascript)" icon="code">
+    Executes custom JavaScript in the browser context. Use this for complex logic, data extraction, or interactions not supported by other blocks.
 
-### **Stop Task**
+    - **Value**: The JS code (e.g., `return document.title;`).
+    - **Output**: The return value is stored in `block.output` for subsequent steps.
+  </Accordion>
 
-Immediately stops the task execution. Use this to end the task early based on a condition (e.g., login success).
+  <Accordion title="Screenshot" icon="camera">
+    Takes a screenshot at the current state. Use this for debugging or keeping records of the task execution.
 
-- **Value**: Exit status (e.g., `success`, `failure`).
+    - **Value**: (Optional) Filename suffix.
+    - **Selector**: (Optional) Capture only this element.
+  </Accordion>
 
-### **Set Variable (**`set`**)**
+  <Accordion title="Stop Task" icon="circle-stop">
+    Immediately stops the task execution. Use this to end the task early based on a condition (e.g., login success).
 
-Updates a runtime variable. Use this to store calculations or flags for later use.
+    - **Value**: Exit status (e.g., `success`, `failure`).
+  </Accordion>
 
-- **Var Name**: The variable to update (e.g., `counter`).
-- **Value**: The new value (can be a JS expression).
+  <Accordion title="Wait for Downloads (wait_downloads)" icon="download">
+    Waits for file downloads to complete. Use this after clicking a download button to ensure the file is saved.
 
-### **Wait for Downloads (**`wait_downloads`**)**
+    - **Value**: Timeout in seconds.
+  </Accordion>
 
-Waits for file downloads to complete. Use this after clicking a download button to ensure the file is saved.
+  <Accordion title="On Error (on_error)" icon="triangle-exclamation">
+    Defines a block of actions to run if an error occurs in the main flow. Use this to implement retry logic or graceful failures (try/catch).
+  </Accordion>
 
-- **Value**: Timeout in seconds.
+  <Accordion title="HTTP Request (http_request)" icon="globe">
+    Makes a server-side HTTP request to any URL. Use this to call external APIs, send webhook notifications, or fetch data from REST endpoints — without leaving the task flow.
 
-### **On Error (**`on_error`**)**
+    - **Method**: `GET`, `POST`, `PUT`, `PATCH`, or `DELETE`.
+    - **URL**: The target endpoint. Supports `{$variables}` for dynamic URLs.
+    - **Headers**: (Optional) A JSON object of request headers (e.g., `{"Authorization": "Bearer {$token}"}`).
+    - **Body**: (Optional, shown for POST/PUT/PATCH/DELETE) The request payload, typically JSON.
+    - **Store Response In Variable**: (Optional) A variable name to store the parsed response for use in later blocks.
 
-Defines a block of actions to run if an error occurs in the main flow. Use this to implement retry logic or graceful failures (try/catch).
+    The request is executed on the server, not in the browser context. If the response body is valid JSON it is parsed automatically; otherwise it is stored as a plain string. Non-2xx responses throw an error that you can catch with an [On Error](/error-handling) block.
 
-### **CSV (**`csv`**)**
+    <Note>
+      Requests to private or internal network addresses are blocked unless the `ALLOW_PRIVATE_NETWORKS` environment variable is enabled. See [Security](/security) for details.
+    </Note>
 
-Parses CSV formatted text into rows (an array of objects). Use this to extract data out of comma separated text for further processing.
+    **Example — fetch an API and store the result:**
 
-- **Value**: The CSV text to parse. If left blank, it will attempt to use the output of the previous block (`block.output`).
+    ```json
+    {
+      "type": "http_request",
+      "method": "GET",
+      "value": "https://api.example.com/products?page={$page}",
+      "headers": "{\"Authorization\": \"Bearer {$token}\"}",
+      "varName": "apiResponse"
+    }
+    ```
 
-### **Merge (**`merge`**)**
+    After this block runs, `{$apiResponse}` contains the parsed JSON response.
+  </Accordion>
 
-Merges multiple arrays, objects, or primitive values into a single output. Use this when you have collected data from different steps and need to combine them into one payload.
+  <Accordion title="Start Task (start)" icon="play">
+    Triggers another task to run from within the current task. Use this to create modular workflows by chaining tasks together.
 
-- **Value**: Comma-separated list of values or variables to merge (e.g., `items, extraItems, {$block.output}`).
-- **Target Variable**: (Optional) The name of a new or existing variable to store the merged result (e.g., `allItems`).
+    - **Task**: The ID of the task to run.
+  </Accordion>
 
-### **HTTP Request (**`http_request`**)**
+  <Accordion title="Solve CAPTCHA (solve_captcha)" icon="shield">
+    <Warning>
+      **Currently broken.** `solve_captcha` and the task-level auto-solve setting are timing out against reCAPTCHA v2 and Cloudflare Turnstile pending further investigation. The Editor palette labels this block as **Solve Captcha (Broken)** to reflect that. See [CAPTCHA Solving](/captcha-solving) for the full status.
+    </Warning>
 
-Makes a server-side HTTP request to any URL. Use this to call external APIs, send webhook notifications, or fetch data from REST endpoints — without leaving the task flow.
+    Detects a CAPTCHA challenge on the current page, solves it through the bundled `ohmycaptcha` service, and injects the token back into the page so the site's own callback fires. Use this when a specific step reaches a challenge you already know about — for example, right after submitting a login form.
 
-- **Method**: `GET`, `POST`, `PUT`, `PATCH`, or `DELETE`.
-- **URL**: The target endpoint. Supports `{$variables}` for dynamic URLs.
-- **Headers**: (Optional) A JSON object of request headers (e.g., `{"Authorization": "Bearer {$token}"}`).
-- **Body**: (Optional, shown for POST/PUT/PATCH/DELETE) The request payload, typically JSON.
-- **Store Response In Variable**: (Optional) A variable name to store the parsed response for use in later blocks.
+    Supported challenge types: reCAPTCHA v2, reCAPTCHA v3, hCaptcha, and Cloudflare Turnstile.
 
-The request is executed on the server, not in the browser context. If the response body is valid JSON it is parsed automatically; otherwise it is stored as a plain string. Non-2xx responses throw an error that you can catch with an [On Error](/error-handling) block.
+    - **CAPTCHA Type**: (Optional) One of `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, or `turnstile`. If empty, the type is auto-detected from the page.
+    - **Selector**: (Optional) A CSS selector scoping the search to a specific container (for example, the widget's iframe wrapper). If empty, the whole page is scanned.
+    - **Store In Variable**: (Optional) A variable name to store solve metadata (`{ success, challenge, duration }`).
+    - **Timeout**: (Optional) Max time in milliseconds to wait for a solution. Defaults to `120000`. Real solving usually takes over a minute, especially for reCAPTCHA v2's image-challenge fallback.
 
-<Note>
-Requests to private or internal network addresses are blocked unless the `ALLOW_PRIVATE_NETWORKS` environment variable is enabled. See [Security](/security) for details.
-</Note>
+    The block runs in Agent mode only. The bundled solver runs its own headless Chromium in a sidecar process, so the host must have at least 2 GB of free memory or the block throws. reCAPTCHA v2 additionally falls back to audio-challenge transcription against an OpenAI-compatible endpoint — that path requires `CLOUD_API_KEY`, `CLOUD_BASE_URL`, and `CLOUD_MODEL` to be set, or those specific challenges fail with `ERROR_CAPTCHA_UNSOLVABLE`. hCaptcha, Turnstile, and reCAPTCHA v3 don't need it.
 
-**Example — fetch an API and store the result:**
+    **Example — solve a reCAPTCHA v2 widget and store the result:**
 
-```json
-{
-  "type": "http_request",
-  "method": "GET",
-  "value": "https://api.example.com/products?page={$page}",
-  "headers": "{\"Authorization\": \"Bearer {$token}\"}",
-  "varName": "apiResponse"
-}
-```
+    ```json
+    {
+      "type": "solve_captcha",
+      "captchaType": "recaptcha_v2",
+      "selector": "#recaptcha-container",
+      "varName": "captchaResult",
+      "timeout": 120000
+    }
+    ```
 
-After this block runs, `{$apiResponse}` contains the parsed JSON response.
+    For tasks that hit CAPTCHAs at unpredictable points, you can turn on the task-level **Auto-Solve CAPTCHA** setting instead of scattering `solve_captcha` blocks through the flow — it runs the same detection pass after every `navigate`, `click`, and `type`, and no-ops when no challenge is present. See [CAPTCHA Solving](/captcha-solving) for the full setup, environment variables, and the auto-solve toggle.
+  </Accordion>
 
-### **Get Content (**`get_content`**)**
+  <Accordion title="Do Nothing (do_nothing)" icon="ban">
+    Performs no operation and moves to the next block. Use this as a placeholder while drafting a task, or as the body of an `if` or `on_error` branch when you explicitly want the branch to fall through without side effects.
 
-Extracts the text content of the current page or a specific element. Use this to capture visible text without writing a custom JavaScript block — for example, grabbing an article body, a table's contents, or the entire page text for downstream processing.
+    The block takes no configuration. It logs `Do nothing` and completes successfully. The aliases `noop` and `pass` behave the same way.
 
-- **Selector**: (Optional) A CSS selector targeting the element to read. If empty, the full page text is returned.
-- **Store In Variable**: (Optional) A variable name to store the extracted text for use in later blocks.
+    **Example — placeholder inside an `if` branch:**
 
-The action returns the `innerText` of the matched element (or `document.body` when no selector is provided). If the selector matches no element, the result is `null`.
+    ```json
+    {
+      "type": "do_nothing"
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
 
-**Example — store the main article text in a variable:**
+<CardGroup cols={2}>
+  <Card title="Selectors" icon="crosshair" href="/selectors">
+    Learn how to target elements with CSS, XPath, and Playwright extensions.
+  </Card>
 
-```json
-{
-  "type": "get_content",
-  "selector": ".article-body",
-  "varName": "articleText"
-}
-```
+  <Card title="Variables" icon="pen" href="/variables">
+    Define dynamic parameters and reuse values across blocks.
+  </Card>
 
-After this block runs, `{$articleText}` contains the visible text of the `.article-body` element.
+  <Card title="Control Flow" icon="shuffle" href="/control-flow">
+    Build conditionals, loops, and error handling into your tasks.
+  </Card>
 
-### **Start Task (**`start`**)**
-
-Triggers another task to run from within the current task. Use this to create modular workflows by chaining tasks together.
-
-- **Task**: The ID of the task to run.
-
-### **Solve CAPTCHA (**`solve_captcha`**)**
-
-<Warning>
-**Currently broken.** `solve_captcha` and the task-level auto-solve setting are timing out against reCAPTCHA v2 and Cloudflare Turnstile pending further investigation. The Editor palette labels this block as **Solve Captcha (Broken)** to reflect that. See [CAPTCHA Solving](/captcha-solving) for the full status.
-</Warning>
-
-Detects a CAPTCHA challenge on the current page, solves it through the bundled `ohmycaptcha` service, and injects the token back into the page so the site's own callback fires. Use this when a specific step reaches a challenge you already know about — for example, right after submitting a login form.
-
-Supported challenge types: reCAPTCHA v2, reCAPTCHA v3, hCaptcha, and Cloudflare Turnstile.
-
-- **CAPTCHA Type**: (Optional) One of `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, or `turnstile`. If empty, the type is auto-detected from the page.
-- **Selector**: (Optional) A CSS selector scoping the search to a specific container (for example, the widget's iframe wrapper). If empty, the whole page is scanned.
-- **Store In Variable**: (Optional) A variable name to store solve metadata (`{ success, challenge, duration }`).
-- **Timeout**: (Optional) Max time in milliseconds to wait for a solution. Defaults to `120000`. Real solving usually takes over a minute, especially for reCAPTCHA v2's image-challenge fallback.
-
-The block runs in Agent mode only. The bundled solver runs its own headless Chromium in a sidecar process, so the host must have at least 2 GB of free memory or the block throws. reCAPTCHA v2 additionally falls back to audio-challenge transcription against an OpenAI-compatible endpoint — that path requires `CLOUD_API_KEY`, `CLOUD_BASE_URL`, and `CLOUD_MODEL` to be set, or those specific challenges fail with `ERROR_CAPTCHA_UNSOLVABLE`. hCaptcha, Turnstile, and reCAPTCHA v3 don't need it.
-
-**Example — solve a reCAPTCHA v2 widget and store the result:**
-
-```json
-{
-  "type": "solve_captcha",
-  "captchaType": "recaptcha_v2",
-  "selector": "#recaptcha-container",
-  "varName": "captchaResult",
-  "timeout": 120000
-}
-```
-
-For tasks that hit CAPTCHAs at unpredictable points, you can turn on the task-level **Auto-Solve CAPTCHA** setting instead of scattering `solve_captcha` blocks through the flow — it runs the same detection pass after every `navigate`, `click`, and `type`, and no-ops when no challenge is present. See [CAPTCHA Solving](/captcha-solving) for the full setup, environment variables, and the auto-solve toggle.
-
-### **Do Nothing (**`do_nothing`**)**
-
-Performs no operation and moves to the next block. Use this as a placeholder while drafting a task, or as the body of an `if` or `on_error` branch when you explicitly want the branch to fall through without side effects.
-
-The block takes no configuration. It logs `Do nothing` and completes successfully. The aliases `noop` and `pass` behave the same way.
-
-**Example — placeholder inside an `if` branch:**
-
-```json
-{
-  "type": "do_nothing"
-}
-```
+  <Card title="Data Extraction" icon="database" href="/data-extraction">
+    Capture and structure page data for export and downstream use.
+  </Card>
+</CardGroup>

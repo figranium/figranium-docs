@@ -1,14 +1,16 @@
 ---
 title: "Control Flow"
+sidebarTitle: "Control Flow"
+description: "Handle dynamic web pages, conditional logic, pagination, and multi-step processes with if/else, loops, and error handling in Figranium tasks."
 ---
 
 Figranium provides robust control flow mechanisms to handle dynamic web pages, conditional logic, pagination, and multi-step processes.
 
-## **Conditional Execution (If / Else / End)**
+## Conditional Execution (If / Else / End)
 
 The **If** block executes a sequence of actions only when a condition is met.
 
-### **Structure**
+### Structure
 
 Every `if` block must be closed with an `end` block. An optional `else` block can be placed between them.
 
@@ -20,90 +22,90 @@ Every `if` block must be closed with an `end` block. An optional `else` block ca
 { "type": "end" }
 ```
 
-### **Condition Types**
+### Condition Types
 
-**1. JavaScript Expression**
+<Tabs>
+  <Tab title="JavaScript Expression">
+    A JS expression evaluated in the browser page context. Must return a truthy/falsy value.
 
-A JS expression evaluated in the browser page context. Must return a truthy/falsy value.
+    ```js
+    exists('.error-message')           // checks if element exists
+    text('.status') === 'Success'      // checks element text
+    url().includes('/dashboard')       // checks current URL
+    {$count} > 5                       // compares a variable
+    block.output !== ''                // checks previous block result
+    ```
 
-```js
-exists('.error-message')           // checks if element exists
-text('.status') === 'Success'      // checks element text
-url().includes('/dashboard')       // checks current URL
-{$count} > 5                       // compares a variable
-block.output !== ''                // checks previous block result
-```
+    Available helpers in expressions:
 
-Available helpers in expressions:
+    | Helper | Description |
+    | :-- | :-- |
+    | `exists(selector)` | Returns `true` if the element is found in the DOM |
+    | `text(selector)` | Returns the text content of the first matching element |
+    | `url()` | Returns the current page URL |
+    | `vars.name` | Access a runtime variable by name |
+    | `block.output` | The result of the previous action block |
+    | `html` | The full page HTML as a string |
+  </Tab>
+  <Tab title="Structured Condition">
+    A form-based alternative to JS expressions. Define a variable or selector, an operator, and a comparison value.
 
-| Helper | Description |
-|:---|:---|
-| `exists(selector)` | Returns `true` if the element is found in the DOM |
-| `text(selector)` | Returns the text content of the first matching element |
-| `url()` | Returns the current page URL |
-| `vars.name` | Access a runtime variable by name |
-| `block.output` | The result of the previous action block |
-| `html` | The full page HTML as a string |
+    | Field | Description |
+    | :-- | :-- |
+    | `conditionVarType` | `string`, `number`, or `boolean` |
+    | `conditionVar` | Variable name or `{$varName}` reference |
+    | `conditionOp` | Comparison operator (see table below) |
+    | `conditionValue` | The value to compare against |
 
-**2. Structured Condition**
+    **Operators by type:**
 
-A form-based alternative to JS expressions. Define a variable or selector, an operator, and a comparison value.
+    | Type | Operators |
+    | :-- | :-- |
+    | String | `equals`, `not_equals`, `contains`, `starts_with`, `ends_with`, `matches` (regex) |
+    | Number | `equals`, `not_equals`, `gt`, `gte`, `lt`, `lte` |
+    | Boolean | `is_true`, `is_false` |
+    | Selector | `exists`, `not_exists` |
+  </Tab>
+  <Tab title="Selector Condition">
+    Set `conditionVarType` to `selector` to branch on whether an element is currently present in the DOM. Figranium runs `document.querySelector(selector)` against the live page each time the condition is evaluated.
 
-| Field | Description |
-|:---|:---|
-| `conditionVarType` | `string`, `number`, or `boolean` |
-| `conditionVar` | Variable name or `{$varName}` reference |
-| `conditionOp` | Comparison operator (see table below) |
-| `conditionValue` | The value to compare against |
+    | Field | Description |
+    | :-- | :-- |
+    | `conditionVarType` | `selector` |
+    | `selector` | CSS selector to check against the current page. Supports template variables like `{$productId}`. |
+    | `conditionOp` | `exists` (element is present) or `not_exists` (element is absent). |
 
-**Operators by type:**
+    Use the target icon next to the selector input to pick the element with the [Highlight Tool](/highlight-tool) instead of typing the selector by hand.
 
-| Type | Operators |
-|:---|:---|
-| String | `equals`, `not_equals`, `contains`, `starts_with`, `ends_with`, `matches` (regex) |
-| Number | `equals`, `not_equals`, `gt`, `gte`, `lt`, `lte` |
-| Boolean | `is_true`, `is_false` |
-| Selector | `exists`, `not_exists` |
+    **Example: Skip a modal only when it's showing**
 
-**3. Selector Condition**
+    ```json
+    { "type": "navigate", "value": "https://example.com" },
+    { "type": "if",
+      "conditionVarType": "selector",
+      "selector": ".cookie-banner",
+      "conditionOp": "exists"
+    },
+      { "type": "click", "selector": ".cookie-banner .accept" },
+    { "type": "end" }
+    ```
 
-Set `conditionVarType` to `selector` to branch on whether an element is currently present in the DOM. Figranium runs `document.querySelector(selector)` against the live page each time the condition is evaluated.
+    **Example: Paginate while a "next" button remains**
 
-| Field | Description |
-|:---|:---|
-| `conditionVarType` | `selector` |
-| `selector` | CSS selector to check against the current page. Supports template variables like `{$productId}`. |
-| `conditionOp` | `exists` (element is present) or `not_exists` (element is absent). |
+    ```json
+    { "type": "while",
+      "conditionVarType": "selector",
+      "selector": ".pagination .next:not(.disabled)",
+      "conditionOp": "exists"
+    },
+      { "type": "click", "selector": ".pagination .next" },
+      { "type": "wait", "value": "1500" },
+    { "type": "end" }
+    ```
+  </Tab>
+</Tabs>
 
-Use the target icon next to the selector input to pick the element with the [Highlight Tool](/highlight-tool) instead of typing the selector by hand.
-
-**Example: Skip a modal only when it's showing**
-
-```json
-{ "type": "navigate", "value": "https://example.com" },
-{ "type": "if",
-  "conditionVarType": "selector",
-  "selector": ".cookie-banner",
-  "conditionOp": "exists"
-},
-  { "type": "click", "selector": ".cookie-banner .accept" },
-{ "type": "end" }
-```
-
-**Example: Paginate while a "next" button remains**
-
-```json
-{ "type": "while",
-  "conditionVarType": "selector",
-  "selector": ".pagination .next:not(.disabled)",
-  "conditionOp": "exists"
-},
-  { "type": "click", "selector": ".pagination .next" },
-  { "type": "wait", "value": "1500" },
-{ "type": "end" }
-```
-
-### **Example: Login Check**
+### Example: Login Check
 
 Check whether the user is already logged in, and skip the login form if so:
 
@@ -119,7 +121,7 @@ Check whether the user is already logged in, and skip the login form if so:
 { "type": "end" }
 ```
 
-### **Nested Conditions**
+### Nested Conditions
 
 You can nest `if` blocks inside each other. Each nested block requires its own `end`:
 
@@ -135,107 +137,109 @@ You can nest `if` blocks inside each other. Each nested block requires its own `
 
 ---
 
-## **While Loop**
+## Loop Types
 
-Executes a block of actions repeatedly as long as the condition remains `true`.
+<AccordionGroup>
+  <Accordion title="While Loop" icon="rotate">
+    Executes a block of actions repeatedly as long as the condition remains `true`.
 
-```json
-{ "type": "while", "value": "exists('.next-page')" },
-  // actions to repeat
-{ "type": "end" }
-```
+    ```json
+    { "type": "while", "value": "exists('.next-page')" },
+      // actions to repeat
+    { "type": "end" }
+    ```
 
-**Common use cases:**
+    **Common use cases:**
 
-- **Pagination**: Click "next page" until there are no more pages.
-- **Polling**: Wait for a specific element or state to appear.
-- **Retry logic**: Re-attempt an action until it succeeds.
+    - **Pagination**: Click "next page" until there are no more pages.
+    - **Polling**: Wait for a specific element or state to appear.
+    - **Retry logic**: Re-attempt an action until it succeeds.
 
-**Example: Scraping paginated results**
+    **Example: Scraping paginated results**
 
-```json
-{ "type": "navigate", "value": "https://example.com/listings" },
-{ "type": "while", "value": "exists('.pagination .next:not(.disabled)')" },
-  { "type": "javascript", "value": "/* collect items on this page */" },
-  { "type": "click", "selector": ".pagination .next" },
-  { "type": "wait", "value": "1500" },
-{ "type": "end" }
-```
+    ```json
+    { "type": "navigate", "value": "https://example.com/listings" },
+    { "type": "while", "value": "exists('.pagination .next:not(.disabled)')" },
+      { "type": "javascript", "value": "/* collect items on this page */" },
+      { "type": "click", "selector": ".pagination .next" },
+      { "type": "wait", "value": "1500" },
+    { "type": "end" }
+    ```
 
-**Prevent infinite loops** by tracking a counter variable:
+    <Warning>
+      Prevent infinite loops by tracking a counter variable:
 
-```json
-{ "type": "set", "varName": "pageNum", "value": "1" },
-{ "type": "while", "value": "exists('.next') && {$pageNum} <= 10" },
-  { "type": "start", "value": "scrape-page-task-id" },
-  { "type": "click", "selector": ".next" },
-  { "type": "set", "varName": "pageNum", "value": "{$pageNum} + 1" },
-{ "type": "end" }
-```
+      ```json
+      { "type": "set", "varName": "pageNum", "value": "1" },
+      { "type": "while", "value": "exists('.next') && {$pageNum} <= 10" },
+        { "type": "start", "value": "scrape-page-task-id" },
+        { "type": "click", "selector": ".next" },
+        { "type": "set", "varName": "pageNum", "value": "{$pageNum} + 1" },
+      { "type": "end" }
+      ```
+    </Warning>
+  </Accordion>
+
+  <Accordion title="Foreach Loop" icon="list">
+    Iterates over all elements matching a CSS selector, executing the block once per element.
+
+    ```json
+    { "type": "foreach", "selector": ".product-card" },
+      // actions scoped to each element
+    { "type": "end" }
+    ```
+
+    **Loop variables available inside the block:**
+
+    | Variable | Description |
+    | :-- | :-- |
+    | `loop.index` | Zero-based index of the current iteration |
+    | `loop.text` | The full text content of the current element |
+    | `loop.html` | The full HTML of the current element |
+    | `loop.item` | Reference to the current element (for click/interact without a selector) |
+
+    **Example: Clicking each item in a list**
+
+    ```json
+    { "type": "foreach", "selector": ".todo-item input[type='checkbox']:not(:checked)" },
+      { "type": "click" },
+    { "type": "end" }
+    ```
+
+    **Example: Extracting data from a table**
+
+    ```json
+    { "type": "foreach", "selector": "table tbody tr" },
+      { "type": "javascript", "value": "return { row: loop.index, text: loop.text }" },
+    { "type": "end" }
+    ```
+  </Accordion>
+
+  <Accordion title="Repeat N Times" icon="repeat">
+    Executes a block a fixed number of times regardless of any condition.
+
+    ```json
+    { "type": "repeat", "value": "5" },
+      // actions to repeat
+    { "type": "end" }
+    ```
+
+    The `loop.index` variable is available inside `repeat` blocks (zero-based).
+
+    **Example: Submit a form 3 times**
+
+    ```json
+    { "type": "repeat", "value": "3" },
+      { "type": "click", "selector": "#submit-btn" },
+      { "type": "wait", "value": "2000" },
+    { "type": "end" }
+    ```
+  </Accordion>
+</AccordionGroup>
 
 ---
 
-## **Foreach Loop**
-
-Iterates over all elements matching a CSS selector, executing the block once per element.
-
-```json
-{ "type": "foreach", "selector": ".product-card" },
-  // actions scoped to each element
-{ "type": "end" }
-```
-
-**Loop variables available inside the block:**
-
-| Variable | Description |
-|:---|:---|
-| `loop.index` | Zero-based index of the current iteration |
-| `loop.text` | The full text content of the current element |
-| `loop.html` | The full HTML of the current element |
-| `loop.item` | Reference to the current element (for click/interact without a selector) |
-
-**Example: Clicking each item in a list**
-
-```json
-{ "type": "foreach", "selector": ".todo-item input[type='checkbox']:not(:checked)" },
-  { "type": "click" },
-{ "type": "end" }
-```
-
-**Example: Extracting data from a table**
-
-```json
-{ "type": "foreach", "selector": "table tbody tr" },
-  { "type": "javascript", "value": "return { row: loop.index, text: loop.text }" },
-{ "type": "end" }
-```
-
----
-
-## **Repeat N Times**
-
-Executes a block a fixed number of times regardless of any condition.
-
-```json
-{ "type": "repeat", "value": "5" },
-  // actions to repeat
-{ "type": "end" }
-```
-
-The `loop.index` variable is available inside `repeat` blocks (zero-based).
-
-**Example: Submit a form 3 times**
-
-```json
-{ "type": "repeat", "value": "3" },
-  { "type": "click", "selector": "#submit-btn" },
-  { "type": "wait", "value": "2000" },
-{ "type": "end" }
-```
-
----
-
-## **Error Handling (On Error)**
+## Error Handling (On Error)
 
 The **On Error** block acts like a `try/catch`. If any action in the main flow throws an error (timeout, element not found, network failure), execution jumps to the error handler block.
 
@@ -262,7 +266,7 @@ The **On Error** block acts like a `try/catch`. If any action in the main flow t
 ```json
 { "type": "on_error" },
 { "type": "end" },
-{ "type": "click", "selector": "#cookie-accept", "timeout": 3000 },
+{ "type": "click", "selector": "#cookie-accept", "timeout": 3000 }
 ```
 
 Placing an empty `on_error`/`end` block before an optional action effectively makes that action non-fatal.
@@ -271,7 +275,7 @@ See [Error Handling](/error-handling) for a deeper guide on retry patterns and r
 
 ---
 
-## **Stop Task**
+## Stop Task
 
 Immediately terminates the current task execution with a given status.
 
@@ -281,3 +285,21 @@ Immediately terminates the current task execution with a given status.
 ```
 
 Use `stop` inside conditionals to short-circuit execution when a goal is already met or when an unrecoverable state is detected.
+
+<CardGroup cols={2}>
+  <Card title="Error Handling" icon="book" href="/error-handling">
+    Learn retry patterns and resilient task design.
+  </Card>
+
+  <Card title="Variables" icon="code" href="/variables">
+    Use variables to build dynamic conditions and counters.
+  </Card>
+
+  <Card title="JavaScript Execution" icon="arrow-right" href="/javascript-execution">
+    Write custom logic for complex conditions.
+  </Card>
+
+  <Card title="Modular Workflows" icon="cube" href="/modular-workflows">
+    Break complex flows into reusable sub-tasks.
+  </Card>
+</CardGroup>

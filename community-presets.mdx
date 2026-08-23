@@ -1,10 +1,12 @@
 ---
 title: "Community Presets Hub"
+sidebarTitle: "Community Presets"
+description: "Browse, import, and publish reusable Figranium automation workflows through the Community Presets Hub. Share battle-tested tasks with the community."
 ---
 
 The **Community Presets Hub** is a marketplace where Figranium users can share and discover automation workflows.
 
-## **Overview**
+## Overview
 
 The Hub allows you to:
 
@@ -12,20 +14,50 @@ The Hub allows you to:
 - **Import Workflows**: Download and import presets directly into your Figranium instance.
 - **Publish Presets**: Share your own battle-tested workflows with other users.
 
-## **How to Use**
+## How to Use
 
-1. **Access the Hub**: Navigate to the **Presets** section in the Figranium dashboard.
-2. **Filter & Search**: Find presets based on tags, popularity, or specific use cases (e.g., "E-commerce", "Social Media").
-3. **One-Click Import**: Once you find a preset you like,  download it and click **Import** to add it to your tasks.
-4. **Customize**: After importing, you can modify the task to suit your specific needs (e.g., updating selectors or variables).
+<Steps>
+  <Step title="Access the Hub">
+    Navigate to the **Presets** section in the Figranium dashboard.
+  </Step>
+  <Step title="Filter and search">
+    Find presets based on tags, popularity, or specific use cases (e.g., "E-commerce", "Social Media").
+  </Step>
+  <Step title="Import a preset">
+    Once you find a preset you like, download it and click **Import** to add it to your tasks.
+  </Step>
+  <Step title="Customize">
+    After importing, you can modify the task to suit your specific needs (e.g., updating selectors or variables).
+  </Step>
+</Steps>
 
-## **Contributing to the Hub**
+## Contributing to the Hub
 
 If you've built a workflow that solves a common problem, consider sharing it!
 
-- **Export Task**: Use the **Export** feature in the Task Editor.
-- **Submit to Hub**: Upload the exported JSON file along with a description and expected output.
+<Steps>
+  <Step title="Export your task">
+    Use the **Export** feature in the Task Editor.
+  </Step>
+  <Step title="Submit to the Hub">
+    Upload the exported JSON file along with a description and expected output.
+  </Step>
+</Steps>
 
-## **Safety & Quality**
+<Warning>
+  Always review imported tasks and their JavaScript blocks before running them against sensitive sites.
+</Warning>
 
-Always review imported tasks and their JavaScript blocks before running them against sensitive sites.
+<Tip>
+  Start with a highly-rated preset that matches your use case, then customize selectors and variables for your target site rather than building from scratch.
+</Tip>
+
+<CardGroup cols={2}>
+  <Card title="Action Blocks" icon="book" href="/action-blocks">
+    Learn about the building blocks used in preset workflows.
+  </Card>
+
+  <Card title="Data Extraction" icon="code" href="/data-extraction">
+    Understand how presets extract and structure data from web pages.
+  </Card>
+</CardGroup>

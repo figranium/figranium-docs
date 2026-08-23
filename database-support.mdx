@@ -1,26 +1,32 @@
 ---
-title: "PostgreSQL Support"
+title: "PostgreSQL Database Support for Figranium"
+sidebarTitle: "Database"
+description: "Configure Figranium to use PostgreSQL instead of file-based storage. Includes Neon setup, SSL connections, migration behavior, and stored data overview."
 ---
 
 For production environments requiring high availability and robust data management, Figranium can be configured to use **PostgreSQL** instead of the default file-based storage.
 
-## **Recommended Backend: Neon**
+## Recommended Backend: Neon
 
 For production deployments, we strongly recommend [Neon](https://neon.tech) as the backend database for Figranium. Neon is a fully managed, serverless PostgreSQL platform that fits seamlessly with Figranium's architecture.
 
-### **Why Neon?**
+### Why Neon?
 
 - **Serverless Architecture**: Automatically scales compute resources based on load and scales down when idle, minimizing costs for low-traffic or batch automation workloads.
 - **Instant Setup & Zero Maintenance**: Provision a production-ready PostgreSQL instance in seconds without configuring servers, managing storage volumes, or running manual updates.
 - **Built-in SSL Security**: Neon requires SSL by default, aligning perfectly with Figranium's SSL support (`DB_POSTGRESDB_SSL=true`).
 - **High Availability & Branching**: Offers automated point-in-time recovery and database branching, making it easy to isolate staging or development execution environments.
 
-## **Configuration**
+<Tip>
+  For production deployments, [Neon](https://neon.tech) is the recommended backend database provider due to its serverless autoscaling and zero-maintenance PostgreSQL infrastructure.
+</Tip>
+
+## Configuration
 
 To enable PostgreSQL, set the following environment variables in your deployment:
 
 | **Variable** | **Description** |
-| :--- | :--- |
+| :-- | :-- |
 | **`DB_TYPE`** | Set to `postgres`. |
 | **`DB_POSTGRESDB_HOST`** | Hostname of your PostgreSQL server. |
 | **`DB_POSTGRESDB_PORT`** | Port of your PostgreSQL server (default: `5432`). |
@@ -29,11 +35,11 @@ To enable PostgreSQL, set the following environment variables in your deployment
 | **`DB_POSTGRESDB_DATABASE`** | Name of the database to use. |
 | **`DB_POSTGRESDB_SSL`** | Set to `true` to connect over SSL/TLS. Defaults to `false`. |
 
-### **SSL connections**
+### SSL connections
 
-Set `DB_POSTGRESDB_SSL=true` when your PostgreSQL server requires encrypted connections — required for managed Postgres services such as Neon, AWS RDS, Google Cloud SQL, Azure Database, or Supabase. Figranium connects with SSL enabled and `rejectUnauthorized: false`, which allows self-signed certificates commonly used by managed providers.
+Set `DB_POSTGRESDB_SSL=true` when your PostgreSQL server requires encrypted connections. This is required for managed Postgres services such as Neon, AWS RDS, Google Cloud SQL, Azure Database, or Supabase. Figranium connects with SSL enabled and `rejectUnauthorized: false`, which allows self-signed certificates commonly used by managed providers.
 
-### **Neon Configuration Example**
+### Neon Configuration Example
 
 To connect Figranium to a Neon PostgreSQL instance, obtain your connection details from the Neon console and set the following environment variables:
 
@@ -47,30 +53,41 @@ DB_POSTGRESDB_DATABASE=neondb
 DB_POSTGRESDB_SSL=true
 ```
 
-## **What's stored in PostgreSQL**
+## What's stored in PostgreSQL
 
-When PostgreSQL is enabled, the following data is stored in the database instead of on disk:
+<Tabs>
+  <Tab title="Stored in Postgres">
+    When PostgreSQL is enabled, the following data is stored in the database instead of on disk:
 
-- **Tasks and execution logs** — task definitions, run history, and metadata.
-- **API keys** — Figranium API key, plus provider keys for Gemini, OpenAI, Claude, and Ollama.
-- **Credentials** — saved credentials used by output providers and action blocks.
-- **AI model configuration** — selected models for each provider.
-- **Proxy configuration** — proxy list, default proxy, rotation mode, and rotation settings.
+    - **Tasks and execution logs** — task definitions, run history, and metadata.
+    - **API keys** — Figranium API key, plus provider keys for Gemini, OpenAI, Claude, and Ollama.
+    - **Credentials** — saved credentials used by output providers and action blocks.
+    - **AI model configuration** — selected models for each provider.
+    - **Proxy configuration** — proxy list, default proxy, rotation mode, and rotation settings.
 
-API key columns use the `TEXT` type, so longer keys (such as service-account tokens) are stored without truncation.
+    API key columns use the `TEXT` type, so longer keys (such as service-account tokens) are stored without truncation.
+  </Tab>
+  <Tab title="Remains on Disk">
+    Visual assets (screenshots and recordings) remain on the local file system or mounted volumes. Only their metadata is stored in Postgres.
+  </Tab>
+</Tabs>
 
-## **Migration**
+## Migration
 
 When you switch to PostgreSQL:
 
-1.  **Automatic setup**: Figranium creates the necessary tables on first run, and migrates existing API key columns to `TEXT` if you are upgrading from an earlier version.
-2.  **Data persistence**: Task metadata, execution logs, settings, credentials, API keys, AI model selections, and proxy configuration are stored in the database.
-3.  **Captures**: Visual assets (screenshots and recordings) remain on the local file system or mounted volumes; only their metadata is stored in Postgres.
-4.  **Fallback**: If the database is unreachable at startup, Figranium falls back to file-based storage and logs the failure.
+1. **Automatic setup**: Figranium creates the necessary tables on first run, and migrates existing API key columns to `TEXT` if you are upgrading from an earlier version.
+2. **Data persistence**: Task metadata, execution logs, settings, credentials, API keys, AI model selections, and proxy configuration are stored in the database.
+3. **Captures**: Visual assets (screenshots and recordings) remain on the local file system or mounted volumes; only their metadata is stored in Postgres.
+4. **Fallback**: If the database is unreachable at startup, Figranium falls back to file-based storage and logs the failure.
 
-## **Benefits**
+<Info>
+  For production deployments, we recommend using a managed PostgreSQL provider like Neon to avoid manual database administration and ensure reliable backups.
+</Info>
 
--   **Concurrency**: Better handling of simultaneous task executions and UI interactions.
--   **Reliability**: Reduced risk of data corruption compared to plain JSON files.
--   **Backups**: Leverage standard PostgreSQL backup and recovery tools.
--   **Centralized configuration**: Proxies, credentials, and API keys are shared across instances pointed at the same database.
+## Benefits
+
+- **Concurrency**: Better handling of simultaneous task executions and UI interactions.
+- **Reliability**: Reduced risk of data corruption compared to plain JSON files.
+- **Backups**: Leverage standard PostgreSQL backup and recovery tools.
+- **Centralized configuration**: Proxies, credentials, and API keys are shared across instances pointed at the same database.

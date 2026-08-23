@@ -16,88 +16,92 @@ import { Figranium } from "@figranium/sdk";
 const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
 ```
 
-## scrape
+## Methods
 
-```ts
-scrape<T = unknown>(
-  input: UnknownRecord & {
-    url?: string;
-    selector?: string;
-    extractionScript?: string;
-    variables?: RuntimeVariables;
-    taskVariables?: RuntimeVariables;
-  },
-  options?: RequestOptions
-): Promise<ExecutionResult<T>>
-```
+<AccordionGroup>
+  <Accordion title="scrape">
+    ```ts
+    scrape<T = unknown>(
+      input: UnknownRecord & {
+        url?: string;
+        selector?: string;
+        extractionScript?: string;
+        variables?: RuntimeVariables;
+        taskVariables?: RuntimeVariables;
+      },
+      options?: RequestOptions
+    ): Promise<ExecutionResult<T>>
+    ```
 
-Performs a one-off scrape by sending `POST /scrape`. Pass a `url`, a `selector` for DOM extraction, or an `extractionScript` for custom parsing. You can also inject runtime [variables](/sdk/js/variables) via `variables` or `taskVariables`.
+    Performs a one-off scrape by sending `POST /scrape`. Pass a `url`, a `selector` for DOM extraction, or an `extractionScript` for custom parsing. You can also inject runtime [variables](/sdk/js/variables) via `variables` or `taskVariables`.
 
-```ts scrape-by-selector.ts
-const result = await figranium.execution.scrape({
-  url: "https://news.ycombinator.com",
-  selector: ".titleline > a",
-  variables: { limit: 5 },
-});
+    ```ts scrape-by-selector.ts
+    const result = await figranium.execution.scrape({
+      url: "https://news.ycombinator.com",
+      selector: ".titleline > a",
+      variables: { limit: 5 },
+    });
+    
+    console.log(result.data);
+    ```
 
-console.log(result.data);
-```
+    ```ts scrape-by-script.ts
+    const result = await figranium.execution.scrape({
+      url: "https://example.com",
+      extractionScript: `
+        const items = Array.from(document.querySelectorAll('.item'));
+        return items.map(el => el.textContent?.trim());
+      `,
+    });
+    
+    console.log(result.data);
+    ```
+  </Accordion>
 
-```ts scrape-by-script.ts
-const result = await figranium.execution.scrape({
-  url: "https://example.com",
-  extractionScript: `
-    const items = Array.from(document.querySelectorAll('.item'));
-    return items.map(el => el.textContent?.trim());
-  `,
-});
+  <Accordion title="agent">
+    ```ts
+    agent<T = unknown>(
+      input: UnknownRecord & { runId?: string },
+      options?: RequestOptions
+    ): Promise<ExecutionResult<T>>
+    ```
 
-console.log(result.data);
-```
+    Runs a one-off agent session by sending `POST /agent`. The agent navigates and interacts autonomously based on the provided input. You can supply a `runId` to correlate or resume a specific run.
 
-## agent
+    ```ts agent-run.ts
+    const result = await figranium.execution.agent({
+      url: "https://example.com",
+      runId: "run-2024-001",
+    });
+    
+    console.log(result.success, result.data);
+    ```
+  </Accordion>
 
-```ts
-agent<T = unknown>(
-  input: UnknownRecord & { runId?: string },
-  options?: RequestOptions
-): Promise<ExecutionResult<T>>
-```
+  <Accordion title="headful">
+    ```ts
+    headful<T = unknown>(
+      input: UnknownRecord & {
+        url?: string;
+        variables?: RuntimeVariables;
+        taskVariables?: RuntimeVariables;
+      },
+      options?: RequestOptions
+    ): Promise<ExecutionResult<T>>
+    ```
 
-Runs a one-off agent session by sending `POST /agent`. The agent navigates and interacts autonomously based on the provided input. You can supply a `runId` to correlate or resume a specific run.
+    Launches a headful (visible) browser session by sending `POST /headful`. Pass a starting `url` and optional runtime [variables](/sdk/js/variables). This is useful when you need to interact with a live browser window or debug visually.
 
-```ts agent-run.ts
-const result = await figranium.execution.agent({
-  url: "https://example.com",
-  runId: "run-2024-001",
-});
-
-console.log(result.success, result.data);
-```
-
-## headful
-
-```ts
-headful<T = unknown>(
-  input: UnknownRecord & {
-    url?: string;
-    variables?: RuntimeVariables;
-    taskVariables?: RuntimeVariables;
-  },
-  options?: RequestOptions
-): Promise<ExecutionResult<T>>
-```
-
-Launches a headful (visible) browser session by sending `POST /headful`. Pass a starting `url` and optional runtime [variables](/sdk/js/variables). This is useful when you need to interact with a live browser window or debug visually.
-
-```ts headful-run.ts
-const result = await figranium.execution.headful({
-  url: "https://example.com/login",
-  variables: { username: "alice" },
-});
-
-console.log(result.runId, result.data);
-```
+    ```ts headful-run.ts
+    const result = await figranium.execution.headful({
+      url: "https://example.com/login",
+      variables: { username: "alice" },
+    });
+    
+    console.log(result.runId, result.data);
+    ```
+  </Accordion>
+</AccordionGroup>
 
 ## Top-level shortcuts
 

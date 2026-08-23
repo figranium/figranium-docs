@@ -42,32 +42,34 @@ try {
 
 ## Fields
 
-### `status`
+<AccordionGroup>
+  <Accordion title="status">
+    - The HTTP status returned by the Figranium server, if a response arrived.
+    - `0` when the request never reached a status (network failure, DNS error, cancelled request).
+  </Accordion>
 
-- The HTTP status returned by the Figranium server, if a response arrived.
-- `0` when the request never reached a status (network failure, DNS error, cancelled request).
+  <Accordion title="code">
+    Server-provided machine-readable error code, taken from the response body's `error` field. Also used for SDK-generated conditions:
 
-### `code`
+    | Code | Meaning |
+    | :-- | :-- |
+    | `REQUEST_ABORTED` | The request was aborted (client `AbortSignal` or timeout). |
+    | `NETWORK_ERROR` | The request could not reach the server. |
+    | `EMPTY_STREAM` | A streaming response had no body. |
+  </Accordion>
 
-Server-provided machine-readable error code, taken from the response body's `error` field. Also used for SDK-generated conditions:
+  <Accordion title="details">
+    Free-form value from the response body's `details` or `detail` field. Typically an object describing which validation failed, which record was missing, or which field was invalid.
+  </Accordion>
 
-| Code | Meaning |
-| :-- | :-- |
-| `REQUEST_ABORTED` | The request was aborted (client `AbortSignal` or timeout). |
-| `NETWORK_ERROR` | The request could not reach the server. |
-| `EMPTY_STREAM` | A streaming response had no body. |
+  <Accordion title="requestId">
+    Value of the `x-request-id` response header, when the server or a proxy sets one. Include this in bug reports to make server-side logs easier to correlate.
+  </Accordion>
 
-### `details`
-
-Free-form value from the response body's `details` or `detail` field. Typically an object describing which validation failed, which record was missing, or which field was invalid.
-
-### `requestId`
-
-Value of the `x-request-id` response header, when the server or a proxy sets one. Include this in bug reports to make server-side logs easier to correlate.
-
-### `response`
-
-The original `Response` object, when the error came from an HTTP response. Available for advanced consumers who need the raw headers or body.
+  <Accordion title="response">
+    The original `Response` object, when the error came from an HTTP response. Available for advanced consumers who need the raw headers or body.
+  </Accordion>
+</AccordionGroup>
 
 ## Branching on status
 
@@ -110,3 +112,7 @@ try {
 ## Cancellation
 
 Cancelled requests throw `FigraniumError { status: 0, code: "REQUEST_ABORTED" }`. The `.cause` reflects the underlying `AbortSignal.reason` when set. See [Request options](/sdk/js/request-options) for cancellation patterns.
+
+<Tip>
+  Always check `error instanceof FigraniumError` before reading SDK-specific fields. Unknown errors should be rethrown so they bubble up to your global error handler.
+</Tip>

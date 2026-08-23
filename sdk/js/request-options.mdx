@@ -81,4 +81,8 @@ Some methods extend `RequestOptions` with extra fields (for example `tasks.save`
 - The client-wide timeout, and any per-call `timeoutMs`, is implemented as an internal `AbortController` with a `DOMException` of type `TimeoutError`. It surfaces as the same `REQUEST_ABORTED` error.
 - Streams stop iterating when the signal aborts. Any pending reader is cancelled and the connection is closed.
 
+<Tip>
+  Use `signal` for user-initiated cancellation and `timeoutMs` for hard deadlines. Combining both gives you precise control over request lifetimes.
+</Tip>
+
 See [Errors](/sdk/js/errors) for the shape of the thrown error.

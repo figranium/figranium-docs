@@ -1,73 +1,84 @@
 ---
-title: "Local Development Guide"
+title: "Figranium Local Development Setup Guide"
+sidebarTitle: "Local Development"
+description: "Set up Figranium for local development without Docker. Clone the repo, install dependencies with pnpm, configure Playwright, and run the dev servers."
 ---
 
 This guide is for developers who want to run Figranium's source code directly on their machine for modification or testing, without using Docker.
 
-## **Prerequisites**
+## Prerequisites
 
 - **Node.js**: Version 18 (LTS) or higher.
 - **pnpm**: Recommended package manager.
 - **Playwright**: Dependencies must be installed on your OS.
 
-## **Setup Steps**
+## Setup Steps
 
-### **1. Clone the Repository**
+<Steps>
+  <Step title="Clone the Repository">
+    ```bash
+    git clone https://github.com/figranium/figranium.git
+    cd figranium
+    ```
+  </Step>
+  <Step title="Install Dependencies">
+    <CodeGroup>
 
-```bash
-git clone https://github.com/figranium/figranium.git
-cd figranium
-```
+    ```bash pnpm
+    pnpm install
+    ```
 
-### **2. Install Dependencies**
+    ```bash npm
+    npm install
+    ```
 
-```bash
-pnpm install
-```
+    ```bash yarn
+    yarn install
+    ```
 
-### **3. Install Playwright Browsers**
+    </CodeGroup>
+  </Step>
+  <Step title="Install Playwright Browsers">
+    ```bash
+    npx playwright install chromium
+    ```
+  </Step>
+  <Step title="Environment Setup">
+    Create a `.env` file in the root directory (refer to the [Configuration](/configuration) page for available variables). At minimum, set:
 
-```bash
-npx playwright install chromium
-```
+    ```bash
+    SESSION_SECRET=your_random_secret_here
+    ```
+  </Step>
+  <Step title="Start the Application">
+    You need to run both the backend server and the frontend development server simultaneously:
 
-### **4. Environment Setup**
+    **Backend:**
 
-Create a `.env` file in the root directory (refer to the **Configuration** page for available variables). At minimum, set:
+    ```bash
+    pnpm run server
+    ```
 
-```text
-SESSION_SECRET=your_random_secret_here
-```
+    **Frontend:**
 
-### **5. Start the Application**
+    ```bash
+    pnpm run dev
+    ```
 
-You need to run both the backend server and the frontend development server simultaneously:
+    The frontend will be available at `http://localhost:5173`, and it will proxy API requests to the backend at `http://localhost:11345`.
+  </Step>
+  <Step title="(Optional) Start the CAPTCHA Solver">
+    If you plan to use the `solve_captcha` action or the task-level auto-solve setting, start the bundled `ohmycaptcha` sidecar in a third terminal:
 
-**Backend:**
+    ```bash
+    pnpm run captcha:dev
+    ```
 
-```bash
-pnpm run server
-```
+    This resolves a Python 3.10\+ interpreter, installs `ohmycaptcha` into an isolated virtualenv, and starts the solver on `127.0.0.1:8000`. The Docker image starts this automatically via `entrypoint.sh`; the source-based workflow does not, so `solve_captcha` blocks fail with a connection error until you run this command. See [CAPTCHA Solving](/captcha-solving) for details.
+  </Step>
+</Steps>
 
-**Frontend:**
-
-```bash
-pnpm run dev
-```
-
-The frontend will be available at `http://localhost:5173`, and it will proxy API requests to the backend at `http://localhost:11345`.
-
-### **6. (Optional) Start the CAPTCHA Solver**
-
-If you plan to use the `solve_captcha` action or the task-level auto-solve setting, start the bundled `ohmycaptcha` sidecar in a third terminal:
-
-```bash
-pnpm run captcha:dev
-```
-
-This resolves a Python 3.10+ interpreter, installs `ohmycaptcha` into an isolated virtualenv, and starts the solver on `127.0.0.1:8000`. The Docker image starts this automatically via `entrypoint.sh`; the source-based workflow does not, so `solve_captcha` blocks fail with a connection error until you run this command. See [CAPTCHA Solving](/captcha-solving) for details.
-
-## **Building for Production**
+## Building for Production
 
 To create a production build:
 

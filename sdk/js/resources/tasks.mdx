@@ -1,5 +1,5 @@
 ---
-title: "TasksResource: manage and run Figranium tasks"
+title: "TasksResource: Manage and Run Figranium Tasks"
 sidebarTitle: "Tasks"
 description: "Reference for the TasksResource class in the Figranium JavaScript SDK. Create, update, version, and execute tasks with typed requests and responses."
 ---
@@ -16,196 +16,200 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
   The client-level convenience `figranium.runTask(id, input?)` proxies directly to `figranium.tasks.run(id, input?)`.
 </Note>
 
-## list
+## Methods
 
-Retrieve every task in the workspace.
+<AccordionGroup>
+  <Accordion title="list">
+    Retrieve every task in the workspace.
 
-- **HTTP endpoint:** `GET /api/tasks`
-- **Signature:** `list(options?: RequestOptions): Promise<Task[]>`
+    - **HTTP endpoint:** `GET /api/tasks`
+    - **Signature:** `list(options?: RequestOptions): Promise<Task[]>`
 
-```ts list-tasks.ts
-const tasks = await figranium.tasks.list();
-console.log(tasks.length);
-```
+    ```ts list-tasks.ts
+    const tasks = await figranium.tasks.list();
+    console.log(tasks.length);
+    ```
 
-Returns an array of [`Task`](/sdk/js/resources/tasks#task-type) objects.
+    Returns an array of [`Task`](/sdk/js/resources/tasks#task-type) objects.
+  </Accordion>
 
-## listSummaries
+  <Accordion title="listSummaries">
+    Fetch a lightweight summary of all tasks.
 
-Fetch a lightweight summary of all tasks.
+    - **HTTP endpoint:** `GET /api/tasks/list`
+    - **Signature:** `listSummaries(options?: RequestOptions): Promise<{ tasks: TaskSummary[] }>`
 
-- **HTTP endpoint:** `GET /api/tasks/list`
-- **Signature:** `listSummaries(options?: RequestOptions): Promise<{ tasks: TaskSummary[] }>`
+    ```ts list-summaries.ts
+    const { tasks } = await figranium.tasks.listSummaries();
+    for (const t of tasks) {
+      console.log(t.id, t.name);
+    }
+    ```
 
-```ts list-summaries.ts
-const { tasks } = await figranium.tasks.listSummaries();
-for (const t of tasks) {
-  console.log(t.id, t.name);
-}
-```
+    Each `TaskSummary` contains `id`, `name`, and an optional `description`.
+  </Accordion>
 
-Each `TaskSummary` contains `id`, `name`, and an optional `description`.
+  <Accordion title="save">
+    Create or update a task. Pass `createVersion: true` to snapshot the current version before saving.
 
-## save
+    - **HTTP endpoint:** `POST /api/tasks` (with `?version=true` when `createVersion` is set)
+    - **Signature:** `save(task: Task, options?: RequestOptions & { createVersion?: boolean }): Promise<Task>`
 
-Create or update a task. Pass `createVersion: true` to snapshot the current version before saving.
+    ```ts save-task.ts
+    import { actions, variable, type Task } from "@figranium/sdk";
+    
+    const task: Task = {
+      name: "Search and extract",
+      url: "https://example.com",
+      mode: "agent",
+      variables: {
+        query: { type: "string", value: "figranium" },
+      },
+      actions: [
+        actions.waitFor("#search"),
+        actions.type("#search", variable("query")),
+        actions.press("Enter", "#search"),
+        actions.getContent(".results", "resultText"),
+      ],
+    };
+    
+    const saved = await figranium.tasks.save(task, { createVersion: true });
+    console.log(saved.id);
+    ```
 
-- **HTTP endpoint:** `POST /api/tasks` (with `?version=true` when `createVersion` is set)
-- **Signature:** `save(task: Task, options?: RequestOptions & { createVersion?: boolean }): Promise<Task>`
+    Returns the saved [`Task`](/sdk/js/resources/tasks#task-type), including any server-generated `id`.
+  </Accordion>
 
-```ts save-task.ts
-import { actions, variable, type Task } from "@figranium/sdk";
+  <Accordion title="touch">
+    Refresh a task's `last_opened` timestamp without changing its definition.
 
-const task: Task = {
-  name: "Search and extract",
-  url: "https://example.com",
-  mode: "agent",
-  variables: {
-    query: { type: "string", value: "figranium" },
-  },
-  actions: [
-    actions.waitFor("#search"),
-    actions.type("#search", variable("query")),
-    actions.press("Enter", "#search"),
-    actions.getContent(".results", "resultText"),
-  ],
-};
+    - **HTTP endpoint:** `POST /api/tasks/:id/touch`
+    - **Signature:** `touch(id: string, options?: RequestOptions): Promise<Task>`
 
-const saved = await figranium.tasks.save(task, { createVersion: true });
-console.log(saved.id);
-```
+    ```ts touch-task.ts
+    const updated = await figranium.tasks.touch("task_123");
+    ```
+  </Accordion>
 
-Returns the saved [`Task`](/sdk/js/resources/tasks#task-type), including any server-generated `id`.
+  <Accordion title="update">
+    Apply a partial patch to an existing task.
 
-## touch
+    - **HTTP endpoint:** `PATCH /api/tasks/:id`
+    - **Signature:** `update(id: string, patch: Partial<Task>, options?: RequestOptions): Promise<{ id: string; updatedAt: number; status: string; task: Task }>`
 
-Refresh a task's `last_opened` timestamp without changing its definition.
+    ```ts update-task.ts
+    const result = await figranium.tasks.update("task_123", {
+      name: "Renamed task",
+      wait: 2000,
+    });
+    console.log(result.updatedAt);
+    ```
+  </Accordion>
 
-- **HTTP endpoint:** `POST /api/tasks/:id/touch`
-- **Signature:** `touch(id: string, options?: RequestOptions): Promise<Task>`
+  <Accordion title="delete">
+    Remove a task by ID.
 
-```ts touch-task.ts
-const updated = await figranium.tasks.touch("task_123");
-```
+    - **HTTP endpoint:** `DELETE /api/tasks/:id`
+    - **Signature:** `delete(id: string, options?: RequestOptions): Promise<{ id: string; deleted: boolean; message?: string }>`
 
-## update
+    ```ts delete-task.ts
+    const result = await figranium.tasks.delete("task_123");
+    console.log(result.deleted, result.message);
+    ```
+  </Accordion>
 
-Apply a partial patch to an existing task.
+  <Accordion title="versions">
+    List all saved versions for a task.
 
-- **HTTP endpoint:** `PATCH /api/tasks/:id`
-- **Signature:** `update(id: string, patch: Partial<Task>, options?: RequestOptions): Promise<{ id: string; updatedAt: number; status: string; task: Task }>`
+    - **HTTP endpoint:** `GET /api/tasks/:id/versions`
+    - **Signature:** `versions(id: string, options?: RequestOptions): Promise<{ versions: TaskVersion[] }>`
 
-```ts update-task.ts
-const result = await figranium.tasks.update("task_123", {
-  name: "Renamed task",
-  wait: 2000,
-});
-console.log(result.updatedAt);
-```
+    ```ts list-versions.ts
+    const { versions } = await figranium.tasks.versions("task_123");
+    for (const v of versions) {
+      console.log(v.id, v.timestamp, v.name);
+    }
+    ```
+  </Accordion>
 
-## delete
+  <Accordion title="version">
+    Retrieve a specific version snapshot.
 
-Remove a task by ID.
+    - **HTTP endpoint:** `GET /api/tasks/:id/versions/:versionId`
+    - **Signature:** `version(id: string, versionId: string, options?: RequestOptions): Promise<{ snapshot: Task; metadata: { id: string; timestamp: number } }>`
 
-- **HTTP endpoint:** `DELETE /api/tasks/:id`
-- **Signature:** `delete(id: string, options?: RequestOptions): Promise<{ id: string; deleted: boolean; message?: string }>`
+    ```ts get-version.ts
+    const { snapshot, metadata } = await figranium.tasks.version("task_123", "v_456");
+    console.log(metadata.timestamp, snapshot.name);
+    ```
+  </Accordion>
 
-```ts delete-task.ts
-const result = await figranium.tasks.delete("task_123");
-console.log(result.deleted, result.message);
-```
+  <Accordion title="clearVersions">
+    Delete all stored versions for a task.
 
-## versions
+    - **HTTP endpoint:** `POST /api/tasks/:id/versions/clear`
+    - **Signature:** `clearVersions(id: string, options?: RequestOptions): Promise<{ success: boolean }>`
 
-List all saved versions for a task.
+    ```ts clear-versions.ts
+    const result = await figranium.tasks.clearVersions("task_123");
+    ```
+  </Accordion>
 
-- **HTTP endpoint:** `GET /api/tasks/:id/versions`
-- **Signature:** `versions(id: string, options?: RequestOptions): Promise<{ versions: TaskVersion[] }>`
+  <Accordion title="rollback">
+    Restore a task to a previous version snapshot.
 
-```ts list-versions.ts
-const { versions } = await figranium.tasks.versions("task_123");
-for (const v of versions) {
-  console.log(v.id, v.timestamp, v.name);
-}
-```
+    - **HTTP endpoint:** `POST /api/tasks/:id/rollback`
+    - **Signature:** `rollback(id: string, versionId: string, options?: RequestOptions): Promise<Task>`
 
-## version
+    ```ts rollback-task.ts
+    const restored = await figranium.tasks.rollback("task_123", "v_456");
+    console.log(restored.id);
+    ```
+  </Accordion>
 
-Retrieve a specific version snapshot.
+  <Accordion title="generateSelector">
+    Use AI to generate a CSS selector for a specific action inside a task.
 
-- **HTTP endpoint:** `GET /api/tasks/:id/versions/:versionId`
-- **Signature:** `version(id: string, versionId: string, options?: RequestOptions): Promise<{ snapshot: Task; metadata: { id: string; timestamp: number } }>`
+    - **HTTP endpoint:** `POST /api/tasks/generate-selector`
+    - **Signature:** `generateSelector(input: { task: Task; actionIndex: number; prompt: string }, options?: RequestOptions): Promise<{ selector: string }>`
 
-```ts get-version.ts
-const { snapshot, metadata } = await figranium.tasks.version("task_123", "v_456");
-console.log(metadata.timestamp, snapshot.name);
-```
+    ```ts generate-selector.ts
+    const { selector } = await figranium.tasks.generateSelector({
+      task: savedTask,
+      actionIndex: 2,
+      prompt: "Target the primary search button",
+    });
+    console.log(selector);
+    ```
+  </Accordion>
 
-## clearVersions
+  <Accordion title="generateScript">
+    Generate a JavaScript extraction script from a natural language description.
 
-Delete all stored versions for a task.
+    - **HTTP endpoint:** `POST /api/tasks/generate-script`
+    - **Signature:** `generateScript(description: string, options?: RequestOptions): Promise<{ script: string }>`
 
-- **HTTP endpoint:** `POST /api/tasks/:id/versions/clear`
-- **Signature:** `clearVersions(id: string, options?: RequestOptions): Promise<{ success: boolean }>`
+    ```ts generate-script.ts
+    const { script } = await figranium.tasks.generateScript(
+      "Extract all product names and prices from the page"
+    );
+    console.log(script);
+    ```
+  </Accordion>
 
-```ts clear-versions.ts
-const result = await figranium.tasks.clearVersions("task_123");
-```
+  <Accordion title="run">
+    Execute a task and return its result. This is the public execution endpoint, reachable at `/tasks/:id/api`.
 
-## rollback
+    - **HTTP endpoint:** `POST /tasks/:id/api`
+    - **Signature:** `run<T = unknown>(id: string, input?: ExecuteTaskOptions, options?: RequestOptions): Promise<ExecutionResult<T>>`
 
-Restore a task to a previous version snapshot.
+    ```ts run-task.ts
+    const result = await figranium.tasks.run<{ items: string[] }>("task_123", {
+      variables: { query: "browser automation" },
+    });
+    console.log(result.data?.items);
+    ```
 
-- **HTTP endpoint:** `POST /api/tasks/:id/rollback`
-- **Signature:** `rollback(id: string, versionId: string, options?: RequestOptions): Promise<Task>`
-
-```ts rollback-task.ts
-const restored = await figranium.tasks.rollback("task_123", "v_456");
-console.log(restored.id);
-```
-
-## generateSelector
-
-Use AI to generate a CSS selector for a specific action inside a task.
-
-- **HTTP endpoint:** `POST /api/tasks/generate-selector`
-- **Signature:** `generateSelector(input: { task: Task; actionIndex: number; prompt: string }, options?: RequestOptions): Promise<{ selector: string }>`
-
-```ts generate-selector.ts
-const { selector } = await figranium.tasks.generateSelector({
-  task: savedTask,
-  actionIndex: 2,
-  prompt: "Target the primary search button",
-});
-console.log(selector);
-```
-
-## generateScript
-
-Generate a JavaScript extraction script from a natural language description.
-
-- **HTTP endpoint:** `POST /api/tasks/generate-script`
-- **Signature:** `generateScript(description: string, options?: RequestOptions): Promise<{ script: string }>`
-
-```ts generate-script.ts
-const { script } = await figranium.tasks.generateScript(
-  "Extract all product names and prices from the page"
-);
-console.log(script);
-```
-
-## run
-
-Execute a task and return its result. This is the public execution endpoint, reachable at `/tasks/:id/api`.
-
-- **HTTP endpoint:** `POST /tasks/:id/api`
-- **Signature:** `run<T = unknown>(id: string, input?: ExecuteTaskOptions, options?: RequestOptions): Promise<ExecutionResult<T>>`
-
-```ts run-task.ts
-const result = await figranium.tasks.run<{ items: string[] }>("task_123", {
-  variables: { query: "browser automation" },
-});
-console.log(result.data?.items);
-```
-
-The generic `T` parameter types `result.data`. The `input` object accepts `variables`, `taskVariables`, `webhookUrl`, and `runId`. For more about execution results and streaming, see [`ExecutionsResource`](/sdk/js/resources/executions). To learn about task variables and runtime substitution, see [`Variables`](/sdk/js/variables) and [`Actions`](/sdk/js/actions).
+    The generic `T` parameter types `result.data`. The `input` object accepts `variables`, `taskVariables`, `webhookUrl`, and `runId`. For more about execution results and streaming, see [`ExecutionsResource`](/sdk/js/resources/executions). To learn about task variables and runtime substitution, see [`Variables`](/sdk/js/variables) and [`Actions`](/sdk/js/actions).
+  </Accordion>
+</AccordionGroup>

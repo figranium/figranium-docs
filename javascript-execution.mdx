@@ -1,14 +1,16 @@
 ---
 title: "JavaScript Execution"
+sidebarTitle: "JavaScript"
+description: "Execute custom JavaScript in the browser context for complex logic, data transformation, unsupported interactions, and dynamic content handling."
 ---
 
 Figranium allows you to execute custom JavaScript in the browser context at any point in a task. This is the most powerful feature for handling complex logic, data transformation, unsupported interactions, and dynamic content.
 
-## **The Run JavaScript Block**
+## The Run JavaScript Block
 
 Add a **Run JavaScript** action block (internally `javascript`) to your task.
 
-### **Execution Context**
+### Execution Context
 
 The code runs directly in the browser page context (via Playwright's `page.evaluate()`).
 
@@ -17,12 +19,12 @@ The code runs directly in the browser page context (via Playwright's `page.evalu
 - **Variables**: Access runtime variables using `{$varName}` syntax — they are injected as string literals before evaluation.
 - **Async**: Your code is wrapped in an async function, so top-level `await` and top-level `return` both work directly. Figranium awaits the returned promise automatically.
 
-### **Return Values**
+### Return Values
 
 The return value of your script is captured and stored in `block.output`, which can be used by subsequent blocks.
 
 | Return type | How it's stored |
-|:---|:---|
+| :-- | :-- |
 | String | Stored as-is |
 | Number | Stored as-is |
 | Boolean | Stored as-is |
@@ -35,17 +37,15 @@ Access the result in later blocks with `{$block.output}` or in conditions with `
 
 ---
 
-## **Examples**
+## Examples
 
-### **Extract Text Content**
+<CodeGroup>
 
-```js
+```js Extract Text Content
 return document.querySelector(".price").innerText.trim();
 ```
 
-### **Extract Multiple Values**
-
-```js
+```js Extract Multiple Values
 const title = document.querySelector("h1")?.innerText.trim() ?? "";
 const price = document.querySelector(".price")?.innerText.trim() ?? "";
 const rating = document.querySelector(".stars")?.dataset.rating ?? "0";
@@ -53,16 +53,12 @@ const rating = document.querySelector(".stars")?.dataset.rating ?? "0";
 return { title, price, rating };
 ```
 
-### **Scroll to Bottom of Page**
-
-```js
+```js Scroll to Bottom
 window.scrollTo(0, document.body.scrollHeight);
 return true;
 ```
 
-### **Scroll to Load More Content (Infinite Scroll)**
-
-```js
+```js Infinite Scroll Detection
 const before = document.querySelectorAll(".item").length;
 window.scrollTo(0, document.body.scrollHeight);
 await new Promise(resolve => setTimeout(resolve, 2000));
@@ -70,39 +66,25 @@ const after = document.querySelectorAll(".item").length;
 return after > before; // returns true if new items loaded
 ```
 
-### **Click an Element That Doesn't Respond to Standard Click**
-
-Some sites use custom event handlers. Dispatch a native event:
-
-```js
+```js Native Event Click
 const btn = document.querySelector(".custom-button");
 btn.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 return true;
 ```
 
-### **Manipulate Local Storage**
-
-```js
+```js Read Local Storage
 const token = localStorage.getItem("auth_token");
 return token;
 ```
 
-### **Using Variables**
-
-Variables are injected as string literals before evaluation. Use them in expressions:
-
-```js
+```js Using Variables
 const query = "{$searchQuery}";
 const category = "{$category}";
 const url = `https://api.example.com/search?q=${encodeURIComponent(query)}&cat=${category}`;
 return url;
 ```
 
-### **Fetch Data from an API Inside the Page Context**
-
-Since the script runs in the browser, you can make `fetch` calls to APIs that the page has access to (bypassing CORS since you're inside the same origin):
-
-```js
+```js Fetch from Page Context
 const response = await fetch("/api/user/profile", {
   headers: { "Accept": "application/json" }
 });
@@ -110,9 +92,7 @@ const data = await response.json();
 return data.username;
 ```
 
-### **Extract a Table as JSON**
-
-```js
+```js Extract Table as JSON
 const rows = Array.from(document.querySelectorAll("table tbody tr"));
 return rows.map(row => {
   const cells = Array.from(row.querySelectorAll("td"));
@@ -124,11 +104,7 @@ return rows.map(row => {
 });
 ```
 
-### **Wait for an Element with a Custom Timeout**
-
-The `javascript` block runs inside an async function wrapper, so top-level `await` works directly. You can add custom polling logic:
-
-```js
+```js Custom Polling Wait
 const maxWait = 10000; // 10 seconds
 const interval = 200;
 let elapsed = 0;
@@ -141,9 +117,11 @@ while (elapsed < maxWait) {
 return false;
 ```
 
+</CodeGroup>
+
 ---
 
-## **Chaining JavaScript Blocks**
+## Chaining JavaScript Blocks
 
 Use `block.output` to pass data between JavaScript blocks:
 
@@ -167,12 +145,12 @@ Use `block.output` to pass data between JavaScript blocks:
 
 ---
 
-## **Extraction Scripts vs. JavaScript Action Blocks**
+## Extraction Scripts vs. JavaScript Action Blocks
 
 Figranium has two places where you can run JavaScript:
 
-| | JavaScript Action Block | Extraction Script |
-|:---|:---|:---|
+|  | JavaScript Action Block | Extraction Script |
+| :-- | :-- | :-- |
 | **When it runs** | At a specific step in the task flow | After all actions complete |
 | **Output** | `block.output` | Task's `result.data` |
 | **Use case** | Mid-flow logic, intermediate data | Final data extraction |
@@ -182,10 +160,12 @@ For final data collection, prefer the **Extraction Script** field in task settin
 
 ---
 
-## **Security Considerations**
+## Security Considerations
 
-- Scripts run with the same privileges as the target page.
-- Variables injected via `{$varName}` are literal string substitutions — avoid injecting user-controlled data into scripts directly to prevent unintended code execution.
+<Warning>
+  Scripts run with the same privileges as the target page. Variables injected via `{$varName}` are literal string substitutions — avoid injecting user-controlled data into scripts directly to prevent unintended code execution.
+</Warning>
+
 - The JavaScript action block runs in the **browser** context, not in Node.js. You cannot access the file system or Node.js APIs from within these blocks.
 - For complex data processing that needs Node.js features, use the **Extraction Script** which runs through Figranium's sandboxed JSDOM environment. The sandbox is hardened against prototype-chain escape techniques, so extraction scripts cannot break out to access the host Node.js runtime.
 - Data objects passed into the sandbox are **read-only**. You cannot set, define, or delete properties on them. If you need to transform data, copy values into new objects you create within your script. See [Sandbox isolation](/security#sandbox-isolation) for details.

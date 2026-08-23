@@ -1,30 +1,40 @@
 ---
-title: "Proxy Rotation"
+title: "Configure Proxy Rotation in Figranium"
+sidebarTitle: "Proxies"
+description: "Learn how to configure, import, and rotate HTTP and SOCKS5 proxies in Figranium. Includes SSRF warnings, rotation strategies, and API endpoints."
 ---
 
 Figranium includes a robust proxy management system to evade IP-based blocking. You can configure proxies globally or enable rotation on a per-task basis.
 
-## **Configuring Proxies**
+## Configuring Proxies
 
 Navigate to **Settings \> Proxies** to manage your proxy list.
 
-### **Adding a proxy**
+### Adding a proxy
 
-Click **Add Proxy** and enter the details:
+<Steps>
+  <Step title="Open proxy settings">
+    Go to **Settings \> Proxies** in the Figranium UI.
+  </Step>
+  <Step title="Click Add Proxy">
+    Click **Add Proxy** and enter the details:
 
-- **Server**: The proxy address (e.g., `http://192.168.1.5:8080`, `socks5://10.0.0.5:1080`).
-- **Username/Password**: Optional credentials for authentication.
-- **Label**: A friendly name (e.g., "US Residential").
+    - **Server**: The proxy address (e.g., `http://192.168.1.5:8080`, `socks5://10.0.0.5:1080`).
+    - **Username/Password**: Optional credentials for authentication.
+    - **Label**: A friendly name (e.g., "US Residential").
+  </Step>
+  <Step title="Save the proxy">
+    Submit the form. The **Add Proxy** button remains disabled until you provide a server address. When you click it, a loading spinner appears and the button disables to prevent duplicate submissions while the proxy is being saved.
+  </Step>
+</Steps>
 
 If you paste a full URL with embedded credentials (for example `http://user:pass@1.2.3.4:8080`) into the **Server** field, Figranium extracts the `user` and `pass` parts into the **Username** and **Password** fields automatically and stores only `http://1.2.3.4:8080` as the server. The same split happens on bulk import. This prevents duplicate-looking entries in the list and keeps upstream authentication working when the proxy is used in a rotation pool.
 
-The **Add Proxy** button remains disabled until you provide a server address. When you click it, a loading spinner appears and the button disables to prevent duplicate submissions while the proxy is being saved.
+<Warning>
+  Proxy server addresses are validated against the SSRF blocklist. Addresses that resolve to private or internal networks (such as `localhost`, `127.0.0.1`, or `169.254.169.254`) are rejected unless you set `ALLOW_PRIVATE_NETWORKS=true`. See [Security best practices](/security) for the full list of blocked ranges.
+</Warning>
 
-<Note>
-Proxy server addresses are validated against the SSRF blocklist. Addresses that resolve to private or internal networks (such as `localhost`, `127.0.0.1`, or `169.254.169.254`) are rejected unless you set `ALLOW_PRIVATE_NETWORKS=true`. See [Security best practices](/security) for the full list of blocked ranges.
-</Note>
-
-### **Importing Proxies**
+### Importing Proxies
 
 You can bulk import proxies from a text file. Click the **Import** button and select a file containing one proxy per line. Supported formats:
 
@@ -34,11 +44,11 @@ You can bulk import proxies from a text file. Click the **Import** button and se
 
 Lines can also be separated by commas or semicolons. Duplicate server addresses are merged automatically — if an imported proxy matches an existing one, the existing entry is updated.
 
-<Note>
-Each proxy in the import is validated individually against the SSRF blocklist. If any entry points to a restricted address, the entire import is rejected. See [Security best practices](/security) for blocked ranges.
-</Note>
+<Warning>
+  Each proxy in the import is validated individually against the SSRF blocklist. If any entry points to a restricted address, the entire import is rejected. See [Security best practices](/security) for blocked ranges.
+</Warning>
 
-### **Rotating pool proxies**
+### Rotating pool proxies
 
 Some proxy providers give you a single gateway address that rotates through a pool of IPs on each request. You can mark a proxy as a **rotating pool** to track this in Figranium.
 
@@ -46,29 +56,29 @@ When adding or editing a proxy, enable the **Rotating pool** checkbox. You can o
 
 Rotating pool proxies work the same as regular proxies for rotation and execution. The flag helps you distinguish single-IP proxies from pool gateways when managing a mixed proxy list.
 
-## **Rotation Strategies**
+## Rotation Strategies
 
 Figranium supports two rotation modes:
 
 1. **Round-Robin**: Cycles through the list sequentially (Proxy 1 -\> Proxy 2 -\> ...). This ensures even usage.
 2. **Random**: Picks a random proxy from the list for each execution.
 
-### **Default Proxy**
+### Default Proxy
 
 You can designate a specific proxy as the "Default". This proxy will be used for all tasks unless rotation is explicitly enabled.
 
-### **Include Host IP**
+### Include Host IP
 
 You can choose whether your server's own IP address should be included in the rotation pool. This is useful for testing or when running on a residential connection.
 
-## **Enabling Rotation in Tasks**
+## Enabling Rotation in Tasks
 
 In the **Task Editor**, enable the **Rotate Proxies** checkbox.
 
 - When enabled: The task will use a proxy from the rotation pool according to the strategy.
 - When disabled: The task will use the **Default Proxy** (if set) or the **Host IP**.
 
-## **API Management**
+## API Management
 
 You can also manage proxies via the API:
 
@@ -78,4 +88,6 @@ You can also manage proxies via the API:
 - `PUT /api/settings/proxies/:id`: Update an existing proxy.
 - `POST /api/settings/proxies/rotation`: Update rotation settings.
 
-All proxy write endpoints validate the server address against the SSRF blocklist. If the address is restricted, the API returns a `400` status with an `INVALID_URL` error code.
+<Info>
+  All proxy write endpoints validate the server address against the SSRF blocklist. If the address is restricted, the API returns a `400` status with an `INVALID_URL` error code.
+</Info>

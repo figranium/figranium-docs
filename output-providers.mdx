@@ -1,73 +1,87 @@
 ---
-title: "Output Providers"
+title: "Push Task Output to External Providers Automatically"
+sidebarTitle: "Output Providers"
+description: "Configure Figranium output providers to push extracted data to Baserow and other destinations automatically after each task run."
 ---
 
 **Output Providers** allow Figranium to automatically push extracted data to external databases and services immediately after a task completes — no manual download or API polling required.
 
-## **Overview**
+## Overview
 
 After a task finishes extracting data, Figranium can automatically forward the result to a configured output destination. This creates a fully automated pipeline:
 
-```
+```text
 Task runs → Extracts data → Pushes to Baserow table
 ```
 
 This is useful for:
+
 - Continuously populating a database with scraped data on a schedule.
 - Building live dashboards that refresh from automated tasks.
 - Feeding extracted data directly into other tools without custom ETL scripts.
 
-## **Supported Providers**
+## Supported Providers
 
-| Provider | Description |
-|:---|:---|
-| **Baserow** | Open-source no-code database. Appends rows to a table via the Baserow REST API. |
+<CardGroup cols={2}>
+  <Card title="Baserow" icon="database" href="#baserow-integration">
+    Open-source no-code database. Appends rows to a table via the Baserow REST API.
+  </Card>
+</CardGroup>
 
 Additional providers may be added in future releases.
 
 ---
 
-## **Baserow Integration**
+## Baserow Integration
 
 [Baserow](https://baserow.io) is a self-hosted, open-source alternative to Airtable. Figranium integrates with it to push extracted JSON data directly into a Baserow table.
 
-### **Prerequisites**
+### Prerequisites
 
 1. A running Baserow instance (self-hosted or Baserow.io cloud).
 2. A Baserow API token with write access to the target table.
 3. The **Table ID** of the destination table in Baserow.
 
-### **Step 1: Configure credentials**
+### Step 1: Configure credentials
 
 You can add credentials in two places:
 
-**From Settings:**
-1. Go to **Settings > API Keys**.
-2. Under **Database / Output**, click **Add API Key** and select **Baserow**.
-3. Enter a **Name**, **Base URL** (e.g., `https://api.baserow.io`), and your **API Token**.
-4. Save the credential.
-
-**From the task editor:**
-1. Open a task and go to **Settings > Output**.
-2. Click **+ New** next to the Credential dropdown.
-3. Fill in the same fields and save.
+<Tabs>
+  <Tab title="From Settings">
+    1. Go to **Settings \> API Keys**.
+    2. Under **Database / Output**, click **Add API Key** and select **Baserow**.
+    3. Enter a **Name**, **Base URL** (e.g., `https://api.baserow.io`), and your **API Token**.
+    4. Save the credential.
+  </Tab>
+  <Tab title="From the task editor">
+    1. Open a task and go to **Settings \> Output**.
+    2. Click **\+ New** next to the Credential dropdown.
+    3. Fill in the same fields and save.
+  </Tab>
+</Tabs>
 
 <Note>
-Figranium validates the base URL to prevent requests to private or internal network addresses. If `ALLOW_PRIVATE_NETWORKS` is set to `false`, URLs pointing to private IP ranges (such as `10.x.x.x`, `172.16.x.x`, or `192.168.x.x`) are rejected. Redirect chains are also validated — if a Baserow instance returns a redirect, each hop is checked against the same blocklist. Additionally, sensitive headers like `Authorization` are automatically stripped if a redirect crosses to a different origin. See [Security best practices](/security) for details.
+  Figranium validates the base URL to prevent requests to private or internal network addresses. If `ALLOW_PRIVATE_NETWORKS` is set to `false`, URLs pointing to private IP ranges (such as `10.x.x.x`, `172.16.x.x`, or `192.168.x.x`) are rejected. Redirect chains are also validated — if a Baserow instance returns a redirect, each hop is checked against the same blocklist. Additionally, sensitive headers like `Authorization` are automatically stripped if a redirect crosses to a different origin. See [Security best practices](/security) for details.
 </Note>
 
-### **Step 2: Configure the Task Output**
+### Step 2: Configure the Task Output
 
-1. Open the task in the **Task Editor**.
-2. Go to **Settings > Output**.
-3. Select:
-   - **Provider**: `Baserow`
-   - **Credential**: The credential you just created.
-   - **Table ID**: The numeric ID of the Baserow table to push data into.
-   - **On Error**: `ignore` (default) or `fail` (marks the execution as failed if the push fails).
-4. Save the task.
+<Steps>
+  <Step title="Open task output settings">
+    Open the task in the **Task Editor** and go to **Settings \> Output**.
+  </Step>
+  <Step title="Select provider and credential">
+    Select **Provider**: `Baserow` and choose the credential you just created.
+  </Step>
+  <Step title="Set table and error behavior">
+    Enter the **Table ID** and choose **On Error**: `ignore` (default) or `fail` (marks the execution as failed if the push fails).
+  </Step>
+  <Step title="Save the task">
+    Save the task to activate the output provider.
+  </Step>
+</Steps>
 
-### **Step 3: Match Your Extraction Data to Table Columns**
+### Step 3: Match Your Extraction Data to Table Columns
 
 Figranium pushes data using Baserow's `user_field_names=true` API parameter, which means you reference columns by their **display name** (not internal ID).
 
@@ -98,34 +112,36 @@ return rows;
 
 The keys in your returned object must match the column names in your Baserow table exactly (case-sensitive).
 
-### **How Data is Sent**
+### How Data is Sent
 
 | Extracted data shape | Baserow API call |
-|:---|:---|
+| :-- | :-- |
 | JSON object `{}` | Single row via `POST /api/database/rows/table/{tableId}/` |
 | JSON array `[{}, {}]` | Batch insert via `POST /api/database/rows/table/{tableId}/batch/` |
 
 The integration uses Baserow's standard row creation API with `Authorization: Token <your-token>`.
 
-### **Error Handling**
+### Error Handling
 
 By default, push failures are **ignored** — the execution is marked as successful even if the Baserow push fails. This prevents network blips from causing false task failures.
 
 To make the task fail when the push fails, set **On Error** to `fail` in the output settings.
 
 Check the execution logs for output push status:
-```
+
+```text
 [OUTPUT] Pushed data to baserow for execution exec_abc123
 [OUTPUT] Push to baserow FAILED for execution exec_abc123: Baserow batch insert failed (403)
 ```
 
 ---
 
-## **API Configuration**
+## API Configuration
 
 You can also configure output providers via the REST API:
 
 **Save a credential:**
+
 ```json
 POST /api/credentials
 {
@@ -141,6 +157,7 @@ POST /api/credentials
 **Set output on a task:**
 
 Include the `output` field in your task definition:
+
 ```json
 {
   "name": "Product Scraper",

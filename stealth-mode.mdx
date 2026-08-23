@@ -1,15 +1,17 @@
 ---
 title: "Stealth & Anti-Detection"
+sidebarTitle: "Stealth Mode"
+description: "Bypass bot detection with Figranium's stealth flags, browser fingerprinting, CloakBrowser engine, and cookie-consent auto-dismissal."
 ---
 
 Figranium is designed to bypass modern bot detection systems by mimicking human behavior and masking automation fingerprints.
 
-## **Stealth Flags**
+## Stealth Flags
 
 When creating an **Agent** task, you can configure the following stealth settings in the **Advanced** panel:
 
 | **Flag** | **Description** |
-| :--- | :--- |
+| :-- | :-- |
 | **Natural Typing** | Simulates human-like keystroke delays and variances. |
 | **Cursor Glide** | Moves the mouse smoothly to targets instead of teleporting instantly. |
 | **Allow Typos** | Occasionally makes (and corrects) typing errors to appear more human. |
@@ -19,24 +21,43 @@ When creating an **Agent** task, you can configure the following stealth setting
 | **Random Clicks** | Introduces slight randomization in click coordinates around the target element. |
 | **Overscroll** | Slightly over-scrolls past target elements before correcting. |
 
-## **Browser Fingerprinting**
+## Browser Fingerprinting
 
 Beyond behavioral simulation, Figranium implements several technical anti-detection measures:
 
--   **User Agent Rotation**: Automatically switch between common browser user-agent strings (currently based on Chrome v143).
--   **Viewport Randomization**: Vary the browser window size slightly for each execution.
--   **Stealth Plugin**: Integrates `puppeteer-extra-plugin-stealth` to hide Playwright/Chromium-specific properties (e.g., `navigator.webdriver`).
--   **Proxy Support**: Easily route traffic through residential or mobile proxies to mask your IP address.
--   **DNS-over-HTTPS**: When no proxy is configured, DNS queries are routed through Cloudflare's encrypted DoH resolver, preventing DNS-based tracking and leaks.
--   **WebRTC Leak Prevention**: WebRTC is configured to disallow non-proxied UDP connections, preventing IP address leaks through WebRTC channels.
+<CardGroup cols={2}>
+  <Card title="User Agent Rotation" icon="shuffle">
+    Automatically switch between common browser user-agent strings (currently based on Chrome v143).
+  </Card>
 
-## **Browser Engine**
+  <Card title="Viewport Randomization" icon="pen-ruler">
+    Vary the browser window size slightly for each execution.
+  </Card>
+
+  <Card title="Stealth Plugin" icon="shield">
+    Integrates `puppeteer-extra-plugin-stealth` to hide Playwright/Chromium-specific properties (e.g., `navigator.webdriver`).
+  </Card>
+
+  <Card title="Proxy Support" icon="globe">
+    Easily route traffic through residential or mobile proxies to mask your IP address.
+  </Card>
+
+  <Card title="DNS-over-HTTPS" icon="lock">
+    When no proxy is configured, DNS queries are routed through Cloudflare's encrypted DoH resolver, preventing DNS-based tracking and leaks.
+  </Card>
+
+  <Card title="WebRTC Leak Prevention" icon="user-secret">
+    WebRTC is configured to disallow non-proxied UDP connections, preventing IP address leaks through WebRTC channels.
+  </Card>
+</CardGroup>
+
+## Browser Engine
 
 Figranium ships two interchangeable browser engines behind the same Playwright API. Every runner — Agent, Headful, and any task launched from the CLI — uses whichever engine is active, so you don't have to change task definitions when you switch.
 
 | **Engine** | **When it runs** | **What it is** |
-| :--- | :--- | :--- |
-| **Playwright + stealth** (default) | `USE_CLOAK_ENGINE` is unset or `false` | Stock Playwright Chromium patched at the JS level with `playwright-extra` and `puppeteer-extra-plugin-stealth`. |
+| :-- | :-- | :-- |
+| **Playwright \+ stealth** (default) | `USE_CLOAK_ENGINE` is unset or `false` | Stock Playwright Chromium patched at the JS level with `playwright-extra` and `puppeteer-extra-plugin-stealth`. |
 | **CloakBrowser** (opt-in) | `USE_CLOAK_ENGINE=true` | A stealth-patched Chromium binary from [CloakBrowser](https://github.com/CloakHQ/cloakbrowser), driven through the same Playwright API. Evasions are applied at the binary level rather than injected at runtime, which is harder for modern bot detectors to fingerprint. |
 
 ### When to switch to CloakBrowser
@@ -47,9 +68,17 @@ Use CloakBrowser when the default stack is being detected on a target site — t
 
 CloakBrowser is opt-in. Its binary is only downloaded when the flag is enabled, so the default install stays lean.
 
-1.  Set `USE_CLOAK_ENGINE=true` in your environment (e.g., `.env` or `docker-compose.yml`).
-2.  Optionally provide a `CLOAKBROWSER_LICENSE_KEY`. Without a key, CloakBrowser falls back to the free legacy binary. A key unlocks the latest stealth binary.
-3.  Restart the server. On next install, `scripts/postinstall.js` runs `npx cloakbrowser install` to fetch the binary.
+<Steps>
+  <Step title="Set the environment flag">
+    Set `USE_CLOAK_ENGINE=true` in your environment (e.g., `.env` or `docker-compose.yml`).
+  </Step>
+  <Step title="Add your license key (optional)">
+    Optionally provide a `CLOAKBROWSER_LICENSE_KEY`. Without a key, CloakBrowser falls back to the free legacy binary. A key unlocks the latest stealth binary.
+  </Step>
+  <Step title="Restart the server">
+    Restart the server. On next install, `scripts/postinstall.js` runs `npx cloakbrowser install` to fetch the binary.
+  </Step>
+</Steps>
 
 ```text .env
 USE_CLOAK_ENGINE=true
@@ -59,10 +88,10 @@ CLOAKBROWSER_LICENSE_KEY=your_license_key_here
 You can also log in interactively instead of setting the env var — `npx cloakbrowser login` writes the key to `~/.cloakbrowser/license.key`, which cloakbrowser reads natively.
 
 <Tip>
-The same task JSON, proxies, cookies, viewport, and stealth flags all work identically across both engines. Switch the flag, restart, and rerun.
+  The same task JSON, proxies, cookies, viewport, and stealth flags all work identically across both engines. Switch the flag, restart, and rerun.
 </Tip>
 
-## **Cookie-Consent Auto-Dismissal**
+## Cookie-Consent Auto-Dismissal
 
 Every Agent-mode page automatically clicks through common cookie-consent banners so your task can interact with the real page immediately, without you having to author a Click block for every consent dialog you might hit.
 
@@ -75,9 +104,13 @@ Figranium injects the community-maintained [`idcac-playwright`](https://www.npmj
 
 There is no configuration flag for this feature — it is always on in Agent mode. If a site's consent dialog is not being dismissed, capture the banner's HTML from the headful browser and file an issue with the selector so it can be added upstream.
 
-## **Best Practices**
+<Warning>
+  Stealth features are intended for legitimate automation and testing. Always respect the target site's Terms of Service and robots.txt. Aggressive scraping may result in IP bans or legal action regardless of evasion techniques used.
+</Warning>
 
-1.  **Enable Human Typing**: Always use this for login forms and search bars.
-2.  **Vary Wait Times**: Use the `wait` action with small random variations instead of fixed durations.
-3.  **Use Residential Proxies**: Essential for scraping sites with aggressive IP-based blocking.
-4.  **Rotate User Agents**: Keep your automation from appearing as a single, static device.
+## Best Practices
+
+1. **Enable Human Typing**: Always use this for login forms and search bars.
+2. **Vary Wait Times**: Use the `wait` action with small random variations instead of fixed durations.
+3. **Use Residential Proxies**: Essential for scraping sites with aggressive IP-based blocking.
+4. **Rotate User Agents**: Keep your automation from appearing as a single, static device.

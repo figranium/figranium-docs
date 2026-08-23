@@ -1,38 +1,56 @@
 ---
-title: "Task Versioning & Rollback"
+title: "Task Versioning and Rollback in Figranium"
+sidebarTitle: "Versioning"
+description: "Learn how Figranium automatically versions task changes, lets you review history, and roll back to previous configurations without losing data."
 ---
 
 Figranium automatically tracks changes to your tasks, allowing you to review history and roll back to previous states if an update breaks your workflow.
 
-## **Creating Versions**
+## Creating Versions
 
 A new version is created every time you save a task with the **Create Version** option enabled in the UI.
 
--   **Automatic Snapshots**: The system captures the entire task configuration, including actions, variables, and settings.
--   **Retention**: By default, Figranium keeps the last **30 versions** per task to optimize storage.
+- **Automatic Snapshots**: The system captures the entire task configuration, including actions, variables, and settings.
+- **Retention**: By default, Figranium keeps the last **30 versions** per task to optimize storage.
 
-## **Reviewing History**
+## Reviewing History
 
 In the **Task Editor**, switch to the **History** tab to see a chronological list of all saved versions.
 
--   **Timestamp**: See exactly when each change was made.
--   **Metadata**: View the name and mode of the task at that point in time.
+- **Timestamp**: See exactly when each change was made.
+- **Metadata**: View the name and mode of the task at that point in time.
 
-## **Rolling Back**
+## Rolling Back
 
 If you need to restore an older version of a task:
 
-1.  Navigate to the **History** tab in the Editor.
-2.  Select the version you want to restore.
-3.  Click **Rollback**.
+<Steps>
+  <Step title="Open the History tab">
+    Navigate to the **History** tab in the Editor.
+  </Step>
+  <Step title="Select a version">
+    Select the version you want to restore.
+  </Step>
+  <Step title="Click Rollback">
+    Click **Rollback** to replace the current configuration with the snapshot from that version.
+  </Step>
+</Steps>
 
-The current task configuration will be replaced with the snapshot from that version. A new version of the *previous* state is also created before the rollback to ensure no data is lost.
+The current task configuration will be replaced with the snapshot from that version. A new version of the _previous_ state is also created before the rollback to ensure no data is lost.
 
-## **API Management**
+<Info>
+  Rolling back creates a snapshot of the current state first, so you can always undo a rollback if needed.
+</Info>
+
+<Tip>
+  Save a version before making major changes to a stable task. That way you can roll back quickly if something goes wrong.
+</Tip>
+
+## API Management
 
 Versions can be managed via the REST API:
 
--   **List Versions**: `GET /api/tasks/:id/versions`
--   **Get Version Snapshot**: `GET /api/tasks/:id/versions/:versionId`
--   **Rollback**: `POST /api/tasks/:id/rollback`
--   **Clear History**: `POST /api/tasks/:id/versions/clear`
+- **List Versions**: `GET /api/tasks/:id/versions`
+- **Get Version Snapshot**: `GET /api/tasks/:id/versions/:versionId`
+- **Rollback**: `POST /api/tasks/:id/rollback`
+- **Clear History**: `POST /api/tasks/:id/versions/clear`

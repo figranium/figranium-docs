@@ -1,24 +1,45 @@
 ---
-title: "Headful Debugging (VNC)"
+title: "Debug and Interact with Headful Browser Sessions"
+sidebarTitle: "Headful Browser"
+description: "Use Figranium's built-in VNC viewer to debug automation visually, interact with popups, pick selectors, and sync cookies to agent runs."
 ---
 
 Figranium includes powerful **Headful Debugging** capabilities that allow you to see and interact with the automation as it runs. This is powered by a VNC server running alongside the Playwright container.
 
-## **Why Headful?**
+## Why Headful?
 
-- **Debugging**: Step through tasks visually to identify why a selector fails.
-- **Manual Intervention**: Solve CAPTCHAs or complete complex 2FA flows that automation cannot handle.
-- **Exploration**: Browse sites naturally to discover selectors and API endpoints.
-- **Recording**: Create high-fidelity video demonstrations of your automation.
+<CardGroup cols={2}>
+  <Card title="Debugging" icon="bug">
+    Step through tasks visually to identify why a selector fails.
+  </Card>
 
-## **Starting a Headful Session**
+  <Card title="Manual Intervention" icon="shield">
+    Solve CAPTCHAs or complete complex 2FA flows that automation cannot handle.
+  </Card>
 
-1. **Editor**: Open a task in the editor.
-2. **Run**: Click **Open Browser** in the editor panel to log in or debug visually.
+  <Card title="Exploration" icon="globe">
+    Browse sites naturally to discover selectors and API endpoints.
+  </Card>
+
+  <Card title="Recording" icon="video">
+    Create high-fidelity video demonstrations of your automation.
+  </Card>
+</CardGroup>
+
+## Starting a Headful Session
+
+<Steps>
+  <Step title="Open a task in the editor">
+    Navigate to the **Task Editor** and open the task you want to debug.
+  </Step>
+  <Step title="Launch the browser">
+    Click **Open Browser** in the editor panel to log in or debug visually.
+  </Step>
+</Steps>
 
 The browser window will open inside the VNC viewer embedded in the UI.
 
-## **Controls**
+## Controls
 
 The VNC interface provides a standard desktop environment:
 
@@ -26,7 +47,7 @@ The VNC interface provides a standard desktop environment:
 - **Clipboard**: Copy/paste text between your host and the remote browser.
 - **Resolution**: The viewport resizes dynamically (default 1920x1080).
 
-## **Popups and multi-page navigation**
+## Popups and multi-page navigation
 
 Headful sessions automatically track the active browser page across popups and new tabs. When a site opens a popup — for example, an OAuth login window or a payment gateway — Figranium switches to the new page so you can interact with it in the VNC viewer. When that page closes, the session returns to the previous page.
 
@@ -38,7 +59,7 @@ This means workflows that span multiple pages work without any extra configurati
 
 If all pages in a session are closed, the headful session remains active and waits for a new page to open.
 
-## **Persistence**
+## Persistence
 
 Headful sessions use a dedicated persistent browser profile directory (`data/browser-profile-headful`). Cookies are automatically synced to agent and scrape runs via `data/headful-storage-state.json`:
 
@@ -48,14 +69,22 @@ Headful sessions use a dedicated persistent browser profile directory (`data/bro
 
 This means the typical workflow still works:
 
-1. **Login once**: Log in manually in the headful browser.
-2. **Automate**: Run an Agent or Scrape task — it will automatically have those cookies available.
+<Steps>
+  <Step title="Login once">
+    Log in manually in the headful browser.
+  </Step>
+  <Step title="Automate">
+    Run an Agent or Scrape task — it will automatically have those cookies available.
+  </Step>
+</Steps>
 
-**Note**: Only non-expired cookies are synced. If `headful-storage-state.json` does not exist yet (no headful session has run), agent and scrape runs simply start with their own profile cookies.
+<Info>
+  Only non-expired cookies are synced. If `headful-storage-state.json` does not exist yet (no headful session has run), agent and scrape runs simply start with their own profile cookies.
+</Info>
 
 **Stateless Option**: Enable `statelessExecution` to launch a clean, incognito-like session that won't save cookies and won't receive headful cookies.
 
-## **Element picking**
+## Element picking
 
 The headful browser doubles as a selector discovery tool. When you click the **Highlight Tool** icon in an action block's selector field, Figranium opens a headful session with **inspect mode already active** — no extra step required.
 
@@ -67,7 +96,7 @@ Figranium generates up to five selector alternatives, ranked from most readable 
 
 See [CSS Selectors — Built-in Highlight Tool](/selectors#built-in-highlight-tool) for details on the ranking algorithm.
 
-## **Variable support**
+## Variable support
 
 Headful sessions resolve [task variables](/variables) in the starting URL. For example, if your task defines a variable `site`, you can set the headful URL to:
 
@@ -77,7 +106,7 @@ https://{$site}.example.com/dashboard
 
 Figranium replaces the variable with its current value before navigating.
 
-## **API integration**
+## API integration
 
 You can start a headful session programmatically:
 
@@ -89,11 +118,11 @@ curl -X POST http://localhost:11345/headful \
 
 The response includes the VNC connection URL.
 
-## **Stopping**
+## Stopping
 
 Click **Close Browser** in the Editor to terminate the session and close the browser. This ensures resources are freed.
 
-## **Crash resilience and auto-reconnect**
+## Crash resilience and auto-reconnect
 
 The three processes that back the headful viewer — Xvfb, x11vnc, and websockify — each run inside a restart loop. If any one of them exits, the container restarts it within a second and appends the event to its per-process log:
 
@@ -103,12 +132,12 @@ The three processes that back the headful viewer — Xvfb, x11vnc, and websockif
 
 The noVNC page mirrors this on the client side: on an RFB disconnect it retries with backoff (up to 8 attempts, capped at 5 seconds between attempts). The status label distinguishes a routine reconnect from a genuine crash:
 
-- **Reconnecting…** — the previous session was open for at least 4 seconds before dropping, so the disconnect is treated as a network blip.
-- **Browser session crashed, retrying…** — the session dropped within 4 seconds of connecting, which usually means Xvfb or x11vnc crashed and the viewer is waiting for the restart loop to bring it back.
+- **Reconnecting...** — the previous session was open for at least 4 seconds before dropping, so the disconnect is treated as a network blip.
+- **Browser session crashed, retrying...** — the session dropped within 4 seconds of connecting, which usually means Xvfb or x11vnc crashed and the viewer is waiting for the restart loop to bring it back.
 
-On Apple Silicon Macs, make sure Docker Desktop is pulling the native `linux/arm64` image. Running the AMD64 image under QEMU emulation is the most common cause of the fast-crash pattern above. See [Troubleshooting — Headful viewer shows "Connecting…" then "Disconnected" on Apple Silicon Macs](/troubleshooting#12-headful-viewer-shows-connecting-then-disconnected-on-apple-silicon-macs).
+On Apple Silicon Macs, make sure Docker Desktop is pulling the native `linux/arm64` image. Running the AMD64 image under QEMU emulation is the most common cause of the fast-crash pattern above. See [Troubleshooting — Headful viewer shows "Connecting..." then "Disconnected" on Apple Silicon Macs](/troubleshooting#12-headful-viewer-shows-connecting-then-disconnected-on-apple-silicon-macs).
 
-## **Access control**
+## Access control
 
 Figranium's VNC stack is hardened against unauthenticated access. If you connect to it through the embedded viewer in the UI, everything works automatically — this section is only relevant if you build a custom client or open a raw VNC connection.
 
@@ -119,7 +148,7 @@ Figranium's VNC stack is hardened against unauthenticated access. If you connect
 Exposing `54311` to the network is not the same as leaving VNC unauthenticated. Every WebSocket upgrade to `54311` is checked against the same rules as `/websockify` on the main Figranium port: `ALLOWED_IPS`, Origin/Host match, and a valid session cookie or API key. Direct RFB connections to port `5900` are still impossible from outside the container.
 
 <Note>
-For production, keep publishing the main Figranium port (default `11345`) and route the viewer through `wss://<host>:11345/websockify`. Only publish `54311` if you need direct access from a custom noVNC client, and put it behind the same auth as any other Figranium endpoint.
+  For production, keep publishing the main Figranium port (default `11345`) and route the viewer through `wss://<host>:11345/websockify`. Only publish `54311` if you need direct access from a custom noVNC client, and put it behind the same auth as any other Figranium endpoint.
 </Note>
 
 ### VNC password
@@ -142,14 +171,14 @@ curl -H "x-api-key: $FIGRANIUM_API_KEY" \
 The endpoint requires an authenticated session or a valid API key. See [`GET /api/headful/vnc-password`](/rest-api#get-api-headful-vnc-password).
 
 <Warning>
-Treat `data/vnc_password.txt` like any other secret. It is stored inside the persistent data volume and remains valid across restarts. Delete the file to force regeneration on the next start.
+  Treat `data/vnc_password.txt` like any other secret. It is stored inside the persistent data volume and remains valid across restarts. Delete the file to force regeneration on the next start.
 </Warning>
 
 ### Authenticated WebSocket upgrades
 
 Every WebSocket upgrade to `/websockify` (used by noVNC) is validated before the connection is proxied to the VNC server. Requests must satisfy **all** of the following:
 
-- Originate from an IP address permitted by [`ALLOWED_IPS`](/security#2-ip-allowlist-allowed-ips).
+- Originate from an IP address permitted by [`ALLOWED_IPS`](/security#2-ip-allowlist-allowed_ips).
 - Present an `Origin` header that matches the request `Host` (CSWSH protection). If both `Origin` and `Host` resolve to loopback or private addresses (`localhost`, `127.0.0.1`, `::1`, `host.docker.internal`, any `*.local` hostname, or an [RFC 1918](https://datatracker.ietf.org/doc/html/rfc1918) private range), the ports and aliases do not need to match. This lets Vite dev servers, Docker port mappings, and IPv6 loopback aliases connect without tripping the CSWSH check while still rejecting cross-origin upgrades from public hosts.
 - Carry either a valid session cookie or an API key (`x-api-key` header or `?apiKey=` query parameter).
 
