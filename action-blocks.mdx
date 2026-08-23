@@ -201,6 +201,10 @@ Triggers another task to run from within the current task. Use this to create mo
 
 ### **Solve CAPTCHA (**`solve_captcha`**)**
 
+<Warning>
+**Currently broken.** `solve_captcha` and the task-level auto-solve setting are timing out against reCAPTCHA v2 and Cloudflare Turnstile pending further investigation. The Editor palette labels this block as **Solve Captcha (Broken)** to reflect that. See [CAPTCHA Solving](/captcha-solving) for the full status.
+</Warning>
+
 Detects a CAPTCHA challenge on the current page, solves it through the bundled `ohmycaptcha` service, and injects the token back into the page so the site's own callback fires. Use this when a specific step reaches a challenge you already know about — for example, right after submitting a login form.
 
 Supported challenge types: reCAPTCHA v2, reCAPTCHA v3, hCaptcha, and Cloudflare Turnstile.
