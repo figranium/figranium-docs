@@ -5,7 +5,42 @@ description: "Product updates and new features in Figranium."
 
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
-<Update label="2026-08-22" description="Today">
+<Update label="2026-08-23" description="Today">
+
+## Features
+
+### Official JavaScript SDK
+
+`@figranium/sdk` is now available as the official TypeScript and JavaScript client for the Figranium API. It wraps every REST and Server-Sent Events endpoint and adds typed action helpers, structured errors, and abortable streams so you can drive Figranium from Node.js or the browser without hand-rolling `fetch` calls.
+
+- **Runs anywhere with `fetch`**: Node.js 18+ and modern browsers. No runtime dependencies.
+- **ESM and CommonJS**: parallel builds ship in the same package, so `import` and `require` both work.
+- **TypeScript-first**: complete `.d.ts` declarations, typed task and action shapes, and generics on execution results.
+- **Full API coverage**: save, version, and run tasks; stream live execution and selector events; manage schedules, captures, credentials, and headful browser sessions; administer settings (API keys, AI providers, proxies).
+- **Typed action helpers**: build tasks with `actions.click(...)`, `actions.type(...)`, and friends, and inject runtime values with the `variable("name")` template helper.
+
+```bash
+npm install @figranium/sdk
+```
+
+```ts
+import { Figranium } from "@figranium/sdk";
+
+const figranium = new Figranium({
+  baseUrl: "http://localhost:11345",
+  apiKey: process.env.FIGRANIUM_API_KEY!,
+});
+
+const { executionId } = await figranium.tasks.run("task_1", {
+  variables: { query: "figranium" },
+});
+```
+
+This release (`0.1.0`) is modeled against Figranium API `0.14.4`. See [JavaScript SDK — Overview](/sdk/js/overview), [Quickstart](/sdk/js/quickstart), and the [Resources reference](/sdk/js/resources/tasks).
+
+</Update>
+
+<Update label="2026-08-22" description="Yesterday">
 
 ## Features
 
