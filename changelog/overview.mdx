@@ -10,7 +10,32 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   Figranium releases continuously. Major features are announced here as they ship. Check back weekly for new capabilities.
 </Note>
 
-<Update label="2026-08-22" description="Today">
+<Update label="2026-08-23" description="This week">
+  ## Features
+
+  ### Official JavaScript / TypeScript SDK
+
+  Figranium now has an official client library on npm as [`@figranium/sdk`](https://www.npmjs.com/package/@figranium/sdk). It wraps every REST and Server-Sent Events endpoint the Figranium server exposes, so you can build tasks and drive runs from Node.js or the browser without hand-rolling `fetch` calls.
+
+  - **Typed everything**: complete TypeScript declarations for task shapes, action helpers, and execution results.
+  - **Works everywhere**: Node.js 18\+ and modern browsers, with parallel ESM and CommonJS builds. No runtime dependencies.
+  - **Typed action helpers**: build tasks with the `actions` factories and a `variable()` template helper instead of raw JSON.
+  - **Abortable streams**: execution and selector event streams are exposed as `AsyncIterable` with `AbortSignal` support.
+  - **Full API coverage**: tasks, executions, schedules, captures, credentials, headful browser sessions, and settings (API keys, AI providers, proxies, theme).
+
+  ```ts
+  import { Figranium, actions, variable, type Task } from "@figranium/sdk";
+
+  const figranium = new Figranium({
+    baseUrl: "http://localhost:11345",
+    apiKey: process.env.FIGRANIUM_API_KEY!,
+  });
+  ```
+
+  Modeled against Figranium API `0.14.4`. See [SDK — Overview](/sdk/js/overview), [Installation](/sdk/js/installation), and the [Quickstart](/sdk/js/quickstart).
+</Update>
+
+<Update label="2026-08-22" description="Last week">
   ## Features
 
   ### Solve CAPTCHAs from Agent mode
