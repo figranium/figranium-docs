@@ -157,5 +157,10 @@
     "telemetry": {
       "enabled": true
     }
+  },
+  "errors": {
+    "404": {
+      "redirect": false
+    }
   }
 }
