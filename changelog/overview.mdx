@@ -10,7 +10,32 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   Figranium releases continuously. Major features are announced here as they ship. Check back weekly for new capabilities.
 </Note>
 
-<Update label="2026-08-22" description="Today">
+<Update label="2026-08-25" description="Today">
+  ## Features
+
+  ### Lightweight list endpoints for tasks and executions
+
+  Two new REST API endpoints return summary metadata only, so dashboards and external integrations no longer have to fetch full task definitions or execution logs just to render a list. Both require API-key authentication.
+
+  - **`GET /api/tasks/list`**: every saved task with ID, name, description, mode, schedule, variables, and timestamps. Version history and full action lists are omitted.
+  - **`GET /api/executions/list`**: execution records with ID, task, status, timestamps, and duration. Full logs and result payloads are omitted.
+
+  Use `GET /api/tasks/:id` or `GET /api/executions/:id` when you need the full detail. See [REST API — Tasks](/rest-api#tasks) and [REST API — Executions](/rest-api#executions).
+
+  ### Task descriptions
+
+  Tasks now accept an optional `description` field. Set it in the task editor or via `POST /api/tasks` and it appears on the canvas trigger card and in `GET /api/tasks/list` responses. External tools and AI agents get context about what a task does without fetching its full definition.
+
+  See [REST API — Tasks](/rest-api#tasks).
+
+  ## Updates
+
+  - **Theme preference now follows you across devices**: Your UI theme is persisted to the backend via the new `GET`/`POST /api/settings/theme` endpoints instead of only browser local storage, so the same theme applies across browsers and devices on the same instance. A `figranium_theme` cookie (1-year TTL) keeps the first paint instant. See [UI Tour — System settings](/ui-tour).
+  - **`POST /api/tasks/:id/touch`**: Updates a task's `updatedAt` timestamp to the current time without modifying its configuration. See [REST API — Tasks](/rest-api#tasks).
+  - **`GET /api/health` reports storage connectivity**: The health endpoint returns `200` with `"status": "ok"` when healthy and `503` with `"status": "degraded"` plus a `storage_error` message when the database is unreachable. It requires no authentication, so you can point uptime monitors and load-balancer health checks at it directly. See [REST API — Health](/rest-api#health).
+</Update>
+
+<Update label="2026-08-22" description="Last week">
   ## Features
 
   ### Solve CAPTCHAs from Agent mode
@@ -42,7 +67,7 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   - **Captures page redesigned as a two-column grid**: The Captures screen now lays out capture cards in a simple two-column grid (a single column on narrow screens) instead of a virtualized scrolling list. See [UI Tour — Captures](/ui-tour).
 </Update>
 
-<Update label="2026-08-21" description="This week">
+<Update label="2026-08-21" description="Last week">
   ## Features
 
   ### `Do Nothing` action block
@@ -55,7 +80,7 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   See [Action Blocks — Do Nothing](/action-blocks#do-nothing-do_nothing).
 </Update>
 
-<Update label="2026-08-20" description="Earlier this week">
+<Update label="2026-08-20" description="Last week">
   ## Features
 
   ### API trigger endpoint now accepts bodyless requests
@@ -71,7 +96,7 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   See [REST API Reference — `POST /api/tasks/:id/api`](/rest-api).
 </Update>
 
-<Update label="2026-08-19" description="Earlier this week">
+<Update label="2026-08-19" description="Last week">
   ## Features
 
   ### Opt-in CloakBrowser browser engine
@@ -113,7 +138,7 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   See [Captures & Storage](/captures-and-storage#screenshots) and [Architecture](/architecture) for the updated behavior.
 </Update>
 
-<Update label="2026-08-17" description="Earlier this week">
+<Update label="2026-08-17" description="Earlier update">
   ## Features
 
   ### Visual field-mapping mode for extraction scripts

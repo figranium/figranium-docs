@@ -339,7 +339,7 @@ If enabled, authentication must be provided via one of the following methods:
   </Accordion>
 
   <Accordion title="GET /api/executions/list">
-    Returns a lightweight list of execution records wrapped in an `executions` array. Useful for dashboards and external integrations that need summary metadata without full logs or result payloads. Requires API-key authentication.
+    Returns a lightweight list of execution records with summary metadata (ID, task ID, task name, status, timestamps, duration) without full logs or result payloads. Use this for dashboard views and history listings when you don't need the per-execution detail returned by `GET /api/executions/:id`. Requires API-key authentication.
 
     **Response**:
 
@@ -350,26 +350,6 @@ If enabled, authentication must be provided via one of the following methods:
           "id": "exec_abc123",
           "taskId": "task_1",
           "taskName": "Scraper",
-          "status": "success",
-          "startedAt": "2026-08-05T18:04:12.335Z",
-          "durationMs": 4200
-        }
-      ]
-    }
-    ```
-  </Accordion>
-
-  <Accordion title="GET /api/executions/list">
-    Returns a lightweight list of execution records with summary metadata (ID, task ID, status, timestamps, duration) without full logs or result payloads. Use this for dashboard views and history listings when you don't need the per-execution detail returned by `GET /api/executions/:id`. Requires API-key authentication.
-
-    **Response**:
-
-    ```json
-    {
-      "executions": [
-        {
-          "id": "exec_abc123",
-          "taskId": "task_1",
           "status": "success",
           "startedAt": "2026-08-05T18:04:12.335Z",
           "finishedAt": "2026-08-05T18:04:16.535Z",
