@@ -102,6 +102,7 @@ This is useful when running on resource-constrained hosts or when you want to pr
 | `CAPTCHA_MODEL_TIER` | `auto` | Local model selection: `auto`, `owlvit`, or `florence2`. `auto` selects OWL-ViT on 2–7.99 GiB hosts and Florence-2 at 8 GiB\+. |
 | `CAPTCHA_MODEL_DEVICE` | `auto` | Local inference device policy: `auto` or `cpu`. |
 | `SKIP_LOCAL_CAPTCHA_MODEL` | `false` | Disable local model detection, download, startup, reconciliation, and fallback. Cached weights are retained. |
+| `CAPTCHA_AUTO_DETECT_TIMEOUT_MS` | `5000` | How long each Auto-Solve Captchas pass waits for a challenge to become ready before moving on. |
 | `CAPTCHA_REMOTE_TIMEOUT_MS` | action deadline minus local reserve | Maximum time allocated to the remote route before falling back locally. |
 | `CAPTCHA_LOCAL_FALLBACK_MIN_MS` | `15000` | Portion of the action deadline reserved for the active-browser local route. |
 | `CAPTCHA_REMOTE_FORWARD_PROXY` | `false` | Opt in to sending the active browser proxy and user agent to compatible proxy-backed remote tasks. |

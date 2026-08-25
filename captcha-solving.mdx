@@ -11,9 +11,11 @@ Supported challenges: reCAPTCHA v2, reCAPTCHA v3, hCaptcha, Cloudflare Turnstile
 You have two ways to invoke it:
 
 - An explicit **Solve Captcha** block that you drop at the exact step in your flow where a challenge appears.
-- A task-level **Auto-Solve Captchas** toggle that runs the same detection pass after every `navigate`, `click`, and `type` action, for tasks that hit CAPTCHAs at unpredictable points.
+- A task-level **Auto-Solve Captchas** toggle that runs the same detection pass after the initial task navigation and after every `navigate`, `click`, and `type` action, for tasks that hit CAPTCHAs at unpredictable points.
 
 Both routes use the same underlying solver and are only available in Agent mode.
+
+A separate **Wait for Captcha** block pauses until a challenge widget is ready without solving it. See [the `wait_captcha` block](#the-wait-captcha-block).
 
 ---
 
@@ -22,8 +24,8 @@ Both routes use the same underlying solver and are only available in Agent mode.
 When the block runs, Figranium:
 
 <Steps>
-  <Step title="Detect the challenge">
-    Scans the page (or the container you scoped it to) for a supported widget and reads its site key, action, and other parameters. If nothing is found, the block errors out with `no CAPTCHA challenge found on the page`.
+  <Step title="Detect the challenge and wait for readiness">
+    Scans the page (or the container you scoped it to) for a supported widget, waits until its control is initialized, visible, enabled, and stable, then reads its site key, action, and other parameters. If no challenge becomes ready in time, the block errors out with `solve_captcha: no CAPTCHA challenge became ready within <timeout>ms`.
   </Step>
   <Step title="Try the remote endpoint (if configured)">
     If `CAPTCHA_SOLVER_URL` is set, submits a task to that endpoint and waits up to `CAPTCHA_REMOTE_TIMEOUT_MS` for a token. Failures are logged and the block falls through to the local solver.
@@ -76,12 +78,55 @@ Drop this block into a task at the step where you expect a challenge. See [Actio
 
 ---
 
+## The `wait_captcha` block
+
+The **Wait for Captcha** block pauses the task until a CAPTCHA control is ready to interact with, without clicking or solving it. Figranium polls the page until the widget's checkbox (or equivalent provider control) is initialized, visible, enabled, pointer-receivable, and stable.
+
+Use it when:
+
+- You solve challenges yourself (manually through the [headful browser](/headful-browser), or with custom logic) and need the flow to hold until the widget has rendered.
+- You want to confirm a challenge appeared before branching with an [If](/control-flow) block.
+- A widget loads asynchronously and later steps race against it.
+
+```json
+{
+  "type": "wait_captcha",
+  "captchaType": "turnstile",
+  "selector": "#turnstile-container",
+  "varName": "captchaReady",
+  "timeout": 30000
+}
+```
+
+- `captchaType` is optional — omit it to wait for the first ready challenge of any supported type. Supported values: `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, `turnstile`.
+- `selector` is optional — omit it to scan the whole page.
+- `varName` stores `{ ready, challenge, duration, siteKey? }`.
+- `timeout` is the deadline in milliseconds (default `120000`).
+
+If no ready challenge appears before the deadline, the block errors with `wait_captcha: no ready CAPTCHA found within <timeout>ms`. Catch it with an [On Error](/error-handling) block if a missing challenge is an expected path.
+
+The `solve_captcha` block runs the same readiness wait internally before solving, so you don't need a `wait_captcha` block in front of it.
+
+---
+
+## Cloudflare managed challenges
+
+Cloudflare serves Turnstile in two forms: a standalone widget embedded in a page, and a **managed challenge** (the full-page "Checking your browser" interstitial on Challenge pages). Figranium handles both:
+
+- **Standalone Turnstile** solves through the remote endpoint or locally, like other challenge types.
+- **Managed challenges** require a configured remote solver. Figranium intercepts the challenge before navigation completes and captures the one-time site key, action, `cData`, `chlPageData`, callback, and user agent that compatible solvers need. The payload uses the field conventions of your endpoint, supporting both 2Captcha-style and AntiCaptcha-style dialects automatically based on the endpoint hostname.
+
+Without `CAPTCHA_SOLVER_URL` set, a managed challenge fails with the local route reporting `managed Turnstile challenges require a configured remote solver` in `attempts`.
+
+---
+
 ## Auto-Solve Captchas (task setting)
 
-Toggle **Auto-Solve Captchas** in the task settings **Behavior** tab. When enabled, Figranium runs the same detection pass automatically after every `navigate`, `click`, and `type` action in that task.
+Toggle **Auto-Solve Captchas** in the task settings **Behavior** tab. When enabled, Figranium runs the same detection pass automatically after the initial task navigation and after every `navigate`, `click`, and `type` action in that task.
 
 - Default: **off**. Tasks that don't need CAPTCHA handling pay no extra latency.
 - When no challenge is present on the page, the auto-pass silently no-ops.
+- Each auto-pass waits up to `CAPTCHA_AUTO_DETECT_TIMEOUT_MS` (default `5000` ms) for a challenge to become ready before moving on, so pages without a challenge aren't stalled for the full solve deadline.
 - Auto-solve and explicit `solve_captcha` blocks work together — turning auto-solve on doesn't disable your explicit blocks.
 
 Use this when you don't know exactly where a CAPTCHA will appear in a flow (for example, sites that rate-limit into a challenge only sometimes). If the CAPTCHA is always at the same step, prefer an explicit block for readability.
@@ -198,6 +243,8 @@ Use this to log solve times, or to branch with an [If](/control-flow) block on `
 ---
 
 ## Troubleshooting
+
+When a `solve_captcha` or `wait_captcha` block fails, the run log includes sanitized `[CAPTCHA ERROR]` lines with per-route diagnostics (credentials and tokens are redacted), and the block reports an errored status. Existing [On Error](/error-handling) handling applies: with a handler the flow jumps to it, without one the failure is logged and the run continues.
 
 <AccordionGroup>
   <Accordion title="Block errors with 'no solver route succeeded'" icon="triangle-exclamation">
