@@ -90,23 +90,25 @@ If enabled, authentication must be provided via one of the following methods:
   </Accordion>
 
   <Accordion title="GET /api/tasks/list">
-    Returns a lightweight list of all saved tasks with summary metadata (ID, name, description, mode, schedule, variables, createdAt, updatedAt) without version history or full action lists. Useful for lightweight listings and dashboard overviews.
+    Returns a lightweight list of all saved tasks with summary metadata (ID, name, description, mode, schedule, variables, createdAt, updatedAt) without version history or full action lists. Useful for lightweight listings and dashboard overviews. Requires API-key authentication.
 
     **Response**:
 
     ```json
-    [
-      {
-        "id": "task_1",
-        "name": "Scraper",
-        "description": "Extracts product prices daily",
-        "mode": "agent",
-        "schedule": { "enabled": true, "cron": "0 9 * * *" },
-        "variables": {},
-        "updatedAt": "2026-08-05T18:04:12.335Z",
-        "createdAt": "2026-08-01T12:00:00.000Z"
-      }
-    ]
+    {
+      "tasks": [
+        {
+          "id": "task_1",
+          "name": "Scraper",
+          "description": "Extracts product prices daily",
+          "mode": "agent",
+          "schedule": { "enabled": true, "cron": "0 9 * * *" },
+          "variables": {},
+          "updatedAt": "2026-08-05T18:04:12.335Z",
+          "createdAt": "2026-08-01T12:00:00.000Z"
+        }
+      ]
+    }
     ```
   </Accordion>
 
@@ -138,7 +140,7 @@ If enabled, authentication must be provided via one of the following methods:
     }
     ```
 
-    The `description` field is optional. When set, it appears on the canvas trigger card and in the `GET /api/tasks/list` response so external tools and AI agents have context about the task without fetching its full definition.
+    The `description` field is optional. When set, it appears on the canvas trigger card and in the `tasks[]` entries returned by `GET /api/tasks/list` so external tools and AI agents have context about the task without fetching its full definition.
   </Accordion>
 
   <Accordion title="PATCH /api/tasks/:id">
@@ -334,6 +336,48 @@ If enabled, authentication must be provided via one of the following methods:
 
     - `limit`: Number of results (default 50).
     - `status`: Filter by status code.
+  </Accordion>
+
+  <Accordion title="GET /api/executions/list">
+    Returns a lightweight list of execution records wrapped in an `executions` array. Useful for dashboards and external integrations that need summary metadata without full logs or result payloads. Requires API-key authentication.
+
+    **Response**:
+
+    ```json
+    {
+      "executions": [
+        {
+          "id": "exec_abc123",
+          "taskId": "task_1",
+          "taskName": "Scraper",
+          "status": "success",
+          "startedAt": "2026-08-05T18:04:12.335Z",
+          "durationMs": 4200
+        }
+      ]
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="GET /api/executions/list">
+    Returns a lightweight list of execution records with summary metadata (ID, task ID, status, timestamps, duration) without full logs or result payloads. Use this for dashboard views and history listings when you don't need the per-execution detail returned by `GET /api/executions/:id`. Requires API-key authentication.
+
+    **Response**:
+
+    ```json
+    {
+      "executions": [
+        {
+          "id": "exec_abc123",
+          "taskId": "task_1",
+          "status": "success",
+          "startedAt": "2026-08-05T18:04:12.335Z",
+          "finishedAt": "2026-08-05T18:04:16.535Z",
+          "durationMs": 4200
+        }
+      ]
+    }
+    ```
   </Accordion>
 
   <Accordion title="GET /api/executions/:id">
