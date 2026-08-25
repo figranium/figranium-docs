@@ -252,7 +252,32 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
     }
     ```
 
-    For tasks that hit CAPTCHAs at unpredictable points, you can turn on the task-level **Auto-Solve Captchas** setting instead of scattering `solve_captcha` blocks through the flow — it runs the same detection pass after every `navigate`, `click`, and `type`, and no-ops when no challenge is present. See [CAPTCHA Solving](/captcha-solving) for the full setup, environment variables, and the auto-solve toggle.
+    For tasks that hit CAPTCHAs at unpredictable points, you can turn on the task-level **Auto-Solve Captchas** setting instead of scattering `solve_captcha` blocks through the flow — it runs the same detection pass after the initial task navigation and after every `navigate`, `click`, and `type`, and no-ops when no challenge is present. See [CAPTCHA Solving](/captcha-solving) for the full setup, environment variables, and the auto-solve toggle.
+  </Accordion>
+
+  <Accordion title="Wait for Captcha (wait_captcha)" icon="hourglass-half" id="wait-captcha">
+    Pauses the task until a CAPTCHA control on the page is initialized, visible, enabled, pointer-receivable, and stable. The block does not click or solve the challenge. Use it to gate later steps on the widget being ready — for example, before handing the page to your own solving logic, or to confirm that a challenge rendered at all.
+
+    Supported challenge types: reCAPTCHA v2, reCAPTCHA v3, hCaptcha, and Cloudflare Turnstile.
+
+    - **Captcha Type**: (Optional) One of `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, or `turnstile`. If empty, the block waits for the first ready challenge of any supported type.
+    - **Container Selector**: (Optional) A CSS selector scoping the search to a specific container. If empty, the whole page is scanned.
+    - **Timeout**: (Optional) Deadline in milliseconds. Defaults to `120000`. If no ready challenge appears before the deadline, the block errors with `wait_captcha: no ready CAPTCHA found within <timeout>ms`, which an [On Error](/error-handling) block can catch.
+    - **Store Result In Variable**: (Optional) A variable name to store `{ ready, challenge, duration, siteKey? }`.
+
+    **Example — wait for a Turnstile widget scoped to its container:**
+
+    ```json
+    {
+      "type": "wait_captcha",
+      "captchaType": "turnstile",
+      "selector": "#turnstile-container",
+      "varName": "captchaReady",
+      "timeout": 30000
+    }
+    ```
+
+    See [CAPTCHA Solving](/captcha-solving#the-wait-captcha-block) for the readiness checks and return value details.
   </Accordion>
 
   <Accordion title="Do Nothing (do_nothing)" icon="ban">

@@ -10,7 +10,42 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   Figranium releases continuously. Major features are announced here as they ship. Check back weekly for new capabilities.
 </Note>
 
-<Update label="2026-08-22" description="Today">
+<Update label="2026-08-25" description="Today">
+  ## Features
+
+  ### `wait_captcha` action block
+
+  A new **Wait for Captcha** block pauses a task until a CAPTCHA checkbox or equivalent provider control is initialized, visible, enabled, pointer-receivable, and stable — without clicking or solving it. Use it to hold the flow until a widget has rendered before your own solving logic, or to confirm a challenge appeared before branching. It supports optional provider filtering (`captchaType`), container scoping (`selector`), a configurable `timeout` (default `120000` ms), and a result variable holding `{ ready, challenge, duration, siteKey? }`.
+
+  ```json
+  {
+    "type": "wait_captcha",
+    "captchaType": "turnstile",
+    "varName": "captchaReady",
+    "timeout": 30000
+  }
+  ```
+
+  See [Action Blocks — Wait for Captcha](/action-blocks#wait-captcha) and [CAPTCHA Solving](/captcha-solving#the-wait-captcha-block).
+
+  ### Cloudflare managed challenge support via remote solvers
+
+  `solve_captcha` now handles Cloudflare **managed challenges** (the full-page "Checking your browser" Challenge interstitial), not just standalone Turnstile widgets. Figranium intercepts the challenge before navigation completes, capturing the one-time site key, action, `cData`, `chlPageData`, callback, and user agent that remote solvers need, and formats the payload for both 2Captcha-style and AntiCaptcha-style endpoint dialects. Managed challenges require a configured `CAPTCHA_SOLVER_URL`; the local solver reports them as unsupported. See [CAPTCHA Solving — Cloudflare managed challenges](/captcha-solving#cloudflare-managed-challenges).
+
+  ## Updates
+
+  - **Auto-solve covers the initial navigation** — the task-level Auto-Solve Captchas setting now runs its detection pass after the initial task navigation too, not just after later `navigate`, `click`, and `type` actions. Each pass is bounded by the new `CAPTCHA_AUTO_DETECT_TIMEOUT_MS` window (default `5000` ms) so challenge-free pages aren't stalled.
+  - **Readiness-gated solving** — `solve_captcha` now waits until the challenge control is actually interactable before attempting a solve, instead of failing on widgets that are still loading.
+  - **Explicit CAPTCHA diagnostics** — failed CAPTCHA blocks now log sanitized `[CAPTCHA ERROR]` lines with per-route diagnostics and report an errored block status, while keeping the existing `On Error` or log-and-continue behavior.
+
+  ## Fixes
+
+  - Cloudflare Challenge pages whose site keys appear only inside challenge-frame URL paths are now detected, while standalone Turnstile support is preserved.
+  - reCAPTCHA iframes on `www.google.com` are now recognized, so the solver proceeds from the checkbox into 3×3/4×4 image grids instead of silently skipping the challenge.
+  - Local reCAPTCHA/hCaptcha solving hardened with interactable-control checks, delayed grid detection, replacement-tile handling, and verified token completion.
+</Update>
+
+<Update label="2026-08-22" description="Last week">
   ## Features
 
   ### Solve CAPTCHAs from Agent mode
