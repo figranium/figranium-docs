@@ -198,6 +198,10 @@ If enabled, authentication must be provided via one of the following methods:
   <Accordion title="POST /api/tasks/:id/api">
     Triggers an execution of a specific task.
 
+    <Tip>
+      You don't need to assemble this URL by hand. The **Trigger via API** panel in the task editor's Task Settings API tab shows the complete endpoint URL for your instance (for example, `https://your-figranium.example.com/api/tasks/task_1/api`) with a `POST` badge, and its copy button copies the full URL.
+    </Tip>
+
     **Body**:
 
     ```json
