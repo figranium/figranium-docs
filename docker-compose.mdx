@@ -23,7 +23,15 @@ This guide covers the recommended installation method using Docker Compose. This
     ```
   </Step>
   <Step title="Create docker-compose.yml">
-    Create a `docker-compose.yml` file in your project directory:
+    Download the ready-made deploy file that ships in the Figranium repository:
+
+    ```bash
+    wget https://raw.githubusercontent.com/figranium/figranium/main/docker-compose.deploy.yml -O docker-compose.yml
+    ```
+
+    `docker-compose.deploy.yml` pulls the pre-built `ghcr.io/figranium/figranium:latest` image, so you don't need to clone the repository or build anything locally. The repository's plain `docker-compose.yml` builds the image from source instead. Use that only if you follow the [Git Clone method](/multi-arch).
+
+    Alternatively, create the `docker-compose.yml` file yourself:
 
     ```yaml
     services:
@@ -48,6 +56,10 @@ This guide covers the recommended installation method using Docker Compose. This
 
     <Note>
       Mount the same host directory to both container paths so captures from agent runs (which write to `/app/src/public/captures`) and scrape runs (which write to `/app/public/captures`) both land on the host.
+    </Note>
+
+    <Note>
+      The downloaded `docker-compose.deploy.yml` does not set `SESSION_SECRET`. Add it under `environment` as shown above to keep sessions valid across container restarts.
     </Note>
   </Step>
   <Step title="Start with Docker Compose">
