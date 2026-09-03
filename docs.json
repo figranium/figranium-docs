@@ -107,10 +107,10 @@
       {
         "group": "Integrations",
         "pages": [
-          "n8n-integration",
-          "simplynode-integration",
           "mcp-integration",
-          "community-presets"
+          "community-presets",
+          "n8n-integration",
+          "simplynode-integration"
         ]
       },
       {
