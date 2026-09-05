@@ -165,12 +165,19 @@ The MCP server exposes rich tools mapped to Figranium's REST API.
 
 ### Cabinet Operations
 
-- **`list_cabinets`**
-  - Lists Cabinets available on the connected Figranium instance so an agent can choose a destination/source by ID.
-- **`create_cabinet`**
-  - Creates a Cabinet that can then be referenced by `cabinetId` in a task or Upload action.
+<CardGroup cols={2}>
+  <Card title="list_cabinets" icon="folder-tree">
+    Lists Cabinets available on the connected Figranium instance so an agent can choose a destination or source by ID.
+  </Card>
 
-These tools pair with the `upload` and `finalize_uploads` action types introduced for Figranium v0.17.
+  <Card title="create_cabinet" icon="folder-plus">
+    Creates a Cabinet that can then be referenced by `cabinetId` in a task or Upload action.
+  </Card>
+</CardGroup>
+
+<Info>
+  These tools pair with the `upload` and `finalize_uploads` action types introduced for Figranium v0.17.
+</Info>
 
 ### Execution Operations
 

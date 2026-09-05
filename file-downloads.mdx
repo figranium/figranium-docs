@@ -30,45 +30,68 @@ Downloads are asynchronous, so a task can otherwise finish before a transfer com
 
 ## Cabinets workspace
 
-Open **Cabinets** from the application sidebar to manage durable downloaded files. From there you can:
+Open **Cabinets** from the application sidebar to manage durable downloaded files.
 
-- create and rename Cabinets
-- inspect Cabinet items and upload state
-- download individual items
-- clear a Cabinet
-- delete items in bulk
-- create ZIP archives
-- safely extract compatible ZIP archives
-- migrate or delete Cabinets
+<CardGroup cols={2}>
+  <Card title="Organize" icon="folder-tree">
+    Create and rename Cabinets, inspect item metadata and upload state, and move workflows onto the Cabinet that fits them.
+  </Card>
 
-Individual Cabinets have direct, reload-safe URLs. If a Cabinet URL points to an invalid Cabinet, Figranium falls back to the default Cabinet.
+  <Card title="Manage items" icon="list-check">
+    Download individual items, clear a Cabinet, or delete selected items in bulk.
+  </Card>
+
+  <Card title="Archive" icon="file-zipper">
+    Create ZIP archives from Cabinet contents and safely extract compatible ZIP archives.
+  </Card>
+
+  <Card title="Migrate" icon="arrow-right-arrow-left">
+    Migrate items before deleting a Cabinet so durable files can move with your workflow.
+  </Card>
+</CardGroup>
+
+<Note>
+  Individual Cabinets have direct, reload-safe URLs. If a Cabinet URL points to an invalid Cabinet, Figranium falls back to the default Cabinet.
+</Note>
 
 ## Reusing a download with Upload
 
 v0.17 adds two Agent actions for turning a captured download into a later upload.
 
-### Upload
+<AccordionGroup>
+  <Accordion title="Upload" icon="upload">
+    **Upload** selects the newest unuploaded item in its source Cabinet and attaches it to the page. It supports ordinary files, ZIP archives, compatible folders, native file inputs, file chooser flows, and drop targets.
 
-**Upload** selects the newest unuploaded item in its source Cabinet and attaches it to the page. It supports ordinary files, ZIP archives, compatible folders, native file inputs, file chooser flows, and drop targets.
+    An Upload action can choose its own Cabinet. If it does not, it uses the task's selected Cabinet, then falls back to the instance default.
 
-An Upload action can choose its own Cabinet. If it does not, it uses the task's selected Cabinet, then falls back to the instance default.
+    This makes download-then-upload workflows possible without copying files outside Figranium.
+  </Accordion>
 
-This makes download-then-upload workflows possible without copying files outside Figranium.
+  <Accordion title="Finalize Uploads" icon="check">
+    **Finalize Uploads** marks all Cabinet items attached during the current execution as uploaded.
 
-### Finalize Uploads
+    Keeping finalization as a separate action lets a workflow attach a file first, submit or validate the surrounding form, and only mark the item consumed after that later step succeeds.
 
-**Finalize Uploads** marks all Cabinet items attached during the current execution as uploaded.
+    An Upload action can also mark an item uploaded immediately when that behavior is preferable.
+  </Accordion>
+</AccordionGroup>
 
-Keeping finalization as a separate action lets a workflow attach a file first, submit or validate the surrounding form, and only mark the item consumed after that later step succeeds.
+<Tip>
+  Keep finalization separate when attaching the file is not the same as successfully completing the upload flow.
+</Tip>
 
-An Upload action can also mark an item uploaded immediately when that behavior is preferable.
+## Integrations
 
-## SDK and MCP
+<CardGroup cols={3}>
+  <Card title="JavaScript SDK" icon="code" href="/sdk/js/resources/cabinets">
+    SDK `0.2.0` exposes Cabinets through `figranium.cabinets` and adds typed `actions.upload()` and `actions.finalizeUploads()` helpers.
+  </Card>
 
-The JavaScript SDK `0.2.0` exposes Cabinets through `figranium.cabinets` and includes typed `actions.upload()` and `actions.finalizeUploads()` helpers. See [CabinetsResource](/sdk/js/resources/cabinets) and [Task Action Helpers](/sdk/js/actions).
+  <Card title="MCP" icon="plug" href="/mcp-integration">
+    The MCP server understands task-level `cabinetId`, `upload`, and `finalize_uploads`, and can list or create Cabinets before building a task.
+  </Card>
 
-The Figranium MCP server also understands task-level `cabinetId`, `upload`, and `finalize_uploads`, and exposes tools to list and create Cabinets so an AI agent can discover a Cabinet ID before building a task.
-
-## n8n
-
-The official n8n node `0.7.0` exposes **Cabinet ID** in Task Create and Update. This lets an n8n workflow configure which Cabinet a Figranium task uses for intercepted downloads. See [n8n Integration](/n8n-integration).
+  <Card title="n8n" icon="diagram-project" href="/n8n-integration">
+    The official n8n node `0.7.0` exposes **Cabinet ID** in Task Create and Update so workflows can choose the task's download Cabinet.
+  </Card>
+</CardGroup>

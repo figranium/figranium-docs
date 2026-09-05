@@ -54,14 +54,31 @@ The node authenticates using a **Figranium API** credential.
 
 The **Figranium** node exposes several top-level resources and operations.
 
-| Resource | Operations |
-| --- | --- |
-| **Execute** | Execute Task |
-| **Task Actions** | List, Create, Update, Delete |
-| **Execution** | List |
-| **Schedule** | List, Get Status, Set Schedule, Delete Schedule, Describe Schedule, Get Scheduler Status |
-| **Browser** | Open |
-| **Inspector** | Highlight |
+<CardGroup cols={2}>
+  <Card title="Execute" icon="play">
+    Run a saved task with optional runtime variable overrides.
+  </Card>
+
+  <Card title="Task Actions" icon="list-check">
+    List, create, partially update, or delete saved tasks, including the v0.17 **Cabinet ID** field.
+  </Card>
+
+  <Card title="Execution" icon="clock-rotate-left">
+    Retrieve lightweight execution history for downstream workflow logic.
+  </Card>
+
+  <Card title="Schedule" icon="calendar-clock">
+    List, inspect, set, delete, describe, and check scheduler status.
+  </Card>
+
+  <Card title="Browser" icon="globe">
+    Launch or reattach to a managed Figranium browser session.
+  </Card>
+
+  <Card title="Inspector" icon="crosshairs">
+    Highlight and resolve elements in an active browser session.
+  </Card>
+</CardGroup>
 
 ---
 

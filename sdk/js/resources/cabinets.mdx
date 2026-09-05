@@ -24,21 +24,29 @@ const cabinets = await figranium.cabinets.list();
 
 ## Supported operations
 
-`CabinetsResource` covers the v0.17 Cabinet lifecycle and item-management API, including:
+`CabinetsResource` covers the v0.17 Cabinet lifecycle and item-management API.
 
-- list Cabinets
-- create a Cabinet
-- rename a Cabinet
-- delete or migrate a Cabinet
-- clear Cabinet contents
-- list Cabinet items
-- set an item's upload status
-- remove Cabinet items, including bulk deletion
-- create ZIP archives
-- safely extract compatible archives
-- construct item download URLs
+<CardGroup cols={2}>
+  <Card title="Cabinet lifecycle" icon="folder-plus">
+    List, create, rename, migrate, clear, and delete Cabinets.
+  </Card>
 
-The exact return types are exported by `@figranium/sdk`, so TypeScript consumers get typed Cabinet metadata and item records.
+  <Card title="Item management" icon="list-check">
+    List Cabinet items, update upload status, and remove one or many items.
+  </Card>
+
+  <Card title="Archives" icon="file-zipper">
+    Create ZIP archives and safely extract compatible archives.
+  </Card>
+
+  <Card title="Downloads" icon="download">
+    Build item download URLs for files stored in a Cabinet.
+  </Card>
+</CardGroup>
+
+<Info>
+  The exact return types are exported by `@figranium/sdk`, so TypeScript consumers get typed Cabinet metadata and item records.
+</Info>
 
 ## Use a Cabinet from a task
 
@@ -66,10 +74,22 @@ If a task omits `cabinetId`, Figranium uses the instance's default Cabinet. An i
 
 Cabinet items track whether they have been uploaded. The `upload` action normally selects the newest unuploaded item. You can mark an item uploaded immediately with `markAsUploaded`, or keep finalization separate and call `finalize_uploads` later in the workflow.
 
-That separation is useful when attaching a file and successfully submitting it are two different steps.
+<Tip>
+  Keep finalization separate when attaching a file and successfully submitting it are two different steps. That lets the workflow consume the Cabinet item only after the later step succeeds.
+</Tip>
 
 ## Related
 
-- [Task Action Helpers](/sdk/js/actions)
-- [TasksResource](/sdk/js/resources/tasks)
-- [File Downloads](/file-downloads)
+<CardGroup cols={3}>
+  <Card title="Action helpers" icon="code" href="/sdk/js/actions">
+    Build typed Upload and Finalize Uploads actions.
+  </Card>
+
+  <Card title="Tasks resource" icon="list-check" href="/sdk/js/resources/tasks">
+    Save and run tasks that select a Cabinet with `cabinetId`.
+  </Card>
+
+  <Card title="File downloads" icon="download" href="/file-downloads">
+    Understand Cabinets, intercepted downloads, and the upload lifecycle.
+  </Card>
+</CardGroup>
