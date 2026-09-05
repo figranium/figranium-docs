@@ -4,7 +4,7 @@ sidebarTitle: "n8n"
 description: "Connect Figranium to n8n workflows with the official community node. Install, authenticate, and trigger tasks or schedules from any n8n automation."
 ---
 
-The official Figranium n8n community node (`n8n-nodes-figranium`) lets you trigger tasks, inspect execution history, and manage schedules from within any n8n workflow.
+The official Figranium n8n community node (`n8n-nodes-figranium`) lets you trigger tasks, create and update task definitions, inspect execution history, manage schedules, and work with Figranium browser sessions directly from n8n. Version `0.7.0` also adds the v0.17 per-task **Cabinet ID** field to Task Create and Update.
 
 ## Installation
 
@@ -52,20 +52,23 @@ The node authenticates using a **Figranium API** credential.
 
 ## Node Overview
 
-The **Figranium** node exposes three top-level resources, each with one or more operations.
+The **Figranium** node exposes several top-level resources and operations.
 
 | Resource | Operations |
 | --- | --- |
-| **Task** | Execute, List |
+| **Execute** | Execute Task |
+| **Task Actions** | List, Create, Update, Delete |
 | **Execution** | List |
 | **Schedule** | List, Get Status, Set Schedule, Delete Schedule, Describe Schedule, Get Scheduler Status |
+| **Browser** | Open |
+| **Inspector** | Highlight |
 
 ---
 
-## Task
+## Execute
 
 <AccordionGroup>
-  <Accordion title="Execute">
+  <Accordion title="Execute Task">
     Runs a saved task and returns its result as JSON.
 
     **Parameters**
@@ -77,11 +80,17 @@ The **Figranium** node exposes three top-level resources, each with one or more 
 
     **API call:** `POST /api/tasks/{taskId}/api`
 
-    **Output:** The full JSON response from the task execution — typically includes result data, status, and metadata.
-
-    **Example use case:** A webhook fires when a new order arrives. The Figranium node executes a "Scrape Competitor Price" task, passing `product_url` as a variable extracted from the webhook payload. The result flows into a database insert node.
+    **Output:** The full JSON response from the task execution.
   </Accordion>
+</AccordionGroup>
 
+---
+
+## Task Actions
+
+Task Create and Update expose the task configuration fields supported by the node. In v0.7.0, both include an optional **Cabinet ID** field. This maps to Figranium v0.17's per-task download Cabinet selection; leave it empty to use the instance's default Cabinet.
+
+<AccordionGroup>
   <Accordion title="List">
     Returns all tasks available on the connected Figranium server.
 
@@ -90,6 +99,22 @@ The **Figranium** node exposes three top-level resources, each with one or more 
     **API call:** `GET /api/tasks/list`
 
     **Output:** One item per task, each containing at minimum a `name` and `id` field.
+  </Accordion>
+
+  <Accordion title="Create">
+    Creates a task from n8n. Required fields are **Name**, **URL**, and **Mode**. Additional fields include task description, waits, selectors, extraction settings, rotation/stealth settings, raw Actions/Variables/Stealth JSON, and **Cabinet ID**.
+
+    **Cabinet ID** selects the Cabinet that receives intercepted downloads for this task. If omitted, Figranium uses the default Cabinet.
+  </Accordion>
+
+  <Accordion title="Update">
+    Partially updates an existing task. Only fields you set are sent to Figranium, so you can change one property without replacing the full task definition.
+
+    **Cabinet ID** can be set or changed here to route future intercepted downloads to a different Cabinet.
+  </Accordion>
+
+  <Accordion title="Delete">
+    Permanently deletes the selected task.
   </Accordion>
 </AccordionGroup>
 
@@ -208,6 +233,28 @@ The **Figranium** node exposes three top-level resources, each with one or more 
     **API call:** `GET /api/schedules/status/all`
 
     **Output:** A status object for the scheduler engine (e.g. running, paused, number of active schedules).
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Browser
+
+<AccordionGroup>
+  <Accordion title="Open">
+    Launches or reattaches to a managed Figranium browser session. The optional **URL** field sets the starting page.
+
+    The node currently targets Figranium's managed headful browser flow; the Mode field is informational.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Inspector
+
+<AccordionGroup>
+  <Accordion title="Highlight">
+    Highlights and inspects elements in an active browser session. You can optionally provide a **Session ID**, **URL**, and **Target Hint** to narrow down the element Figranium should resolve.
   </Accordion>
 </AccordionGroup>
 

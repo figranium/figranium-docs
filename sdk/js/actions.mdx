@@ -45,6 +45,10 @@ Use `disabled: true` to keep an action in the list without executing it.
   <Card title="Variables and CAPTCHA" icon="lock" href="#variables">
     Set and merge variables, plus CAPTCHA solving actions.
   </Card>
+
+  <Card title="Files and Cabinets" icon="folder-open" href="#files-and-cabinets">
+    Upload the newest unuploaded Cabinet item and finalize attached items after success.
+  </Card>
 </CardGroup>
 
 ## Navigation and interaction
@@ -131,6 +135,33 @@ See [Variables and templates](/sdk/js/variables) for more.
 ```
 
 Solve routing uses the configured remote endpoint first (if `CAPTCHA_SOLVER_URL` is set), then falls back to the built-in local model. See [CAPTCHA Solving](/captcha-solving) for setup and return-value shape.
+
+## Files and Cabinets
+
+SDK `0.2.0` adds typed helpers for the v0.17 Cabinet upload flow.
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `actions.upload(input?, base?)` | `upload` | Attach the newest unuploaded item from a Cabinet. Set `cabinetId` to choose a Cabinet and `markAsUploaded` to finalize immediately after attaching. |
+| `actions.finalizeUploads(base?)` | `finalize_uploads` | Mark all Cabinet items attached during the current execution as uploaded. |
+
+When `cabinetId` is omitted on an Upload action, Figranium uses the task's `cabinetId`; if the task also omits it, the instance default Cabinet is used.
+
+Keeping finalization separate is useful when an upload should only be consumed after the surrounding workflow reaches a successful point.
+
+```ts
+const task: Task = {
+  name: "Upload latest export",
+  url: "https://example.com/upload",
+  mode: "agent",
+  cabinetId: "cab_basic",
+  actions: [
+    actions.upload({ selector: "input[type=file]" }),
+    actions.click("button[type=submit]"),
+    actions.finalizeUploads(),
+  ],
+};
+```
 
 ## Typed one-off actions
 

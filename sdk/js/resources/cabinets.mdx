@@ -1,0 +1,75 @@
+---
+title: "CabinetsResource: Manage Download Queues"
+sidebarTitle: "Cabinets"
+description: "Manage Figranium v0.17 Cabinets with the JavaScript SDK: list, create, rename, clear, delete, update item status, ZIP/unzip, and build download URLs."
+---
+
+# CabinetsResource
+
+SDK `0.2.0` adds `figranium.cabinets`, a typed client for the Cabinets API introduced in Figranium v0.17.
+
+Cabinets are durable, installation-wide download queues. Tasks can route intercepted downloads into a selected Cabinet, and later actions can upload the newest unuploaded item from that queue.
+
+## Access the resource
+
+```ts
+import { Figranium } from "@figranium/sdk";
+
+const figranium = new Figranium({
+  apiKey: process.env.FIGRANIUM_API_KEY!,
+});
+
+const cabinets = await figranium.cabinets.list();
+```
+
+## Supported operations
+
+`CabinetsResource` covers the v0.17 Cabinet lifecycle and item-management API, including:
+
+- list Cabinets
+- create a Cabinet
+- rename a Cabinet
+- delete or migrate a Cabinet
+- clear Cabinet contents
+- list Cabinet items
+- set an item's upload status
+- remove Cabinet items, including bulk deletion
+- create ZIP archives
+- safely extract compatible archives
+- construct item download URLs
+
+The exact return types are exported by `@figranium/sdk`, so TypeScript consumers get typed Cabinet metadata and item records.
+
+## Use a Cabinet from a task
+
+Tasks can set `cabinetId` to select where intercepted browser downloads are stored:
+
+```ts
+import { actions, type Task } from "@figranium/sdk";
+
+const task: Task = {
+  name: "Download and reuse file",
+  url: "https://example.com/export",
+  mode: "agent",
+  cabinetId: "cab_basic",
+  actions: [
+    actions.click("#download"),
+    actions.upload({ selector: "input[type=file]" }),
+    actions.finalizeUploads(),
+  ],
+};
+```
+
+If a task omits `cabinetId`, Figranium uses the instance's default Cabinet. An individual Upload action can override the task-level selection with its own `cabinetId`.
+
+## Upload status
+
+Cabinet items track whether they have been uploaded. The `upload` action normally selects the newest unuploaded item. You can mark an item uploaded immediately with `markAsUploaded`, or keep finalization separate and call `finalize_uploads` later in the workflow.
+
+That separation is useful when attaching a file and successfully submitting it are two different steps.
+
+## Related
+
+- [Task Action Helpers](/sdk/js/actions)
+- [TasksResource](/sdk/js/resources/tasks)
+- [File Downloads](/file-downloads)

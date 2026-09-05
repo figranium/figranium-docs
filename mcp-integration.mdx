@@ -6,7 +6,7 @@ description: "Connect Claude Desktop, Cursor, and other MCP clients to Figranium
 
 The **Figranium MCP Server** is a Model Context Protocol (MCP) server for Figranium built using the official `@modelcontextprotocol/sdk`. This integration allows LLM clients such as **Claude Desktop**, **Cursor**, and **Manus AI** to seamlessly discover, execute, inspect, schedule, and programmatically construct Figranium browser automation tasks via standard STDIO transport.
 
-With this server, your AI assistant or agent can autonomously navigate the web, scrape structured data, handle multi-step workflows, and manage automated schedules directly using Figranium.
+With this server, your AI assistant or agent can autonomously navigate the web, scrape structured data, handle multi-step workflows, manage automated schedules, and work with v0.17 Cabinets for download/upload workflows directly using Figranium. The current MCP package is `figranium-mcp` v1.2.0 and uses `@figranium/sdk` v0.2.x for API access.
 
 <Info>
   The Model Context Protocol (MCP) is an open standard that lets AI applications securely connect to external data sources and tools. The Figranium MCP server exposes tasks, executions, and schedules as discoverable resources and callable tools.
@@ -116,14 +116,15 @@ The server initializes and communicates a predefined set of instructions directl
 
 ### 1. Task Creation and Execution Environments
 
-- **Task Modes**: Fast, non-interactive tasks should use the `scrape` mode. Detailed, interactive, multi-step tasks requiring complex mouse and keyboard simulation should use the `agent` mode.
+- **Task Modes**: Use `agent` mode by default, including for scraping tasks, because it supports action blocks. Use `scrape` only for exceptional action-free scraping where maximum speed matters; use `headful` for visible interactive debugging.
 - **Headful Execution**: For debugging or executing tasks that require a visible environment, headful execution is supported to let you visually inspect interactions in real-time.
 - **Stealth Configurations**: Anti-bot stealth mechanisms can be toggled inside the `stealth` configuration block. These simulate organic mouse curves, natural delays, randomized click offsets, and other human-like interactions.
 
 ### 2. Step Sequence Construction (Actions)
 
 - Automation workflows are organized sequentially in the `actions` array.
-- Supported actions include navigation (`navigate`), waits (`wait`, `wait_selector`, `wait_downloads`), interactions (`click`, `type`, `hover`, `press`, `scroll`), custom scripts (`javascript`), and control flow (`if`, `else`, `end`, `while`, `repeat`, `foreach`).
+- Supported actions include navigation (`navigate`), waits (`wait`, `wait_selector`, `wait_downloads`), interactions (`click`, `type`, `hover`, `press`, `scroll`), custom scripts (`javascript`), control flow (`if`, `else`, `end`, `while`, `repeat`, `foreach`), CAPTCHA actions (`solve_captcha`, `wait_captcha`), and v0.17 file actions (`upload`, `finalize_uploads`).
+- Tasks can also set `cabinetId` to choose the Cabinet that receives intercepted downloads. An `upload` action can optionally set its own `cabinetId` and `markAsUploaded`; otherwise it uses the task/default Cabinet and can be finalized later with `finalize_uploads`.
 - Always insert a `wait_selector` step **before** performing any interactive actions (e.g. `click` or `type`) to ensure the target element is loaded in the DOM.
 
 ### 3. Target Selector Strategy
@@ -156,11 +157,20 @@ The MCP server exposes rich tools mapped to Figranium's REST API.
 
 - **`create_task`**
   - Creates a completely configured Figranium task.
-  - _Parameters_: Name, starting URL, execution mode (`scrape` or `agent`), stealth settings, actions array, variables list, and scheduling details.
+  - _Parameters_: Name, starting URL, execution mode (`scrape`, `agent`, or `headful`), stealth settings, actions array, variables, optional `cabinetId`, and scheduling details.
 - **`task_list`**
   - Fetches all task IDs, names, and descriptions registered on the server.
 - **`task_execute`**
   - Triggers the execution of a task by ID. Supports runtime variable overrides.
+
+### Cabinet Operations
+
+- **`list_cabinets`**
+  - Lists Cabinets available on the connected Figranium instance so an agent can choose a destination/source by ID.
+- **`create_cabinet`**
+  - Creates a Cabinet that can then be referenced by `cabinetId` in a task or Upload action.
+
+These tools pair with the `upload` and `finalize_uploads` action types introduced for Figranium v0.17.
 
 ### Execution Operations
 
