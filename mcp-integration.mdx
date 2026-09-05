@@ -6,7 +6,7 @@ description: "Connect Claude Desktop, Cursor, and other MCP clients to Figranium
 
 The **Figranium MCP Server** is a Model Context Protocol (MCP) server for Figranium built using the official `@modelcontextprotocol/sdk`. This integration allows LLM clients such as **Claude Desktop**, **Cursor**, and **Manus AI** to seamlessly discover, execute, inspect, schedule, and programmatically construct Figranium browser automation tasks via standard STDIO transport.
 
-With this server, your AI assistant or agent can autonomously navigate the web, scrape structured data, handle multi-step workflows, manage automated schedules, and work with v0.17 Cabinets for download/upload workflows directly using Figranium. The current MCP package is `figranium-mcp` v1.2.0 and uses `@figranium/sdk` v0.2.x for API access.
+With this server, your AI assistant or agent can autonomously navigate the web, scrape structured data, handle multi-step workflows, and manage automated schedules directly using Figranium.
 
 <Info>
   The Model Context Protocol (MCP) is an open standard that lets AI applications securely connect to external data sources and tools. The Figranium MCP server exposes tasks, executions, and schedules as discoverable resources and callable tools.
@@ -116,7 +116,7 @@ The server initializes and communicates a predefined set of instructions directl
 
 ### 1. Task Creation and Execution Environments
 
-- **Task Modes**: Use `agent` mode by default, including for scraping tasks, because it supports action blocks. Use `scrape` only for exceptional action-free scraping where maximum speed matters; use `headful` for visible interactive debugging.
+- **Task Modes**: Fast, non-interactive tasks should use the `scrape` mode. Detailed, interactive, multi-step tasks requiring complex mouse and keyboard simulation should use the `agent` mode.
 - **Headful Execution**: For debugging or executing tasks that require a visible environment, headful execution is supported to let you visually inspect interactions in real-time.
 - **Stealth Configurations**: Anti-bot stealth mechanisms can be toggled inside the `stealth` configuration block. These simulate organic mouse curves, natural delays, randomized click offsets, and other human-like interactions.
 
