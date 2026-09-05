@@ -31,7 +31,6 @@ The `@figranium/sdk` package is the official TypeScript and JavaScript client fo
 | Field | Value |
 | :-- | :-- |
 | Package | `@figranium/sdk` |
-| Current version | `0.2.0` |
 | Node engine | `>=18` |
 | Module formats | ESM (`./dist/index.js`) and CommonJS (`./dist/index.cjs`) |
 | Types | Bundled (`./dist/index.d.ts`, `./dist/index.d.cts`) |
@@ -44,7 +43,7 @@ The `@figranium/sdk` package is the official TypeScript and JavaScript client fo
 - Save, update, version, and roll back tasks.
 - Run tasks with runtime variables, or call `scrape`, `agent`, and `headful` directly.
 - Stream live execution and selector events over Server-Sent Events.
-- Manage schedules, captures, cookies, output credentials, and v0.17 Cabinets.
+- Manage schedules, captures, cookies, output credentials, and Cabinets.
 - Select a per-task Cabinet for intercepted downloads and build typed Upload / Finalize Uploads actions.
 - Open and inspect headful browser sessions.
 - Administer settings (API keys, AI providers, proxies, theme) with a browser session.
@@ -71,4 +70,4 @@ The `@figranium/sdk` package is the official TypeScript and JavaScript client fo
 
 ## Compatibility
 
-SDK `0.2.0` includes the Figranium v0.17 Cabinet API surface and the accompanying `AGENT_SPEC.md` changes. Task and execution result types intentionally accept extra fields so newer server versions can add response data without breaking SDK consumers.
+The SDK includes the Cabinet API surface and the accompanying `AGENT_SPEC.md` task fields. Task and execution result types intentionally accept extra fields so newer server releases can add response data without breaking SDK consumers.

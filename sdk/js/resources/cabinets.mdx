@@ -1,12 +1,12 @@
 ---
 title: "CabinetsResource: Manage Download Queues"
 sidebarTitle: "Cabinets"
-description: "Manage Figranium v0.17 Cabinets with the JavaScript SDK: list, create, rename, clear, delete, update item status, ZIP/unzip, and build download URLs."
+description: "Manage Figranium Cabinets with the JavaScript SDK: list, create, rename, clear, delete, update item status, ZIP/unzip, and build download URLs."
 ---
 
 # CabinetsResource
 
-SDK `0.2.0` adds `figranium.cabinets`, a typed client for the Cabinets API introduced in Figranium v0.17.
+`figranium.cabinets` is the SDK's typed client for the Cabinets API.
 
 Cabinets are durable, installation-wide download queues. Tasks can route intercepted downloads into a selected Cabinet, and later actions can upload the newest unuploaded item from that queue.
 
@@ -24,7 +24,7 @@ const cabinets = await figranium.cabinets.list();
 
 ## Supported operations
 
-`CabinetsResource` covers the v0.17 Cabinet lifecycle and item-management API.
+`CabinetsResource` covers the Cabinet lifecycle and item-management API.
 
 <CardGroup cols={2}>
   <Card title="Cabinet lifecycle" icon="folder-plus">

@@ -4,7 +4,7 @@ sidebarTitle: "Downloads"
 description: "Learn how Figranium intercepts, stores, and exposes downloaded files during automation tasks. Includes wait strategies and API access."
 ---
 
-Figranium v0.17 stores intercepted browser downloads in **Cabinets**: durable, installation-wide download queues that make files reusable across executions and upload steps.
+Figranium stores intercepted browser downloads in **Cabinets**: durable, installation-wide download queues that make files reusable across executions and upload steps.
 
 Every installation has a default Cabinet. New installations start with **Basic Cabinet**, while legacy intercepted downloads are migrated automatically so existing download links continue to work.
 
@@ -56,7 +56,7 @@ Open **Cabinets** from the application sidebar to manage durable downloaded file
 
 ## Reusing a download with Upload
 
-v0.17 adds two Agent actions for turning a captured download into a later upload.
+Figranium provides two Agent actions for turning a captured download into a later upload.
 
 <AccordionGroup>
   <Accordion title="Upload" icon="upload">
@@ -84,7 +84,7 @@ v0.17 adds two Agent actions for turning a captured download into a later upload
 
 <CardGroup cols={3}>
   <Card title="JavaScript SDK" icon="code" href="/sdk/js/resources/cabinets">
-    SDK `0.2.0` exposes Cabinets through `figranium.cabinets` and adds typed `actions.upload()` and `actions.finalizeUploads()` helpers.
+    The SDK exposes Cabinets through `figranium.cabinets` and includes typed `actions.upload()` and `actions.finalizeUploads()` helpers.
   </Card>
 
   <Card title="MCP" icon="plug" href="/mcp-integration">
@@ -92,6 +92,6 @@ v0.17 adds two Agent actions for turning a captured download into a later upload
   </Card>
 
   <Card title="n8n" icon="diagram-project" href="/n8n-integration">
-    The official n8n node `0.7.0` exposes **Cabinet ID** in Task Create and Update so workflows can choose the task's download Cabinet.
+    The official n8n node exposes **Cabinet ID** in Task Create and Update so workflows can choose the task's download Cabinet.
   </Card>
 </CardGroup>

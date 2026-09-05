@@ -123,7 +123,7 @@ The server initializes and communicates a predefined set of instructions directl
 ### 2. Step Sequence Construction (Actions)
 
 - Automation workflows are organized sequentially in the `actions` array.
-- Supported actions include navigation (`navigate`), waits (`wait`, `wait_selector`, `wait_downloads`), interactions (`click`, `type`, `hover`, `press`, `scroll`), custom scripts (`javascript`), control flow (`if`, `else`, `end`, `while`, `repeat`, `foreach`), CAPTCHA actions (`solve_captcha`, `wait_captcha`), and v0.17 file actions (`upload`, `finalize_uploads`).
+- Supported actions include navigation (`navigate`), waits (`wait`, `wait_selector`, `wait_downloads`), interactions (`click`, `type`, `hover`, `press`, `scroll`), custom scripts (`javascript`), control flow (`if`, `else`, `end`, `while`, `repeat`, `foreach`), CAPTCHA actions (`solve_captcha`, `wait_captcha`), and file actions (`upload`, `finalize_uploads`).
 - Tasks can also set `cabinetId` to choose the Cabinet that receives intercepted downloads. An `upload` action can optionally set its own `cabinetId` and `markAsUploaded`; otherwise it uses the task/default Cabinet and can be finalized later with `finalize_uploads`.
 - Always insert a `wait_selector` step **before** performing any interactive actions (e.g. `click` or `type`) to ensure the target element is loaded in the DOM.
 
@@ -176,7 +176,7 @@ The MCP server exposes rich tools mapped to Figranium's REST API.
 </CardGroup>
 
 <Info>
-  These tools pair with the `upload` and `finalize_uploads` action types introduced for Figranium v0.17.
+  These tools pair with the `upload` and `finalize_uploads` action types.
 </Info>
 
 ### Execution Operations

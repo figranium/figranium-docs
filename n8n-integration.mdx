@@ -4,7 +4,7 @@ sidebarTitle: "n8n"
 description: "Connect Figranium to n8n workflows with the official community node. Install, authenticate, and trigger tasks or schedules from any n8n automation."
 ---
 
-The official Figranium n8n community node (`n8n-nodes-figranium`) lets you trigger tasks, create and update task definitions, inspect execution history, manage schedules, and work with Figranium browser sessions directly from n8n. Version `0.7.0` also adds the v0.17 per-task **Cabinet ID** field to Task Create and Update.
+The official Figranium n8n community node (`n8n-nodes-figranium`) lets you trigger tasks, create and update task definitions, inspect execution history, manage schedules, and work with Figranium browser sessions directly from n8n. Task Create and Update also expose the per-task **Cabinet ID** field.
 
 ## Installation
 
@@ -60,7 +60,7 @@ The **Figranium** node exposes several top-level resources and operations.
   </Card>
 
   <Card title="Task Actions" icon="list-check">
-    List, create, partially update, or delete saved tasks, including the v0.17 **Cabinet ID** field.
+    List, create, partially update, or delete saved tasks, including the **Cabinet ID** field.
   </Card>
 
   <Card title="Execution" icon="clock-rotate-left">
@@ -105,7 +105,7 @@ The **Figranium** node exposes several top-level resources and operations.
 
 ## Task Actions
 
-Task Create and Update expose the task configuration fields supported by the node. In v0.7.0, both include an optional **Cabinet ID** field. This maps to Figranium v0.17's per-task download Cabinet selection; leave it empty to use the instance's default Cabinet.
+Task Create and Update expose the task configuration fields supported by the node. Both include an optional **Cabinet ID** field for per-task download Cabinet selection; leave it empty to use the instance's default Cabinet.
 
 <AccordionGroup>
   <Accordion title="List">
