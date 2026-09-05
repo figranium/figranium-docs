@@ -183,9 +183,27 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
   </Accordion>
 
   <Accordion title="Wait for Downloads (wait_downloads)" icon="download">
-    Waits for file downloads to complete. Use this after clicking a download button to ensure the file is saved.
+    Waits for file downloads to complete. Use this after clicking a download button to ensure the transfer finishes before the task continues.
 
     - **Value**: Timeout in seconds.
+
+    Completed downloads are persisted in the task's selected [Cabinet](/file-downloads), introduced in v0.17.
+  </Accordion>
+
+  <Accordion title="Upload (upload)" icon="upload">
+    Attaches the newest unuploaded item from a Cabinet to the current page. Use it for download-then-upload workflows without moving files outside Figranium.
+
+    - **Selector**: Target file input, file chooser trigger, or compatible drop target.
+    - **Cabinet ID**: (Optional) Cabinet to read from. If omitted, the task's Cabinet is used, then the default Cabinet.
+    - **Mark As Uploaded**: (Optional) Mark the item uploaded immediately after attaching it.
+
+    Upload supports ordinary files, ZIP archives, compatible folders, native file inputs, file choosers, and drop targets.
+  </Accordion>
+
+  <Accordion title="Finalize Uploads (finalize_uploads)" icon="check">
+    Marks all Cabinet items attached during the current execution as uploaded.
+
+    Use this after the surrounding form submission or upload flow succeeds when you want consumption to happen later than the attachment itself.
   </Accordion>
 
   <Accordion title="On Error (on_error)" icon="triangle-exclamation">

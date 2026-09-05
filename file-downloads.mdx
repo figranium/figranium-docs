@@ -4,58 +4,94 @@ sidebarTitle: "Downloads"
 description: "Learn how Figranium intercepts, stores, and exposes downloaded files during automation tasks. Includes wait strategies and API access."
 ---
 
-Figranium provides built-in support for capturing and managing files downloaded during automation tasks. Whether it's a PDF report, a CSV export, or an image, Figranium ensures these files are intercepted and made available for review or further processing.
+Figranium stores intercepted browser downloads in **Cabinets**: durable, installation-wide download queues that make files reusable across executions and upload steps.
 
-## How it Works
+Every installation has a default Cabinet. New installations start with **Basic Cabinet**, while legacy intercepted downloads are migrated automatically so existing download links continue to work.
 
-Figranium automatically monitors the browser session for download events. When a download is triggered — whether by clicking a download link, submitting a form, or a direct navigation — the system intercepts the file.
+## How downloads are stored
 
-### Automatic Interception
+Figranium automatically monitors browser sessions for download events. When a download is triggered by a click, form submission, or navigation, the file is intercepted and routed into the Cabinet selected by the task.
 
-You don't need to configure specific selectors or listeners for downloads. Figranium's engine listens for the browser's download signal and handles the transfer of the file to the task's execution context.
+Task Settings exposes a Cabinet selection for downloads. If the task does not specify one, Figranium uses the instance's default Cabinet.
 
-### Waiting for Downloads
+Cabinet items preserve their original filename and folder structure in isolated storage so files with the same name do not collide. Items also track metadata such as kind, size, timestamps, upload status, and source task/execution.
 
-Since downloads often occur asynchronously and can take time depending on file size and network speed, it is important to ensure the task doesn't finish before the download is complete.
+## Waiting for downloads
 
-The **Wait for Downloads** (`wait_downloads`) action block is designed for this purpose:
+Downloads are asynchronous, so a task can otherwise finish before a transfer completes. Use **Wait for Downloads** (`wait_downloads`) immediately after the action that starts the download.
 
-- **Usage**: Place this block immediately after the action that triggers the download (e.g., a **Click** block).
-- **Timeout**: You can specify a timeout (in seconds). The task will wait until all pending downloads have finished or the timeout is reached.
-- **Default**: If no timeout is specified, it defaults to 30 seconds.
+- **Usage**: Place it after the Click or other action that triggers the download.
+- **Timeout**: Configure how long the task should wait for pending downloads.
+- **Default**: If no timeout is set, the block uses its normal default wait.
 
 <Info>
-  Always place a **Wait for Downloads** block after the action that triggers the download. Without it, the task may complete before the file finishes transferring.
+  **Wait for Downloads** controls execution timing. The completed file itself is persisted in the selected Cabinet, so it remains available after the execution ends.
 </Info>
 
-## Accessing Downloaded Files
+## Cabinets workspace
 
-Once a download is captured, it is associated with the specific task execution.
+Open **Cabinets** from the application sidebar to manage durable downloaded files.
 
-### The Results Drawer
+<CardGroup cols={2}>
+  <Card title="Organize" icon="folder-tree">
+    Create and rename Cabinets, inspect item metadata and upload state, and move workflows onto the Cabinet that fits them.
+  </Card>
 
-In the task editor, you can access downloads directly from the **Results** drawer:
+  <Card title="Manage items" icon="list-check">
+    Download individual items, clear a Cabinet, or delete selected items in bulk.
+  </Card>
 
-<Steps>
-  <Step title="Open the Results drawer">
-    After a task run, open the **Results** drawer in the editor.
-  </Step>
-  <Step title="Switch to the Downloads tab">
-    Click the **Downloads** tab to see a list of intercepted files with their original filenames.
-  </Step>
-  <Step title="Download or delete files">
-    You can download these files to your local machine or delete them from the list.
-  </Step>
-</Steps>
+  <Card title="Archive" icon="file-zipper">
+    Create ZIP archives from Cabinet contents and safely extract compatible ZIP archives.
+  </Card>
 
-### REST API
+  <Card title="Migrate" icon="arrow-right-arrow-left">
+    Migrate items before deleting a Cabinet so durable files can move with your workflow.
+  </Card>
+</CardGroup>
 
-Downloads are also accessible via the Figranium API. When you fetch the status or results of a task execution, the response includes a `downloads` array containing metadata for each captured file.
+<Note>
+  Individual Cabinets have direct, reload-safe URLs. If a Cabinet URL points to an invalid Cabinet, Figranium falls back to the default Cabinet.
+</Note>
 
-### Integrations
+## Reusing a download with Upload
 
-For automated workflows, such as those using the **n8n integration**, downloaded files can be passed as binary data to subsequent nodes, allowing for seamless document processing pipelines.
+Figranium provides two Agent actions for turning a captured download into a later upload.
+
+<AccordionGroup>
+  <Accordion title="Upload" icon="upload">
+    **Upload** selects the newest unuploaded item in its source Cabinet and attaches it to the page. It supports ordinary files, ZIP archives, compatible folders, native file inputs, file chooser flows, and drop targets.
+
+    An Upload action can choose its own Cabinet. If it does not, it uses the task's selected Cabinet, then falls back to the instance default.
+
+    This makes download-then-upload workflows possible without copying files outside Figranium.
+  </Accordion>
+
+  <Accordion title="Finalize Uploads" icon="check">
+    **Finalize Uploads** marks all Cabinet items attached during the current execution as uploaded.
+
+    Keeping finalization as a separate action lets a workflow attach a file first, submit or validate the surrounding form, and only mark the item consumed after that later step succeeds.
+
+    An Upload action can also mark an item uploaded immediately when that behavior is preferable.
+  </Accordion>
+</AccordionGroup>
 
 <Tip>
-  For large files or slow connections, increase the **Wait for Downloads** timeout beyond the default 30 seconds to prevent premature task completion.
+  Keep finalization separate when attaching the file is not the same as successfully completing the upload flow.
 </Tip>
+
+## Integrations
+
+<CardGroup cols={3}>
+  <Card title="JavaScript SDK" icon="code" href="/sdk/js/resources/cabinets">
+    The SDK exposes Cabinets through `figranium.cabinets` and includes typed `actions.upload()` and `actions.finalizeUploads()` helpers.
+  </Card>
+
+  <Card title="MCP" icon="plug" href="/mcp-integration">
+    The MCP server understands task-level `cabinetId`, `upload`, and `finalize_uploads`, and can list or create Cabinets before building a task.
+  </Card>
+
+  <Card title="n8n" icon="diagram-project" href="/n8n-integration">
+    The official n8n node exposes **Cabinet ID** in Task Create and Update so workflows can choose the task's download Cabinet.
+  </Card>
+</CardGroup>

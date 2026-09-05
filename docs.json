@@ -93,6 +93,7 @@
               "sdk/js/resources/tasks",
               "sdk/js/resources/executions",
               "sdk/js/resources/schedules",
+              "sdk/js/resources/cabinets",
               "sdk/js/resources/captures",
               "sdk/js/resources/credentials",
               "sdk/js/resources/browser",
