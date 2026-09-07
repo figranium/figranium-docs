@@ -111,7 +111,8 @@
           "mcp-integration",
           "community-presets",
           "n8n-integration",
-          "simplynode-integration"
+          "simplynode-integration",
+          "digitalocean-one-click"
         ]
       },
       {

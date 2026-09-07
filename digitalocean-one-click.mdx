@@ -1,0 +1,46 @@
+---
+title: "DigitalOcean 1-Click"
+sidebarTitle: "DigitalOcean"
+description: "Deploy Figranium on DigitalOcean with the official 1-Click App, automatic updates, and a preconfigured self-hosted environment."
+---
+
+# DigitalOcean 1-Click
+
+Deploy Figranium on DigitalOcean without manually configuring Docker, Compose, or the host environment.
+
+The official Figranium 1-Click App creates a self-hosted Figranium instance on your own DigitalOcean Droplet. The image includes the required runtime, Docker configuration, and reverse proxy setup so you can start building browser automations shortly after deployment.
+
+## Deploy Figranium
+
+1. Open the Figranium listing in the DigitalOcean Marketplace.
+2. Create a Droplet from the Figranium 1-Click App.
+3. Choose a Droplet size appropriate for your workload.
+4. Finish creating the Droplet and wait for provisioning to complete.
+5. Open the Droplet's public IP address in your browser.
+6. Create your Figranium account and start building tasks.
+
+Caddy is included and preconfigured as a reverse proxy, so Figranium can be reached through the Droplet's public IP without adding the application port to the URL.
+
+## Automatic updates
+
+DigitalOcean 1-Click deployments automatically keep Figranium up to date.
+
+The deployment checks for the latest stable Figranium container image shortly after boot and then once per hour. When a newer image is available, Docker pulls it and recreates the Figranium service with the updated image. If the deployed image is already current, the running container is left unchanged.
+
+Persistent Figranium data and captures are stored outside the application container and are preserved when the service is updated.
+
+## Droplet sizing
+
+Figranium requires enough memory to run Chromium reliably. A 2 GB Droplet is the practical minimum for typical workloads, while 4 GB or more is recommended for heavier tasks or concurrent browser executions.
+
+See [Host Specs](/host-specs) for detailed resource guidance.
+
+## Use your own domain
+
+You can point a domain or subdomain to the Droplet's public IP and configure Caddy to serve Figranium through that hostname. Caddy can then automatically provision and renew HTTPS certificates.
+
+## Self-hosted by design
+
+The DigitalOcean 1-Click App is still a self-hosted Figranium deployment. The Droplet, its data, and its infrastructure remain under your control while avoiding the manual setup normally required for a fresh server.
+
+Once deployed, you can use Figranium normally through the visual editor, REST API, JavaScript SDK, MCP server, and supported integrations.
