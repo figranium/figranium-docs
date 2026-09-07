@@ -1,0 +1,164 @@
+---
+title: "DigitalOcean 1-Click"
+sidebarTitle: "DigitalOcean"
+description: "Deploy Figranium on DigitalOcean with the official 1-Click App, automatic updates, and a preconfigured self-hosted environment."
+---
+
+# DigitalOcean 1-Click
+
+Deploy Figranium on your own DigitalOcean Droplet with the official 1-Click App.
+
+The image comes preconfigured with Docker, Figranium, Caddy, and an automatic updater, so you can go from a new Droplet to a working visual browser automation environment without manually installing the application stack.
+
+<CardGroup cols={2}>
+  <Card title="1-Click deployment" icon="cloud-arrow-up">
+    Provision a self-hosted Figranium instance directly from the DigitalOcean Marketplace.
+  </Card>
+
+  <Card title="Automatic updates" icon="arrows-rotate">
+    The deployment checks for the latest stable Figranium image after boot and once per hour.
+  </Card>
+
+  <Card title="Caddy included" icon="globe">
+    Access Figranium through the Droplet's public IP without specifying the internal application port.
+  </Card>
+
+  <Card title="Self-hosted" icon="server">
+    Your Droplet, browser workloads, data, and infrastructure remain under your control.
+  </Card>
+</CardGroup>
+
+## Deploy
+
+<Steps>
+  <Step title="Create a Figranium Droplet">
+    Open the Figranium listing in the DigitalOcean Marketplace and create a Droplet from the 1-Click App.
+  </Step>
+  <Step title="Choose your Droplet size">
+    Use at least 2 GB of RAM for typical workloads. For heavier browser tasks or concurrent executions, 4 GB or more is recommended.
+  </Step>
+  <Step title="Wait for provisioning">
+    DigitalOcean will create the Droplet and start the preconfigured Figranium environment automatically.
+  </Step>
+</Steps>
+
+<Note>
+  See [Host Specs](/host-specs) for more detailed resource guidance.
+</Note>
+
+## Getting Started
+
+Your Figranium instance is ready to use after the Droplet finishes provisioning.
+
+<Steps>
+  <Step title="Open Figranium">
+    Visit:
+
+    ```text
+    http://your_droplet_public_ipv4
+    ```
+
+    Caddy is preconfigured as a reverse proxy, so you do not need to specify Figranium's internal application port.
+
+    On your first visit, create your administrator account and sign in.
+  </Step>
+  <Step title="Create your first automation">
+    From the dashboard, create a new task and use Figranium's visual editor to build your browser workflow.
+
+    You can automate navigation, clicks, typing, data extraction, screenshots, JavaScript, and other browser interactions.
+  </Step>
+  <Step title="Use the API">
+    Figranium includes a REST API for executing tasks and connecting your instance to external applications, AI agents, and workflow automation platforms.
+
+    Your API key is available from Figranium's settings after signing in.
+
+    <Card title="REST API" icon="code" href="/rest-api">
+      Learn how to execute and manage Figranium programmatically.
+    </Card>
+  </Step>
+</Steps>
+
+## Automatic updates
+
+The DigitalOcean deployment keeps Figranium current automatically.
+
+<Tip>
+  The updater runs shortly after boot and then checks once per hour for a newer stable Figranium container image.
+</Tip>
+
+When a newer image is available, Docker pulls it and recreates the Figranium service using the updated image. If the deployed image is already current, the running container is left unchanged.
+
+Persistent application data and captures are stored outside the application container and are preserved when Figranium is updated.
+
+## Custom domain and HTTPS
+
+You can optionally serve Figranium from your own domain or subdomain and let Caddy manage HTTPS automatically.
+
+<Steps>
+  <Step title="Point your domain to the Droplet">
+    Create an `A` record with your DNS provider that points your domain or subdomain to:
+
+    ```text
+    your_droplet_public_ipv4
+    ```
+  </Step>
+  <Step title="Edit the Caddy configuration">
+    SSH into the Droplet and edit:
+
+    ```text
+    /etc/caddy/Caddyfile
+    ```
+
+    Replace the default configuration with:
+
+    ```caddyfile
+    your-domain.example.com {
+        reverse_proxy 127.0.0.1:11345
+    }
+    ```
+  </Step>
+  <Step title="Allow HTTPS traffic">
+    ```bash
+    sudo ufw allow 443/tcp
+    ```
+  </Step>
+  <Step title="Validate and reload Caddy">
+    ```bash
+    sudo caddy validate --config /etc/caddy/Caddyfile
+    sudo systemctl reload caddy
+    ```
+  </Step>
+</Steps>
+
+Once the DNS record resolves to the Droplet, Caddy automatically provisions and renews an HTTPS certificate for the domain.
+
+Your Figranium instance will then be available at:
+
+```text
+https://your-domain.example.com
+```
+
+<Warning>
+  Do not expose Figranium publicly without completing the initial administrator setup and reviewing your instance's security configuration.
+</Warning>
+
+## What the 1-Click App includes
+
+- Figranium running from the latest stable container image
+- Docker and Docker Compose
+- Caddy configured as a reverse proxy
+- Automatic Figranium update checks after boot and every hour
+- Persistent application data and capture storage
+- DigitalOcean Droplet Agent support
+
+The result is a standard self-hosted Figranium deployment with the server setup already handled for you.
+
+<CardGroup cols={2}>
+  <Card title="Build visually" icon="diagram-project" href="/action-blocks">
+    Stack action blocks to create complex browser workflows without writing full Playwright scripts.
+  </Card>
+
+  <Card title="Connect your stack" icon="plug" href="/mcp-integration">
+    Use the API, SDK, MCP server, and integrations to connect Figranium to agents and automation tools.
+  </Card>
+</CardGroup>
