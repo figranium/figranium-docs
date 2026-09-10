@@ -5,32 +5,33 @@ description: "Run Figranium from the command line for one-off scrapes, agent tas
 ---
 
 <Warning>
-  **The official `figranium` NPM package is retired and is not supported from v0.13 onward.** Install and run Figranium via Docker or from source instead. The `npm`/`npx` commands below are kept for reference for users on older releases.
+  The old `figranium` npm package is retired. Current releases run the CLI from a local source checkout; do not install or invoke Figranium through `npm -g` or `npx figranium`.
 </Warning>
 
-Figranium can be run entirely from the command line, either as a persistent web server or in standalone modes for one-off scraping and automation tasks.
+Figranium includes a source-based CLI for inspecting tasks and launching standalone scraper, Agent, or Headful runs.
 
 ## Installation
 
-<CodeGroup>
+Clone the repository and install its dependencies using the normal source setup:
 
-```bash Global install
-npm install -g figranium
+```bash
+git clone https://github.com/figranium/figranium.git
+cd figranium
+npm install
 ```
-
-```bash npx (no install)
-npx figranium
-```
-
-</CodeGroup>
 
 ## Usage
 
+Launch the interactive CLI from the repository root:
+
 ```bash
-figranium [options]
-figranium --scrape --url <url> [--selector <css>]
-figranium --agent --task <id>
-figranium --headful --url <url>
+node bin/cli.js
+```
+
+The CLI can invoke the underlying `agent.js`, `headful.js`, and `scrape.js` runners according to the selected runtime mode. For direct runner flags, use each runner's built-in help, for example:
+
+```bash
+node agent.js --help
 ```
 
 ## Modes
@@ -41,7 +42,7 @@ figranium --headful --url <url>
 
     ```bash
     figranium
-    figranium --port 8080   # Start on a custom port
+    node bin/cli.js --port 8080   # Start on a custom port
     ```
   </Accordion>
 
@@ -49,7 +50,7 @@ figranium --headful --url <url>
     Runs a fast, one-off page scrape without full agent logic. Ideal for simple text extraction tasks.
 
     ```bash
-    figranium --scrape --url "https://example.com" --selector ".product-price"
+    node bin/cli.js --scrape --url "https://example.com" --selector ".product-price"
     ```
 
     **Flags for `--scrape`:**
@@ -65,7 +66,7 @@ figranium --headful --url <url>
     **Example — Save to file:**
 
     ```bash
-    figranium --scrape --url "https://quotes.toscrape.com" --selector ".quote" --output quotes.json
+    node bin/cli.js --scrape --url "https://quotes.toscrape.com" --selector ".quote" --output quotes.json
     ```
   </Accordion>
 
@@ -73,7 +74,7 @@ figranium --headful --url <url>
     Executes the full block-based automation engine for a saved task.
 
     ```bash
-    figranium --agent --task "my-task-id"
+    node bin/cli.js --agent --task "my-task-id"
     ```
 
     **Flags for `--agent`:**
@@ -113,7 +114,7 @@ figranium --headful --url <url>
     Launches a visible Chromium browser for manual inspection and debugging.
 
     ```bash
-    figranium --headful --url "https://example.com"
+    node bin/cli.js --headful --url "https://example.com"
     ```
 
     The browser opens on your display (requires a graphical environment). On a headless server, use the VNC integration instead — see [Headful Browser](/headful-browser).
@@ -159,7 +160,7 @@ Combine CLI modes with shell scripts for automated pipelines:
 ```bash Shell pipeline
 #!/bin/bash
 # Run a scrape and pipe results to a processor
-figranium --scrape --url "https://api.example.com/data" \
+node bin/cli.js --scrape --url "https://api.example.com/data" \
   --selector ".data-row" \
   --output /tmp/scraped.json
 
@@ -168,7 +169,7 @@ python3 process_data.py /tmp/scraped.json
 
 ```bash Cron schedule
 # Crontab: run every hour at the top of the hour
-0 * * * * /usr/local/bin/figranium --agent --task "my-hourly-task"
+0 * * * * /usr/local/bin/node bin/cli.js --agent --task "my-hourly-task"
 ```
 
 </CodeGroup>

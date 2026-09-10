@@ -1,0 +1,53 @@
+---
+title: "Page Translation"
+sidebarTitle: "Page Translation"
+description: "Translate browser-rendered task pages before actions and extraction using Figranium's per-task translate.js integration."
+---
+
+Figranium can translate the rendered target page for a task before its actions and extraction logic run. Translation is configured per task and is **disabled by default**.
+
+## Enable translation
+
+In Task Settings, enable **Page Translation** and choose a target language. The equivalent task JSON is:
+
+```json
+{
+  "translation": {
+    "enabled": true,
+    "targetLanguage": "spanish"
+  }
+}
+```
+
+`targetLanguage` uses translate.js language names. Common values include `english`, `spanish`, `french`, `german`, `italian`, `portuguese`, `japanese`, `korean`, `chinese_simplified`, and `arabic`.
+
+## Execution behavior
+
+- **Agent tasks** translate the initial rendered page before actions and extraction run.
+- Translation is reapplied after later navigations in the same browser page.
+- **Headful sessions** use the same task translation setting.
+- **Scrape mode** is HTTP-only and does not execute page translation.
+- If `translation` is omitted, Figranium behaves as if `enabled` were `false`.
+
+This is useful when your selectors, extraction logic, or downstream data processing expect page text in a consistent language while the source site may render another one.
+
+<Warning>
+  Enabling translation loads translate.js and sends rendered page text to its configured external translation service. Only enable it for pages whose content may be shared with that service.
+</Warning>
+
+## Example task fragment
+
+```json
+{
+  "name": "Translated product scraper",
+  "mode": "agent",
+  "url": "https://example.com",
+  "translation": {
+    "enabled": true,
+    "targetLanguage": "english"
+  },
+  "actions": []
+}
+```
+
+Translation changes the rendered page text available to browser-backed actions; it does not turn Agent mode into an autonomous AI agent or alter Scrape mode's HTTP-only execution model.

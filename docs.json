@@ -61,6 +61,7 @@
           "javascript-execution",
           "data-extraction",
           "extraction-script-generation",
+          "page-translation",
           "stealth-mode",
           "captcha-solving",
           "csv-processing",
