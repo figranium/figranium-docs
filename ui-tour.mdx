@@ -1,10 +1,10 @@
 ---
-title: "Figranium UI Tour: Dashboard, Editor, Captures, Executions, Settings"
+title: "Figranium UI Tour: Dashboard, Editor, Captures, Executions, Cabinets, Settings"
 sidebarTitle: "UI Tour"
-description: "Explore Figranium's five main screens: Dashboard, Editor, Captures, Executions, and Settings. Learn how to navigate, create tasks, and configure your instance."
+description: "Explore Figranium's six main screens: Dashboard, Editor, Captures, Executions, Cabinets, and Settings. Learn how to navigate, create tasks, and configure your instance."
 ---
 
-Figranium's user interface is designed for simplicity and power. It consists of five main sections: Dashboard, Editor, Captures, Executions, and Settings.
+Figranium's user interface is designed for simplicity and power. It consists of six main sections: Dashboard, Editor, Captures, Executions, Cabinets, and Settings.
 
 <CardGroup cols={2}>
   <Card title="Dashboard" icon="layout-dashboard" href="/dashboard">
@@ -21,6 +21,10 @@ Figranium's user interface is designed for simplicity and power. It consists of 
 
   <Card title="Executions" icon="list-checks" href="/executions">
     Review a chronological log of every task run with status, source, and duration.
+  </Card>
+
+  <Card title="Cabinets" icon="shelves" href="/cabinets">
+    Manage durable download queues, upload state, archives, and files produced by tasks.
   </Card>
 
   <Card title="Settings" icon="settings" href="/settings">
@@ -57,7 +61,7 @@ The core of Figranium. This screen features an infinite canvas spatial editor fo
     - **Changing block type**: Click the type label on a block (e.g., "CLICK", "TYPE") to open the Action Palette for that block, letting you switch it to a different action type. If you click the label a second time quickly, the block settings modal opens instead.
   - **Sticky Notes**: Right-click the canvas and select **Add sticky note** to place a free-form text note anywhere on the canvas. Use sticky notes to annotate your workflow, leave reminders, or document complex logic for collaborators.
     - **Colors**: Click a color swatch in the note header to change the note color (default, yellow, pink, green, or purple).
-    - **Edit**: Click the edit button in the note header to modify the text.
+    - **Edit**: Click the edit button in the note header to modify the text. Sticky notes grow automatically as their content gets longer, so long guidance is not clipped into a fixed-height card.
     - **Copy**: Click the copy button to copy the note content to your clipboard.
     - **Delete**: Click the delete button to remove the note.
     - **Keyboard navigation**: All sticky note actions are fully keyboard-accessible. Tab into a note to reveal the action buttons, and use visible focus indicators to navigate between controls.
@@ -66,7 +70,9 @@ The core of Figranium. This screen features an infinite canvas spatial editor fo
     - **Keyboard navigation**: Use the arrow keys to move between actions in the grid — `Up`/`Down` move between rows and `Left`/`Right` move within a row. Press `Enter` to insert the highlighted action. Press `Escape` to clear the current search query; if the search field is already empty, pressing `Escape` closes the palette. The active item is visually highlighted so you always know which action is selected. All interactive elements have visible focus indicators for keyboard and screen-reader users.
     - **Auto-open configuration modal**: After you insert a configurable action from the palette, Figranium automatically opens that block's settings modal so you can fill in its selector, value, or other parameters straight away — no extra double-click required. Structural blocks that take no configuration (`else`, `end`, `on_error`, and `do_nothing`) skip this step and are added silently.
     - **Shortcut hints**: Buttons throughout the editor display their keyboard shortcut in a tooltip when you hover or focus them (e.g., "Add action (Ctrl \+ K)" or "Run Task (Ctrl \+ Enter)").
-  - **Variables**: Define dynamic parameters (e.g., `{$query}`) for reuse.
+  - **Variables**: Define dynamic parameters (e.g., `{$query}`) for reuse. The editor header includes a Variables shortcut that opens the Variables tab in Task Settings directly.
+  - **On Execution**: New tasks include the On Execution configuration panel by default. Its task-level wait defaults to `0` seconds unless you explicitly set another value.
+  - **Page Translation**: Browser-backed tasks can opt in to translating the rendered page before actions and extraction run. Translation is disabled by default and is reapplied after navigation in Agent and Headful sessions. Scrape mode remains HTTP-only and does not run page translation. See [Page Translation](/page-translation).
   - **Extraction Script**: Write JavaScript to parse the page content after execution.
   - **Settings**: Configure stealth, recording, proxy rotation, and viewports.
 - **Schedule Tab**:
@@ -112,7 +118,7 @@ A gallery of all artifacts generated by your tasks, laid out as a two-column gri
 
 ## Executions (`/executions`)
 
-A chronological log of every task run, whether triggered from the editor or via the API.
+A chronological log of task executions triggered from the editor or via the API. Interactive Headful browser sessions are intentionally excluded from this list.
 
 - **Source filter**: Use the **All**, **Editor**, and **API** tabs at the top to narrow the list by how each run was triggered.
 - **Execution rows**: Each entry shows the task name, mode, timestamp, source, status, and duration. The HTTP status code is displayed as a color-coded badge — green for success (2xx), red for client/server errors (4xx/5xx), and blue for other codes — so you can scan results at a glance. Click a row to open the full execution detail, including the screenshot, activity log, and extracted data. The detail view uses the same color-coded status badges. Click the **Back** button to return to the executions list — it displays a shortcut hint (Alt \+ 3) in its tooltip.
@@ -120,6 +126,18 @@ A chronological log of every task run, whether triggered from the editor or via 
 - **Clear all**: Click the trash icon in the page header to delete every execution record at once. A confirmation prompt appears before anything is removed.
 - **Empty state**: When no executions exist, the screen displays a prompt with a shortcut to the dashboard so you can start a task right away.
 - **Keyboard navigation**: All action buttons support keyboard navigation with visible focus indicators.
+
+## Cabinets (`/cabinets`)
+
+Cabinets are durable, installation-wide download queues used by browser downloads and Upload actions.
+
+- **Basic Cabinet**: New and migrated tasks fall back to the built-in Basic Cabinet unless another Cabinet is selected.
+- **Per-task routing**: Choose which Cabinet receives intercepted downloads from a task.
+- **Upload status**: Items can be marked uploaded or unuploaded so later Upload actions can pick the latest pending file.
+- **Archives**: Create ZIP archives from Cabinet items and extract ZIP files from the Cabinets workspace.
+- **Management**: Create, rename, clear, or delete Cabinets and manage individual items without deleting the task that produced them.
+
+See [Downloads and Cabinets](/file-downloads) for the full workflow.
 
 ## Settings (`/settings`)
 

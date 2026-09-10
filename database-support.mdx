@@ -64,6 +64,7 @@ DB_POSTGRESDB_SSL=true
     - **Credentials** — saved credentials used by output providers and action blocks.
     - **AI model configuration** — selected models for each provider.
     - **Proxy configuration** — proxy list, default proxy, rotation mode, and rotation settings.
+    - **Cabinet metadata** — Cabinet definitions and item metadata, including upload status and task/run provenance. The downloaded file bytes themselves remain on disk.
 
     API key columns use the `TEXT` type, so longer keys (such as service-account tokens) are stored without truncation.
   </Tab>
