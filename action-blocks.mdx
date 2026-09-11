@@ -28,10 +28,41 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
 
 <AccordionGroup>
   <Accordion title="Click" icon="arrow-pointer">
-    Simulates a left-click on an element. Use this to interact with buttons, links, or any clickable item.
+    Interacts with a button, link, or other clickable item.
 
     - **Selector**: The CSS selector of the target element (e.g., `#btn`, `.link`).
+    - **Click Type**: `single` (default), `double`, or `right`.
     - **Wait**: Optional delay (in seconds) after clicking.
+  </Accordion>
+
+  <Accordion title="Check (check)" icon="square-check">
+    Ensures a checkbox or radio control is selected. This is idempotent: an already-selected control is left unchanged.
+
+    - **Selector**: The checkbox or radio control to select.
+  </Accordion>
+
+  <Accordion title="Uncheck (uncheck)" icon="square">
+    Ensures a checkbox is cleared. The selector must target a compatible checkbox control.
+
+    - **Selector**: The checkbox to clear.
+  </Accordion>
+
+  <Accordion title="Drag and Drop (drag_and_drop)" icon="arrows-left-right">
+    Drags the element matched by **Selector** onto the element matched by **Target Selector**. Choose each selector independently, including in headful selector picking.
+
+    - **Selector**: The draggable source element.
+    - **Target Selector**: The required drop target element.
+  </Accordion>
+
+  <Accordion title="Select (select)" icon="list">
+    Selects an option in a native HTML `<select>` control.
+
+    - **Selector**: The native select element.
+    - **Value**: The option value to choose.
+  </Accordion>
+
+  <Accordion title="Reload (reload)" icon="rotate">
+    Reloads the current page and waits for the refreshed document to load.
   </Accordion>
 
   <Accordion title="Type" icon="keyboard">
