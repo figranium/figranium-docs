@@ -31,7 +31,7 @@ Use `disabled: true` to keep an action in the list without executing it.
 
 <CardGroup cols={2}>
   <Card title="Navigation and interaction" icon="arrow-right" href="#navigation-and-interaction">
-    Navigate, click, type, press keys, wait, hover, and capture screenshots.
+    Navigate, click, check controls, drag and drop, select options, type, press keys, wait, hover, reload, and capture screenshots.
   </Card>
 
   <Card title="Extraction" icon="database" href="#extraction">
@@ -56,7 +56,12 @@ Use `disabled: true` to keep an action in the list without executing it.
 | Helper | Action type | Purpose |
 | :-- | :-- | :-- |
 | `actions.navigate(url, base?)` | `navigate` | Navigate the current tab to `url`. |
-| `actions.click(selector, base?)` | `click` | Click the element matched by `selector`. |
+| `actions.click(selector, clickTypeOrBase?, base?)` | `click` | Click the element matched by `selector`. Use `"single"` (default), `"double"`, or `"right"` for the click type. |
+| `actions.check(selector, base?)` | `check` | Ensure a checkbox or radio control is selected. |
+| `actions.uncheck(selector, base?)` | `uncheck` | Ensure a checkbox is cleared. |
+| `actions.dragAndDrop(selector, targetSelector, base?)` | `drag_and_drop` | Drag the source element to the target element. |
+| `actions.select(selector, value, base?)` | `select` | Select an option by value in a native `<select>`. |
+| `actions.reload(base?)` | `reload` | Reload the current page. |
 | `actions.type(selector, value, mode?, base?)` | `type` | Type into `selector`. `mode` is `"replace"` (default) or `"append"`. |
 | `actions.press(key, selector?, base?)` | `press` | Press a keyboard `key`, optionally targeting `selector`. |
 | `actions.wait(seconds, base?)` | `wait` | Wait a fixed number of seconds. |
@@ -142,10 +147,10 @@ The SDK includes typed helpers for the Cabinet upload flow.
 
 | Helper | Action type | Purpose |
 | :-- | :-- | :-- |
-| `actions.upload(input?, base?)` | `upload` | Attach the newest unuploaded item from a Cabinet. Set `cabinetId` to choose a Cabinet and `markAsUploaded` to finalize immediately after attaching. |
+| `actions.upload(input?, base?)` | `upload` | Attach the newest unuploaded item from a Cabinet. Set `downloadCabinetId` to choose a Cabinet and `markAsUploaded` to finalize immediately after attaching. |
 | `actions.finalizeUploads(base?)` | `finalize_uploads` | Mark all Cabinet items attached during the current execution as uploaded. |
 
-When `cabinetId` is omitted on an Upload action, Figranium uses the task's `cabinetId`; if the task also omits it, the instance default Cabinet is used.
+When `downloadCabinetId` is omitted on an Upload action, Figranium uses the task's `cabinetId`; if the task also omits it, the instance default Cabinet is used.
 
 Keeping finalization separate is useful when an upload should only be consumed after the surrounding workflow reaches a successful point.
 
