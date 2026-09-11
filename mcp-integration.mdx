@@ -123,8 +123,9 @@ The server initializes and communicates a predefined set of instructions directl
 ### 2. Step Sequence Construction (Actions)
 
 - Automation workflows are organized sequentially in the `actions` array.
-- Supported actions include navigation (`navigate`), waits (`wait`, `wait_selector`, `wait_downloads`), interactions (`click`, `type`, `hover`, `press`, `scroll`), custom scripts (`javascript`), control flow (`if`, `else`, `end`, `while`, `repeat`, `foreach`), CAPTCHA actions (`solve_captcha`, `wait_captcha`), and file actions (`upload`, `finalize_uploads`).
-- Tasks can also set `cabinetId` to choose the Cabinet that receives intercepted downloads. An `upload` action can optionally set its own `cabinetId` and `markAsUploaded`; otherwise it uses the task/default Cabinet and can be finalized later with `finalize_uploads`.
+- Supported actions include navigation (`navigate`, `reload`), waits (`wait`, `wait_selector`, `wait_downloads`), interactions (`click` with `single`, `double`, or `right` click modes; `check`, `uncheck`, `drag_and_drop`, `select`, `type`, `hover`, `press`, `scroll`), custom scripts (`javascript`), control flow (`if`, `else`, `end`, `while`, `repeat`, `foreach`), CAPTCHA actions (`solve_captcha`, `wait_captcha`), and file actions (`upload`, `finalize_uploads`).
+- Tasks can also set `cabinetId` to choose the Cabinet that receives intercepted downloads. An `upload` action can optionally set `downloadCabinetId` and `markAsUploaded`; otherwise it uses the task/default Cabinet and can be finalized later with `finalize_uploads`.
+- Agent and headful tasks can opt in to `translation: { enabled: true, targetLanguage }` so rendered page text is translated before actions and re-applied after navigation. Translation is unavailable in scrape mode.
 - Add `wait_selector` only when readiness actually requires it. Do not add waits automatically before every interaction.
 - Prefer native Figranium actions over JavaScript, and avoid redundant `navigate`, wait, loop, or `start` / “On Execution” blocks when task-level behavior already covers them.
 
