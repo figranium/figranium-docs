@@ -153,9 +153,6 @@
       "canonical": "https://figranium.dev/docs"
     }
   },
-  "fonts": {
-    "family": "Questrial"
-  },
   "integrations": {
     "telemetry": {
       "enabled": true
