@@ -171,5 +171,8 @@
   },
   "markdown": {
     "schema": true
+  },
+  "icons": {
+    "library": "tabler"
   }
 }
