@@ -247,15 +247,15 @@ Use this to log solve times, or to branch with an [If](/control-flow) block on `
 When a `solve_captcha` or `wait_captcha` block fails, the run log includes sanitized `[CAPTCHA ERROR]` lines with per-route diagnostics (credentials and tokens are redacted), and the block reports an errored status. Existing [On Error](/error-handling) handling applies: with a handler the flow jumps to it, without one the failure is logged and the run continues.
 
 <AccordionGroup>
-  <Accordion title="Block errors with 'no solver route succeeded'" icon="triangle-exclamation">
+  <Accordion title="Block errors with 'no solver route succeeded'" icon="alert-triangle">
     Both the remote endpoint (if configured) and the local solver failed. Check `attempts` in the return value for the per-route error. Common causes: `CAPTCHA_SOLVER_URL` unreachable, host memory below 2 GiB with `SKIP_LOCAL_CAPTCHA_MODEL` implicitly disabling local, or a challenge variant not yet supported.
   </Accordion>
 
-  <Accordion title="Local solver never runs on a small host" icon="microchip">
+  <Accordion title="Local solver never runs on a small host" icon="cpu">
     Local image solving requires at least 2 GiB effective cgroup memory. On smaller hosts, configure a remote endpoint via `CAPTCHA_SOLVER_URL` / `CAPTCHA_SOLVER_KEY`.
   </Accordion>
 
-  <Accordion title="Forcing CAPTCHA_MODEL_TIER=florence2 fails to start" icon="chart-simple">
+  <Accordion title="Forcing CAPTCHA_MODEL_TIER=florence2 fails to start" icon="chart-bar">
     Florence-2 requires 8 GiB\+ effective memory and 2 GiB available. Drop back to `auto` or `owlvit`.
   </Accordion>
 
