@@ -171,5 +171,8 @@
   },
   "icons": {
     "library": "tabler"
+  },
+  "fonts": {
+    "family": "Questrial"
   }
 }
