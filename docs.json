@@ -165,5 +165,8 @@
   },
   "markdown": {
     "schema": true
+  },
+  "fonts": {
+    "family": "Questrial"
   }
 }
