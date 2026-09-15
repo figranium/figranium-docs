@@ -52,6 +52,13 @@
         ]
       },
       {
+        "group": "API",
+        "pages": [
+          "rest-api",
+          "cli-tool"
+        ]
+      },
+      {
         "group": "Agent Logic",
         "pages": [
           "variables",
@@ -66,13 +73,6 @@
           "captcha-solving",
           "csv-processing",
           "modular-workflows"
-        ]
-      },
-      {
-        "group": "API",
-        "pages": [
-          "rest-api",
-          "cli-tool"
         ]
       },
       {
