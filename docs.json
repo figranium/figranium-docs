@@ -112,6 +112,9 @@
         "pages": [
           "community-presets",
           "n8n-integration",
+          "zapier-integration",
+          "dify-integration",
+          "langflow-integration",
           "simplynode-integration",
           "digitalocean-one-click"
         ]

@@ -1,0 +1,39 @@
+---
+title: "Dify Integration"
+sidebarTitle: "Dify"
+description: "Connect Figranium to Dify with the official plugin and run browser automation tasks from Dify workflows and agent applications."
+---
+
+The Figranium plugin for Dify brings Figranium browser automation into Dify workflows and applications. Connect your Figranium instance, choose a task, and pass structured runtime variables from Dify into each run.
+
+## Install the plugin
+
+<Steps>
+  <Step title="Install Figranium">
+    In Dify, open the Marketplace and install the **Figranium** plugin.
+  </Step>
+  <Step title="Configure credentials">
+    Add your Figranium **Base URL** and **API key** when configuring the plugin. You can copy both from Figranium **Settings**.
+
+    Use the base URL without a trailing slash. If you need an API key, see [Get Your Figranium API Key](/api-key).
+  </Step>
+  <Step title="Add a Figranium tool">
+    Add the Figranium tool to your Dify workflow or application.
+  </Step>
+  <Step title="Choose a task">
+    Select the Figranium task to execute from the available tasks.
+  </Step>
+  <Step title="Map variables">
+    Provide runtime variables as key-value data when the task needs dynamic inputs. Values can come from user input or previous Dify nodes.
+  </Step>
+</Steps>
+
+## Runtime variables
+
+Figranium task variables make one automation reusable across many Dify runs. For example, a Dify workflow can supply a URL, search term, customer ID, or other value without changing the underlying Figranium task.
+
+See [Variables & Templating](/variables) for the Figranium variable syntax and behavior.
+
+## Authentication
+
+The plugin connects to the Figranium instance you configure. Treat the API key as a secret and rotate it if it becomes exposed. See [API Key](/api-key) for key management.
