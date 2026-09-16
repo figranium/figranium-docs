@@ -55,7 +55,7 @@
         "group": "API",
         "pages": [
           "rest-api",
-          "cli-tool"
+          "mcp-integration"
         ]
       },
       {
@@ -109,7 +109,6 @@
       {
         "group": "Integrations",
         "pages": [
-          "mcp-integration",
           "community-presets",
           "n8n-integration",
           "simplynode-integration",
