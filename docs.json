@@ -112,11 +112,11 @@
         "pages": [
           "community-presets",
           "n8n-integration",
-          "simplynode-integration",
-          "digitalocean-one-click",
           "zapier-integration",
           "dify-integration",
-          "langflow-integration"
+          "langflow-integration",
+          "simplynode-integration",
+          "digitalocean-one-click"
         ]
       },
       {
