@@ -113,7 +113,10 @@
           "community-presets",
           "n8n-integration",
           "simplynode-integration",
-          "digitalocean-one-click"
+          "digitalocean-one-click",
+          "zapier-integration",
+          "dify-integration",
+          "langflow-integration"
         ]
       },
       {

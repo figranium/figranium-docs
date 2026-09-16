@@ -1,0 +1,41 @@
+---
+title: "Zapier Integration"
+sidebarTitle: "Zapier"
+description: "Connect Figranium to Zapier, authenticate with your instance URL and API key, and run Figranium tasks from Zaps."
+---
+
+Figranium's Zapier integration lets you run browser automation tasks from a Zap and pass runtime variables into them.
+
+## Before you start
+
+You need a running Figranium instance and an API key. If you do not have a key yet, see [Get Your Figranium API Key](/api-key).
+
+<Steps>
+  <Step title="Add Figranium to your Zap">
+    In Zapier, create or open a Zap and add **Figranium** as an action app.
+  </Step>
+  <Step title="Connect your Figranium instance">
+    When prompted, enter your Figranium **Base URL** and **API key**. You can copy both from Figranium **Settings**.
+
+    Use the base URL without a trailing slash.
+  </Step>
+  <Step title="Choose a task">
+    Select the Figranium task you want to execute from the task dropdown.
+  </Step>
+  <Step title="Add runtime variables">
+    If the task uses variables, provide the values you want to override for this run. Leave variables empty when no overrides are needed.
+  </Step>
+  <Step title="Test and publish">
+    Test the action to confirm Figranium can execute the selected task, then finish configuring and publish your Zap.
+  </Step>
+</Steps>
+
+## Runtime variables
+
+Runtime variables let the same Figranium task accept different inputs on each Zap run. Define variables in Figranium, then map data from earlier Zap steps into those variables.
+
+For details on Figranium variables and templating, see [Variables & Templating](/variables).
+
+## Authentication
+
+The integration authenticates directly with your Figranium instance. Keep your API key private and rotate it if it is exposed. See [API Key](/api-key) for key management instructions.

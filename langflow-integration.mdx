@@ -1,0 +1,39 @@
+---
+title: "LangFlow Integration"
+sidebarTitle: "LangFlow"
+description: "Use the Figranium component in LangFlow to run browser automation tasks and pass dynamic variables through visual AI flows."
+---
+
+Figranium integrates with LangFlow so browser automation can become part of a visual LangFlow flow. Configure your Figranium connection, select a task, and feed dynamic values into the task from other components.
+
+## Set up Figranium in LangFlow
+
+<Steps>
+  <Step title="Add Figranium to a flow">
+    In LangFlow, find the **Figranium** component and add it to your flow.
+  </Step>
+  <Step title="Configure the connection">
+    Enter your Figranium **Base URL** and **API key** in the component configuration. You can copy both from Figranium **Settings**.
+
+    Use the base URL without a trailing slash. If you need to create a key, see [Get Your Figranium API Key](/api-key).
+  </Step>
+  <Step title="Select a task">
+    Choose the Figranium task the component should run.
+  </Step>
+  <Step title="Provide variables">
+    Supply runtime variables when the task needs dynamic input. Connect values from other LangFlow components or provide them directly.
+  </Step>
+  <Step title="Run the flow">
+    Execute the flow. LangFlow invokes the selected Figranium task using the configured connection and inputs.
+  </Step>
+</Steps>
+
+## Runtime variables
+
+Use variables to connect LangFlow data to reusable Figranium automations. A flow can pass values such as URLs, queries, or identifiers into a task at execution time.
+
+See [Variables & Templating](/variables) for details.
+
+## Authentication
+
+The component uses your Figranium API key to authenticate with your instance. Keep the key secret and rotate it if necessary. See [API Key](/api-key) for key management instructions.
