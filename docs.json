@@ -55,6 +55,7 @@
         "group": "API",
         "pages": [
           "rest-api",
+          "api-key",
           "mcp-integration"
         ]
       },
