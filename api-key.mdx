@@ -1,0 +1,60 @@
+---
+title: "Get Your Figranium API Key"
+sidebarTitle: "API Key"
+description: "Find, copy, generate, and use your Figranium API key for integrations and API access."
+icon:
+  name: "key"
+  library: "tabler"
+---
+
+Use your Figranium API key to authenticate integrations, scripts, and other external tools with your instance.
+
+<Steps>
+  <Step title="Open Settings">
+    In Figranium, open **Settings** from the main navigation.
+  </Step>
+
+  <Step title="Find API Keys">
+    Scroll to the **API Keys** section. This is where Figranium manages the key used for external API access.
+  </Step>
+
+  <Step title="Copy or generate your key">
+    Copy your existing Figranium API key. If you do not have one yet, generate a new key from this section.
+  </Step>
+
+  <Step title="Paste it into your integration">
+    Return to the service you are connecting, such as Zapier, and paste the key into its **API Key** field.
+  </Step>
+</Steps>
+
+<Warning>
+  Treat your API key like a password. Do not publish it in screenshots, source code, public repositories, or shared documents.
+</Warning>
+
+## Using the key directly
+
+Figranium accepts the API key in several authentication formats. For most integrations and scripts, use the `x-api-key` header:
+
+```bash
+curl https://your-figranium.example.com/api/tasks \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+You can also authenticate with a bearer token:
+
+```bash
+curl https://your-figranium.example.com/api/tasks \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+<Note>
+  Your Figranium **Base URL** is the address of your own Figranium instance. For example, `https://figranium.example.com` or `http://localhost:11345` for a default local installation.
+</Note>
+
+## Regenerating a key
+
+If a key is exposed or you want to replace it, generate a new one in **Settings > API Keys**. Any integration still using the previous key will need to be updated with the new value.
+
+<Card title="REST API Reference" icon="code" href="/rest-api">
+  See the full API reference for authentication methods, endpoints, request bodies, and examples.
+</Card>
