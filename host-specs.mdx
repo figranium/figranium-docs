@@ -25,7 +25,7 @@ This guide outlines the recommended hardware specifications for self-hosting Fig
 ## Hosting Tiers
 
 <CardGroup cols={3}>
-  <Card title="Sub-Minimum (Low-Spec Hosting)">
+  <Card title="Sub-Minimum (Low-Spec Hosting)" icon="alert-triangle">
     Figranium is highly portable and _can_ boot and run with 1 GB of RAM on low-end VPS instances or similar constrained environments.
 
     However, **1 GB of RAM is not recommended** for normal or production workloads:
@@ -35,7 +35,7 @@ This guide outlines the recommended hardware specifications for self-hosting Fig
     - **No Video/Screenshot Buffers**: Automating multiple concurrent browsers or capturing video logs under these conditions will likely result in heavy latency or failed executions.
   </Card>
 
-  <Card title="Minimum Smooth (Baseline Reliability)">
+  <Card title="Minimum Smooth (Baseline Reliability)" icon="circle-check">
     This is the recommended baseline for running single-threaded, scheduled workflows, lightweight data extraction, and periodic scraping tasks without performance issues.
 
     - **CPU**: 1 vCPU
@@ -44,7 +44,7 @@ This guide outlines the recommended hardware specifications for self-hosting Fig
     - **Workload Scope**: Suitable for executing a single task at a time, performing API extraction, or basic web scraping without extensive media capture.
   </Card>
 
-  <Card title="Sweet Spot (Recommended Production)">
+  <Card title="Sweet Spot (Recommended Production)" icon="rocket">
     This specification is highly recommended for production environments. It ensures snappy UI response times, smooth concurrent scheduling, and optimal browser execution.
 
     - **CPU**: 2 vCPUs (or more)
