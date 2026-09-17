@@ -17,7 +17,7 @@ Figranium is composed of three main layers:
     React-based visual editor for building tasks, managing settings, and inspecting captures.
   </Card>
 
-  <Card title="Backend (API & Runner)" icon="server" href="/rest-api">
+  <Card title="Backend (API & Runner)" icon={{ name:"server",library:"tabler" }} href="/rest-api">
     Node.js and Express.js API that orchestrates execution and manages data persistence.
   </Card>
 
@@ -49,12 +49,12 @@ Figranium is composed of three main layers:
 
 ### Browser Engine Layer
 
-- **Technology**: Playwright (Chromium) for Agent and Headful modes; `got-scraping` \+ Cheerio for Scrape mode.
+- **Technology**: Playwright (Chromium) for Agent and Headful modes; `got-scraping` + Cheerio for Scrape mode.
 - **Purpose**: Agent and Headful modes execute real browser interactions (clicking, typing, navigating). Scrape mode issues an HTTP request and parses the response DOM without a browser.
 - **Features**:
   - **Context Isolation**: Each Agent task runs in a fresh or persistent Playwright context, depending on configuration.
   - **Stealth Plugin**: Integrates `puppeteer-extra-plugin-stealth` in Agent mode to hide Playwright/Chromium fingerprints (`navigator.webdriver` and friends).
-  - **Cookie-Consent Auto-Dismissal**: Every Agent page injects the `idcac-playwright` community ruleset on `domcontentloaded` and automatically clicks the "reject" or "close" button on known consent banners (OneTrust, Cookiebot, TrustArc, and hundreds more). See [Stealth & Anti-Detection](/stealth-mode#cookie-consent-auto-dismissal).
+  - **Cookie-Consent Auto-Dismissal**: Every Agent page injects the community-maintained `idcac-playwright` ruleset on `domcontentloaded` and automatically clicks the "reject" or "close" button on known consent banners (OneTrust, Cookiebot, TrustArc, and hundreds more). See [Stealth & Anti-Detection](/stealth-mode#cookie-consent-auto-dismissal).
   - **Network Interception**: Captures network requests/responses for debugging and data extraction in Agent mode.
 
 ## Figranite Engine
