@@ -42,6 +42,7 @@
         "group": "Features",
         "pages": [
           "proxy-rotation",
+          "simplynode-integration",
           "captures-and-storage",
           "file-downloads",
           "headful-browser",
@@ -115,7 +116,6 @@
           "zapier-integration",
           "dify-integration",
           "langflow-integration",
-          "simplynode-integration",
           "digitalocean-one-click"
         ]
       },
