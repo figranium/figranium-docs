@@ -67,9 +67,8 @@ Choose **Execute → Execute Task**.
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
 | **Task Name or ID** | Dropdown | Yes | Loaded automatically from the connected Figranium instance. You can also supply an ID with an n8n expression. |
-| **Variables** | Key-value collection | No | Runtime variables passed to the task. Each entry contains a **Name** and **Value**. |
-
-The node calls `POST /api/tasks/{taskId}/api` and returns the Figranium JSON response for use by downstream nodes.
+| **Variables** | Key-value collection | No | Runtime variables passed to the task. Add each variable as a **Name** and **Value** pair; raw JSON is not required. |
+| The node calls `POST /api/tasks/{taskId}/api` and returns the Figranium JSON response for use by downstream nodes. |
 
 <Tip>
   Variable names are case-sensitive. You can use n8n expressions in variable values, such as `{{ $json.product_url }}`.
