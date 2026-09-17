@@ -15,7 +15,7 @@ Think of it as opening a private/incognito window for each task run.
 ## Stateful vs Stateless
 
 <CardGroup cols={2}>
-  <Card title="Stateful (default)" icon="database">
+  <Card title="Stateful (default)" icon={{ name:"database",library:"tabler" }}>
     Without stateless mode, Figranium:
 
     1. Launches the browser using a persistent profile directory on disk (`data/browser-profile` for agent mode, `data/browser-profile-scrape` for scrape mode).
@@ -26,7 +26,7 @@ Think of it as opening a private/incognito window for each task run.
     This is ideal for tasks that require a persistent login — you log in once, and subsequent runs reuse the session without re-authenticating.
   </Card>
 
-  <Card title="Stateless" icon="shield">
+  <Card title="Stateless" icon={{ name:"shield",library:"tabler" }}>
     With stateless mode enabled:
 
     1. The browser starts as a true incognito session — launched in-memory with no disk profile directory at all (no cookies, no local storage, no session).
