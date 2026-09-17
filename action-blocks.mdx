@@ -106,7 +106,7 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
     - **Selector**: The target element.
   </Accordion>
 
-  <Accordion title="Navigate To" icon="globe">
+  <Accordion title="Navigate To" icon={{ name:"navigation",library:"tabler" }}>
     Redirects the browser to a new URL. Use this to start a flow or move to a different page.
 
     - **Value**: The full URL (e.g., `https://example.com/login`).
@@ -241,7 +241,7 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
     Defines a block of actions to run if an error occurs in the main flow. Use this to implement retry logic or graceful failures (try/catch).
   </Accordion>
 
-  <Accordion title="HTTP Request (http_request)" icon="globe">
+  <Accordion title="HTTP Request (http_request)" icon={{ name:"api",library:"tabler" }}>
     Makes a server-side HTTP request to any URL. Use this to call external APIs, send webhook notifications, or fetch data from REST endpoints — without leaving the task flow.
 
     - **Method**: `GET`, `POST`, `PUT`, `PATCH`, or `DELETE`.
