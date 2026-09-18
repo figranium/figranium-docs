@@ -1,7 +1,7 @@
 ---
 title: "Activepieces Integration"
 sidebarTitle: "Activepieces"
-description: "Connect Figranium to Activepieces and troubleshoot connectivity, including Task dropdowns that keep loading."
+description: "Connect Figranium to Activepieces and configure connectivity between your Figranium and Activepieces servers."
 ---
 
 The Figranium piece for Activepieces lets you run saved browser automation tasks, inspect executions, and manage schedules from Activepieces flows.
@@ -20,31 +20,6 @@ The Activepieces server loads dynamic data such as the Task dropdown. The reques
 </Warning>
 
 Your Figranium Base URL therefore needs to be reachable **from the machine or container running Activepieces**. In the common case where Figranium and Activepieces are hosted on separate servers, use the normal network-accessible URL for your Figranium instance.
-
-## Task dropdown keeps loading
-
-If the **Task** dropdown loads indefinitely, first verify that the configured Figranium Base URL is reachable from the Activepieces server and that the API key is valid.
-
-The piece requests:
-
-```http
-GET /api/tasks/list
-x-api-key: <your-api-key>
-```
-
-A Base URL that works in your own browser is not necessarily reachable from the Activepieces server. Check DNS, firewall rules, reverse-proxy configuration, TLS, and any network restrictions between the two hosts.
-
-### Running both services on the same machine
-
-If Activepieces runs in a container while Figranium runs directly on the same host, do not use `localhost` unless Figranium is running inside that same container. From inside a container, `localhost` refers to the container itself.
-
-Use an address that resolves from the Activepieces container to the host. The exact address depends on your container runtime and operating system. For example, Docker Desktop commonly provides:
-
-```text
-http://host.docker.internal:11345
-```
-
-On other Docker setups, you may need to configure a host gateway or use an appropriate reachable host address.
 
 ## Available actions
 
