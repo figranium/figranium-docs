@@ -116,6 +116,7 @@
           "zapier-integration",
           "dify-integration",
           "langflow-integration",
+          "activepieces-integration",
           "digitalocean-one-click"
         ]
       },
