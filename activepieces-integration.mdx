@@ -1,37 +1,184 @@
 ---
 title: "Activepieces Integration"
 sidebarTitle: "Activepieces"
-description: "Connect Figranium to Activepieces and configure connectivity between your Figranium and Activepieces servers."
+description: "Install the Figranium piece for Activepieces, connect your instance, execute browser automation tasks, pass runtime variables, and manage schedules."
 ---
 
-The Figranium piece for Activepieces lets you run saved browser automation tasks, inspect executions, and manage schedules from Activepieces flows.
+The Figranium piece for Activepieces brings Figranium browser automation into Activepieces flows. Use it to execute saved tasks with dynamic inputs, inspect tasks and executions, manage schedules, or call other Figranium API endpoints without building the HTTP requests yourself.
+
+## Before you start
+
+You need:
+
+- A running Figranium instance that the Activepieces server can reach.
+- A Figranium API key. See [Get Your Figranium API Key](/api-key).
+- Access to **Platform Admin** in Activepieces to install the custom piece.
 
 ## Install the piece
 
-In Activepieces, open **Platform Admin → Pieces → Install Piece**.
+<Steps>
+  <Step title="Open Platform Admin">
+    In Activepieces, open **Platform Admin**, then select **Pieces**.
+  </Step>
+  <Step title="Open Install Piece">
+    Click **Install Piece**.
+  </Step>
+  <Step title="Choose the npm package">
+    Set **Package Type** to **NPM Registry**, then enter:
 
-Choose **NPM Registry**, then enter:
+    | Field | Value |
+    | --- | --- |
+    | **Piece Name** | `@figranium/piece` |
+    | **Piece Version** | `0.0.1` |
+  </Step>
+  <Step title="Install Figranium">
+    Click **Install**. After installation, Figranium becomes available in the Activepieces flow builder.
+  </Step>
+</Steps>
 
-- **Piece Name:** `@figranium/piece`
-- **Piece Version:** `0.0.1`
-
-Click **Install**. Once installed, the Figranium piece will be available in the flow builder.
+<Note>
+The version field is explicit in Activepieces. When you want to use a newer release of the piece, install the newer published package version.
+</Note>
 
 ## Connect Figranium
 
-Create a Figranium connection with:
+Add a Figranium action to a flow and create a connection.
 
-- **Base URL** — the URL of your Figranium server.
-- **API Key** — your Figranium API key.
+| Field | Description |
+| --- | --- |
+| **Base URL** | The network-accessible URL of your Figranium instance. Use the base URL without a trailing slash. |
+| **API Key** | Your Figranium API key. |
 
-The piece loads saved tasks from Figranium so actions such as **Execute Task** can show a Task dropdown.
+The piece authenticates requests to your Figranium instance using the API key.
 
 <Warning>
-The Activepieces server loads dynamic data such as the Task dropdown. The request comes from the Activepieces server, not directly from your browser.
+Dynamic fields such as the Task dropdown are loaded by the Activepieces server. Your Figranium Base URL must therefore be reachable from the Activepieces host, not only from the browser you use to edit the flow.
 </Warning>
 
-Your Figranium Base URL therefore needs to be reachable **from the machine or container running Activepieces**. In the common case where Figranium and Activepieces are hosted on separate servers, use the normal network-accessible URL for your Figranium instance.
+When Figranium and Activepieces are hosted separately, use the normal URL or network address through which the Activepieces server can reach Figranium. If both services are on a private network, the Base URL can use an internal hostname as long as it resolves from Activepieces.
 
-## Available actions
+## Execute a task
 
-The piece includes actions to execute tasks, list tasks and executions, list and manage schedules, inspect scheduler status, preview schedule configurations, and make custom Figranium API calls.
+Add the **Execute Task** action to your flow.
+
+<Steps>
+  <Step title="Select a task">
+    Choose a saved Figranium task from the **Task** dropdown. The list is loaded from the connected Figranium instance.
+  </Step>
+  <Step title="Provide variables">
+    Add runtime variable values when the task expects dynamic input. Leave them empty when the saved task does not need overrides.
+  </Step>
+  <Step title="Run the flow">
+    When the Activepieces flow reaches the action, Figranium executes the selected task and returns its result to the flow.
+  </Step>
+</Steps>
+
+The action executes the task through:
+
+```http
+POST /api/tasks/{taskId}/api
+```
+
+## Runtime variables
+
+Runtime variables let one saved Figranium task work with different inputs on every Activepieces run. For example, an earlier step can provide a product URL, search query, account identifier, or other value to the browser automation without modifying the task itself.
+
+Variable names must match the variables defined by the Figranium task. See [Variables & Templating](/variables) for variable behavior and templating.
+
+## Actions
+
+<CardGroup cols={2}>
+  <Card title="Execute Task" icon="play">
+    Run a saved Figranium task with optional runtime variables.
+  </Card>
+
+  <Card title="List Tasks" icon="list-check">
+    Retrieve saved tasks from the connected Figranium instance.
+  </Card>
+
+  <Card title="List Executions" icon="history">
+    Retrieve Figranium execution history for use elsewhere in the flow.
+  </Card>
+
+  <Card title="Schedules" icon="calendar-clock">
+    List, inspect, create, update, delete, and describe task schedules.
+  </Card>
+
+  <Card title="Scheduler Status" icon="activity">
+    Inspect the overall state of the Figranium scheduler.
+  </Card>
+
+  <Card title="Custom API Call" icon="braces">
+    Call another Figranium API endpoint directly from Activepieces.
+  </Card>
+</CardGroup>
+
+## Schedule actions
+
+<AccordionGroup>
+  <Accordion title="List Schedules">
+    Returns tasks that have schedules configured.
+
+    **API call:** `GET /api/schedules`
+  </Accordion>
+
+  <Accordion title="Get Schedule Status">
+    Returns the schedule configuration and next-run information for a selected task.
+
+    **API call:** `GET /api/schedules/{taskId}/status`
+  </Accordion>
+
+  <Accordion title="Get Scheduler Status">
+    Returns the overall Figranium scheduler status.
+
+    **API call:** `GET /api/schedules/status/all`
+  </Accordion>
+
+  <Accordion title="Set Schedule">
+    Creates or updates the schedule for a selected task.
+
+    **API call:** `POST /api/schedules/{taskId}`
+  </Accordion>
+
+  <Accordion title="Delete Schedule">
+    Removes the schedule from a task without deleting the task.
+
+    **API call:** `DELETE /api/schedules/{taskId}`
+  </Accordion>
+
+  <Accordion title="Describe Schedule">
+    Validates and previews a schedule configuration without saving it.
+
+    **API call:** `POST /api/schedules/{taskId}/describe`
+  </Accordion>
+</AccordionGroup>
+
+## Custom API calls
+
+Use **Custom API Call** when you need a Figranium endpoint that does not have a dedicated Activepieces action. Choose the HTTP method, provide the endpoint path and any supported request data, then use the returned response in later flow steps.
+
+For available endpoints, see the [REST API Reference](/rest-api).
+
+## Networking
+
+The Activepieces server, rather than the flow editor in your browser, communicates with Figranium. A URL that opens successfully on your own computer may not be reachable from Activepieces.
+
+For separate hosts, make sure the Activepieces server can resolve and connect to the configured Figranium Base URL and that any firewall, reverse proxy, TLS, or private-network rules permit the connection.
+
+If Activepieces runs in a container while Figranium runs directly on the **same host**, `localhost` from Activepieces refers to the Activepieces container itself. Use an address that reaches the host from that container. Docker Desktop commonly provides `host.docker.internal`; other Docker environments may require a host gateway or another reachable host address.
+
+## Authentication and security
+
+The piece sends your Figranium API key to the Figranium instance configured in the connection. Treat the key as a secret, avoid embedding it directly in flow fields, and rotate it if it is exposed.
+
+See [API Key](/api-key) for key management instructions.
+
+## Package
+
+The Figranium Activepieces package is:
+
+```text
+@figranium/piece
+```
+
+Install it through **Platform Admin → Pieces → Install Piece → NPM Registry**. The package is maintained separately from the built-in Activepieces pieces, so installation is explicit.
