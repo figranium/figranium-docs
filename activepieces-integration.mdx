@@ -1,7 +1,7 @@
 ---
 title: "Activepieces Integration"
 sidebarTitle: "Activepieces"
-description: "Connect Figranium to Activepieces and troubleshoot local Docker connectivity, including Task dropdowns that keep loading."
+description: "Connect Figranium to Activepieces and troubleshoot connectivity, including Task dropdowns that keep loading."
 ---
 
 The Figranium piece for Activepieces lets you run saved browser automation tasks, inspect executions, and manage schedules from Activepieces flows.
@@ -15,27 +15,15 @@ Install the Figranium piece and create a connection with:
 
 The piece loads saved tasks from Figranium so actions such as **Execute Task** can show a Task dropdown.
 
-## Local Figranium instances
-
 <Warning>
-The Activepieces server loads the Task dropdown. The request does not come directly from your browser.
+The Activepieces server loads dynamic data such as the Task dropdown. The request comes from the Activepieces server, not directly from your browser.
 </Warning>
 
-If Figranium is running on your Mac at `http://localhost:11345` while Activepieces is running in Docker, do **not** use `localhost` as the Base URL. Inside the Activepieces container, `localhost` refers to the container itself rather than your Mac.
+Your Figranium Base URL therefore needs to be reachable **from the machine or container running Activepieces**. In the common case where Figranium and Activepieces are hosted on separate servers, use the normal network-accessible URL for your Figranium instance.
 
-On macOS, use:
+## Task dropdown keeps loading
 
-```text
-http://host.docker.internal:11345
-```
-
-The Activepieces container can use `host.docker.internal` to reach Figranium running on the host machine.
-
-If Activepieces is hosted on another server, your Figranium Base URL must be reachable from that server. A local `localhost` URL on your computer will not be reachable by hosted Activepieces.
-
-### Task dropdown keeps loading
-
-If the **Task** dropdown loads indefinitely, first verify that the Base URL is reachable **from the Activepieces server or container**.
+If the **Task** dropdown loads indefinitely, first verify that the configured Figranium Base URL is reachable from the Activepieces server and that the API key is valid.
 
 The piece requests:
 
@@ -44,7 +32,19 @@ GET /api/tasks/list
 x-api-key: <your-api-key>
 ```
 
-For a local Docker setup on macOS, changing the Base URL from `http://localhost:11345` to `http://host.docker.internal:11345` will usually resolve this connectivity issue.
+A Base URL that works in your own browser is not necessarily reachable from the Activepieces server. Check DNS, firewall rules, reverse-proxy configuration, TLS, and any network restrictions between the two hosts.
+
+### Running both services on the same machine
+
+If Activepieces runs in a container while Figranium runs directly on the same host, do not use `localhost` unless Figranium is running inside that same container. From inside a container, `localhost` refers to the container itself.
+
+Use an address that resolves from the Activepieces container to the host. The exact address depends on your container runtime and operating system. For example, Docker Desktop commonly provides:
+
+```text
+http://host.docker.internal:11345
+```
+
+On other Docker setups, you may need to configure a host gateway or use an appropriate reachable host address.
 
 ## Available actions
 
