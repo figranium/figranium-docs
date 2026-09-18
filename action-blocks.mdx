@@ -7,19 +7,19 @@ description: "Complete reference for Figranium action blocks. Browse navigation,
 In "Agent" mode, tasks are built from a sequence of actions. These actions are executed sequentially by the browser.
 
 <CardGroup cols={2}>
-  <Card title="Navigation & Interaction" icon={{ name:"pointer",library:"tabler" }} href="#basic-actions">
+  <Card title="Navigation & Interaction" icon="pointer" href="#basic-actions">
     Click, type, scroll, hover, press keys, and navigate between pages.
   </Card>
 
-  <Card title="Logic & Flow Control" icon={{ name:"arrows-shuffle",library:"tabler" }} href="#logic--flow-control">
+  <Card title="Logic & Flow Control" icon="arrows-shuffle" href="#logic--flow-control">
     Conditionals, loops, repeats, and error handling.
   </Card>
 
-  <Card title="Data & Variables" icon={{ name:"database",library:"tabler" }} href="#data--variables">
+  <Card title="Data & Variables" icon="database" href="#data--variables">
     Set variables, parse CSV, merge data, and extract content.
   </Card>
 
-  <Card title="Advanced Actions" icon={{ name:"code",library:"tabler" }} href="#advanced-actions">
+  <Card title="Advanced Actions" icon="code" href="#advanced-actions">
     JavaScript execution, HTTP requests, CAPTCHA solving, and screenshots.
   </Card>
 </CardGroup>
@@ -106,7 +106,7 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
     - **Selector**: The target element.
   </Accordion>
 
-  <Accordion title="Navigate To" icon={{ name:"navigation",library:"tabler" }}>
+  <Accordion title="Navigate To" icon="navigation">
     Redirects the browser to a new URL. Use this to start a flow or move to a different page.
 
     - **Value**: The full URL (e.g., `https://example.com/login`).
@@ -241,7 +241,7 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
     Defines a block of actions to run if an error occurs in the main flow. Use this to implement retry logic or graceful failures (try/catch).
   </Accordion>
 
-  <Accordion title="HTTP Request (http_request)" icon={{ name:"api",library:"tabler" }}>
+  <Accordion title="HTTP Request (http_request)" icon="api">
     Makes a server-side HTTP request to any URL. Use this to call external APIs, send webhook notifications, or fetch data from REST endpoints — without leaving the task flow.
 
     - **Method**: `GET`, `POST`, `PUT`, `PATCH`, or `DELETE`.
@@ -345,19 +345,19 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
 </AccordionGroup>
 
 <CardGroup cols={2}>
-  <Card title="Selectors" icon={{ name:"target",library:"tabler" }} href="/selectors">
+  <Card title="Selectors" icon="target" href="/selectors">
     Learn how to target elements with CSS, XPath, and Playwright extensions.
   </Card>
 
-  <Card title="Variables" icon={{ name:"edit",library:"tabler" }} href="/variables">
+  <Card title="Variables" icon="edit" href="/variables">
     Define dynamic parameters and reuse values across blocks.
   </Card>
 
-  <Card title="Control Flow" icon={{ name:"arrows-shuffle",library:"tabler" }} href="/control-flow">
+  <Card title="Control Flow" icon="arrows-shuffle" href="/control-flow">
     Build conditionals, loops, and error handling into your tasks.
   </Card>
 
-  <Card title="Data Extraction" icon={{ name:"database",library:"tabler" }} href="/data-extraction">
+  <Card title="Data Extraction" icon="database" href="/data-extraction">
     Capture and structure page data for export and downstream use.
   </Card>
 </CardGroup>
