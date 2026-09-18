@@ -1,0 +1,51 @@
+---
+title: "Activepieces Integration"
+sidebarTitle: "Activepieces"
+description: "Connect Figranium to Activepieces and troubleshoot local Docker connectivity, including Task dropdowns that keep loading."
+---
+
+The Figranium piece for Activepieces lets you run saved browser automation tasks, inspect executions, and manage schedules from Activepieces flows.
+
+## Connect Figranium
+
+Install the Figranium piece and create a connection with:
+
+- **Base URL** — the URL of your Figranium server.
+- **API Key** — your Figranium API key.
+
+The piece loads saved tasks from Figranium so actions such as **Execute Task** can show a Task dropdown.
+
+## Local Figranium instances
+
+<Warning>
+The Activepieces server loads the Task dropdown. The request does not come directly from your browser.
+</Warning>
+
+If Figranium is running on your Mac at `http://localhost:11345` while Activepieces is running in Docker, do **not** use `localhost` as the Base URL. Inside the Activepieces container, `localhost` refers to the container itself rather than your Mac.
+
+On macOS, use:
+
+```text
+http://host.docker.internal:11345
+```
+
+The Activepieces container can use `host.docker.internal` to reach Figranium running on the host machine.
+
+If Activepieces is hosted on another server, your Figranium Base URL must be reachable from that server. A local `localhost` URL on your computer will not be reachable by hosted Activepieces.
+
+### Task dropdown keeps loading
+
+If the **Task** dropdown loads indefinitely, first verify that the Base URL is reachable **from the Activepieces server or container**.
+
+The piece requests:
+
+```http
+GET /api/tasks/list
+x-api-key: <your-api-key>
+```
+
+For a local Docker setup on macOS, changing the Base URL from `http://localhost:11345` to `http://host.docker.internal:11345` will usually resolve this connectivity issue.
+
+## Available actions
+
+The piece includes actions to execute tasks, list tasks and executions, list and manage schedules, inspect scheduler status, preview schedule configurations, and make custom Figranium API calls.
