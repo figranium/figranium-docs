@@ -10,7 +10,23 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   Figranium releases continuously. Major features are announced here as they ship. Check back weekly for new capabilities.
 </Note>
 
-<Update label="2026-09-23" description="This week">
+<Update label="2026-09-25" description="This week">
+  ## Features
+
+  ### Remove a task schedule
+
+  The **Schedule** tab now includes a **Remove Schedule** button. After you confirm, Figranium clears the schedule from the task and keeps the task itself. The `DELETE /api/schedules/:taskId` endpoint now removes the schedule entirely instead of only disabling it. See [Task scheduling](/task-scheduling#schedule-api).
+
+  ## Updates
+
+  - **MCP server v1.3.3**: the [MCP server](/mcp-integration) now rejects workflows that start with a **Timed Wait** or **Navigate To** action. Use the task-level `wait` and `url` settings instead. It also rejects workflows that end with a **Get Content** action. Use an extraction script for final output.
+
+  ## Fixes
+
+  - **Light-theme colors**: text selection follows the active theme again, and the **Add Proxy** button and active extraction-mode switch use the theme accent color.
+</Update>
+
+<Update label="2026-09-23" description="Earlier this week">
   ## Features
 
   ### Responsive canvas dot magnification
