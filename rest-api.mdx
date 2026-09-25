@@ -1084,12 +1084,12 @@ Programmatic control of the managed headful browser session. Use these endpoints
   </Accordion>
 
   <Accordion title="DELETE /api/schedules/:taskId">
-    Disables the schedule for a task.
+    Removes the schedule from a task. The task itself is kept.
 
     **Response**:
 
     ```json
-    { "success": true }
+    { "success": true, "schedule": null }
     ```
   </Accordion>
 
