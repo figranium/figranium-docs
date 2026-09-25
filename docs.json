@@ -82,11 +82,16 @@
               "stealth-mode",
               "proxy-rotation",
               "captcha-solving",
-              "page-translation",
-              "simplynode-integration"
+              "page-translation"
             ]
           },
-          "community-presets",
+          {
+            "group": "Templates",
+            "icon": "template",
+            "pages": [
+              "community-presets"
+            ]
+          },
           {
             "group": "Operations",
             "icon": "activity-heartbeat",
