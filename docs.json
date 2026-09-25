@@ -3,9 +3,9 @@
   "theme": "mint",
   "name": "Figranium Docs",
   "colors": {
-    "primary": "#ffffff",
+    "primary": "#2563EB",
     "light": "#ffffff",
-    "dark": "#ffffff"
+    "dark": "#2563EB"
   },
   "navigation": {
     "groups": [
@@ -149,7 +149,7 @@
   "css": "/styles.css",
   "appearance": {
     "strict": true,
-    "default": "dark"
+    "default": "system"
   },
   "seo": {
     "indexing": "navigable",
