@@ -10,13 +10,270 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   Figranium releases continuously. Major features are announced here as they ship. Check back weekly for new capabilities.
 </Note>
 
-<Update label="2026-08-26" description="Today">
+<Update label="2026-09-23" description="This week">
+  ## Features
+
+  ### Responsive canvas dot magnification
+
+  The editor and read-only embeds now animate a compact 48px magnification field around the cursor: nearby canvas dots expand smoothly, settle back to normal when the cursor moves away, and fill an active marquee-selection rectangle. The effect respects the OS reduced-motion preference. Its interaction is inspired by the dot-magnification effect in iOS 27 Photographic Styles.
+
+  ### Improved sticky notes
+
+  Sticky notes now render Markdown, use an auto-growing editor, expose an edit-only toolbar, pick theme-aware default colors, and expose clearer copy and delete controls.
+
+  ## Fixes
+
+  - **Sticky-note recovery** — sticky notes are preserved when older clients or integrations save a Task without the `stickyNotes` field. Affected notes are recovered from the newest version snapshot that contains them, and notes are retained when restoring pre-note versions.
+  - Legacy escaped-newline and run-on numbered-list note content is normalized during recovery and editing.
+</Update>
+
+<Update label="2026-09-21" description="This week">
+  ## Fixes
+
+  ### Browser viewer reliability
+
+  - Embedded headful browser sessions now work behind reverse proxies. The noVNC viewer authenticates its WebSocket connection with a short-lived, single-use ticket bound to the signed-in session, so selector inspection keeps working even when a proxy rewrites the internal `Host` header.
+  - Bounded noVNC credential and connection attempts so an unavailable browser viewer no longer leaves the application indefinitely on "Connecting…".
+
+  ### Live updates and task reliability
+
+  - Task edits and deletions now synchronize live across open editors, with stale-save rejection so an older autosave cannot overwrite a newer remote change.
+  - Execution updates propagate live across run-history and execution-detail views, including completed manual and scheduled executions.
+  - Corrected Task create/update behavior after live synchronization, and preserved imported Task data when a remotely deleted Task is handled locally.
+
+  ## Updates
+
+  - **Theme-aware surfaces** — the browser-session modal, overlay, and noVNC loading screen now follow the selected Light or Solarized Light appearance instead of forcing dark surfaces. Editor controls, action palettes, floating/context menus, insert controls, text selection, and hover states pick up matching theme-aware styling.
+  - Added an insertion control before the first workflow block and refined the editor toolbar and project visuals.
+  - Refreshed project screenshots and banner artwork; the Fiptcha lockfile workflow no longer runs on release tags.
+</Update>
+
+<Update label="2026-09-16" description="Last week">
+  ## Features
+
+  ### Auto appearance preference
+
+  A new persisted **Auto** appearance follows the device light/dark setting and updates when that preference changes. Auto is now the default for both new and existing installations. Appearance settings show Auto as a compact image-free option alongside the manual theme cards, and the former first-run theme chooser has been removed.
+
+  ## Updates
+
+  - **Reworked light and Solarized surfaces** — editor, dialogs, menus, dashboard, drawers, and controls use restrained elevation, semantic borders, readable labels and connectors, blue primary actions in the standard Light theme, and gentle modal backdrops instead of dark-theme shadows and black scrims.
+  - **Theme-aware sticky notes** — including readable Markdown and controls. Default notes use a translucent brand-blue treatment with dark text in light themes, and the visual resize grip has been removed while preserving saved note dimensions.
+  - Updated Fiptcha to v0.1.6 for the latest CAPTCHA-solving improvements; the npm lockfile is synchronized.
+  - Refreshed the README to reflect the current product.
+</Update>
+
+<Update label="2026-09-14" description="Last week">
+  ## Fixes
+
+  ### Browser and editor reliability
+
+  - The headful selector picker is now responsive: only the active page is synchronized, with a bounded timeout, the latest requested inspect state is preserved across delayed evaluations and navigation, and **Stop Inspect** stays available while synchronization is pending.
+  - Sticky-note dragging and resizing keep gesture updates local until pointer release, and stale overlapping autosave responses no longer replace newer task state.
+  - Embedded task canvases are fully read-only while retaining viewport panning, and the captures modal closes when a rerun finishes.
+  - The initial execution message was replaced with a neutral activity-waiting status.
+
+  ## Updates
+
+  - Updated Fiptcha from v0.1.1 to v0.1.4 for grid-solver fixes and no-scroll CAPTCHA interactions, including per-tile local-model fallback when whole-grid detection finds no match.
+  - Repaired the npm lockfile and changed V1 qualification dependency setup to use the repository's supported install path.
+  - Tightened the README introduction around deterministic visual browser automation and API endpoints; removed an obsolete generated verification video artifact.
+</Update>
+
+<Update label="2026-09-13" description="Last week">
+  ## Features
+
+  ### Fiptcha extracted as a standalone package
+
+  Figranium's built-in CAPTCHA solver is now the standalone [`fiptcha`](https://www.npmjs.com/package/fiptcha) package. The existing Agent actions, settings, companion commands, and automatic solving flow are preserved. Figranium is updated to Fiptcha v0.1.1, which correctly detects and clicks interactable reCAPTCHA v2 checkbox controls and improves iframe readiness handling for CAPTCHA providers.
+
+  ## Fixes
+
+  - **Headful browser sessions** — authenticated tabs no longer reopen unexpectedly while cookie synchronization remains intact.
+
+  ## Updates
+
+  - **Tabler icons throughout** — Material Symbols were replaced with Tabler icons across the interface, missing icon aliases were completed, global sizing and task controls were refined, and Cabinets adopted Tabler folder icons.
+  - Bundled Questrial and Space Mono locally to avoid third-party font latency; refreshed the task-editor product capture and removed obsolete demo video assets and links.
+  - Automatically managed control-flow markers are hidden from the visual editor catalog while remaining available through the API/MCP contract.
+
+  ## Configuration
+
+  - **PostgreSQL configuration is now environment-only** — it moved out of Settings into environment variables, preserving both standard variables and DigitalOcean-friendly lowercase aliases (including SSL configuration).
+  - Added the password-manager/injector roadmap item and removed outdated README/tagline material.
+</Update>
+
+<Update label="2026-09-11" description="Earlier this month">
+  ## Features
+
+  ### New browser action blocks
+
+  Agent mode gained `check`, `uncheck`, `drag_and_drop`, and `reload` actions, and Click blocks now support single, double, and right-click modes. Drag and drop uses independently selectable source and target selectors, including headful selector picking. The expanded action contract is documented in `AGENT_SPEC.md`, alongside the existing native `select` action.
+
+  ### Opt-in Task page translation
+
+  Tasks can now be configured with a target language for automatic page translation, which is reapplied after browser navigation. Translation is off by default.
+
+  ## Updates
+
+  - **Read-only Embed canvas** — the canonical read-only Embed canvas is aligned with the editor for layout, block rendering, panning, sticky notes, and context controls.
+  - Refined the editor with centered Task titles, direct API and Schedule shortcuts, clearer action/UI icons, normal-case execution terminology, and improved read-only interaction controls.
+
+  ## Fixes
+
+  - False anti-bot outcomes after a CAPTCHA is solved no longer occur; regression coverage added.
+
+  ## Updates
+
+  - Updated proxy-provider branding from Swiftproxy to Thordata, refreshed the README's Google Maps Lead Scraper screenshot, and documented scoped API-key work on the roadmap.
+</Update>
+
+<Update label="2026-09-09" description="Earlier this month">
+  ## Features
+
+  ### Per-Task page translation
+
+  A new opt-in per-Task **Page Translation** setting adds target-language selection. Agent and headful browser runs now load `translate.js` for enabled Tasks, translate the initial page, and reapply translation after navigation. Translation remains off by default; Scrape mode keeps its HTTP-only behavior.
+
+  ## Updates
+
+  - **On Execution defaults** — new Tasks include the On Execution configuration panel by default, with a zero-second default wait.
+  - Added a Task Variables shortcut in the editor header and made the editor, execution-detail, and browser-page titles contextual to the active Task or page.
+  - Unsolicited headful popups no longer steal focus; editor action controls were refined; Cabinet-route sidebar highlighting was corrected.
+  - Normalized app typography to normal casing for improved readability.
+
+  ## Updates
+
+  - **Cabinet metadata persistence** — Cabinet metadata now persists across both JSON and PostgreSQL storage backends, with qualification coverage for Cabinet uploads and persistence.
+  - Hardened Docker publishing against Playwright runtime-version drift.
+  - Migrated the selected UI, user-journey, and star-prompt verification scripts to TypeScript and updated CI to run the migrated suite.
+
+  Updated the README's product, roadmap, and security guidance; completed the translate.js roadmap item and documented the Task translation field in `AGENT_SPEC.md`.
+</Update>
+
+<Update label="2026-09-05" description="Earlier this month">
+  ## Features
+
+  ### Cabinets: durable download queues and uploads
+
+  Figranium now ships installation-wide **Cabinets** as durable download queues, including a default Basic Cabinet, legacy-download migration, isolated item storage, upload status, Cabinet item downloads, ZIP creation, and safe archive extraction.
+
+  - **Cabinets workspace and API** — create, rename, clear, change status, bulk delete, migrate/delete, download, ZIP, and unzip.
+  - **Per-Task download Cabinet** — Tasks can select a Cabinet as the destination for intercepted browser downloads. Migrated legacy capture download links are preserved.
+  - **Upload actions** — two new Agent actions: **Upload** selects the newest unuploaded Cabinet item and handles ordinary files, ZIPs, compatible folders, native file inputs, file choosers, and drop targets. **Finalize Uploads** marks all items attached during the execution.
+
+  The Cabinet Task field and upload action contract are documented in `AGENT_SPEC.md`.
+
+  ## Updates
+
+  - **File icons** — extension-aware monochrome file icons for Cabinet and execution downloads, plus a dedicated CSV glyph throughout action UI.
+  - **Direct URLs** — Settings tabs and individual Cabinets have direct, reload-safe URLs, and invalid Cabinets fall back to the default Cabinet.
+  - Added Option-number sidebar navigation on macOS, improved the sidebar add-button affordance, made loop variables unavailable outside a For Each scope, and refined Cabinet controls and proxy rotation settings.
+  - Replaced Cabinet browser prompts with the app's glass modal treatment, removed the theme introduction prompt, and updated the package description to describe the product directly.
+
+  ## Reliability
+
+  - Added and hardened deterministic v1 qualification coverage for browser execution, control-flow blocks, persistence, scheduler behavior, Docker startup, PostgreSQL migration, headful operation, and concurrent execution.
+  - Corrected false-positive qualification assertions and CI setup, isolated qualification API keys, and tightened Docker cleanup and health verification.
+
+  ## Security
+
+  - Added rate limiting to Cabinet download, migrated-capture, Cabinet view, and SPA fallback handlers in response to CodeQL findings.
+</Update>
+
+<Update label="2026-08-30" description="Last month">
+  ## Features
+
+  ### Canvas loop redesign
+
+  `while`, `repeat`, and `foreach` loop actions are now atomic canvas blocks with rounded return-path connectors, replacing the previous loop layout with a rendering style consistent with `if` blocks. Shared action-block helpers identify block-start/loop action types, match a block's start to its `end` marker, compute a block's action range, and expand selected action ids to fully include any block they belong to.
+
+  Cross-scope action dragging on the canvas is now constrained: an action or block can be dragged into a different branch/loop scope while staying within valid drop targets. Closed-loop connector paths were refined to route cleanly around the redesigned loop blocks.
+
+  ### Run through block
+
+  The action configuration modal now includes a **Run through block** tester that executes a single block in a temporary headless browser from the start of the Task through the selected block, without running extraction, recording, or persistent session state.
+
+  - A redesigned block configuration workspace shows resolved inputs, expected output, live variable snapshots, execution logs, and a screenshot of the page after the tested block ran, alongside status (success, error, skipped, stopped, not reached) and duration.
+  - In-flight block tests can be stopped, which cancels the underlying execution on the server.
+
+  ### Variable insertion by drag-and-drop
+
+  Variables can now be dropped into plain text/code inputs (`CodeEditor`) and rich text inputs (`RichInput`), inserting the variable token at the caret position under the cursor. Shared variable-insertion helpers and a reusable variable list/palette component are used by the new block configuration workspace.
+
+  ### Task version deletion
+
+  Individual saved Task versions can now be permanently deleted, alongside the existing version preview, rollback, and clear-all actions. The versions panel shows explicit loading state while a version is being created or deleted and no longer allows overlapping requests.
+
+  ## Fixes
+
+  - **Block test no longer aborts itself** — auto-saving the Task right before the test request was re-creating the test-stop callback, and an effect that treated any change to that callback as a reason to run its cleanup was canceling the test that had just started. Cleanup now only fires on the modal actually unmounting.
+
+  ## Updates
+
+  - **Configuration modal split** — the action configuration modal is now a shared `ConfigModalShell` plus dedicated `BlockConfigWorkspace` and `ExecutionConfigModal` surfaces, aligning its layout with the new block-testing and variable-insertion functionality.
+</Update>
+
+<Update label="2026-08-29" description="Last month">
+  ## Features
+
+  ### New execution outcomes
+
+  Agent and Scrape executions now report automatic `stopped`, `crashed`, and `anti_bot` outcomes alongside `success` and `error`. Cancellation requests, unhandled runtime failures, and unresolved bot challenges retain distinct final states across the runtime, scheduler, API summaries, run history, execution details, and editor results.
+
+  Shared outcome classification and normalization use deterministic precedence for overlapping terminal conditions with backwards-compatible handling of historical execution records. The execution-outcome contract is documented in `AGENT_SPEC.md`.
+
+  ### Redesigned Dashboard and application shell
+
+  The Dashboard, Executions, Execution Detail, Captures, Settings, loading, and not-found pages are redesigned around the editor canvas's compact controls, layered surfaces, thin borders, and node-like panels while preserving the existing global icon sidebar and theme system.
+
+  - **Dashboard overview** — real Task and execution metrics, searchable compact Task rows, sorting by recent activity, name, mode, or action count, and schedule, target, mode, and last-opened metadata.
+  - **Task actions** — inline edit/delete controls are replaced with single-click opening and a canvas-styled overflow menu offering Open, Copy Link, Copy API URL, and Delete.
+  - **Run History** — denser, filterable execution list with summary metrics, clearer outcome hierarchy, and a structured execution-detail header and metadata strip (virtualization and output rendering unchanged).
+  - **Captures** — compact media library with direct open, download, copy, and delete actions, plus redesigned loading and empty states.
+  - **Settings** — responsive secondary navigator for API Keys, AI Models, User Agent, Proxies, Appearance, and About. The standalone Storage section was removed while the capture-management APIs and standalone Captures page were retained.
+
+  ## Updates
+
+  - **Reusable select and combobox** — native browser selects and datalists are replaced throughout the application with theme-aware custom controls supporting keyboard navigation, portals, viewport-aware positioning, optional icons, and mixed option content.
+  - Dropdown labels stay in normal casing and gain monochrome provider icons for reCAPTCHA, hCaptcha, and Cloudflare CAPTCHA choices while retaining the generic Auto icon.
+  - Shared extraction-field option definitions between the canvas and Task Settings editors keep both extraction surfaces synchronized.
+
+  ## Fixes
+
+  - Unauthenticated application startup no longer attempts to fetch Tasks before a session is available.
+  - Removed the dark background highlight behind block names in the editor canvas.
+</Update>
+
+<Update label="2026-08-28" description="Last month">
+  ## Fixes
+
+  - **Extraction editor state** — hand-written extraction JavaScript is preserved when switching between the Visual and JavaScript editors. Mode changes now update only the selected editor mode, while actual visual field edits still regenerate the visual script.
+  - Missing or `unknown` execution sources are changed to `api`, so API-triggered runs display and filter correctly in both the execution list and detail view, including historical records.
+
+  ## Updates
+
+  - The **On Execution** block automatically expands whenever a new task is created (including tasks initialized by navigating directly to `/tasks/new`); existing tasks still open with the block collapsed.
+  - Dashboard task favicons display in their original full color instead of applying a grayscale filter.
+  - Replaced the animated README demo GIF with a static product screenshot while retaining links to the video walkthroughs.
+
+  ## Deployment
+
+  - Added `docker-compose.deploy.yml` as a production-oriented Compose configuration using the published GHCR image, persistent data and capture mounts, exposed application and noVNC ports, and an automatic restart policy.
+
+  ## Cleanup
+
+  - Removed the deprecated `OHMYCAPTCHA_URL` and `OHMYCAPTCHA_CLIENT_KEY` aliases and their documentation; remote CAPTCHA solving now uses `CAPTCHA_SOLVER_URL` and `CAPTCHA_SOLVER_KEY`. The obsolete ignored OhMyCAPTCHA checkout and ignore rule were also removed.
+  - Added a roadmap item for per-automation downloads folders and an upload block that selects files from an automation's file workspace.
+</Update>
+
+<Update label="2026-08-26" description="Last month">
   ## Updates
 
   - **Full-color task favicons on the dashboard** — task cards now display the target site's favicon in full color at all times. Previously, favicons rendered in grayscale and only gained color on hover. This makes it easier to spot a task by its site branding when scanning the dashboard grid. See [UI Tour — Dashboard](/ui-tour#dashboard-dashboard).
 </Update>
 
-<Update label="2026-08-25" description="Yesterday">
+<Update label="2026-08-25" description="Last month">
   ## Features
 
   ### `wait_captcha` action block
@@ -51,12 +308,12 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   - Local reCAPTCHA/hCaptcha solving hardened with interactable-control checks, delayed grid detection, replacement-tile handling, and verified token completion.
 </Update>
 
-<Update label="2026-08-22" description="Last week">
+<Update label="2026-08-22" description="Last month">
   ## Features
 
   ### Solve CAPTCHAs from Agent mode
 
-  Agent mode can now solve reCAPTCHA v2, reCAPTCHA v3, hCaptcha, and Cloudflare Turnstile challenges without leaving the task flow. Solves are routed through an optional YesCaptcha/AntiCaptcha-compatible remote endpoint first, then fall back to a built-in active-browser local model (OWL-ViT on 2–7.99 GiB hosts, Florence-2 at 8 GiB\+). Local weights are fetched on first use into persistent `data/captcha-model/`; nothing is bundled into the image.
+  Agent mode can now solve reCAPTCHA v2, reCAPTCHA v3, hCaptcha, and Cloudflare Turnstile challenges without leaving the task flow. Solves are routed through an optional YesCaptcha/AntiCaptcha-compatible remote endpoint first, then fall back to a built-in active-browser local model (OWL-ViT on 2–7.99 GiB hosts, Florence-2 at 8 GiB+). Local weights are fetched on first use into persistent `data/captcha-model/`; nothing is bundled into the image.
 
   There are two ways to use it:
 
@@ -83,7 +340,7 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   - **Captures page redesigned as a two-column grid**: The Captures screen now lays out capture cards in a simple two-column grid (a single column on narrow screens) instead of a virtualized scrolling list. See [UI Tour — Captures](/ui-tour).
 </Update>
 
-<Update label="2026-08-21" description="This week">
+<Update label="2026-08-21" description="Last month">
   ## Features
 
   ### `Do Nothing` action block
@@ -96,7 +353,7 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   See [Action Blocks — Do Nothing](/action-blocks#do-nothing-do_nothing).
 </Update>
 
-<Update label="2026-08-20" description="Earlier this week">
+<Update label="2026-08-20" description="Last month">
   ## Features
 
   ### API trigger endpoint now accepts bodyless requests
@@ -112,7 +369,7 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   See [REST API Reference — `POST /api/tasks/:id/api`](/rest-api).
 </Update>
 
-<Update label="2026-08-19" description="Earlier this week">
+<Update label="2026-08-19" description="Last month">
   ## Features
 
   ### Opt-in CloakBrowser browser engine
@@ -154,7 +411,7 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   See [Captures & Storage](/captures-and-storage#screenshots) and [Architecture](/architecture) for the updated behavior.
 </Update>
 
-<Update label="2026-08-17" description="Earlier this week">
+<Update label="2026-08-17" description="Last month">
   ## Features
 
   ### Visual field-mapping mode for extraction scripts
