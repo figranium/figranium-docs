@@ -952,10 +952,10 @@
       },
       "delete": {
         "tags": ["Schedules"],
-        "summary": "Disable a task's schedule",
+        "summary": "Remove a task's schedule",
         "parameters": [{ "name": "taskId", "in": "path", "required": true, "schema": { "type": "string" } }],
         "responses": {
-          "200": { "description": "Disabled", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SuccessFlag" } } } },
+          "200": { "description": "Schedule removed", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SuccessFlag" } } } },
           "404": { "$ref": "#/components/responses/NotFound" }
         }
       }
