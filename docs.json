@@ -235,5 +235,13 @@
       "type": "github",
       "href": "https://github.com/figranium/figranium"
     }
+  },
+  "footer": {
+    "socials": {
+      "discord": "https://discord.com/invite/kPmfbgu9Xn",
+      "github": "https://github.com/figranium",
+      "x": "https://x.com/figranium",
+      "youtube": "https://youtube.com/Figranium"
+    }
   }
 }
