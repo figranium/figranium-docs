@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Figranium Docs",
+  "name": "Figranium",
   "colors": {
     "primary": "#2563EB",
     "light": "#ffffff",
@@ -178,5 +178,6 @@
   },
   "fonts": {
     "family": "Questrial"
-  }
+  },
+  "description": "Figranium is an open-source browser automation platform for visually building reliable browser tasks and running them through an API."
 }
