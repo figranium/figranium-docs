@@ -142,8 +142,8 @@
     "dark": "/images/icon_light.svg"
   },
   "logo": {
-    "light": "/images/figranium-dark.svg",
-    "dark": "/images/figranium-light.svg",
+    "light": "/images/figranium-light.svg",
+    "dark": "/images/figranium-dark.svg",
     "href": "https://figranium.dev"
   },
   "css": "/styles.css",
