@@ -15,7 +15,7 @@ You have two ways to invoke it:
 
 Both routes use the same underlying solver and are only available in Agent mode.
 
-A separate **Wait for Captcha** block pauses until a challenge widget is ready without solving it. See [the `wait_captcha` block](#the-wait-captcha-block).
+A separate **Wait for Captcha** block pauses until a challenge widget is ready without solving it. See [Wait for Captcha](#wait-for-captcha).
 
 ---
 
@@ -42,9 +42,9 @@ Local image solving requires at least **2 GiB effective cgroup memory**. Hosts b
 
 ---
 
-## The `solve_captcha` block
+## Solve Captcha
 
-Drop this block into a task at the step where you expect a challenge. See [Action Blocks — Solve Captcha](/action-blocks#solve-captcha) for the full field reference; the shape is:
+Drop the **Solve Captcha** block into a task at the step where you expect a challenge. See [Action Blocks — Solve Captcha](/action-blocks#solve-captcha) for the full field reference; the shape is:
 
 ```json
 {
@@ -78,7 +78,7 @@ Drop this block into a task at the step where you expect a challenge. See [Actio
 
 ---
 
-## The `wait_captcha` block
+## Wait for Captcha
 
 The **Wait for Captcha** block pauses the task until a CAPTCHA control is ready to interact with, without clicking or solving it. Figranium polls the page until the widget's checkbox (or equivalent provider control) is initialized, visible, enabled, pointer-receivable, and stable.
 
@@ -105,7 +105,7 @@ Use it when:
 
 If no ready challenge appears before the deadline, the block errors with `wait_captcha: no ready CAPTCHA found within <timeout>ms`. Catch it with an [On Error](/error-handling) block if a missing challenge is an expected path.
 
-The `solve_captcha` block runs the same readiness wait internally before solving, so you don't need a `wait_captcha` block in front of it.
+The Solve Captcha block runs the same readiness wait internally before solving, so you don't need a Wait for Captcha block in front of it.
 
 ---
 
@@ -122,12 +122,12 @@ Without `CAPTCHA_SOLVER_URL` set, a managed challenge fails with the local route
 
 ## Auto-Solve Captchas (task setting)
 
-Toggle **Auto-Solve Captchas** in the task settings **Behavior** tab. When enabled, Figranium runs the same detection pass automatically after the initial task navigation and after every `navigate`, `click`, and `type` action in that task.
+Toggle **Auto-Solve Captchas** in the task settings **Behavior** tab. When enabled, Figranium runs the same detection pass automatically after the initial task navigation and after every Navigate, Click, and Type action in that task.
 
 - Default: **off**. Tasks that don't need CAPTCHA handling pay no extra latency.
 - When no challenge is present on the page, the auto-pass silently no-ops.
 - Each auto-pass waits up to `CAPTCHA_AUTO_DETECT_TIMEOUT_MS` (default `5000` ms) for a challenge to become ready before moving on, so pages without a challenge aren't stalled for the full solve deadline.
-- Auto-solve and explicit `solve_captcha` blocks work together — turning auto-solve on doesn't disable your explicit blocks.
+- Auto-solve and explicit Solve Captcha blocks work together, so turning auto-solve on doesn't disable your explicit blocks.
 
 Use this when you don't know exactly where a CAPTCHA will appear in a flow (for example, sites that rate-limit into a challenge only sometimes). If the CAPTCHA is always at the same step, prefer an explicit block for readability.
 
@@ -244,7 +244,7 @@ Use this to log solve times, or to branch with an [If](/control-flow) block on `
 
 ## Troubleshooting
 
-When a `solve_captcha` or `wait_captcha` block fails, the run log includes sanitized `[CAPTCHA ERROR]` lines with per-route diagnostics (credentials and tokens are redacted), and the block reports an errored status. Existing [On Error](/error-handling) handling applies: with a handler the flow jumps to it, without one the failure is logged and the run continues.
+When a Solve Captcha or Wait for Captcha block fails, the run log includes sanitized `[CAPTCHA ERROR]` lines with per-route diagnostics (credentials and tokens are redacted), and the block reports an errored status. Existing [On Error](/error-handling) handling applies: with a handler the flow jumps to it, without one the failure is logged and the run continues.
 
 <AccordionGroup>
   <Accordion title="Block errors with 'no solver route succeeded'" icon="alert-triangle">

@@ -1,7 +1,7 @@
 ---
 title: "Configure Proxy Rotation in Figranium"
 sidebarTitle: "Proxies"
-description: "Learn how to configure, import, and rotate HTTP and SOCKS5 proxies in Figranium. Includes SSRF warnings, rotation strategies, and API endpoints."
+description: "Learn how to configure, import, and rotate HTTP and SOCKS5 proxies in Figranium, including SSRF safety and rotation strategies for scraping tasks."
 ---
 
 Figranium includes a robust proxy management system to evade IP-based blocking. You can configure proxies globally or enable rotation on a per-task basis.
@@ -11,11 +11,11 @@ Figranium includes a robust proxy management system to evade IP-based blocking. 
 If you need a proxy provider for Figranium, we recommend:
 
 <CardGroup cols={2}>
-  <Card title="Thordata" href="https://www.thordata.com/?ls=github&lk=figranium">
+  <Card title="Thordata" icon="circle-number-1" href="https://www.thordata.com/?ls=github&lk=figranium">
     Residential and rotating proxy infrastructure suitable for scraping, automation, and geo-targeted workloads.
   </Card>
 
-  <Card title="SimplyNode" href="https://app.simplynode.io/sign-up">
+  <Card title="SimplyNode" icon="circle-number-2" href="https://app.simplynode.io/sign-up">
     Residential and mobile proxies with rotating and sticky-session options that work well with Figranium's proxy pool support.
   </Card>
 </CardGroup>
@@ -92,16 +92,6 @@ In the **Task Editor**, enable the **Rotate Proxies** checkbox.
 - When enabled: The task will use a proxy from the rotation pool according to the strategy.
 - When disabled: The task will use the **Default Proxy** (if set) or the **Host IP**.
 
-## API Management
-
-You can also manage proxies via the API:
-
-- `GET /api/settings/proxies`: List all proxies.
-- `POST /api/settings/proxies`: Add a proxy.
-- `POST /api/settings/proxies/import`: Bulk import proxies.
-- `PUT /api/settings/proxies/:id`: Update an existing proxy.
-- `POST /api/settings/proxies/rotation`: Update rotation settings.
-
 <Info>
-  All proxy write endpoints validate the server address against the SSRF blocklist. If the address is restricted, the API returns a `400` status with an `INVALID_URL` error code.
+  Proxy server addresses are validated against the SSRF blocklist whenever you add or edit them. If the address points to a restricted range, Figranium rejects it with an `INVALID_URL` error.
 </Info>

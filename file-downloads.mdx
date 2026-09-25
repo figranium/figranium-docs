@@ -18,7 +18,7 @@ Cabinet items preserve their original filename and folder structure in isolated 
 
 ## Waiting for downloads
 
-Downloads are asynchronous, so a task can otherwise finish before a transfer completes. Use **Wait for Downloads** (`wait_downloads`) immediately after the action that starts the download.
+Downloads are asynchronous, so a task can otherwise finish before a transfer completes. Use **Wait for Downloads** immediately after the action that starts the download.
 
 - **Usage**: Place it after the Click or other action that triggers the download.
 - **Timeout**: Configure how long the task should wait for pending downloads.
@@ -33,7 +33,7 @@ Downloads are asynchronous, so a task can otherwise finish before a transfer com
 Open **Cabinets** from the application sidebar to manage durable downloaded files.
 
 <CardGroup cols={2}>
-  <Card title="Organize" icon="folder-tree">
+  <Card title="Organize" icon="brush">
     Create and rename Cabinets, inspect item metadata and upload state, and move workflows onto the Cabinet that fits them.
   </Card>
 
@@ -41,11 +41,11 @@ Open **Cabinets** from the application sidebar to manage durable downloaded file
     Download individual items, clear a Cabinet, or delete selected items in bulk.
   </Card>
 
-  <Card title="Archive" icon="file-zipper">
+  <Card title="Archive" icon="archive">
     Create ZIP archives from Cabinet contents and safely extract compatible ZIP archives.
   </Card>
 
-  <Card title="Migrate" icon="arrow-right-arrow-left">
+  <Card title="Migrate" icon="device-desktop-share">
     Migrate items before deleting a Cabinet so durable files can move with your workflow.
   </Card>
 </CardGroup>
@@ -91,7 +91,7 @@ Figranium provides two Agent actions for turning a captured download into a late
     The MCP server understands task-level `cabinetId`, `upload`, and `finalize_uploads`, and can list or create Cabinets before building a task.
   </Card>
 
-  <Card title="n8n" icon="diagram-project" href="/n8n-integration">
+  <Card title="n8n" icon="brand-stackshare" href="/n8n-integration">
     The official n8n node exposes **Cabinet ID** in Task Create and Update so workflows can choose the task's download Cabinet.
   </Card>
 </CardGroup>

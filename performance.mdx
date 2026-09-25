@@ -67,7 +67,7 @@ Prefer:
 
 ## Minimize Page Navigations
 
-Each `navigate` action waits for the page to fully load. If you can extract all data from a single page (e.g., using JavaScript to process an API response already in the DOM), do so.
+Each **Navigate** block waits for the page to fully load. If you can extract all data from a single page (e.g., using JavaScript to process an API response already in the DOM), do so.
 
 **Use in-page API calls instead of navigating:**
 
@@ -84,7 +84,7 @@ This is dramatically faster than navigating to each product page individually.
 
 ## Foreach loop optimization
 
-Figranium automatically optimizes `foreach` loops based on which loop variables you use. If your loop body does not reference `{$loop.html}`, the engine skips fetching the inner HTML of each element, which significantly reduces serialization overhead.
+Figranium automatically optimizes Foreach loops based on which loop variables you use. If your loop body does not reference `{$loop.html}`, the engine skips fetching the inner HTML of each element, which significantly reduces serialization overhead.
 
 This means simple text-based loops are fast by default:
 
@@ -113,7 +113,7 @@ If you are working with very large extractions and notice slow rendering, switch
 
 ## Batch extraction
 
-For maximum performance when extracting structured data, collect all data in one JavaScript block rather than iterating with `foreach` \+ individual JavaScript calls:
+For maximum performance when extracting structured data, collect all data in one JavaScript block rather than iterating with a Foreach loop plus individual JavaScript blocks:
 
 ```json
 // Slower: foreach + javascript per item
@@ -161,18 +161,11 @@ curl --proxy "http://user:pass@proxy-host:port" -o /dev/null -s -w "%{time_total
 
 Figranium stores execution records in `data/executions.json` (or in PostgreSQL). Over time, this file can grow large and slow down the dashboard.
 
-- Set up a periodic cleanup: **Settings \> Data \> Clear Execution History**.
-- Use the REST API to automate cleanup:
-  ```bash
-  POST /api/executions/clear
-  ```
+- Set up a periodic cleanup from **Settings \> Data \> Clear Execution History**.
 
 ### Screenshot and Recording Cleanup
 
-Recordings (video files) can be large. Regularly purge them:
-
-- **Settings \> Data \> Clear Screenshots & Recordings**
-- Or via API: `POST /api/clear-screenshots`
+Recordings (video files) can be large. Regularly purge them from **Settings > Data > Clear Screenshots & Recordings**.
 
 ### PostgreSQL for Scale
 
@@ -196,8 +189,8 @@ PostgreSQL provides better concurrency, atomic writes, and faster queries for la
 
 Performance and reliability go hand-in-hand. A task that fails and restarts wastes more time than one that completes slightly slower.
 
-- **Build in error handling**: Wrap optional interactions in `on_error`/`end` blocks. See [Error Handling](/error-handling).
-- **Use `wait_selector` over fixed waits**: More reliable and faster.
+- **Build in error handling**: Wrap optional interactions in On Error / End blocks. See [Error Handling](/error-handling).
+- **Use Wait for Selector over fixed waits**: More reliable and faster.
 - **Test on slow network**: Use browser DevTools throttling to verify your selectors and waits work under slow conditions before deploying.
 - **Keep tasks focused**: Large monolithic tasks are harder to debug. Break them into smaller, modular workflows. See [Modular Workflows](/modular-workflows).
 

@@ -65,27 +65,27 @@ When executed, Figranium replaces `{$query}` with "Figranium".
 Figranium provides several built-in variables:
 
 <CardGroup cols={2}>
-  <Card title="{$now}" icon="clock">
+  <Card title="`{$now}`" icon="clock">
     Current ISO timestamp.
   </Card>
 
-  <Card title="block.output" icon="arrow-right">
+  <Card title="`block.output`" icon="arrow-right">
     The result of the previous action (e.g., text from a `javascript` block).
   </Card>
 
-  <Card title="loop.index" icon="code">
-    The current index in a `foreach` loop.
+  <Card title="`loop.index`" icon="code">
+    The current index in a Foreach loop.
   </Card>
 
-  <Card title="loop.item" icon="cube">
-    The current item in a `foreach` loop.
+  <Card title="`loop.item`" icon="cube">
+    The current item in a Foreach loop.
   </Card>
 
-  <Card title="loop.text" icon="book">
+  <Card title="`loop.text`" icon="book">
     The text content of the current loop item.
   </Card>
 
-  <Card title="loop.html" icon="code">
+  <Card title="`loop.html`" icon="code">
     The HTML content of the current loop item.
   </Card>
 </CardGroup>

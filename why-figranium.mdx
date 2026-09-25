@@ -1,98 +1,66 @@
 ---
-title: "Why Choose Figranium for Browser Automation"
-description: "Understand what Figranium is, who it is for, and how it fits into modern browser automation stacks."
-keywords: ["browser automation", "visual browser workflows", "self-hosted browser automation", "n8n browser automation", "MCP browser automation"]
+title: "Why Choose Figranium Over Code, SaaS, and Low-Code Tools"
 sidebarTitle: "Why Figranium"
+description: "Compare Figranium to code-first frameworks, SaaS scraping platforms, and low-code tools to decide if self-hosted visual browser automation fits your stack."
+keywords:
+  - "browser automation"
+  - "visual browser workflows"
+  - "self-hosted browser automation"
+  - "n8n browser automation"
+  - "MCP browser automation"
 ---
 
-Figranium is a **self-hosted visual browser automation platform** for building complex browser workflows without writing the workflow itself as Playwright code.
-
-You build workflows in the block-based editor, then run them interactively, through the REST API, from the CLI, on a schedule, through n8n, or through MCP.
-
-## The short version
-
-> **Build browser workflows visually. Execute them through the interfaces that fit your stack.**
-
-Figranium is especially useful when a website does not provide the API you need, when a workflow involves multiple browser interactions, or when you want browser automation to become a reusable part of a larger automation system.
-
-## Why use Figranium?
+Figranium is a self-hosted visual browser automation platform. You compose workflows from action blocks, then run them through the REST API, CLI, scheduler, n8n, or MCP. This page compares Figranium to three common alternatives so you can decide if it fits your stack.
 
 <CardGroup cols={2}>
   <Card title="Build visually" icon="cube">
-    Compose browser tasks from reusable action blocks such as navigation, waiting, clicking, typing, JavaScript, extraction, and control flow. The visual editor makes the workflow itself inspectable instead of hiding it inside application code.
+    Compose tasks from reusable blocks: navigation, waiting, clicking, typing, JavaScript, extraction, and control flow. The visual editor makes the workflow inspectable instead of hiding it inside application code.
   </Card>
 
   <Card title="Self-host the automation layer" icon="server">
-    Figranium is designed to run on your own infrastructure. Task definitions, browser state, and execution data can remain under your control rather than being sent to a third-party browser automation SaaS.
+    Task definitions, browser state, and execution data stay under your control. No third-party SaaS hosts your cookies or proxy credentials.
   </Card>
 
   <Card title="Execute the same workflow multiple ways" icon="bolt">
-    A workflow does not have to stay inside the editor. Use the visual editor for building and debugging, the REST API for application integrations, the CLI for headless operation, the scheduler for recurring jobs, n8n for larger automation pipelines, or MCP for AI clients that support the Model Context Protocol.
+    Use the visual editor for building and debugging, the REST API for application integrations, the CLI for headless operation, the scheduler for recurring jobs, n8n for larger automation pipelines, or MCP for AI clients.
   </Card>
 
   <Card title="Keep browser automation reusable" icon="rotate">
-    Instead of embedding browser actions directly into every integration, create a task once and expose it as an executable capability. Variables can be supplied at runtime, making the same task useful for different inputs.
+    Create a task once and expose it as an executable capability. Supply variables at runtime so the same task handles different inputs.
   </Card>
 </CardGroup>
 
-## Where Figranium fits
+## Figranium vs. code-first frameworks (Playwright / Puppeteer)
 
-Figranium sits between the systems that trigger automation and the browser that performs it. Your application or API can trigger a task directly through the REST API. n8n can trigger the same tasks through the Figranium community node. MCP-compatible clients can discover and operate Figranium through the MCP server.
+Code-first frameworks give you full control over the browser in TypeScript or Python. That power comes with maintenance overhead: every selector change, retry policy, and stealth tweak lives in your codebase. Figranium keeps the same Playwright engine under the hood but exposes it through a visual block editor. You still get stealth patching, proxy rotation, and headless or headful execution, without maintaining hundreds of lines of browser-control code for every workflow.
 
-The important distinction is that Figranium is the **browser workflow layer**. Your application, n8n workflow, or MCP client can decide when a browser workflow should run and what inputs it receives.
+Choose a code-first framework when your team wants browser control embedded directly into a test suite or application and prefers reviewing automation as source code. Figranium is better when multiple team members need to build or modify workflows, or when you want a stable API surface that does not change every time a page layout shifts.
 
-## When Figranium is a good fit
+## Figranium vs. SaaS scraping platforms
+
+Hosted scraping platforms manage browsers and proxies for you, but they bill by usage credits and keep your task definitions on their servers. Figranium is fully self-hosted: you run it on your own VM, bare-metal box, or local machine. There are no usage credits, no metered page loads, and no external access to your execution logs or extracted data.
+
+Choose a hosted provider when you specifically want managed browser infrastructure rather than operating the automation layer yourself. Figranium is better when data residency, predictable costs, or custom proxy/CAPTCHA setups matter.
+
+## Figranium vs. low-code workflow platforms (n8n / Zapier)
+
+Low-code platforms excel at connecting APIs and gluing services together. They are not designed for complex browser interactions such as clicking through shadow DOM, solving CAPTCHAs, or harvesting structured data from rendered pages. Figranium complements them: build the browser workflow in Figranium, then trigger it from an n8n node or Zapier webhook.
+
+Choose a general-purpose workflow platform when your automation does not actually need a browser. Figranium is better when the workflow requires real page rendering, JavaScript execution, or interaction with sites that have no public API.
+
+## When Figranium fits
 
 - You need to automate a website that has no suitable API.
 - You want a visual workflow rather than handwritten browser-control code.
 - You need reusable tasks that can be triggered by other systems.
-- You need browser automation alongside n8n workflows.
+- You need browser automation alongside n8n or Activepieces workflows.
 - You want to expose browser workflows to MCP-compatible AI clients.
 - You want to self-host the browser automation infrastructure.
 - You need scheduling, execution history, session state, proxies, or other operational features around browser workflows.
 
-## When another tool may be a better fit
+## When to pick something else
 
-<Note>
-  Figranium is not intended to replace every browser-automation use case.
-</Note>
-
-Choose a code-first browser framework when your team wants browser control embedded directly into a software test suite or application and prefers writing and reviewing the automation as source code.
-
-Choose a hosted browser infrastructure provider when you specifically want managed browser infrastructure rather than operating the automation layer yourself.
-
-Choose a dedicated antidetect browser (such as Multilogin, GoLogin, or similar) when your primary need is managing many persistent, isolated browser profiles for multi-account workflows. Figranium runs stealth-patched Chromium and can rotate proxies, user agents, and viewports per task, but it is not a standalone antidetect browser with a per-account profile manager. See [Stealth & Anti-Detection](/stealth-mode) for what Figranium's stealth layer does and does not cover.
-
-Choose a general-purpose workflow platform when your workflow does not actually need a browser.
-
-## Go deeper
-
-<CardGroup cols={2}>
-  <Card title="Getting started" icon="rocket" href="/overview">
-    Learn the basics and get up and running with Figranium.
-  </Card>
-
-  <Card title="Action Blocks" icon="cube" href="/action-blocks">
-    Explore the building blocks of browser workflows.
-  </Card>
-
-  <Card title="REST API" icon="code" href="/rest-api">
-    Integrate Figranium tasks into your applications.
-  </Card>
-
-  <Card title="n8n Integration" icon="plug" href="/n8n-integration">
-    Connect Figranium to larger automation pipelines.
-  </Card>
-
-  <Card title="MCP Integration" icon="robot" href="/mcp-integration">
-    Expose workflows to AI clients via the Model Context Protocol.
-  </Card>
-
-  <Card title="Task Scheduling" icon="clock" href="/task-scheduling">
-    Set up recurring jobs and timed executions.
-  </Card>
-
-  <Card title="Task Versioning & Rollback" icon="rotate" href="/task-versioning">
-    Manage changes and recover previous task versions.
-  </Card>
-</CardGroup>
+- **Code-first frameworks** — if your primary need is embedding browser control into a software test suite and your team prefers source-code review.
+- **Hosted browser infrastructure** — if you want fully managed browsers and are comfortable with usage-based billing and third-party data hosting.
+- **Dedicated antidetect browsers** — if you need persistent, isolated browser profiles for multi-account workflows (Multilogin, GoLogin, etc.). Figranium runs stealth-patched Chromium and rotates proxies, user agents, and viewports per task, but it is not a standalone antidetect profile manager.
+- **General-purpose workflow platforms** — if your workflow does not need a browser at all.

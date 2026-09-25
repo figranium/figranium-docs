@@ -1,93 +1,53 @@
 ---
-title: "Overview"
+title: "Figranium: Open-Source Block-Based Browser Automation"
 sidebarTitle: "Overview"
-description: "Figranium is a self-hosted, block-based browser automation platform with a visual editor, REST API, CLI, and MCP server."
+description: "Figranium is a self-hosted, block-based browser automation platform for building visual tasks and running them through an API, MCP server, or SDK."
 ---
 
-Figranium is a self-hosted, block-based browser automation platform for teams and developers who need predictable, auditable, and secure workflows without third-party SaaS. It pairs **Playwright** for browser control with a **React** visual editor and an **Express.js** backend for tasks, proxies, and executions.
+Figranium is a self-hosted, block-based browser automation platform. You build visual tasks in the editor, then execute them through the REST API, MCP server, or SDK. All task definitions, browser state, and execution data stay on your own infrastructure.
 
 <CardGroup cols={2}>
-  <Card title="Quickstart" icon="rocket" href="/docker-compose">
-    Install with Docker Compose and open the editor in a few minutes.
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Get Figranium running locally in minutes.
   </Card>
 
-  <Card title="Why Figranium" icon="help-circle" href="/why-figranium">
-    Understand where Figranium fits alongside code-first frameworks and SaaS.
+  <Card title="Docker Compose" icon="container" href="/docker-compose">
+    Deploy with the official Docker Compose template.
   </Card>
 
-  <Card title="Architecture" icon="sitemap" href="/architecture">
-    See how the frontend, backend, and Figranite engine fit together.
+  <Card title="Action Blocks" icon="cube" href="/action-blocks">
+    Browse the blocks that make up browser workflows.
   </Card>
 
-  <Card title="Action Blocks" icon="box" href="/action-blocks">
-    Browse the block reference for building automation flows.
-  </Card>
-</CardGroup>
-
-## Key philosophy
-
-<CardGroup cols={2}>
-  <Card title="Block-first design" icon="grip-vertical">
-    Complex logic breaks down into simple, composable blocks: Click, Type, Wait, JavaScript, If/Else. Accessible to non-engineers, powerful for developers.
+  <Card title="REST API" icon="code" href="/rest-api">
+    Trigger tasks and fetch results from any application.
   </Card>
 
-  <Card title="Self-hosted and private" icon="lock">
-    Task definitions, cookies, local storage, and execution logs live on your machine or server. No sensitive data leaves your infrastructure.
+  <Card title="MCP Server" icon="robot" href="/mcp-integration">
+    Expose tasks to AI clients via the Model Context Protocol.
   </Card>
 
-  <Card title="Hybrid execution" icon="arrows-shuffle">
-    Debug interactively in the editor, trigger via REST API, or run headless from the CLI. Same task, different entry points.
-  </Card>
-
-  <Card title="Stealth and resilience" icon="spy">
-    Proxy rotation, user-agent rotation, and stealth plugins help automation blend in with normal traffic.
+  <Card title="Templates Hub" icon="layout-grid" href="/community-presets">
+    Import community presets and share your own.
   </Card>
 </CardGroup>
 
 ## What you can build
 
-<CardGroup cols={2}>
-  <Card title="Data scrapers" icon="table" href="/data-extraction">
-    Extract structured JSON or CSV from websites, handling pagination and dynamic content.
-  </Card>
+- **Data extraction** — scrape structured JSON or CSV from websites with pagination and dynamic content.
+- **Form automation** — fill forms, upload files, and interact with single-page apps.
+- **End-to-end testing** — run browser tests with visual feedback and deterministic execution.
+- **Scheduled jobs** — trigger recurring workflows with built-in cron-style scheduling.
 
-  <Card title="Authentication bots" icon="key" href="/session-state">
-    Automate login flows to refresh cookies or session tokens for downstream systems.
-  </Card>
+## Key principles
 
-  <Card title="Testing agents" icon="test-pipe" href="/headful-browser">
-    Run end-to-end tests on your web applications with visual feedback.
-  </Card>
+- **Block-first** — complex logic breaks into simple, composable blocks such as Click, Type, Wait, and If/Else.
+- **Self-hosted** — task definitions, cookies, local storage, and logs live on your machine or server.
+- **Deterministic** — the Figranite engine runs tasks in a predictable, ordered sequence with controlled flow logic.
+- **Hybrid execution** — debug interactively in the editor, trigger via REST API, or run headless from the CLI. The same task works across every entry point.
 
-  <Card title="Workflow automation" icon="settings" href="/modular-workflows">
-    Fill forms, upload files, and interact with complex single-page applications.
-  </Card>
-</CardGroup>
+## Where next
 
-## Core components
-
-<CardGroup cols={2}>
-  <Card title="Dashboard" icon="layout-grid" href="/ui-tour">
-    Manage your library of tasks and view execution history.
-  </Card>
-
-  <Card title="Task editor" icon="pencil" href="/action-blocks">
-    Drag-and-drop interface to build flows with real-time validation.
-  </Card>
-
-  <Card title="Execution engine" icon="cpu" href="/architecture">
-    Backend runner that handles browser context, stealth, and result storage.
-  </Card>
-
-  <Card title="Proxy manager" icon="network" href="/proxy-rotation">
-    Dedicated system for managing and rotating HTTP and SOCKS proxies.
-  </Card>
-
-  <Card title="Task scheduler" icon="clock" href="/task-scheduling">
-    Built-in cron scheduling for automated task execution.
-  </Card>
-
-  <Card title="REST API and CLI" icon="terminal" href="/rest-api">
-    Trigger tasks from any language or shell script.
-  </Card>
-</CardGroup>
+- [Why Figranium](/why-figranium) — how it compares to code-first frameworks, SaaS platforms, and low-code tools.
+- [Architecture](/architecture) — the frontend, backend, and browser engine layers.
+- [Configuration](/configuration) — environment variables, database options, and deployment settings.

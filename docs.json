@@ -8,131 +8,176 @@
     "dark": "#2563EB"
   },
   "navigation": {
-    "groups": [
+    "tabs": [
       {
-        "group": "Intro",
+        "tab": "Documentation",
+        "icon": "book",
         "pages": [
-          "overview",
-          "architecture",
-          "why-figranium",
-          "pronunciation"
-        ]
-      },
-      {
-        "group": "Installation",
-        "pages": [
-          "host-specs",
-          "docker-compose",
-          "multi-arch",
-          "configuration",
-          "database-support",
-          "local-development"
-        ]
-      },
-      {
-        "group": "Basics",
-        "pages": [
-          "ui-tour",
-          "action-blocks",
-          "selectors",
-          "highlight-tool"
-        ]
-      },
-      {
-        "group": "Features",
-        "pages": [
-          "proxy-rotation",
-          "simplynode-integration",
-          "captures-and-storage",
-          "file-downloads",
-          "headful-browser",
-          "stateless-execution",
-          "task-versioning",
-          "task-scheduling",
-          "output-providers"
-        ]
-      },
-      {
-        "group": "API",
-        "pages": [
-          "rest-api",
-          "api-key",
-          "mcp-integration"
-        ]
-      },
-      {
-        "group": "Agent Logic",
-        "pages": [
-          "variables",
-          "advanced-templating",
-          "control-flow",
-          "error-handling",
-          "javascript-execution",
-          "data-extraction",
-          "extraction-script-generation",
-          "page-translation",
-          "stealth-mode",
-          "captcha-solving",
-          "csv-processing",
-          "modular-workflows"
-        ]
-      },
-      {
-        "group": "JavaScript SDK",
-        "pages": [
-          "sdk/js/overview",
-          "sdk/js/installation",
-          "sdk/js/quickstart",
-          "sdk/js/client-configuration",
-          "sdk/js/authentication",
-          "sdk/js/request-options",
-          "sdk/js/errors",
-          "sdk/js/streaming",
-          "sdk/js/actions",
-          "sdk/js/variables",
           {
-            "group": "Resources",
+            "group": "Introduction",
+            "icon": "info-circle",
             "pages": [
-              "sdk/js/resources/tasks",
-              "sdk/js/resources/executions",
-              "sdk/js/resources/schedules",
-              "sdk/js/resources/cabinets",
-              "sdk/js/resources/captures",
-              "sdk/js/resources/credentials",
-              "sdk/js/resources/browser",
-              "sdk/js/resources/execution",
-              "sdk/js/resources/settings",
-              "sdk/js/resources/auth",
-              "sdk/js/resources/health"
+              "overview",
+              "why-figranium",
+              "architecture",
+              "pronunciation"
+            ]
+          },
+          {
+            "group": "Get Started",
+            "icon": "brand-docker",
+            "pages": [
+              "host-specs",
+              "docker-compose",
+              "digitalocean-one-click",
+              "multi-arch",
+              "local-development",
+              "configuration",
+              "database-support"
+            ]
+          },
+          {
+            "group": "Editor & Task Building",
+            "icon": "tools",
+            "pages": [
+              "ui-tour",
+              "action-blocks",
+              "selectors",
+              "highlight-tool",
+              "variables",
+              "advanced-templating",
+              "control-flow",
+              "error-handling",
+              "javascript-execution",
+              "modular-workflows"
+            ]
+          },
+          {
+            "group": "Data & Extraction",
+            "icon": "database-export",
+            "pages": [
+              "data-extraction",
+              "extraction-script-generation",
+              "csv-processing",
+              "output-providers"
+            ]
+          },
+          {
+            "group": "Running Tasks",
+            "icon": "player-play",
+            "pages": [
+              "headful-browser",
+              "stateless-execution",
+              "task-scheduling",
+              "task-versioning",
+              "captures-and-storage",
+              "file-downloads",
+              "session-state"
+            ]
+          },
+          {
+            "group": "Anti-Detection",
+            "icon": "masks-theater",
+            "pages": [
+              "stealth-mode",
+              "proxy-rotation",
+              "captcha-solving",
+              "page-translation",
+              "simplynode-integration"
+            ]
+          },
+          "community-presets",
+          {
+            "group": "Operations",
+            "icon": "activity-heartbeat",
+            "pages": [
+              "performance",
+              "security",
+              "troubleshooting"
             ]
           }
         ]
       },
       {
-        "group": "Integrations",
+        "tab": "API & Integrations",
+        "icon": "api",
         "pages": [
-          "community-presets",
-          "n8n-integration",
-          "zapier-integration",
-          "dify-integration",
-          "langflow-integration",
-          "activepieces-integration",
-          "digitalocean-one-click"
+          {
+            "group": "REST API",
+            "icon": "api",
+            "pages": [
+              "rest-api",
+              "api-key"
+            ]
+          },
+          {
+            "group": "Workflow Integrations",
+            "icon": "brand-zapier",
+            "pages": [
+              "n8n-integration",
+              "zapier-integration",
+              "activepieces-integration",
+              "dify-integration",
+              "langflow-integration"
+            ]
+          },
+          {
+            "group": "MCP",
+            "icon": "brain",
+            "pages": [
+              "mcp-integration"
+            ]
+          }
         ]
       },
       {
-        "group": "Ops",
-        "pages": [
-          "performance",
-          "security",
-          "session-state",
-          "troubleshooting"
+        "tab": "SDK",
+        "icon": "sdk",
+        "groups": [
+          {
+            "group": "JavaScript SDK",
+            "icon": "brand-javascript",
+            "pages": [
+              "sdk/js/overview",
+              "sdk/js/installation",
+              "sdk/js/quickstart",
+              "sdk/js/client-configuration",
+              "sdk/js/authentication",
+              "sdk/js/request-options",
+              "sdk/js/errors",
+              "sdk/js/streaming",
+              "sdk/js/actions",
+              "sdk/js/variables",
+              {
+                "group": "Resources",
+                "pages": [
+                  "sdk/js/resources/tasks",
+                  "sdk/js/resources/executions",
+                  "sdk/js/resources/schedules",
+                  "sdk/js/resources/cabinets",
+                  "sdk/js/resources/captures",
+                  "sdk/js/resources/credentials",
+                  "sdk/js/resources/browser",
+                  "sdk/js/resources/execution",
+                  "sdk/js/resources/settings",
+                  "sdk/js/resources/auth",
+                  "sdk/js/resources/health"
+                ]
+              }
+            ]
+          }
         ]
       },
       {
-        "group": "Changelog",
-        "pages": [
-          "changelog/overview"
+        "tab": "Changelog",
+        "icon": "history-toggle",
+        "groups": [
+          {
+            "group": "Changelog",
+            "pages": [
+              "changelog/overview"
+            ]
+          }
         ]
       }
     ]

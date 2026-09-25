@@ -26,11 +26,11 @@ When creating an **Agent** task, you can configure the following stealth setting
 Beyond behavioral simulation, Figranium implements several technical anti-detection measures:
 
 <CardGroup cols={2}>
-  <Card title="User Agent Rotation" icon="shuffle">
+  <Card title="User Agent Rotation" icon="brand-chrome">
     Automatically switch between common browser user-agent strings (currently based on Chrome v143).
   </Card>
 
-  <Card title="Viewport Randomization" icon="pen-ruler">
+  <Card title="Viewport Randomization" icon="arrows-random">
     Vary the browser window size slightly for each execution.
   </Card>
 
@@ -46,7 +46,7 @@ Beyond behavioral simulation, Figranium implements several technical anti-detect
     When no proxy is configured, DNS queries are routed through Cloudflare's encrypted DoH resolver, preventing DNS-based tracking and leaks.
   </Card>
 
-  <Card title="WebRTC Leak Prevention" icon="user-secret">
+  <Card title="WebRTC Leak Prevention" icon="database-leak">
     WebRTC is configured to disallow non-proxied UDP connections, preventing IP address leaks through WebRTC channels.
   </Card>
 </CardGroup>

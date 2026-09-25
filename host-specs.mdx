@@ -12,7 +12,7 @@ This guide outlines the recommended hardware specifications for self-hosting Fig
 
 ## Resource Tier Quick Reference
 
-| Metric | Sub-Minimum (Can run, not recommended) | Minimum Smooth (Baseline reliability) | Sweet Spot (Recommended production) |
+| Metric | Sub-Minimum (Can run, not recommended) | Minimum Smooth (Baseline reliability) | Sweet Spot (Recommended in production) |
 | :-- | :-- | :-- | :-- |
 | **vCPU** | 0.5 Cores | 1 Core | 2 Cores or more |
 | **RAM** | 1 GB | 2 GB | 4 GB or more |
@@ -25,7 +25,7 @@ This guide outlines the recommended hardware specifications for self-hosting Fig
 ## Hosting Tiers
 
 <CardGroup cols={3}>
-  <Card title="Sub-Minimum (Low-Spec Hosting)" icon="circle-exclamation">
+  <Card title="Sub-Minimum (Low-Spec Hosting)" icon="x-mark">
     Figranium is highly portable and _can_ boot and run with 1 GB of RAM on low-end VPS instances or similar constrained environments.
 
     However, **1 GB of RAM is not recommended** for normal or production workloads:
@@ -103,4 +103,4 @@ services:
 Because Figranium captures screenshots, records videos of executions, and can store extensive database transaction history, storage speed and capacity should be matched to your usage:
 
 - **Use Solid State Drives (SSD)**: Figranium utilizes file-based persistent storage (by default) and heavily interacts with the disk during logging and browser state preservation. SSDs prevent disk-write bottlenecks.
-- **Video Recording & Captures**: Automated recordings consume more CPU and disk space. If you automate a large volume of tasks, we recommend disabling automated recording inside the General Settings panel of your tasks or setting up a regular cleanup schedule via API (`POST /api/clear-screenshots`) or through the Settings UI. See [Performance & Optimization](/performance) for instructions on maintaining a clean storage footprint.
+- **Video Recording & Captures**: Automated recordings consume more CPU and disk space. If you automate a large volume of tasks, disable automated recording inside the General Settings panel of your tasks and clear old captures periodically from **Settings > Data**. See [Performance & Optimization](/performance) for instructions on maintaining a clean storage footprint.

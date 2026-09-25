@@ -20,27 +20,27 @@ In many action fields (like `if` conditions or `set` values), you can use full J
 Inside JS expressions, Figranium provides several convenient helper functions:
 
 <CardGroup cols={2}>
-  <Card title="exists(selector)" icon="eye">
+  <Card title="`exists(selector)`" icon="eye">
     Returns `true` if the CSS selector matches any element on the page.
   </Card>
 
-  <Card title="text(selector)" icon="font">
+  <Card title="`text(selector)`" icon="text-size">
     Returns the inner text of the first element matching the selector.
   </Card>
 
-  <Card title="url()" icon="link">
+  <Card title="`url()`" icon="link">
     Returns the current browser URL.
   </Card>
 
-  <Card title="vars" icon="code">
+  <Card title="`vars`" icon="code">
     A global object containing all defined task variables.
   </Card>
 
-  <Card title="block.output" icon="arrow-right">
+  <Card title="`block.output`" icon="arrow-right">
     Contains the return value of the immediately preceding action.
   </Card>
 
-  <Card title="html" icon="file-code">
+  <Card title="`html`" icon="file-code">
     The full page HTML as a string.
   </Card>
 </CardGroup>
@@ -63,23 +63,23 @@ You can reference nested properties within objects or arrays using dot notation.
 Inside a `foreach` loop, the following special variables are available:
 
 <CardGroup cols={2}>
-  <Card title="{$loop.index}" icon="code">
+  <Card title="`{$loop.index}`" icon="code">
     The current iteration index (starts at 0).
   </Card>
 
-  <Card title="{$loop.count}" icon="cube">
+  <Card title="`{$loop.count}`" icon="cube">
     The total number of items being iterated.
   </Card>
 
-  <Card title="{$loop.item}" icon="arrow-right">
+  <Card title="`{$loop.item}`" icon="arrow-right">
     The data object for the current row (if iterating over an array).
   </Card>
 
-  <Card title="{$loop.text}" icon="book">
+  <Card title="`{$loop.text}`" icon="book">
     The text content of the current DOM element.
   </Card>
 
-  <Card title="{$loop.html}" icon="code">
+  <Card title="`{$loop.html}`" icon="code">
     The inner HTML of the current element.
   </Card>
 </CardGroup>

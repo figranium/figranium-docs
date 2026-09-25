@@ -4,7 +4,7 @@ sidebarTitle: "Modular Workflows"
 description: "Break complex Figranium automations into reusable sub-tasks and chain them together with the start action for maintainable, scalable workflows."
 ---
 
-Figranium supports **Modular Workflows**, allowing you to break complex automations into smaller, reusable tasks and chain them together using the `start` action.
+Figranium supports **Modular Workflows**, allowing you to break complex automations into smaller, reusable tasks and chain them together using the **Start Task** block.
 
 ## Why Modular Workflows?
 
@@ -15,7 +15,7 @@ As automations grow, a single monolithic task becomes hard to maintain. Modular 
     Common sub-flows (login, cookie consent, pagination) across many tasks.
   </Card>
 
-  <Card title="Debug" icon="vial">
+  <Card title="Debug" icon="bug-off">
     Individual components in isolation without re-running the entire workflow.
   </Card>
 
@@ -23,14 +23,14 @@ As automations grow, a single monolithic task becomes hard to maintain. Modular 
     Large automation suites into readable, focused building blocks.
   </Card>
 
-  <Card title="Share" icon="share-nodes">
+  <Card title="Share" icon="share-3">
     Components with your team as standalone, documented tasks.
   </Card>
 </CardGroup>
 
-## The `start` Action
+## The `Start` Action
 
-The `start` action triggers another task by its ID, running it as a sub-task within the current execution context.
+The `Start` action triggers another task by its ID, running it as a sub-task within the current execution context.
 
 ```json
 {
@@ -43,7 +43,7 @@ The `start` action triggers another task by its ID, running it as a sub-task wit
 
 - The child task runs to completion before the parent continues.
 - Variables from the parent task are passed down to the child task automatically.
-- The child task's `block.output` (extraction result) is available back in the parent as `block.output` after the `start` action.
+- The child task's `block.output` (extraction result) is available back in the parent as `block.output` after the Start Task block.
 - If the child task fails, the parent task's error handling applies.
 
 ---
@@ -63,10 +63,10 @@ The `start` action triggers another task by its ID, running it as a sub-task wit
     ]
     ```
 
-    Note its task ID from the dashboard URL or `GET /api/tasks`.
+    Note its task ID from the dashboard URL.
   </Step>
   <Step title="Add `start` to Your Main Task">
-    In your main task, add a `start` action block where you want the child task to run:
+    In your main task, add a **Start Task** block where you want the child task to run:
 
     ```json
     [
@@ -127,7 +127,7 @@ Break pagination into a loop calling a "Scrape One Page" sub-task:
 
 ### Pattern 3: Error Recovery
 
-Use `on_error` to trigger a recovery sub-task when something goes wrong:
+Use an **On Error** block to trigger a recovery sub-task when something goes wrong:
 
 ```json
 [
@@ -141,7 +141,7 @@ Use `on_error` to trigger a recovery sub-task when something goes wrong:
 
 ## Accessing Child Task Output
 
-After a `start` action, the child task's extraction result is available in `block.output`:
+After a Start Task block, the child task's extraction result is available in `block.output`:
 
 ```json
 [
@@ -179,16 +179,15 @@ It is technically possible to create recursive chains (Task A starts Task B, whi
 You can find a task's ID in several ways:
 
 1. **Dashboard URL**: When you open a task, the URL contains the task ID (e.g., `/editor/task_abc123`).
-2. **REST API**: `GET /api/tasks` returns a list of all tasks with their IDs.
 3. **Export**: The exported JSON file includes the task ID at the top level.
 
 ---
 
 ## Task ID validation
 
-The `start` action sanitizes the task ID before issuing the internal API call. Only alphanumeric characters, underscores (`_`), and hyphens (`-`) are preserved; any other character — including path separators, query strings, and whitespace — is stripped out.
+The Start Task block sanitizes the task ID before issuing the internal API call. Only alphanumeric characters, underscores (`_`), and hyphens (`-`) are preserved; any other character, including path separators, query strings, and whitespace, is stripped out.
 
-If sanitization removes every character (for example, when a template variable resolves to `../../api/clear-cookies?` or any other non-conforming string), the action fails fast with `Invalid task id.` and no request is made. This prevents a crafted variable value from being used to probe other internal endpoints through the `start` action.
+If sanitization removes every character (for example, when a template variable resolves to `../../api/clear-cookies?` or any other non-conforming string), the action fails fast with `Invalid task id.` and no request is made. This prevents a crafted variable value from being used to probe other internal endpoints through the Start Task block.
 
 ```json
 {
@@ -204,7 +203,7 @@ When `user_input` resolves to `task_abc123`, the action runs normally. When it r
 </Tip>
 
 <CardGroup cols={2}>
-  <Card title="Variables" icon="code" href="/variables">
+  <Card title="Variables" icon="variable" href="/variables">
     Pass dynamic data between parent and child tasks.
   </Card>
 

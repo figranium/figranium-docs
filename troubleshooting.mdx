@@ -86,7 +86,7 @@ Common issues and their solutions when running Figranium.
     - **Cause 1**: The selector is wrong — the element doesn't match the CSS you provided.
       - **Fix**: Use [Headful Debugging](/headful-browser) to open the browser and inspect the live page. Right-click \> Inspect to find the correct selector.
     - **Cause 2**: The element loads asynchronously after the page renders.
-      - **Fix**: Add a `wait` action (e.g., 2000ms) before the failing action, or use a `wait_selector` action explicitly targeting the element.
+      - **Fix**: Add a Wait action (e.g., 2000ms) before the failing action, or use a Wait for Selector action explicitly targeting the element.
     - **Cause 3**: The element is inside a `<iframe>`.
       - **Note**: Figranium does not currently support cross-origin iframes. Same-origin iframes may work via JavaScript execution.
     - **Cause 4**: The element is inside a Shadow DOM.
@@ -125,7 +125,7 @@ Common issues and their solutions when running Figranium.
       2. Enable **Stealth Mode** options in the Task Editor (natural typing, idle movements, etc.).
       3. Use high-quality **Residential Proxies** rather than datacenter IPs.
       4. Rotate **User Agents** in `Settings > System > User Agent`.
-      5. Add random `wait` actions (500–2000ms) between interactions.
+      5. Add random Wait actions (500 to 2000ms) between interactions.
       6. Avoid actions that no human would do (instant form fill, no mouse movement).
   </Accordion>
 </AccordionGroup>
@@ -151,9 +151,9 @@ Common issues and their solutions when running Figranium.
 <AccordionGroup>
   <Accordion title="Empty or incorrect extraction output">
     - **Cause 1**: The extraction script runs before dynamic content finishes loading.
-      - **Fix**: Add `wait` or `wait_selector` actions before your final extraction step.
+      - **Fix**: Add Wait or Wait for Selector actions before your final extraction step.
     - **Cause 2**: The extraction script has a bug.
-      - **Fix**: Use a `javascript` action in the middle of your task to `return document.querySelector(".target")?.innerText` and inspect the result in the execution logs.
+      - **Fix**: Use a JavaScript action in the middle of your task to `return document.querySelector(".target")?.innerText` and inspect the result in the execution logs.
     - **Cause 3**: The page structure changed.
       - **Fix**: Open the page in headful mode and re-inspect the selectors.
   </Accordion>
@@ -165,10 +165,10 @@ Common issues and their solutions when running Figranium.
 
 <AccordionGroup>
   <Accordion title="Task hangs indefinitely">
-    - **Cause 1**: A `while` loop with a condition that's always true.
-      - **Fix**: Add a counter variable and a `stop` condition to break the loop.
-    - **Cause 2**: A `wait_selector` waiting for an element that never appears.
-      - **Fix**: Wrap it in an `on_error` block with a fallback, or reduce the timeout.
+    - **Cause 1**: A While loop with a condition that's always true.
+      - **Fix**: Add a counter variable and a Stop block to break the loop.
+    - **Cause 2**: A Wait for Selector waiting for an element that never appears.
+      - **Fix**: Wrap it in an On Error block with a fallback, or reduce the timeout.
     - **Cause 3**: A download action waiting for a file that never triggers.
       - **Fix**: Check that the target element actually initiates a download.
   </Accordion>

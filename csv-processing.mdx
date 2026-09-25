@@ -8,7 +8,7 @@ Figranium provides built-in support for parsing and utilizing CSV data, making i
 
 ## The CSV Action
 
-The `csv` action block parses CSV-formatted text into an array of objects.
+The **CSV** action block parses CSV-formatted text into an array of objects.
 
 - **Input**: Takes a raw CSV string in the `value` field. If empty, it uses `block.output` from the previous step.
 - **Output**: The resulting array is stored in a variable of your choice (via `varName`).
@@ -22,9 +22,9 @@ The `csv` action block parses CSV-formatted text into an array of objects.
 
 ## Workflow Example
 
-1. **Extract Data**: Use a `javascript` block to read a CSV file's content or fetch it from a URL.
-2. **Parse CSV**: Add a `csv` action, setting the `varName` to `bulkData`.
-3. **Iterate**: Use a `foreach` action with the selector `bulkData` (or a variable reference).
+1. **Extract Data**: Use a JavaScript block to read a CSV file's content or fetch it from a URL.
+2. **Parse CSV**: Add a **CSV** action, setting the `varName` to `bulkData`.
+3. **Iterate**: Use a **Foreach** action with the selector `bulkData` (or a variable reference).
 4. **Execute**: Inside the loop, use `{$loop.item.column_name}` to access specific fields for each row.
 
 ## Tips
@@ -33,5 +33,5 @@ The `csv` action block parses CSV-formatted text into an array of objects.
 - **Empty Rows**: Figranium automatically filters out empty rows to prevent execution errors.
 
 <Tip>
-  Combine the `csv` action with [Variables](/variables) and [Foreach Loops](/control-flow) to build powerful bulk-processing workflows that scale across hundreds of rows.
+  Combine the **CSV** action with [Variables](/variables) and [Foreach Loops](/control-flow) to build powerful bulk-processing workflows that scale across hundreds of rows.
 </Tip>

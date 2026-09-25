@@ -27,7 +27,7 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
 ## Basic Actions
 
 <AccordionGroup>
-  <Accordion title="Click" icon="arrow-pointer">
+  <Accordion title="Click" icon="click">
     Interacts with a button, link, or other clickable item.
 
     - **Selector**: The CSS selector of the target element (e.g., `#btn`, `.link`).
@@ -100,7 +100,7 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
     - **Value**: Pixels to scroll (e.g., `500`) or specific commands (`bottom`, `top`).
   </Accordion>
 
-  <Accordion title="Hover" icon="hand">
+  <Accordion title="Hover" icon="hand-stop">
     Moves the mouse cursor over an element. Use this to trigger dropdown menus or tooltips.
 
     - **Selector**: The target element.
@@ -116,7 +116,7 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
 ## Logic & Flow Control
 
 <AccordionGroup>
-  <Accordion title="If / else / end" icon="shuffle">
+  <Accordion title="If / else" icon="git-branch">
     Conditional execution block. Use this to handle dynamic situations, like closing a popup only if it appears.
 
     - **Condition**: A JavaScript expression (e.g., `exists('.error')`).
@@ -124,21 +124,21 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
     - **Operator**: `equals`, `contains`, `exists`, etc.
   </Accordion>
 
-  <Accordion title="While / end" icon="rotate">
+  <Accordion title="While" icon="rotate">
     Repeats a block of actions while a condition is true. Use this for pagination or waiting for a specific state change.
 
     - **Condition**: Same as `if`.
     - **Value**: (Optional) Max iterations to prevent infinite loops.
   </Accordion>
 
-  <Accordion title="For Each / end" icon="list">
+  <Accordion title="For Each" icon="list">
     Iterates over a list of elements. Use this to scrape lists of items, like search results or product cards.
 
     - **Selector**: The elements to iterate (e.g., `.product-item`).
     - **Var Name**: Variable to store the current element index/data.
   </Accordion>
 
-  <Accordion title="Repeat N / end" icon="repeat">
+  <Accordion title="Repeat N" icon="repeat">
     Repeats a block N times. Use this when you know exactly how many times an action needs to happen.
 
     - **Value**: Number of repetitions.
@@ -148,27 +148,27 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
 ## Data & Variables
 
 <AccordionGroup>
-  <Accordion title="Set Variable (set)" icon="pen">
+  <Accordion title="Set Variable (set)" icon="edit">
     Updates a runtime variable. Use this to store calculations or flags for later use.
 
     - **Var Name**: The variable to update (e.g., `counter`).
     - **Value**: The new value (can be a JS expression).
   </Accordion>
 
-  <Accordion title="CSV (csv)" icon="file-csv">
+  <Accordion title="CSV (csv)" icon="file-type-csv">
     Parses CSV formatted text into rows (an array of objects). Use this to extract data out of comma separated text for further processing.
 
     - **Value**: The CSV text to parse. If left blank, it will attempt to use the output of the previous block (`block.output`).
   </Accordion>
 
-  <Accordion title="Merge (merge)" icon="object-group">
+  <Accordion title="Merge (merge)" icon="arrow-merge">
     Merges multiple arrays, objects, or primitive values into a single output. Use this when you have collected data from different steps and need to combine them into one payload.
 
     - **Value**: Comma-separated list of values or variables to merge (e.g., `items, extraItems, {$block.output}`).
     - **Target Variable**: (Optional) The name of a new or existing variable to store the merged result (e.g., `allItems`).
   </Accordion>
 
-  <Accordion title="Get Content (get_content)" icon="file-lines">
+  <Accordion title="Get Content (get_content)" icon="align-box-center-stretch">
     Extracts the text content of the current page or a specific element. Use this to capture visible text without writing a custom JavaScript block — for example, grabbing an article body, a table's contents, or the entire page text for downstream processing.
 
     - **Selector**: (Optional) A CSS selector targeting the element to read. If empty, the full page text is returned.
@@ -207,7 +207,7 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
     - **Selector**: (Optional) Capture only this element.
   </Accordion>
 
-  <Accordion title="Stop Task" icon="circle-stop">
+  <Accordion title="Stop Task" icon="player-stop">
     Immediately stops the task execution. Use this to end the task early based on a condition (e.g., login success).
 
     - **Value**: Exit status (e.g., `success`, `failure`).
@@ -237,11 +237,11 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
     Use this after the surrounding form submission or upload flow succeeds when you want consumption to happen later than the attachment itself.
   </Accordion>
 
-  <Accordion title="On Error (on_error)" icon="triangle-exclamation">
+  <Accordion title="On Error (on_error)" icon="alert-triangle">
     Defines a block of actions to run if an error occurs in the main flow. Use this to implement retry logic or graceful failures (try/catch).
   </Accordion>
 
-  <Accordion title="HTTP Request (http_request)" icon="api">
+  <Accordion title="HTTP Request (http_request)" icon="http-get">
     Makes a server-side HTTP request to any URL. Use this to call external APIs, send webhook notifications, or fetch data from REST endpoints — without leaving the task flow.
 
     - **Method**: `GET`, `POST`, `PUT`, `PATCH`, or `DELETE`.
@@ -271,7 +271,7 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
     After this block runs, `{$apiResponse}` contains the parsed JSON response.
   </Accordion>
 
-  <Accordion title="Start Task (start)" icon="play">
+  <Accordion title="Start Task (start)" icon="player-play">
     Triggers another task to run from within the current task. Use this to create modular workflows by chaining tasks together.
 
     - **Task**: The ID of the task to run.
@@ -301,10 +301,10 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
     }
     ```
 
-    For tasks that hit CAPTCHAs at unpredictable points, you can turn on the task-level **Auto-Solve Captchas** setting instead of scattering `solve_captcha` blocks through the flow — it runs the same detection pass after the initial task navigation and after every `navigate`, `click`, and `type`, and no-ops when no challenge is present. See [CAPTCHA Solving](/captcha-solving) for the full setup, environment variables, and the auto-solve toggle.
+    For tasks that hit CAPTCHAs at unpredictable points, you can turn on the task-level **Auto-Solve Captchas** setting instead of scattering Solve Captcha blocks through the flow. It runs the same detection pass after the initial task navigation and after every Navigate, Click, and Type, and no-ops when no challenge is present. See [CAPTCHA Solving](/captcha-solving) for the full setup, environment variables, and the auto-solve toggle.
   </Accordion>
 
-  <Accordion title="Wait for Captcha (wait_captcha)" icon="hourglass-half" id="wait-captcha">
+  <Accordion title="Wait for Captcha (wait_captcha)" icon="clock" id="wait-captcha">
     Pauses the task until a CAPTCHA control on the page is initialized, visible, enabled, pointer-receivable, and stable. The block does not click or solve the challenge. Use it to gate later steps on the widget being ready — for example, before handing the page to your own solving logic, or to confirm that a challenge rendered at all.
 
     Supported challenge types: reCAPTCHA v2, reCAPTCHA v3, hCaptcha, and Cloudflare Turnstile.
@@ -330,7 +330,7 @@ In "Agent" mode, tasks are built from a sequence of actions. These actions are e
   </Accordion>
 
   <Accordion title="Do Nothing (do_nothing)" icon="ban">
-    Performs no operation and moves to the next block. Use this as a placeholder while drafting a task, or as the body of an `if` or `on_error` branch when you explicitly want the branch to fall through without side effects.
+    Performs no operation and moves to the next block. Use this as a placeholder while drafting a task, or as the body of an If or On Error branch when you explicitly want the branch to fall through without side effects.
 
     The block takes no configuration. It logs `Do nothing` and completes successfully. The aliases `noop` and `pass` behave the same way.
 

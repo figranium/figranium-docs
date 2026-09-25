@@ -68,7 +68,7 @@ This guide is for developers who want to run Figranium's source code directly on
     The frontend will be available at `http://localhost:5173`, and it will proxy API requests to the backend at `http://localhost:11345`.
   </Step>
   <Step title="(Optional) Start the Apple Silicon CAPTCHA companion">
-    The `solve_captcha` action and task-level auto-solve setting work out of the box: remote solving is used if `CAPTCHA_SOLVER_URL` is configured, otherwise the built-in local model runs in-process (weights are cached in `data/captcha-model/` on first use).
+    The **Solve Captcha** action and task-level auto-solve setting work out of the box: remote solving is used if `CAPTCHA_SOLVER_URL` is configured, otherwise the built-in local model runs in-process (weights are cached in `data/captcha-model/` on first use).
 
     On Apple Silicon, you can optionally run the native companion in a third terminal to offload inference to CoreML/MLX:
 

@@ -1,7 +1,7 @@
 ---
 title: "Error Handling"
 sidebarTitle: "Error Handling"
-description: "Make your Figranium automation tasks resilient with on_error blocks, retry loops, timeout strategies, and fallback sub-tasks."
+description: "Make your Figranium automation tasks resilient with On Error blocks, retry loops, timeout strategies, and fallback sub-tasks."
 ---
 
 Figranium provides several mechanisms to make your automation tasks resilient to failures, from optional actions to retry loops and fallback sub-tasks.
@@ -11,7 +11,7 @@ Figranium provides several mechanisms to make your automation tasks resilient to
 Common failure modes in browser automation:
 
 <CardGroup cols={2}>
-  <Card title="Timeouts" icon="triangle-exclamation">
+  <Card title="Timeouts" icon="time-duration-0">
     An element takes longer than expected to appear.
   </Card>
 
@@ -31,7 +31,7 @@ Common failure modes in browser automation:
     A CAPTCHA is triggered.
   </Card>
 
-  <Card title="Dynamic Content" icon="arrows-rotate">
+  <Card title="Dynamic Content" icon="stroke-dynamic">
     Dynamic content changes the page structure.
   </Card>
 </CardGroup>
@@ -42,7 +42,7 @@ A well-designed task anticipates these failures and handles them gracefully.
 
 ## The On Error Block
 
-The On Error block is Figranium's primary error handling mechanism. It works like a `try/catch`: if any action in the main flow raises an error, execution jumps to the `on_error` block.
+The On Error block is Figranium's primary error handling mechanism. It works like a `try/catch`: if any action in the main flow raises an error, execution jumps to the On Error block.
 
 ```json
 { "type": "on_error" },
@@ -50,11 +50,11 @@ The On Error block is Figranium's primary error handling mechanism. It works lik
 { "type": "end" }
 ```
 
-The `on_error` / `end` pair should be placed in the task to catch errors from preceding actions. Any error thrown by an action before the `on_error` block is caught.
+The On Error / End pair should be placed in the task to catch errors from preceding actions. Any error thrown by an action before the On Error block is caught.
 
 <AccordionGroup>
   <Accordion title="Making an Action Optional" icon="circle-check">
-    The simplest use: place an empty `on_error`/`end` block to absorb errors from an action that may or may not exist:
+    The simplest use: place an empty On Error / End block to absorb errors from an action that may or may not exist:
 
     ```json
     // Dismiss a cookie banner only if it appears — ignore if it doesn't
@@ -76,7 +76,7 @@ The `on_error` / `end` pair should be placed in the task to catch errors from pr
     ```
   </Accordion>
 
-  <Accordion title="Stop on Error with a Reason" icon="triangle-exclamation">
+  <Accordion title="Stop on Error with a Reason" icon="player-stop">
     Log the failure and stop the task cleanly:
 
     ```json
@@ -94,7 +94,7 @@ The `on_error` / `end` pair should be placed in the task to catch errors from pr
 
 ### Retry with a Counter Variable
 
-Use a `while` loop combined with a counter to retry a failing action up to N times:
+Use a While loop combined with a counter to retry a failing action up to N times:
 
 ```json
 { "type": "set", "varName": "retries", "value": "0" },
@@ -145,7 +145,7 @@ Popups that appear unpredictably are a common cause of task failures. Handle the
 
 ### Dismiss Any Popup on Every Page
 
-Use a sub-task triggered via `start` to handle common popups at the beginning of every task:
+Use a sub-task triggered via a Start Task block to handle common popups at the beginning of every task:
 
 ```json
 // popup-handler task
@@ -184,13 +184,13 @@ Each action block can have its own `timeout` (in milliseconds). Use shorter time
 { "type": "wait_selector", "selector": ".results", "timeout": 15000 }
 ```
 
-Use `on_error` around short-timeout actions to make them non-fatal when the element doesn't appear.
+Use an On Error block around short-timeout actions to make them non-fatal when the element doesn't appear.
 
 ---
 
 ## Logging Errors for Inspection
 
-Use a `javascript` block inside `on_error` to log diagnostic information to the execution output:
+Use a JavaScript block inside an On Error branch to log diagnostic information to the execution output:
 
 ```json
 { "type": "on_error" },
@@ -217,9 +217,9 @@ When using [Output Providers](/output-providers), you can control what happens i
 Choose `fail` when data delivery is critical and you want alerts on push failures.
 
 <Warning>
-  Always include a termination condition in retry loops. An unbounded `while` loop with no exit condition will run until the task times out.
+  Always include a termination condition in retry loops. An unbounded While loop with no exit condition will run until the task times out.
 </Warning>
 
 <Tip>
-  Combine `on_error` blocks with [JavaScript Execution](/javascript-execution) to capture rich diagnostic data when failures occur.
+  Combine On Error blocks with [JavaScript Execution](/javascript-execution) to capture rich diagnostic data when failures occur.
 </Tip>
