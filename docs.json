@@ -182,7 +182,8 @@
             "group": "Changelog",
             "pages": [
               "changelog/overview"
-            ]
+            ],
+            "icon": "history-toggle"
           }
         ]
       }
