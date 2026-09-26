@@ -15,7 +15,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
 ## Methods
 
 <AccordionGroup>
-  <Accordion title="list">
+  <Accordion title="`list`">
     ```ts
     list(options?: RequestOptions & { apiKeyRoute?: boolean }): Promise<{ executions: Execution[] }>
     ```
@@ -36,7 +36,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="get">
+  <Accordion title="`get`">
     ```ts
     get<T = unknown>(id: string, options?: RequestOptions): Promise<{ execution: Execution<T> }>
     ```
@@ -57,7 +57,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="delete">
+  <Accordion title="`delete`">
     ```ts
     delete(id: string, options?: RequestOptions): Promise<{ success: boolean }>
     ```
@@ -69,7 +69,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="clear">
+  <Accordion title="`clear`">
     ```ts
     clear(options?: RequestOptions): Promise<{ success: boolean }>
     ```
@@ -81,7 +81,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="stop">
+  <Accordion title="`stop`">
     ```ts
     stop(input: { runId: string }, options?: RequestOptions): Promise<{ success: boolean }>
     ```
@@ -93,7 +93,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="stream">
+  <Accordion title="`stream`">
     ```ts
     stream<T = unknown>(options?: RequestOptions): AsyncIterable<StreamEvent<T>>
     ```

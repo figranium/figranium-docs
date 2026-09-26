@@ -125,26 +125,6 @@ If enabled, authentication must be provided via one of the following methods:
 ## Tasks
 
 <AccordionGroup>
-  <Accordion title="GET /api/tasks">
-    Lists all saved tasks. Each task includes its full configuration except for the version history, which is fetched separately when you open a task in the editor.
-
-    **Response**:
-
-    ```json
-    [
-      {
-        "id": "task_1",
-        "name": "Scraper",
-        "description": "Extracts product prices daily",
-        "url": "https://example.com",
-        "mode": "agent"
-      }
-    ]
-    ```
-
-    The `description` field is optional and only present if the task has one.
-  </Accordion>
-
   <Accordion title="GET /api/tasks/list">
     Returns a lightweight list of all saved tasks with summary metadata (ID, name, description, mode, schedule, variables, createdAt, updatedAt) without version history or full action lists. Useful for lightweight listings and dashboard overviews. Requires API-key authentication.
 
@@ -168,16 +148,21 @@ If enabled, authentication must be provided via one of the following methods:
     ```
   </Accordion>
 
-  <Accordion title="POST /api/tasks/:id/touch">
-    Updates the `updatedAt` timestamp of a task to the current time without modifying its configuration.
+  <Accordion title="GET /api/tasks">
+    Lists all saved tasks with full configuration (except version history). Prefer `GET /api/tasks/list` for lightweight listings.
 
     **Response**:
 
     ```json
-    {
-      "id": "task_1",
-      "updatedAt": "2026-08-16T12:00:00.000Z"
-    }
+    [
+      {
+        "id": "task_1",
+        "name": "Scraper",
+        "description": "Extracts product prices daily",
+        "url": "https://example.com",
+        "mode": "agent"
+      }
+    ]
     ```
   </Accordion>
 
@@ -256,80 +241,6 @@ If enabled, authentication must be provided via one of the following methods:
   <Accordion title="POST /api/tasks/:id/api">
     Triggers an execution of a specific task. See [Trigger a task](#trigger-a-task) above for the full reference.
   </Accordion>
-
-  <Accordion title="POST /api/tasks/generate-selector">
-    Uses the configured AI provider to generate a CSS selector from a plain-language description and the current page DOM. The endpoint runs the task up to the specified action index to capture the live HTML, then sends it to the AI provider chain (Gemini -\> OpenAI -\> Claude -\> Ollama) and returns the first successful result. Requires authentication.
-
-    **Body**:
-
-    ```json
-    {
-      "task": { "url": "https://example.com", "actions": [...] },
-      "actionIndex": 2,
-      "prompt": "the search input field"
-    }
-    ```
-
-    | Field | Type | Required | Description |
-    | :-- | :-- | :-- | :-- |
-    | `task` | object | Yes | The full task object, including `url` and `actions` |
-    | `actionIndex` | number | Yes | Run actions up to this index to capture the page state |
-    | `prompt` | string | Yes | A natural-language description of the element to find |
-
-    **Response** (success):
-
-    ```json
-    {
-      "selector": "input[aria-label=\"Search\"]"
-    }
-    ```
-
-    **Error responses**:
-
-    | Status | Cause |
-    | :-- | :-- |
-    | `400` | Missing `task`, `actionIndex`, or `prompt`, or no AI provider keys configured |
-    | `500` | All configured AI providers failed to generate a selector, or the DOM extraction failed |
-
-    <Note>
-      Ollama requests from this endpoint go through redirect-safe fetching with SSRF validation at every hop. See [Ollama URL validation](/security#ollama-url-validation) for details.
-    </Note>
-  </Accordion>
-
-  <Accordion title="POST /api/tasks/generate-script">
-    Uses the configured AI provider to generate a JavaScript extraction script from a plain-language description. The endpoint tries each provider in order (Gemini -\> OpenAI -\> Claude -\> Ollama) and returns the first successful result. Requires authentication.
-
-    **Body**:
-
-    ```json
-    {
-      "description": "extract all article titles and links from the page"
-    }
-    ```
-
-    | Field | Type | Required | Description |
-    | :-- | :-- | :-- | :-- |
-    | `description` | string | Yes | A natural-language description of the data to extract |
-
-    **Response** (success):
-
-    ```json
-    {
-      "script": "const articles = Array.from(document.querySelectorAll('article'));\nreturn articles.map(a => ({\n  title: a.querySelector('h2')?.innerText.trim(),\n  link: a.querySelector('a')?.href\n}));"
-    }
-    ```
-
-    **Error responses**:
-
-    | Status | Cause |
-    | :-- | :-- |
-    | `400` | Missing or empty `description`, or no AI provider keys configured |
-    | `502` | All configured AI providers failed to generate a script |
-
-    <Note>
-      Ollama requests from this endpoint go through redirect-safe fetching with SSRF validation at every hop. See [Ollama URL validation](/security#ollama-url-validation) for details.
-    </Note>
-  </Accordion>
 </AccordionGroup>
 
 ---
@@ -337,36 +248,6 @@ If enabled, authentication must be provided via one of the following methods:
 ## Executions
 
 <AccordionGroup>
-  <Accordion title="GET /api/executions">
-    Lists execution history.
-
-    **Query Parameters**:
-
-    - `limit`: Number of results (default 50).
-    - `status`: Filter by status code.
-  </Accordion>
-
-  <Accordion title="GET /api/executions/list">
-    Returns a lightweight list of execution records wrapped in an `executions` array. Useful for dashboards and external integrations that need summary metadata without full logs or result payloads. Requires API-key authentication.
-
-    **Response**:
-
-    ```json
-    {
-      "executions": [
-        {
-          "id": "exec_abc123",
-          "taskId": "task_1",
-          "taskName": "Scraper",
-          "status": "success",
-          "startedAt": "2026-08-05T18:04:12.335Z",
-          "durationMs": 4200
-        }
-      ]
-    }
-    ```
-  </Accordion>
-
   <Accordion title="GET /api/executions/list">
     Returns a lightweight list of execution records with summary metadata (ID, task ID, status, timestamps, duration) without full logs or result payloads. Use this for dashboard views and history listings when you don't need the per-execution detail returned by `GET /api/executions/:id`. Requires API-key authentication.
 
@@ -388,22 +269,21 @@ If enabled, authentication must be provided via one of the following methods:
     ```
   </Accordion>
 
+  <Accordion title="GET /api/executions">
+    Lists execution history.
+
+    **Query Parameters**:
+
+    - `limit`: Number of results (default 50).
+    - `status`: Filter by status code.
+  </Accordion>
+
   <Accordion title="GET /api/executions/:id">
     Gets detailed logs and result for a specific execution.
   </Accordion>
 
   <Accordion title="DELETE /api/executions/:id">
     Deletes a single execution record by ID.
-
-    **Response**:
-
-    ```json
-    { "success": true }
-    ```
-  </Accordion>
-
-  <Accordion title="POST /api/executions/clear">
-    Deletes all execution records. Use this endpoint to free disk space or reset history after large batch runs.
 
     **Response**:
 
@@ -429,115 +309,7 @@ If enabled, authentication must be provided via one of the following methods:
 
 ---
 
-## Settings
-
-### AI provider keys
-
-Manage API keys for each AI provider. All providers support multiple keys for automatic failover.
-
-<AccordionGroup>
-  <Accordion title="GET /api/settings/gemini-api-key">
-    Returns the configured Gemini API keys.
-  </Accordion>
-
-  <Accordion title="POST /api/settings/gemini-api-key">
-    Saves one or more Gemini API keys.
-
-    **Body**:
-
-    ```json
-    {
-      "geminiApiKeys": ["your-gemini-key"]
-    }
-    ```
-  </Accordion>
-
-  <Accordion title="GET /api/settings/openai-api-key">
-    Returns the configured OpenAI API keys.
-  </Accordion>
-
-  <Accordion title="POST /api/settings/openai-api-key">
-    Saves one or more OpenAI API keys.
-
-    **Body**:
-
-    ```json
-    {
-      "openAiApiKeys": ["your-openai-key"]
-    }
-    ```
-  </Accordion>
-
-  <Accordion title="GET /api/settings/claude-api-key">
-    Returns the configured Claude (Anthropic) API keys.
-  </Accordion>
-
-  <Accordion title="POST /api/settings/claude-api-key">
-    Saves one or more Claude API keys.
-
-    **Body**:
-
-    ```json
-    {
-      "claudeApiKeys": ["your-claude-key"]
-    }
-    ```
-  </Accordion>
-
-  <Accordion title="GET /api/settings/ollama-api-key">
-    Returns the configured Ollama instances.
-  </Accordion>
-
-  <Accordion title="POST /api/settings/ollama-api-key">
-    Saves one or more Ollama instance configurations. Each entry is a JSON string containing the base URL and model name.
-
-    **Body**:
-
-    ```json
-    {
-      "ollamaApiKeys": ["{\"url\":\"http://localhost:11434\",\"model\":\"gemma4:e2b\"}"]
-    }
-    ```
-
-    You can also pass a plain URL string (e.g., `"http://localhost:11434"`), in which case the default model `gemma4:e2b` is used.
-  </Accordion>
-</AccordionGroup>
-
-### AI model settings
-
-<AccordionGroup>
-  <Accordion title="GET /api/settings/ai-models">
-    Returns the currently configured default model for each AI provider. Requires authentication.
-
-    **Response**:
-
-    ```json
-    {
-      "gemini": "gemini-3-flash-preview",
-      "openai": "gpt-5-nano",
-      "claude": "claude-haiku-4-6",
-      "ollama": "llama3.2"
-    }
-    ```
-  </Accordion>
-
-  <Accordion title="POST /api/settings/ai-models">
-    Updates the default model for one or more AI providers. Omitted providers keep their current value. Requires authentication.
-
-    **Body**:
-
-    ```json
-    {
-      "openai": "gpt-4o",
-      "claude": "claude-sonnet-4-5"
-    }
-    ```
-
-    **Response**: Returns the full updated model configuration (same shape as the `GET` response).
-  </Accordion>
-</AccordionGroup>
-
-### Proxies
+## Proxies
 
 <AccordionGroup>
   <Accordion title="GET /api/settings/proxies">
@@ -611,219 +383,6 @@ Manage API keys for each AI provider. All providers support multiple keys for au
 
   <Accordion title="DELETE /api/settings/proxies/:id">
     Deletes a single proxy by ID.
-  </Accordion>
-
-  <Accordion title="DELETE /api/settings/proxies">
-    Deletes multiple proxies by ID.
-
-    **Body**:
-
-    ```json
-    {
-      "ids": ["proxy_a1b2c3", "proxy_d4e5f6"]
-    }
-    ```
-  </Accordion>
-
-  <Accordion title="POST /api/settings/proxies/rotation">
-    Updates rotation settings.
-
-    **Body**:
-
-    ```json
-    {
-      "defaultProxyId": "proxy_a1b2c3",
-      "includeDefaultInRotation": true,
-      "rotationMode": "random"
-    }
-    ```
-
-    | Field | Type | Description |
-    | :-- | :-- | :-- |
-    | `defaultProxyId` | string | ID of the proxy to use when rotation is off (use `null` for Host IP) |
-    | `includeDefaultInRotation` | boolean | Whether to include the default proxy in the rotation pool |
-    | `rotationMode` | string | `"round-robin"` or `"random"` |
-  </Accordion>
-</AccordionGroup>
-
----
-
-## Credentials
-
-<AccordionGroup>
-  <Accordion title="GET /api/credentials">
-    Lists all saved credentials. Tokens are redacted in the response.
-
-    **Response**:
-
-    ```json
-    [
-      {
-        "id": "cred_a1b2c3d4e5f6g7h8",
-        "name": "My Baserow",
-        "provider": "baserow",
-        "config": {
-          "baseUrl": "https://baserow.io",
-          "token": "••••••••"
-        }
-      }
-    ]
-    ```
-  </Accordion>
-
-  <Accordion title="POST /api/credentials">
-    Creates a new output provider credential.
-
-    **Body**:
-
-    ```json
-    {
-      "provider": "baserow",
-      "name": "My Baserow",
-      "config": {
-        "baseUrl": "https://baserow.io",
-        "token": "your-api-token"
-      }
-    }
-    ```
-
-    The `baseUrl` is validated against SSRF rules. If the URL points to a private or internal network address (and `ALLOW_PRIVATE_NETWORKS` is `false`), the request returns:
-
-    ```json
-    { "error": "INVALID_BASE_URL", "details": "Invalid base URL format or restricted destination" }
-    ```
-  </Accordion>
-
-  <Accordion title="PUT /api/credentials/:id">
-    Updates an existing credential. The same URL validation applies when updating the `baseUrl`.
-  </Accordion>
-
-  <Accordion title="DELETE /api/credentials/:id">
-    Deletes a credential by ID.
-
-    **Response**:
-
-    ```json
-    { "success": true }
-    ```
-  </Accordion>
-
-  <Accordion title="GET /api/credentials/:id/proxy/baserow/databases">
-    Lists all Baserow databases accessible by the credential. This proxies the request through Figranium so your Baserow token is never exposed to the browser.
-
-    **Response**:
-
-    ```json
-    [
-      { "id": 1, "name": "Web Scraping" },
-      { "id": 2, "name": "Product Data" }
-    ]
-    ```
-  </Accordion>
-
-  <Accordion title="GET /api/credentials/:id/proxy/baserow/databases/:databaseId/tables">
-    Lists all tables within a specific Baserow database. The `databaseId` parameter must be a numeric value.
-
-    **Response**:
-
-    ```json
-    [
-      { "id": 45, "name": "Products" },
-      { "id": 46, "name": "Pricing History" }
-    ]
-    ```
-
-    **Error responses**:
-
-    | Status | Error code | Cause |
-    | :-- | :-- | :-- |
-    | `400` | `INVALID_DATABASE_ID` | The `databaseId` parameter is not a valid number |
-
-    These proxy endpoints are used by the task editor's **Output** tab to let you browse and select a destination table without leaving Figranium.
-  </Accordion>
-
-  <Accordion title="POST /api/settings/api-key">
-    Generates or regenerates the system API key. If you include an `apiKey` field in the request body, that value is saved as the new key (max 512 characters). If omitted, a new key is generated automatically.
-
-    **Body** (optional):
-
-    ```json
-    {
-      "apiKey": "your-custom-key"
-    }
-    ```
-
-    **Error responses**:
-
-    | Status | Error code | Cause |
-    | :-- | :-- | :-- |
-    | `400` | `API_KEY_TOO_LONG` | The supplied key exceeds 512 characters |
-  </Accordion>
-
-  <Accordion title="GET /api/settings/selector-finder">
-    Returns the default selector finder preference.
-
-    **Response**:
-
-    ```json
-    { "selectorFinder": "highlight" }
-    ```
-
-    Possible values: `"highlight"` (standard point-and-click picker) or `"ai"` (AI Selector Finder).
-  </Accordion>
-
-  <Accordion title="POST /api/settings/selector-finder">
-    Sets the default selector finder tool.
-
-    **Body**:
-
-    ```json
-    { "selectorFinder": "ai" }
-    ```
-  </Accordion>
-
-  <Accordion title="GET /api/settings/theme">
-    Returns the currently persisted UI theme.
-
-    **Response**:
-
-    ```json
-    { "theme": "dark" }
-    ```
-
-    Possible values: `"dark"`, `"light"`, `"solarized-light"`, `"solarized-dark"`.
-
-    If no theme has been saved yet, Figranium falls back to any `figranium_theme` or `theme` cookie sent with the request, writes that value to the backend data store, and returns it. When neither the store nor a cookie has a valid value, Figranium returns `"dark"`.
-
-    **Error responses**:
-
-    | Status | Error code | Cause |
-    | :-- | :-- | :-- |
-    | `500` | `THEME_LOAD_FAILED` | Reading the theme from the backend data store failed |
-  </Accordion>
-
-  <Accordion title="POST /api/settings/theme">
-    Persists the UI theme to the backend data store so it follows the user across browsers and devices on the same instance. The response also sets a `figranium_theme` cookie (path `/`, `SameSite=Lax`, 1-year `max-age`) for fast initial page loads.
-
-    **Body**:
-
-    ```json
-    { "theme": "solarized-dark" }
-    ```
-
-    Any value outside `"dark"`, `"light"`, `"solarized-light"`, `"solarized-dark"` is silently coerced to `"dark"`.
-
-    **Response**:
-
-    ```json
-    { "theme": "solarized-dark" }
-    ```
-
-    **Error responses**:
-
-    | Status | Error code | Cause |
-    | :-- | :-- | :-- |
-    | `500` | `THEME_SAVE_FAILED` | Writing the theme to the backend data store failed |
   </Accordion>
 </AccordionGroup>
 
@@ -965,63 +524,6 @@ Programmatic control of the managed headful browser session. Use these endpoints
 
 ---
 
-## Headful
-
-<AccordionGroup>
-  <Accordion title="GET /api/headful/status">
-    Returns the current state of the headful (VNC) browser session. Requires authentication.
-
-    **Response** (VNC enabled, session active):
-
-    ```json
-    {
-      "useNovnc": true,
-      "novncPort": 54311,
-      "isRunning": true
-    }
-    ```
-
-    **Response** (VNC disabled):
-
-    ```json
-    {
-      "useNovnc": false
-    }
-    ```
-
-    | Field | Description |
-    | :-- | :-- |
-    | `useNovnc` | Whether VNC support is enabled on the server |
-    | `novncPort` | The port the noVNC viewer is running on (only present when enabled) |
-    | `isRunning` | Whether a headful browser session is currently active |
-
-    Use this endpoint to check if a headful session is running before starting a new one, or to display connection status in a custom integration.
-  </Accordion>
-
-  <Accordion title="GET /api/headful/vnc-password">
-    Returns the auto-generated VNC password used by `x11vnc` for the headful browser session. Requires authentication (session or API key).
-
-    **Response** (`200`):
-
-    ```json
-    {
-      "password": "aB3cD4eF5gH6"
-    }
-    ```
-
-    **Error responses**:
-
-    | Status | Error code | Meaning |
-    | :-- | :-- | :-- |
-    | `404` | `VNC_PASSWORD_NOT_FOUND` | Figranium has not generated a VNC password yet. This can happen if the VNC stack has never started (for example, on a build without headful support). |
-    | `500` | `FAILED_TO_READ_VNC_PASSWORD` | The password file exists but could not be read. Check filesystem permissions on `data/vnc_password.txt`. |
-
-    The password is generated on first start and persisted at `data/vnc_password.txt`. The embedded noVNC viewer fetches it automatically. You only need to call this endpoint when building a custom VNC client — for example, connecting a standalone VNC viewer through an SSH tunnel. See [Headful browser — Access control](/headful-browser#access-control).
-  </Accordion>
-</AccordionGroup>
-
----
-
 ## Schedules
 
 <AccordionGroup>
@@ -1109,51 +611,6 @@ Programmatic control of the managed headful browser session. Use these endpoints
       "cron": "0 9 * * *",
       "description": "Every day at 9:00 AM",
       "isValid": true
-    }
-    ```
-  </Accordion>
-
-  <Accordion title="POST /api/schedules/:taskId/describe">
-    Validates and describes a proposed schedule configuration without saving it to the task. Pass the schedule parameters in the request body.
-
-    **Body**:
-
-    ```json
-    {
-      "frequency": "daily",
-      "hour": 9,
-      "minute": 0
-    }
-    ```
-
-    **Response**:
-
-    ```json
-    {
-      "valid": true,
-      "cron": "0 9 * * *",
-      "description": "Every day at 9:00 AM",
-      "nextRun": 1690099200000
-    }
-    ```
-  </Accordion>
-
-  <Accordion title="GET /api/schedules/status/all">
-    Returns runtime status of the scheduler and all active jobs.
-
-    **Response**:
-
-    ```json
-    {
-      "running": true,
-      "scheduledCount": 2,
-      "tasks": [
-        {
-          "taskId": "c1f7a08b",
-          "cron": "0 9 * * *",
-          "nextRun": "2024-07-23T09:00:00.000Z"
-        }
-      ]
     }
     ```
   </Accordion>

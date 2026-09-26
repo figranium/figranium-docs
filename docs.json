@@ -116,21 +116,22 @@
             ]
           },
           {
+            "group": "MCP",
+            "icon": "brain",
+            "pages": [
+              "mcp-integration"
+            ]
+          },
+          {
             "group": "Workflow Integrations",
             "icon": "brand-zapier",
             "pages": [
               "n8n-integration",
               "zapier-integration",
+              "make-integration",
               "activepieces-integration",
               "dify-integration",
               "langflow-integration"
-            ]
-          },
-          {
-            "group": "MCP",
-            "icon": "brain",
-            "pages": [
-              "mcp-integration"
             ]
           }
         ]

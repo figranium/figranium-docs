@@ -15,7 +15,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
 ## Methods
 
 <AccordionGroup>
-  <Accordion title="open">
+  <Accordion title="`open`">
     Opens a browser session. You can run in headless mode, headful mode, scrape mode, or agent mode.
 
     - **HTTP endpoint:** `POST /api/browser/open`
@@ -33,7 +33,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="highlight">
+  <Accordion title="`highlight`">
     Highlights candidate selectors on a page and returns a DOM snapshot. Useful for building or debugging selector-based tasks.
 
     - **HTTP endpoint:** `POST /api/inspector/highlight`
@@ -52,7 +52,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="stopHeadful">
+  <Accordion title="`stopHeadful`">
     Stops the active headful browser session.
 
     - **HTTP endpoint:** `POST /headful/stop`
@@ -64,7 +64,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="headfulStatus">
+  <Accordion title="`headfulStatus`">
     Checks whether the headful session is configured to use noVNC.
 
     - **HTTP endpoint:** `GET /api/headful/status`
@@ -77,7 +77,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="inspect">
+  <Accordion title="`inspect`">
     Inspects the current headful session and returns diagnostic information.
 
     - **HTTP endpoint:** `POST /api/headful/inspect`
@@ -90,7 +90,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="vncPassword">
+  <Accordion title="`vncPassword`">
     Retrieves the VNC password for the current headful session.
 
     - **HTTP endpoint:** `GET /api/headful/vnc-password`
@@ -102,7 +102,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="selectorStream">
+  <Accordion title="`selectorStream`">
     Streams live selector events from the headful session as an async iterable.
 
     - **HTTP endpoint:** `GET /api/headful/selector_stream`
@@ -155,15 +155,15 @@ await figranium.browser.stopHeadful();
 ## Related resources
 
 <CardGroup cols={2}>
-  <Card title="Streaming" icon="signal-stream" href="/sdk/js/streaming">
+  <Card title="Streaming" icon="cloud" href="/sdk/js/streaming">
     Details on `AsyncIterable<StreamEvent<T>>` and abort controllers.
   </Card>
 
-  <Card title="Request options" icon="sliders" href="/sdk/js/request-options">
+  <Card title="Request options" icon="http-get" href="/sdk/js/request-options">
     Pass `signal`, `timeoutMs`, and custom `headers`.
   </Card>
 
-  <Card title="Errors" icon="triangle-exclamation" href="/sdk/js/errors">
+  <Card title="Errors" icon="alert-triangle" href="/sdk/js/errors">
     Handle `FigraniumError` responses.
   </Card>
 </CardGroup>

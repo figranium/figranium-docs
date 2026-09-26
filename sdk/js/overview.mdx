@@ -17,11 +17,11 @@ The `@figranium/sdk` package is the official TypeScript and JavaScript client fo
     Works in Node.js 18\+ and modern browsers with the built-in `fetch`. No runtime dependencies.
   </Card>
 
-  <Card title="ESM and CommonJS" icon="boxes-stacked">
+  <Card title="ESM and CommonJS" icon="brand-javascript">
     Ships parallel ESM and CommonJS builds so `import` and `require` both work out of the box.
   </Card>
 
-  <Card title="Abortable streams" icon="signal-stream">
+  <Card title="Abortable streams" icon="cloud-x">
     Execution and selector Server-Sent Events surface as `AsyncIterable` with `AbortSignal` support.
   </Card>
 </CardGroup>
@@ -59,15 +59,15 @@ The `@figranium/sdk` package is the official TypeScript and JavaScript client fo
     Build, save, and run a typed task in a few minutes.
   </Card>
 
-  <Card title="Client configuration" icon="sliders" href="/sdk/js/client-configuration">
+  <Card title="Client configuration" icon="user-cog" href="/sdk/js/client-configuration">
     Configure `baseUrl`, timeouts, custom `fetch`, and default headers.
   </Card>
 
-  <Card title="Resources" icon="folder-tree" href="/sdk/js/resources/tasks">
+  <Card title="Resources" icon="tool" href="/sdk/js/resources/tasks">
     Reference for every resource exposed on the `Figranium` client.
   </Card>
 </CardGroup>
 
 ## Compatibility
 
-The SDK includes the Cabinet API surface and the accompanying `AGENT_SPEC.md` task fields. Task and execution result types intentionally accept extra fields so newer server releases can add response data without breaking SDK consumers.
+The SDK includes the Cabinet API surface and the accompanying task fields from the agent action contract. Task and execution result types intentionally accept extra fields so newer server releases can add response data without breaking SDK consumers.

@@ -19,7 +19,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
 ## Methods
 
 <AccordionGroup>
-  <Accordion title="scrape">
+  <Accordion title="`scrape`">
     ```ts
     scrape<T = unknown>(
       input: UnknownRecord & {
@@ -58,7 +58,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="agent">
+  <Accordion title="`agent`">
     ```ts
     agent<T = unknown>(
       input: UnknownRecord & { runId?: string },
@@ -78,7 +78,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="headful">
+  <Accordion title="`headful`">
     ```ts
     headful<T = unknown>(
       input: UnknownRecord & {

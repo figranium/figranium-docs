@@ -1,0 +1,44 @@
+---
+title: "Make Integration"
+sidebarTitle: "Make"
+description: "Use the Figranium app in Make (formerly Integromat) to trigger browser automation tasks and pass dynamic variables from any of Make's 2,000+ connected apps."
+---
+
+Figranium integrates with [Make](https://www.make.com) (formerly Integromat) so browser automation can be triggered from any Make scenario. Install the Figranium app in your Make workspace, connect it to your Figranium instance, and run tasks with dynamic input from other modules.
+
+## Install the Figranium app
+
+Use the private app invitation to add Figranium to your Make workspace.
+
+<Steps>
+  <Step title="Open the invitation link">
+    Visit the [Figranium app invitation](https://www.make.com/en/hq/app-invitation/72fa07d2d54f4bdf77cccee72ac17f3b) while signed in to Make. Accept the invitation to install Figranium in your workspace.
+  </Step>
+  <Step title="Add Figranium to a scenario">
+    In the Make scenario editor, search for **Figranium** in the module picker and add it to your scenario.
+  </Step>
+  <Step title="Create a connection">
+    Enter your Figranium **Base URL** and **API key** when Make prompts you to create a new connection. Copy the API key from Figranium **Settings**. Your Base URL is the address you use to reach your Figranium instance.
+
+    Use the base URL without a trailing slash. If you need to create a key, see [Get Your Figranium API Key](/api-key).
+  </Step>
+  <Step title="Select a task">
+    Choose the Figranium task the module should run.
+  </Step>
+  <Step title="Provide variables">
+    Map values from earlier modules into the task's runtime variables, or set them directly in the module configuration.
+  </Step>
+  <Step title="Run the scenario">
+    Run the scenario. Make invokes the selected Figranium task using the configured connection and inputs, and the task's result is available as output bundles for downstream modules.
+  </Step>
+</Steps>
+
+## Runtime variables
+
+Use variables to pass Make data into reusable Figranium automations. A scenario can supply values such as URLs, queries, or identifiers into a task at execution time.
+
+See [Variables & Templating](/variables) for details.
+
+## Authentication
+
+The Figranium app uses your API key to authenticate with your instance. Keep the key secret and rotate it if necessary. See [API Key](/api-key) for key management instructions.

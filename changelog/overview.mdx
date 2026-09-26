@@ -25,6 +25,7 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
 
   - **Light-theme colors**: text selection follows the active theme again, and the **Add Proxy** button and active extraction-mode switch use the theme accent color.
   - **Long-running tasks over MCP**: [MCP server](/mcp-integration) v1.3.2 no longer times out after 30 seconds when you run a task. It now waits for the real execution result. Your MCP client can still apply its own timeout.
+  - **Long-running tasks over MCP**: [MCP server](/mcp-integration) v1.3.2 no longer times out after 30 seconds when you run a task. It now waits for the real execution result. Your MCP client can still apply its own timeout.
 </Update>
 
 <Update label="2026-09-23" description="Earlier this week">
@@ -125,7 +126,7 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
 
   ### New browser action blocks
 
-  Agent mode gained `check`, `uncheck`, `drag_and_drop`, and `reload` actions, and Click blocks now support single, double, and right-click modes. Drag and drop uses independently selectable source and target selectors, including headful selector picking. The expanded action contract is documented in `AGENT_SPEC.md`, alongside the existing native `select` action.
+  Agent mode gained `check`, `uncheck`, `drag_and_drop`, and `reload` actions, and Click blocks now support single, double, and right-click modes. Drag and drop uses independently selectable source and target selectors, including headful selector picking. The expanded action contract is documented alongside the existing native `select` action.
 
   ### Opt-in Task page translation
 
@@ -165,7 +166,7 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   - Hardened Docker publishing against Playwright runtime-version drift.
   - Migrated the selected UI, user-journey, and star-prompt verification scripts to TypeScript and updated CI to run the migrated suite.
 
-  Updated the README's product, roadmap, and security guidance; completed the translate.js roadmap item and documented the Task translation field in `AGENT_SPEC.md`.
+  Updated the README's product, roadmap, and security guidance; completed the translate.js roadmap item and documented the Task translation field in the agent action contract.
 </Update>
 
 <Update label="2026-09-05" description="Earlier this month">
@@ -179,7 +180,7 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   - **Per-Task download Cabinet** — Tasks can select a Cabinet as the destination for intercepted browser downloads. Migrated legacy capture download links are preserved.
   - **Upload actions** — two new Agent actions: **Upload** selects the newest unuploaded Cabinet item and handles ordinary files, ZIPs, compatible folders, native file inputs, file choosers, and drop targets. **Finalize Uploads** marks all items attached during the execution.
 
-  The Cabinet Task field and upload action contract are documented in `AGENT_SPEC.md`.
+  The Cabinet Task field and upload action contract are documented in the agent action contract.
 
   ## Updates
 
@@ -238,7 +239,7 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
 
   Agent and Scrape executions now report automatic `stopped`, `crashed`, and `anti_bot` outcomes alongside `success` and `error`. Cancellation requests, unhandled runtime failures, and unresolved bot challenges retain distinct final states across the runtime, scheduler, API summaries, run history, execution details, and editor results.
 
-  Shared outcome classification and normalization use deterministic precedence for overlapping terminal conditions with backwards-compatible handling of historical execution records. The execution-outcome contract is documented in `AGENT_SPEC.md`.
+  Shared outcome classification and normalization use deterministic precedence for overlapping terminal conditions with backwards-compatible handling of historical execution records. The execution-outcome contract is part of the documented agent action contract.
 
   ### Redesigned Dashboard and application shell
 

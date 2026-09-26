@@ -43,7 +43,7 @@ The API key is sent as the `x-api-key` header on requests.
 ## Resources and operations
 
 <CardGroup cols={2}>
-  <Card title="Execute" icon="play">
+  <Card title="Execute" icon="player-play">
     **Execute Task** runs a saved task and returns its result.
   </Card>
 
@@ -51,7 +51,7 @@ The API key is sent as the `x-api-key` header on requests.
     **List**, **Create**, **Update**, and **Delete** saved tasks.
   </Card>
 
-  <Card title="Execution" icon="clock-rotate-left">
+  <Card title="Execution" icon="list">
     **List** past execution records.
   </Card>
 
@@ -68,7 +68,7 @@ Choose **Execute → Execute Task**.
 | --- | --- | --- | --- |
 | **Task Name or ID** | Dropdown | Yes | Loaded automatically from the connected Figranium instance. You can also supply an ID with an n8n expression. |
 | **Variables** | Key-value collection | No | Runtime variables passed to the task. Add each variable as a **Name** and **Value** pair; raw JSON is not required. |
-| The node calls `POST /api/tasks/{taskId}/api` and returns the Figranium JSON response for use by downstream nodes. |
+| The node calls `POST /api/tasks/{taskId}/api` and returns the Figranium JSON response for use by downstream nodes. |  |  |  |
 
 <Tip>
   Variable names are case-sensitive. You can use n8n expressions in variable values, such as `{{ $json.product_url }}`.

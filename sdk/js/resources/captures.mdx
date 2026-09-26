@@ -15,7 +15,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
 ## Methods
 
 <AccordionGroup>
-  <Accordion title="list">
+  <Accordion title="`list`">
     Returns all captures, including recordings and screenshots. Optionally filter by `runId`.
 
     - **HTTP endpoint:** `GET /api/data/captures` (with `runId` query parameter when set)
@@ -43,7 +43,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="screenshots">
+  <Accordion title="`screenshots`">
     Returns only screenshot captures, omitting recordings.
 
     - **HTTP endpoint:** `GET /api/data/screenshots`
@@ -59,7 +59,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="delete">
+  <Accordion title="`delete`">
     Delete a single capture by its name.
 
     - **HTTP endpoint:** `DELETE /api/data/captures/:name`
@@ -71,7 +71,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="cookies">
+  <Accordion title="`cookies`">
     List stored browser cookies and their origins.
 
     - **HTTP endpoint:** `GET /api/data/cookies`
@@ -85,7 +85,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="deleteCookie">
+  <Accordion title="`deleteCookie`">
     Remove a specific cookie by name, optionally scoped to a domain and path.
 
     - **HTTP endpoint:** `POST /api/data/cookies/delete`
@@ -101,7 +101,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="clear">
+  <Accordion title="`clear`">
     Delete all screenshots at once.
 
     - **HTTP endpoint:** `POST /api/data/clear-screenshots`
@@ -113,7 +113,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="clearCookies">
+  <Accordion title="`clearCookies`">
     Delete all stored cookies.
 
     - **HTTP endpoint:** `POST /api/data/clear-cookies`
@@ -149,11 +149,11 @@ console.log("Cookie deleted:", success);
 ## Related resources
 
 <CardGroup cols={2}>
-  <Card title="Request options" icon="sliders" href="/sdk/js/request-options">
+  <Card title="Request options" icon="http-get" href="/sdk/js/request-options">
     Pass `signal`, `timeoutMs`, and custom headers.
   </Card>
 
-  <Card title="Errors" icon="triangle-exclamation" href="/sdk/js/errors">
+  <Card title="Errors" icon="alert-triangle" href="/sdk/js/errors">
     Handle `FigraniumError` responses.
   </Card>
 

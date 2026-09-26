@@ -19,7 +19,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
 ## Methods
 
 <AccordionGroup>
-  <Accordion title="list">
+  <Accordion title="`list`">
     Retrieve every task in the workspace.
 
     - **HTTP endpoint:** `GET /api/tasks`
@@ -33,7 +33,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     Returns an array of [`Task`](/sdk/js/resources/tasks#task-type) objects.
   </Accordion>
 
-  <Accordion title="listSummaries">
+  <Accordion title="`listSummaries`">
     Fetch a lightweight summary of all tasks.
 
     - **HTTP endpoint:** `GET /api/tasks/list`
@@ -49,7 +49,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     Each `TaskSummary` contains `id`, `name`, and an optional `description`.
   </Accordion>
 
-  <Accordion title="save">
+  <Accordion title="`save`">
     Create or update a task. Pass `createVersion: true` to snapshot the current version before saving.
 
     - **HTTP endpoint:** `POST /api/tasks` (with `?version=true` when `createVersion` is set)
@@ -80,7 +80,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     Returns the saved [`Task`](/sdk/js/resources/tasks#task-type), including any server-generated `id`.
   </Accordion>
 
-  <Accordion title="touch">
+  <Accordion title="`touch`\`">
     Refresh a task's `last_opened` timestamp without changing its definition.
 
     - **HTTP endpoint:** `POST /api/tasks/:id/touch`
@@ -91,7 +91,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="update">
+  <Accordion title="`update`">
     Apply a partial patch to an existing task.
 
     - **HTTP endpoint:** `PATCH /api/tasks/:id`
@@ -106,7 +106,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="delete">
+  <Accordion title="`delete`">
     Remove a task by ID.
 
     - **HTTP endpoint:** `DELETE /api/tasks/:id`
@@ -118,7 +118,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="versions">
+  <Accordion title="`versions`">
     List all saved versions for a task.
 
     - **HTTP endpoint:** `GET /api/tasks/:id/versions`
@@ -132,7 +132,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="version">
+  <Accordion title="`version`">
     Retrieve a specific version snapshot.
 
     - **HTTP endpoint:** `GET /api/tasks/:id/versions/:versionId`
@@ -144,7 +144,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="clearVersions">
+  <Accordion title="`clearVersions`">
     Delete all stored versions for a task.
 
     - **HTTP endpoint:** `POST /api/tasks/:id/versions/clear`
@@ -155,7 +155,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="rollback">
+  <Accordion title="`rollback`">
     Restore a task to a previous version snapshot.
 
     - **HTTP endpoint:** `POST /api/tasks/:id/rollback`
@@ -167,7 +167,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="generateSelector">
+  <Accordion title="`generateSelector`">
     Use AI to generate a CSS selector for a specific action inside a task.
 
     - **HTTP endpoint:** `POST /api/tasks/generate-selector`
@@ -183,7 +183,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="generateScript">
+  <Accordion title="`generateScript`">
     Generate a JavaScript extraction script from a natural language description.
 
     - **HTTP endpoint:** `POST /api/tasks/generate-script`
@@ -197,7 +197,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="run">
+  <Accordion title="`run`">
     Execute a task and return its result. This is the public execution endpoint, reachable at `/tasks/:id/api`.
 
     - **HTTP endpoint:** `POST /tasks/:id/api`

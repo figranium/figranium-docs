@@ -22,7 +22,7 @@ const figranium = new Figranium({
 ## API Key
 
 <AccordionGroup>
-  <Accordion title="getApiKey">
+  <Accordion title="`getApiKey`">
     ```ts
     getApiKey(options?: RequestOptions): Promise<{ apiKey: string | null }>
     ```
@@ -37,7 +37,7 @@ const figranium = new Figranium({
     ```
   </Accordion>
 
-  <Accordion title="setApiKey">
+  <Accordion title="`setApiKey`">
     ```ts
     setApiKey(apiKey?: string, options?: RequestOptions): Promise<{ apiKey: string }>
     ```
@@ -56,7 +56,7 @@ const figranium = new Figranium({
 ## User Agent
 
 <AccordionGroup>
-  <Accordion title="getUserAgent">
+  <Accordion title="`getUserAgent`">
     ```ts
     getUserAgent(options?: RequestOptions): Promise<UnknownRecord>
     ```
@@ -71,7 +71,7 @@ const figranium = new Figranium({
     ```
   </Accordion>
 
-  <Accordion title="setUserAgent">
+  <Accordion title="`setUserAgent`">
     ```ts
     setUserAgent(selection: string | null, options?: RequestOptions): Promise<UnknownRecord>
     ```
@@ -89,7 +89,7 @@ const figranium = new Figranium({
 ## AI Models
 
 <AccordionGroup>
-  <Accordion title="getAiModels">
+  <Accordion title="`getAiModels`">
     ```ts
     getAiModels(options?: RequestOptions): Promise<AiModels>
     ```
@@ -105,7 +105,7 @@ const figranium = new Figranium({
     ```
   </Accordion>
 
-  <Accordion title="setAiModels">
+  <Accordion title="`setAiModels`">
     ```ts
     setAiModels(models: AiModels, options?: RequestOptions): Promise<AiModels>
     ```
@@ -126,7 +126,7 @@ const figranium = new Figranium({
 ## Provider API Keys
 
 <AccordionGroup>
-  <Accordion title="getProviderKeys">
+  <Accordion title="`getProviderKeys`">
     ```ts
     getProviderKeys(provider: AiProvider, options?: RequestOptions): Promise<Record<string, string[]>>
     ```
@@ -141,7 +141,7 @@ const figranium = new Figranium({
     ```
   </Accordion>
 
-  <Accordion title="setProviderKeys">
+  <Accordion title="`setProviderKeys`">
     ```ts
     setProviderKeys(provider: AiProvider, keys: string[], options?: RequestOptions): Promise<Record<string, string[]>>
     ```
@@ -159,7 +159,7 @@ const figranium = new Figranium({
 ## Theme
 
 <AccordionGroup>
-  <Accordion title="getTheme">
+  <Accordion title="`getTheme`">
     ```ts
     getTheme(options?: RequestOptions): Promise<{ theme: Theme }>
     ```
@@ -175,7 +175,7 @@ const figranium = new Figranium({
     ```
   </Accordion>
 
-  <Accordion title="setTheme">
+  <Accordion title="`setTheme`">
     ```ts
     setTheme(theme: Theme, options?: RequestOptions): Promise<{ theme: Theme }>
     ```
@@ -193,7 +193,7 @@ const figranium = new Figranium({
 ## Proxies
 
 <AccordionGroup>
-  <Accordion title="listProxies">
+  <Accordion title="`listProxies`">
     ```ts
     listProxies(options?: RequestOptions): Promise<ProxyList>
     ```
@@ -209,7 +209,7 @@ const figranium = new Figranium({
     ```
   </Accordion>
 
-  <Accordion title="addProxy">
+  <Accordion title="`addProxy`">
     ```ts
     addProxy(proxy: ProxyInput, options?: RequestOptions): Promise<ProxyList>
     ```
@@ -228,7 +228,7 @@ const figranium = new Figranium({
     ```
   </Accordion>
 
-  <Accordion title="importProxies">
+  <Accordion title="`importProxies`">
     ```ts
     importProxies(proxies: ProxyInput[], options?: RequestOptions): Promise<ProxyList>
     ```
@@ -245,7 +245,7 @@ const figranium = new Figranium({
     ```
   </Accordion>
 
-  <Accordion title="updateProxy">
+  <Accordion title="`updateProxy`">
     ```ts
     updateProxy(id: string, proxy: ProxyInput, options?: RequestOptions): Promise<ProxyList>
     ```
@@ -262,7 +262,7 @@ const figranium = new Figranium({
     ```
   </Accordion>
 
-  <Accordion title="deleteProxy">
+  <Accordion title="`deleteProxy`">
     ```ts
     deleteProxy(id: string, options?: RequestOptions): Promise<ProxyList>
     ```
@@ -276,7 +276,7 @@ const figranium = new Figranium({
     ```
   </Accordion>
 
-  <Accordion title="deleteProxies">
+  <Accordion title="`deleteProxies`">
     ```ts
     deleteProxies(ids: string[], options?: RequestOptions): Promise<ProxyList>
     ```
@@ -290,7 +290,7 @@ const figranium = new Figranium({
     ```
   </Accordion>
 
-  <Accordion title="setDefaultProxy">
+  <Accordion title="`setDefaultProxy`">
     ```ts
     setDefaultProxy(id: string | null, options?: RequestOptions): Promise<ProxyList>
     ```
@@ -304,7 +304,7 @@ const figranium = new Figranium({
     ```
   </Accordion>
 
-  <Accordion title="setProxyRotation">
+  <Accordion title="`setProxyRotation`">
     ```ts
     setProxyRotation(
       input: { includeDefaultInRotation?: boolean; rotationMode?: "round-robin" | "random" },

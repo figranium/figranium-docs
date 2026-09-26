@@ -15,7 +15,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
 ## Methods
 
 <AccordionGroup>
-  <Accordion title="checkSetup">
+  <Accordion title="`checkSetup`">
     ```ts
     figranium.auth.checkSetup(options?: RequestOptions): Promise<{ setupRequired: boolean }>
     ```
@@ -33,7 +33,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="setup">
+  <Accordion title="`setup`">
     ```ts
     figranium.auth.setup(
       input: { name: string; email: string; password: string },
@@ -56,7 +56,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="login">
+  <Accordion title="`login`">
     ```ts
     figranium.auth.login(
       input: { email: string; password: string },
@@ -89,7 +89,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     </Note>
   </Accordion>
 
-  <Accordion title="logout">
+  <Accordion title="`logout`">
     ```ts
     figranium.auth.logout(options?: RequestOptions): Promise<{ success: boolean }>
     ```
@@ -104,7 +104,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```
   </Accordion>
 
-  <Accordion title="me">
+  <Accordion title="`me`">
     ```ts
     figranium.auth.me(options?: RequestOptions): Promise<{ user: User }>
     ```
