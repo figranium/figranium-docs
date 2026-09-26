@@ -176,7 +176,7 @@
             "pages": [
               "sdk/python/overview",
               "sdk/python/installation",
-              "quickstart",
+              "sdk/python/quickstart",
               "sdk/python/client-configuration",
               "sdk/python/authentication",
               "sdk/python/request-options",

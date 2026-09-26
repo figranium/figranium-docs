@@ -1,0 +1,162 @@
+---
+title: "Figranium Python SDK Quickstart"
+sidebarTitle: "Quickstart"
+description: "Get started with the Figranium Python SDK: create a client, define and run a task with action helpers, and execute a direct scrape in minutes."
+---
+
+The Figranium Python SDK lets you drive a Figranium server from Python: build tasks with typed action helpers, run them synchronously or asynchronously, and stream results. This quickstart walks you from an empty project to running your first task in a handful of lines.
+
+## Prerequisites
+
+- Python 3.9 or later
+- A running Figranium instance (`http://localhost:11345` by default)
+- An API key generated from the Figranium web UI
+
+<Steps>
+  <Step title="Install the SDK">
+    ```bash
+    pip install figranium-sdk
+    ```
+
+    The package installs `figranium` (the import name) plus its only runtime dependency, `httpx`. See [Installation](/sdk/python/installation) for optional extras.
+  </Step>
+
+  <Step title="Create a client">
+    Store your API key in an environment variable so it never lands in source control.
+
+    ```python quickstart.py
+    import os
+    from figranium import Figranium
+
+    client = Figranium(
+        base_url="http://localhost:11345",
+        api_key=os.environ["FIGRANIUM_API_KEY"],
+    )
+    ```
+
+    See [Client configuration](/sdk/python/client-configuration) for every constructor option and [Authentication](/sdk/python/authentication) for API key setup.
+  </Step>
+
+  <Step title="Define and save a task">
+    Use `actions` helpers to describe the browser workflow. `variable("query")` produces the template token `{$query}` that is replaced at runtime.
+
+    ```python quickstart.py
+    from figranium import Task, actions, variable
+
+    task: Task = {
+        "name": "Search example",
+        "url": "https://example.com",
+        "mode": "scrape",
+        "variables": {
+            "query": {"type": "string", "value": "figranium"},
+        },
+        "actions": [
+            actions.type("#search", variable("query")),
+            actions.click("button[type=submit]"),
+            actions.wait_for(".results"),
+            actions.get_content(".results", var_name="html"),
+        ],
+    }
+
+    saved = client.tasks.save(task)
+    ```
+
+    See [Actions](/sdk/python/actions) for every helper and [Variables](/sdk/python/variables) for typed variable declarations.
+  </Step>
+
+  <Step title="Run the task">
+    Use `run_task` (a shortcut for `client.tasks.run`) and pass runtime variable overrides in `input`.
+
+    ```python quickstart.py
+    result = client.run_task(saved["id"], {"variables": {"query": "browser automation"}})
+
+    print(result["success"], result["outcome"])
+    print(result["data"])
+    ```
+  </Step>
+
+  <Step title="Handle errors">
+    Every HTTP, transport, and timeout failure raises `FigraniumError`. Inspect `code` and `status` to branch on the failure kind.
+
+    ```python quickstart.py
+    from figranium import FigraniumError
+
+    try:
+        result = client.run_task(saved["id"], {"variables": {"query": "..."}})
+    except FigraniumError as error:
+        print(error.status, error.code, error.request_id)
+        raise
+    ```
+
+    See [Errors](/sdk/python/errors) for the full list of codes.
+  </Step>
+</Steps>
+
+## Complete example
+
+```python quickstart.py
+import os
+from figranium import Figranium, FigraniumError, Task, actions, variable
+
+client = Figranium(
+    base_url="http://localhost:11345",
+    api_key=os.environ["FIGRANIUM_API_KEY"],
+)
+
+task: Task = {
+    "name": "Search example",
+    "url": "https://example.com",
+    "mode": "scrape",
+    "variables": {
+        "query": {"type": "string", "value": "figranium"},
+    },
+    "actions": [
+        actions.type("#search", variable("query")),
+        actions.click("button[type=submit]"),
+        actions.wait_for(".results"),
+        actions.get_content(".results", var_name="html"),
+    ],
+}
+
+try:
+    saved = client.tasks.save(task)
+    result = client.run_task(saved["id"], {"variables": {"query": "browser automation"}})
+    print(result["data"])
+except FigraniumError as error:
+    print(f"[{error.status}] {error.code}: {error}")
+    raise
+finally:
+    client.close()
+```
+
+## Direct execution without saving
+
+For one-off runs, skip `tasks.save` and call `client.scrape`, `client.agent`, or `client.headful` directly. These use the same `Task` shape, but the server does not persist them.
+
+```python direct_scrape.py
+result = client.scrape({
+    "url": "https://example.com",
+    "selector": "body",
+})
+print(result["data"])
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Action helpers" icon="hand-pointer" href="/sdk/python/actions">
+    Every helper you can use to build a task, from navigation to CAPTCHA solving.
+  </Card>
+
+  <Card title="Streaming" icon="satellite-dish" href="/sdk/python/streaming">
+    Iterate over live executions with `client.executions.stream()`.
+  </Card>
+
+  <Card title="Handle errors" icon="triangle-exclamation" href="/sdk/python/errors">
+    `FigraniumError` fields, codes, and cancellation semantics.
+  </Card>
+
+  <Card title="Tasks resource" icon="list-check" href="/sdk/python/resources/tasks">
+    Save, version, list, and run tasks programmatically.
+  </Card>
+</CardGroup>
