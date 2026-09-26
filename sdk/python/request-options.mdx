@@ -1,0 +1,104 @@
+---
+title: "Per-Request Options in the Figranium Python SDK"
+sidebarTitle: "Request Options"
+description: "Pass timeout and headers per call in the Figranium Python SDK. Override timeouts, inject one-off headers, and handle request aborts and network errors."
+---
+
+Every SDK method accepts an optional `options` keyword argument that controls per-call timeouts and one-off headers. The same `RequestOptions` shape works for regular requests and for Server-Sent Events streams.
+
+## RequestOptions
+
+```python
+from figranium import RequestOptions
+
+RequestOptions = {
+    "headers": {"x-correlation-id": "req-42"},
+    "timeout": 10.0,
+}
+```
+
+`RequestOptions` is a `TypedDict` with two optional fields:
+
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `headers` | `Mapping[str, str]` | Extra headers merged over the client's default headers for this call. |
+| `timeout` | `Optional[float]` | Overrides the client-wide default timeout for this call, in seconds. Streams default to no timeout. |
+
+## Override timeout per call
+
+Use `timeout` to set a shorter or longer bound for a single request.
+
+```python filename.py
+import os
+from figranium import Figranium
+
+client = Figranium(api_key=os.environ["FIGRANIUM_API_KEY"])
+
+# Use a 5-second timeout for this call only
+client.tasks.list(options={"timeout": 5.0})
+```
+
+The client-wide default is `30.0` seconds. See [Client configuration](/sdk/python/client-configuration) for setting the default.
+
+## Inject one-off headers
+
+Use `headers` to add request correlation IDs, feature flags, or override a default value once.
+
+```python filename.py
+client.tasks.list(
+    options={"headers": {"x-correlation-id": "req-42"}},
+)
+```
+
+## Combining options
+
+Pass both fields together when needed:
+
+```python filename.py
+client.tasks.save(
+    task,
+    create_version=True,
+    options={
+        "timeout": 10.0,
+        "headers": {"x-run-id": "run-123"},
+    },
+)
+```
+
+## Timeout and cancellation semantics
+
+Python does not use `AbortSignal`. Cancellation is handled by `httpx` timeouts or by breaking out of a stream iteration.
+
+- When a request exceeds the configured timeout, the SDK raises `FigraniumError` with `code="REQUEST_ABORTED"`. The `__cause__` property carries the underlying `httpx.TimeoutException`.
+- When the request cannot reach the server (DNS failure, connection refused, TLS error), the SDK raises `FigraniumError` with `code="NETWORK_ERROR"`. The `__cause__` property carries the underlying `httpx.HTTPError`.
+
+```python filename.py
+from figranium import Figranium, FigraniumError
+
+client = Figranium(api_key=os.environ["FIGRANIUM_API_KEY"])
+
+try:
+    client.run_task("slow-task", options={"timeout": 5.0})
+except FigraniumError as error:
+    if error.code == "REQUEST_ABORTED":
+        print("The request timed out:", error.__cause__)
+    elif error.code == "NETWORK_ERROR":
+        print("Figranium is unreachable:", error.__cause__)
+```
+
+## Stream timeouts
+
+Streams have no default timeout. Pass `options={"timeout": 60.0}` when you want a terminal deadline. The stream raises `FigraniumError(code="REQUEST_ABORTED")` when the timer fires.
+
+```python filename.py
+for event in client.executions.stream(options={"timeout": 60.0}):
+    print(event["data"])
+```
+
+See [Streaming](/sdk/python/streaming) for more on consuming SSE events.
+
+<Tip>
+  Use `timeout` for hard deadlines on individual requests. For long-running streams, consider breaking out of the loop when your application state changes.
+</Tip>
+
+See [Errors](/sdk/python/errors) for the full error shape.

@@ -68,7 +68,7 @@ await figranium.schedules.set("task-123", weeklySchedule);
 ## Methods
 
 <AccordionGroup>
-  <Accordion title="list">
+  <Accordion title="`list`">
     Retrieve all tasks that currently have a schedule configured.
 
     - **HTTP endpoint:** `GET /api/schedules`
@@ -85,7 +85,7 @@ await figranium.schedules.set("task-123", weeklySchedule);
     Returns an object with a `schedules` array. Each `ScheduleEntry` contains `taskId`, `taskName`, `mode`, and the attached `Schedule` object.
   </Accordion>
 
-  <Accordion title="set">
+  <Accordion title="`set`">
     Attach or update a schedule for a specific task.
 
     - **HTTP endpoint:** `POST /api/schedules/:taskId`
@@ -105,7 +105,7 @@ await figranium.schedules.set("task-123", weeklySchedule);
     Returns an object containing the saved `schedule`, a human-readable `description`, and the `nextRun` timestamp (or `null` if the schedule is disabled or invalid).
   </Accordion>
 
-  <Accordion title="delete">
+  <Accordion title="`delete`">
     Remove a task's schedule entirely.
 
     - **HTTP endpoint:** `DELETE /api/schedules/:taskId`
@@ -118,7 +118,7 @@ await figranium.schedules.set("task-123", weeklySchedule);
     Returns `{ success: boolean }` indicating whether the schedule was removed.
   </Accordion>
 
-  <Accordion title="status">
+  <Accordion title="`status`">
     Inspect the current schedule for a single task, including its computed cron expression and validity.
 
     - **HTTP endpoint:** `GET /api/schedules/:taskId/status`
@@ -133,7 +133,7 @@ await figranium.schedules.set("task-123", weeklySchedule);
     Returns an object with the current `schedule`, the resolved `cron` string, a human-readable `description`, and an `isValid` flag.
   </Accordion>
 
-  <Accordion title="describe">
+  <Accordion title="`describe`">
     Validate a schedule payload for a task without saving it. This is useful for previewing the next run time and confirming a cron expression before you call `set`.
 
     - **HTTP endpoint:** `POST /api/schedules/:taskId/describe`
@@ -154,7 +154,7 @@ await figranium.schedules.set("task-123", weeklySchedule);
     Returns an object with `valid`, `description`, `cron`, and `nextRun`. If `valid` is `false`, the schedule will not be accepted by `set`.
   </Accordion>
 
-  <Accordion title="overallStatus">
+  <Accordion title="`overallStatus`">
     Get a high-level view of the scheduler state across all tasks.
 
     - **HTTP endpoint:** `GET /api/schedules/status/all`

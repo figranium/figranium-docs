@@ -1,0 +1,86 @@
+---
+title: "HealthResource: Service Status Check"
+sidebarTitle: "Health"
+description: "Use the HealthResource to verify that a Figranium server is running and reachable. No authentication is required."
+---
+
+The `HealthResource` on `client.health` provides a lightweight liveness probe for any Figranium instance. Call `check()` to confirm the server is up, read its version, and verify that your SDK install and network path are working. No API key is required.
+
+## Client setup
+
+```python
+from figranium import Figranium
+
+client = Figranium(api_key="your-api-key")
+```
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`check`">
+    ```python
+    check(*, options=None)
+    ```
+
+    Performs a `GET /api/health` request and returns the server's health status. This is the fastest way to verify connectivity and SDK configuration.
+
+    ### Returns
+
+    A dict with at least these fields:
+
+    - `status`: a human-readable status string such as `"ok"`
+    - `version`: the running Figranium server version
+
+    ### Example: verify connectivity
+
+    ```python health_check.py
+    status = client.health.check()
+    print(status["status"])   # "ok"
+    print(status["version"])  # "0.14.4"
+    ```
+
+    ### Example: no authentication needed
+
+    Because `check()` requires no authentication, you can call it before the user has signed in or provided an API key:
+
+    ```python health_no_auth.py
+    client = Figranium(base_url="https://figranium.example")
+    status = client.health.check()
+    print(status["status"])
+    ```
+
+    ### Example: handle transport failures
+
+    Wrap `check()` in a `try/except` to detect network or DNS issues. Transport failures surface as [`FigraniumError`](/sdk/python/errors) with `code="NETWORK_ERROR"`:
+
+    ```python health_transport.py
+    from figranium import Figranium, FigraniumError
+    
+    client = Figranium(base_url="https://figranium.example")
+    
+    try:
+        status = client.health.check()
+        print("Server is up:", status["status"])
+    except FigraniumError as error:
+        if error.code == "NETWORK_ERROR":
+            print("Cannot reach the Figranium server. Check the base_url and network.")
+        raise
+    ```
+
+    <Note>
+      The `check()` method accepts the standard `RequestOptions` dict as its `options` keyword argument, so you can pass custom `headers` or a per-request `timeout` when needed.
+    </Note>
+  </Accordion>
+</AccordionGroup>
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="Errors" icon="alert-triangle" href="/sdk/python/errors">
+    Handle `FigraniumError` responses, including `NETWORK_ERROR`.
+  </Card>
+
+  <Card title="Request options" icon="http-get" href="/sdk/python/request-options">
+    Pass custom `headers` and per-request `timeout` overrides.
+  </Card>
+</CardGroup>

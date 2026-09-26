@@ -1,0 +1,173 @@
+---
+title: "CapturesResource: Recordings, Screenshots, and Cookies"
+sidebarTitle: "Captures"
+description: "Use the Figranium Python SDK to list captures, delete recordings, manage browser cookies, and clear screenshots. Covers every CapturesResource method with typed examples."
+---
+
+The `captures` resource on the Figranium Python SDK gives you access to recordings, screenshots, and browser cookies produced during task executions. You can list captures for a specific run, delete individual files, inspect stored cookies, and bulk-clear screenshots or cookies when you need to reclaim space or reset state.
+
+```python
+from figranium import Figranium
+import os
+
+client = Figranium(api_key=os.environ["FIGRANIUM_API_KEY"])
+```
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`list`">
+    Returns all captures, including recordings and screenshots. Optionally filter by `run_id`.
+
+    - **HTTP endpoint:** `GET /api/data/captures` (with `runId` query parameter when set)
+    - **Signature:** `captures.list(*, run_id=None, options=None)`
+
+    ```python list_captures.py
+    result = client.captures.list(run_id="run_abc123")
+    
+    for capture in result["captures"]:
+        print(f"{capture['type']}: {capture['name']} ({capture['size']} bytes)")
+    ```
+
+    Each capture entry contains `name`, `url`, `size`, `modified`, and `type` (`"recording"` or `"screenshot"`).
+  </Accordion>
+
+  <Accordion title="`screenshots`">
+    Returns only screenshot captures, omitting recordings.
+
+    - **HTTP endpoint:** `GET /api/data/screenshots`
+    - **Signature:** `captures.screenshots(*, options=None)`
+
+    ```python list_screenshots.py
+    result = client.captures.screenshots()
+    
+    for shot in result["screenshots"]:
+        print(f"{shot['name']}: {shot['url']}")
+    ```
+  </Accordion>
+
+  <Accordion title="`delete`">
+    Delete a single capture by its name.
+
+    - **HTTP endpoint:** `DELETE /api/data/captures/{name}`
+    - **Signature:** `captures.delete(name, *, options=None)`
+
+    ```python delete_capture.py
+    result = client.captures.delete("run_abc123_recording.webm")
+    print(result["success"])
+    ```
+  </Accordion>
+
+  <Accordion title="`cookies`">
+    List stored browser cookies and their origins.
+
+    - **HTTP endpoint:** `GET /api/data/cookies`
+    - **Signature:** `captures.cookies(*, options=None)`
+
+    ```python list_cookies.py
+    result = client.captures.cookies()
+    
+    print(f"Found {len(result['cookies'])} cookies across {len(result['origins'])} origins")
+    ```
+  </Accordion>
+
+  <Accordion title="`delete_cookie`">
+    Remove a specific cookie by name, optionally scoped to a domain and path.
+
+    - **HTTP endpoint:** `POST /api/data/cookies/delete`
+    - **Signature:** `captures.delete_cookie(name, *, domain=None, path=None, options=None)`
+
+    ```python delete_cookie.py
+    result = client.captures.delete_cookie(
+        "session_id",
+        domain="example.com",
+        path="/",
+    )
+    print(result["success"])
+    ```
+  </Accordion>
+
+  <Accordion title="`clear`">
+    Delete all screenshots at once.
+
+    - **HTTP endpoint:** `POST /api/data/clear-screenshots`
+    - **Signature:** `captures.clear(*, options=None)`
+
+    ```python clear_screenshots.py
+    result = client.captures.clear()
+    print(result["success"])
+    ```
+  </Accordion>
+
+  <Accordion title="`clear_cookies`">
+    Delete all stored cookies.
+
+    - **HTTP endpoint:** `POST /api/data/clear-cookies`
+    - **Signature:** `captures.clear_cookies(*, options=None)`
+
+    ```python clear_cookies.py
+    result = client.captures.clear_cookies()
+    print(result["success"])
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Working example: list captures for a run and delete cookies
+
+This example combines `list` and `delete_cookie` to clean up after a run: it lists captures for a specific run, then removes a session cookie for the target domain.
+
+```python cleanup_after_run.py
+result = client.captures.list(run_id="run_abc123")
+
+recording = next((c for c in result["captures"] if c["type"] == "recording"), None)
+if recording:
+    print(f"Recording: {recording['name']} ({recording['size']} bytes)")
+
+delete_result = client.captures.delete_cookie(
+    "auth_token",
+    domain="example.com",
+)
+
+print("Cookie deleted:", delete_result["success"])
+```
+
+## Async usage
+
+All `captures` methods are also available on `AsyncFigranium`. Use `await` for each call.
+
+```python async_captures.py
+import asyncio
+from figranium import AsyncFigranium
+import os
+
+async def main():
+    async with AsyncFigranium(api_key=os.environ["FIGRANIUM_API_KEY"]) as client:
+        result = await client.captures.list(run_id="run_abc123")
+        print(len(result["captures"]), "captures")
+
+asyncio.run(main())
+```
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="Request options" icon="sliders" href="/sdk/python/request-options">
+    Pass custom headers and per-request timeouts.
+  </Card>
+
+  <Card title="Errors" icon="alert-triangle" href="/sdk/python/errors">
+    Handle FigraniumError responses.
+  </Card>
+
+  <Card title="Executions" icon="bolt" href="/sdk/python/resources/executions">
+    Start runs that produce captures.
+  </Card>
+
+  <Card title="Captures and storage" icon="hard-drive" href="/captures-and-storage">
+    Learn how Figranium stores recordings and screenshots.
+  </Card>
+
+  <Card title="Session state" icon="cookie" href="/session-state">
+    Understand how cookies and session state work in Figranium.
+  </Card>
+</CardGroup>

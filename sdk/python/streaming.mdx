@@ -1,0 +1,118 @@
+---
+title: "Stream Executions and Selector Events"
+sidebarTitle: "Streaming"
+description: "Consume Figranium Server-Sent Events with the Python SDK. Execution and selector streams as Iterator or AsyncIterator, event parsing, and terminal timeouts."
+---
+
+Figranium exposes two Server-Sent Events endpoints, and the Python SDK surfaces both as iterators. On the synchronous `Figranium` client you use a plain `for` loop. On `AsyncFigranium` you use `async for`. Both return the same `StreamEvent` shape.
+
+## Streams
+
+| Method | Endpoint | Purpose |
+| :-- | :-- | :-- |
+| `client.executions.stream()` | `/api/executions/stream` | Live execution lifecycle events |
+| `client.browser.selector_stream()` | `/api/headful/selector_stream` | Selector events from a headful browser session |
+
+Both take an optional `options` keyword argument (`headers`, `timeout`).
+
+## StreamEvent shape
+
+```python
+from figranium import StreamEvent
+
+StreamEvent = {
+    "data": Any,      # Parsed JSON payload; falls back to the raw string
+    "raw": str,       # Concatenated data lines exactly as received
+    "event": str,     # SSE event: name, when present
+    "id": str,        # SSE id: value, when present
+    "retry": int,     # SSE retry: value, when present
+}
+```
+
+The SDK tries `json.loads` on the data lines. If parsing fails, `data` is the raw string and `raw` still contains the original payload.
+
+## Consume execution events
+
+<Steps>
+  <Step title="Create a client">
+    Initialize the SDK with your API key.
+
+    ```python filename.py
+    import os
+    from figranium import Figranium
+    
+    client = Figranium(api_key=os.environ["FIGRANIUM_API_KEY"])
+    ```
+  </Step>
+  <Step title="Iterate the stream">
+    Use a `for` loop to consume events as they arrive.
+
+    ```python filename.py
+    for event in client.executions.stream():
+        print(event["event"], event["data"])
+    ```
+
+    Iteration ends when the server closes the connection or when your loop breaks. Breaking out of the loop cancels the underlying reader.
+  </Step>
+</Steps>
+
+## Async execution stream
+
+On `AsyncFigranium`, use `async for`:
+
+```python filename.py
+import asyncio
+import os
+from figranium import AsyncFigranium
+
+async def main():
+    async with AsyncFigranium(api_key=os.environ["FIGRANIUM_API_KEY"]) as client:
+        async for event in client.executions.stream():
+            print(event["event"], event["data"])
+
+asyncio.run(main())
+```
+
+## Terminal timeouts
+
+Streams have no default timeout. Set `timeout` only when you want a hard deadline; the stream raises `FigraniumError(code="REQUEST_ABORTED")` when the timer fires:
+
+```python filename.py
+for event in client.executions.stream(options={"timeout": 60.0}):
+    print(event["data"])
+```
+
+## Cancel a stream
+
+In Python, cancellation is done by breaking out of the loop or by the terminal `timeout` expiring. There is no `AbortSignal` equivalent.
+
+```python filename.py
+for event in client.executions.stream():
+    if is_terminal(event):
+        break
+    handle(event)
+```
+
+## Selector stream from a headful browser
+
+The selector stream reports element highlights from a headful browser session. Use it to power visual inspectors:
+
+```python filename.py
+for event in client.browser.selector_stream():
+    print(event["event"], event["data"])
+```
+
+See [Browser resource](/sdk/python/resources/browser) for opening, inspecting, and stopping headful sessions.
+
+## Errors
+
+Streams raise `FigraniumError` in the same conditions as regular requests:
+
+- `REQUEST_ABORTED`: the terminal `timeout` fired.
+- `NETWORK_ERROR`: the stream could not reach the server.
+
+See [Errors](/sdk/python/errors) for the full error shape.
+
+<Tip>
+  For long-running streams, prefer breaking out of the loop over a short `timeout` so you can stop cleanly when your application state changes.
+</Tip>

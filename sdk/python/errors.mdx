@@ -1,0 +1,113 @@
+---
+title: "Handle Errors from the Figranium Python SDK"
+sidebarTitle: "Errors"
+description: "FigraniumError is the single exception class in the Python SDK. Learn its fields, SDK-generated codes, and how to branch on status or catch transport and timeout failures."
+---
+
+The Figranium Python SDK raises one exception class for every failure: `FigraniumError`. It covers HTTP error responses, network failures, timeouts, and request aborts. You can branch on `error.status` for HTTP semantics, on `error.code` for machine-readable categories, and on `error.__cause__` for the original transport exception.
+
+## FigraniumError shape
+
+```python
+class FigraniumError(Exception):
+    status: int                # HTTP status, or 0 for transport failures
+    code: str | None           # Server error code or SDK-generated code
+    details: Any               # Server-provided diagnostics
+    request_id: str | None     # From the x-request-id response header
+    response: httpx.Response | None   # Original response, when available
+    __cause__: BaseException | None   # Underlying exception for transport chains
+```
+
+`FigraniumError` extends the standard `Exception` class, so `.message` and the traceback are available as usual.
+
+## Basic handling
+
+```python
+from figranium import Figranium, FigraniumError
+
+client = Figranium(api_key="your-api-key")
+
+try:
+    client.run_task("missing-task")
+except FigraniumError as error:
+    print(error.status)      # e.g. 404
+    print(error.code)        # e.g. "TASK_NOT_FOUND"
+    print(error.details)     # server diagnostics
+    print(error.request_id)  # when supplied by the server or proxy
+```
+
+## Fields
+
+<AccordionGroup>
+  <Accordion title="`status`">
+    The HTTP status returned by the Figranium server, if a response arrived. `0` when the request never reached a status, such as a network failure, DNS error, or cancelled request.
+  </Accordion>
+
+  <Accordion title="`code`">
+    Server-provided machine-readable error code, taken from the response body's `error` field. Also used for SDK-generated conditions:
+
+    | Code | Meaning |
+    | :-- | :-- |
+    | `REQUEST_ABORTED` | The request was aborted by a timeout or cancellation. |
+    | `NETWORK_ERROR` | The request could not reach the server. |
+  </Accordion>
+
+  <Accordion title="`details`">
+    Free-form value from the response body's `details` or `detail` field. Typically an object describing which validation failed, which record was missing, or which field was invalid.
+  </Accordion>
+
+  <Accordion title="`request_id`">
+    Value of the `x-request-id` response header, when the server or a proxy sets one. Include this in bug reports to make server-side logs easier to correlate.
+  </Accordion>
+
+  <Accordion title="`response`">
+    The original `httpx.Response` object, when the error came from an HTTP response. Available for advanced consumers who need the raw headers or body.
+  </Accordion>
+</AccordionGroup>
+
+## Branching on status
+
+```python
+try:
+    client.tasks.get("some-task-id")
+except FigraniumError as error:
+    if error.status == 401:
+        # Reauthenticate or refresh the API key.
+        refresh_api_key()
+    elif error.status == 404:
+        # Task is gone; treat as an empty result.
+        return None
+    elif error.status == 429:
+        # Back off and retry.
+        time.sleep(2 ** attempt)
+    else:
+        raise
+```
+
+## Transport failures
+
+When the request never gets a response (server unreachable, DNS failure, TLS error), `status` is `0` and `code` is `NETWORK_ERROR`. The `__cause__` property carries the underlying `httpx.HTTPError`.
+
+```python
+try:
+    client.health.check()
+except FigraniumError as error:
+    if error.code == "NETWORK_ERROR":
+        print("Figranium is unreachable:", error.__cause__)
+```
+
+## Timeouts and cancellation
+
+When a request exceeds the configured timeout, the SDK raises `FigraniumError` with `code="REQUEST_ABORTED"`. The `__cause__` is the `httpx.TimeoutException`.
+
+```python
+try:
+    client.run_task("slow-task", options={"timeout": 5.0})
+except FigraniumError as error:
+    if error.code == "REQUEST_ABORTED":
+        print("The request timed out:", error.__cause__)
+```
+
+<Tip>
+  Always check `isinstance(error, FigraniumError)` before reading SDK-specific fields. Unknown errors should be rethrown so they bubble up to your global error handler.
+</Tip>

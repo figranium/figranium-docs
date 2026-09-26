@@ -1,0 +1,108 @@
+---
+title: "ExecutionResource: Direct Scrape, Agent, and Headful Runs"
+sidebarTitle: "Execution"
+description: "Run one-off browser automation with the Figranium Python SDK. Use scrape, agent, and headful methods without creating a saved task."
+---
+
+The `ExecutionResource` provides direct, stateless endpoints for running browser automation without saving a task first. You can scrape a page, run an agent session, or launch a headful browser in a single call. The `Figranium` client also exposes these as top-level shortcuts: `client.scrape()`, `client.agent()`, and `client.headful()`.
+
+<Note>
+  `ExecutionResource` (singular) is for **direct runs**. For saved-task execution, see [`TasksResource`](/sdk/python/resources/tasks). For execution history and live streams, see [`ExecutionsResource`](/sdk/python/resources/executions).
+</Note>
+
+```python
+import os
+from figranium import Figranium
+
+client = Figranium(api_key=os.environ["FIGRANIUM_API_KEY"])
+```
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`scrape`">
+    ```python
+    scrape(input, *, options=None) -> ExecutionResult
+    ```
+
+    Performs a one-off scrape by sending `POST /scrape`. Pass a `url`, a `selector` for DOM extraction, or an `extraction_script` for custom parsing. You can also inject runtime [variables](/sdk/python/variables) via `variables` or `taskVariables`.
+
+    ```python scrape_by_selector.py
+    result = client.execution.scrape({
+        "url": "https://news.ycombinator.com",
+        "selector": ".titleline > a",
+        "variables": {"limit": 5},
+    })
+    print(result["data"])
+    ```
+
+    ```python scrape_by_script.py
+    result = client.execution.scrape({
+        "url": "https://example.com",
+        "extractionScript": """
+            const items = Array.from(document.querySelectorAll('.item'));
+            return items.map(el => el.textContent?.trim());
+        """,
+    })
+    print(result["data"])
+    ```
+  </Accordion>
+
+  <Accordion title="`agent`">
+    ```python
+    agent(input, *, options=None) -> ExecutionResult
+    ```
+
+    Runs a one-off agent session by sending `POST /agent`. The agent navigates and interacts autonomously based on the provided input. You can supply a `runId` to correlate or resume a specific run.
+
+    ```python agent_run.py
+    result = client.execution.agent({
+        "url": "https://example.com",
+        "runId": "run-2024-001",
+    })
+    print(result["success"], result["data"])
+    ```
+  </Accordion>
+
+  <Accordion title="`headful`">
+    ```python
+    headful(input, *, options=None) -> ExecutionResult
+    ```
+
+    Launches a headful (visible) browser session by sending `POST /headful`. Pass a starting `url` and optional runtime [variables](/sdk/python/variables). This is useful when you need to interact with a live browser window or debug visually.
+
+    ```python headful_run.py
+    result = client.execution.headful({
+        "url": "https://example.com/login",
+        "variables": {"username": "alice"},
+    })
+    print(result["runId"], result["data"])
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Top-level shortcuts
+
+`Figranium` mirrors these methods at the client root so you can call them directly without reaching into `execution`:
+
+```python shortcuts.py
+scrape_result = client.scrape({"url": "https://example.com", "selector": "h1"})
+agent_result = client.agent({"url": "https://example.com"})
+headful_result = client.headful({"url": "https://example.com"})
+```
+
+On `AsyncFigranium`, each shortcut is awaited the same way: `result = await async_client.scrape(...)`.
+
+## Return type
+
+All three methods return `ExecutionResult`, which includes the following fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `data` | `Any` | The result payload from the run. |
+| `outcome` | `TaskOutcome` | One of `"success"`, `"error"`, `"stopped"`, `"crashed"`, or `"anti_bot"`. |
+| `success` | `bool` | Whether the execution completed successfully. |
+| `error` | `str` | Error message if the run failed. |
+| `runId` | `str` | Correlation ID for the execution. |
+
+For error handling, see [`/sdk/python/errors`](/sdk/python/errors). For request options such as custom `headers` and `timeout`, see [`/sdk/python/request-options`](/sdk/python/request-options).

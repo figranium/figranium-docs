@@ -1,7 +1,7 @@
 ---
 title: "Configure the Figranium SDK Client"
 sidebarTitle: "Client"
-description: "Configure the Figranium JavaScript SDK: baseUrl, timeouts, custom fetch, default headers, and session versus API-key authentication."
+description: "Configure the Figranium JavaScript SDK: baseUrl, API key, timeouts, custom fetch, and default headers merged into every request."
 ---
 
 The `Figranium` class takes a single options object. Every option is optional; the SDK falls back to sensible defaults so a local install works with `new Figranium({ apiKey })`.
@@ -13,15 +13,11 @@ The `Figranium` class takes a single options object. Every option is optional; t
 </ParamField>
 
 <ParamField path="apiKey" type="string">
-  API key sent as `Authorization: Bearer <key>` by default. Mutually exclusive with `session`.
+  API key sent as `Authorization: Bearer <key>` by default. Create keys from the Figranium web UI.
 </ParamField>
 
 <ParamField path="apiKeyHeader" type="string">
   Header name for the API key. Either `"authorization"` (default) or `"x-api-key"`.
-</ParamField>
-
-<ParamField path="session" type="boolean">
-  Set to `true` to send credentials (`fetch(..., { credentials: "include" })`) so cookies are attached to every request. Required for `settings.*` endpoints. Mutually exclusive with `apiKey`.
 </ParamField>
 
 <ParamField path="timeoutMs" type="number">
@@ -52,19 +48,7 @@ Pass `apiKey` to authenticate every request with an API key. By default the key 
 new Figranium({ apiKey: "fig_...", apiKeyHeader: "x-api-key" });
 ```
 
-`apiKey` and `session` are mutually exclusive. See [Authentication](/sdk/js/authentication).
-
-### `session`
-
-Set `session: true` to send credentials (`fetch(..., { credentials: "include" })`) so cookies are attached to every request. Required for `settings.*` endpoints, which are session-only.
-
-```ts
-new Figranium({ baseUrl: "https://figranium.example", session: true });
-```
-
-<Note>
-  Node's built-in `fetch` does not keep a cookie jar. For Node-based administration, provide a cookie-aware `fetch` implementation through the `fetch` option.
-</Note>
+See [Authentication](/sdk/js/authentication) for how to create and manage API keys.
 
 ### `timeoutMs`
 
@@ -117,15 +101,12 @@ The `Figranium` instance exposes one property per resource, plus a few top-level
 
 | Property | Purpose |
 | :-- | :-- |
-| [`tasks`](/sdk/js/resources/tasks) | Save, update, delete, version, generate, and execute tasks |
+| [`tasks`](/sdk/js/resources/tasks) | List, save, version, update, delete, and execute tasks |
 | [`executions`](/sdk/js/resources/executions) | List, inspect, stop, delete, clear, and stream runs |
 | [`schedules`](/sdk/js/resources/schedules) | Configure, describe, disable, and inspect schedules |
 | [`captures`](/sdk/js/resources/captures) | List and delete recordings and screenshots; manage cookies |
-| [`credentials`](/sdk/js/resources/credentials) | Manage output credentials and browse Baserow metadata |
 | [`browser`](/sdk/js/resources/browser) | Open browser sessions, highlight selectors, inspect headful sessions |
 | [`execution`](/sdk/js/resources/execution) | Direct `scrape`, `agent`, and `headful` execution endpoints |
-| [`settings`](/sdk/js/resources/settings) | Session-protected API keys, AI providers, theme, user agent, proxies |
-| [`auth`](/sdk/js/resources/auth) | Initial setup and session login, logout, and current-user methods |
 | [`health`](/sdk/js/resources/health) | Service health check |
 
 Top-level shortcuts:

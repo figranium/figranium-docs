@@ -1,0 +1,143 @@
+---
+title: "ExecutionsResource: List, Inspect, and Stream Runs"
+sidebarTitle: "Executions"
+description: "Manage Figranium task executions with the Python SDK. List, get, delete, clear, stop, and stream execution events in real time."
+---
+
+The `ExecutionsResource` on the Figranium Python SDK gives you full visibility and control over every task run. Use it to list past executions, inspect a single run, clean up history, stop active runs, and subscribe to a live Server-Sent Events stream of execution updates.
+
+```python
+import os
+from figranium import Figranium
+
+client = Figranium(api_key=os.environ["FIGRANIUM_API_KEY"])
+```
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`list`">
+    ```python
+    list(*, api_key_route=True, options=None) -> {"executions": List[Execution]}
+    ```
+
+    Returns a list of executions. By default it calls `GET /api/executions/list`, which is the route intended for API-key access. If you pass `api_key_route=False`, the SDK switches to `GET /api/executions` instead.
+
+    <Note>
+      Most callers should leave `api_key_route` at its default (`True`). Only override it when your deployment requires the alternate route.
+    </Note>
+
+    ```python
+    # Default route: GET /api/executions/list
+    result = client.executions.list()
+    print(result["executions"][0]["runId"], result["executions"][0]["status"])
+    
+    # Alternate route: GET /api/executions
+    result = client.executions.list(api_key_route=False)
+    ```
+  </Accordion>
+
+  <Accordion title="`get`">
+    ```python
+    get(execution_id, *, options=None) -> {"execution": Execution}
+    ```
+
+    Fetches a single execution by its ID. Calls `GET /api/executions/{id}`.
+
+    ```python
+    result = client.executions.get("exec_01JXYZ")
+    print(result["execution"]["status"], result["execution"]["durationMs"])
+    ```
+  </Accordion>
+
+  <Accordion title="`delete`">
+    ```python
+    delete(execution_id, *, options=None) -> {"success": bool}
+    ```
+
+    Removes a single execution record. Calls `DELETE /api/executions/{id}`.
+
+    ```python
+    result = client.executions.delete("exec_01JXYZ")
+    print(result["success"])
+    ```
+  </Accordion>
+
+  <Accordion title="`clear`">
+    ```python
+    clear(*, options=None) -> {"success": bool}
+    ```
+
+    Deletes all executions in bulk. Calls `POST /api/executions/clear`.
+
+    ```python
+    result = client.executions.clear()
+    print(result["success"])
+    ```
+  </Accordion>
+
+  <Accordion title="`stop`">
+    ```python
+    stop(run_id, *, options=None) -> {"success": bool}
+    ```
+
+    Sends a stop signal to an active run. Calls `POST /api/executions/stop`.
+
+    ```python
+    result = client.executions.stop("run_abc123")
+    print(result["success"])
+    ```
+  </Accordion>
+
+  <Accordion title="`stream`">
+    ```python
+    stream(*, options=None) -> Iterator[StreamEvent]
+    ```
+
+    Opens a Server-Sent Events connection to `GET /api/executions/stream` and yields each event as it arrives. The iterator stays open until the server closes the stream, the client stops iterating, or the request is aborted.
+
+    For details on the `StreamEvent` shape and how cancellation works, see [Streaming](/sdk/python/streaming). For error handling, see [Errors](/sdk/python/errors).
+
+    ```python
+    import figranium
+    
+    try:
+        for event in client.executions.stream(options={"timeout": 60}):
+            print(event["event"], event["data"])
+    except figranium.FigraniumError as error:
+        # FigraniumError with code "REQUEST_ABORTED" when timed out
+        print(error)
+    ```
+
+    On `AsyncFigranium`, `stream` returns an `AsyncIterator[StreamEvent]` and you iterate with `async for`.
+
+    ```python
+    async for event in await async_client.executions.stream():
+        print(event["event"], event["data"])
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## End-to-end example
+
+This example lists recent executions, inspects the newest one, and stops it if it is still running.
+
+```python
+# 1) List recent executions (default API-key route)
+result = client.executions.list()
+executions = result["executions"]
+
+if not executions:
+    print("No executions yet.")
+else:
+    # 2) Inspect the most recent run
+    latest = executions[0]
+    detail = client.executions.get(latest["id"])
+    execution = detail["execution"]
+    print(f"Run {execution['runId']} status: {execution['status']}")
+
+    # 3) Stop if still active
+    if execution["status"] == "running":
+        stop_result = client.executions.stop(execution["runId"])
+        print("Stop requested:", stop_result["success"])
+```

@@ -1,0 +1,149 @@
+---
+title: "Configure the Figranium Python SDK Client"
+sidebarTitle: "Client"
+description: "Configure the Figranium Python SDK: base_url, API key, timeouts, custom httpx client, and default headers merged into every request."
+---
+
+The `Figranium` and `AsyncFigranium` classes accept keyword-only constructor arguments. Every option is optional, and the SDK falls back to sensible defaults so a local install works with `Figranium(api_key="...")`.
+
+## Constructor options
+
+<ParamField path="base_url" type="str">
+  Absolute URL of your Figranium server. Must use `http` or `https`. Trailing slashes are trimmed. Defaults to `"http://localhost:11345"`.
+</ParamField>
+
+<ParamField path="api_key" type="Optional[str]">
+  API key sent as `Authorization: Bearer <key>` by default. Create keys from the Figranium web UI.
+</ParamField>
+
+<ParamField path="api_key_header" type="str">
+  Header name for the API key. Either `"authorization"` (default) or `"x-api-key"`.
+</ParamField>
+
+<ParamField path="timeout" type="float">
+  Client-wide default timeout for non-stream requests, in seconds. Defaults to `30.0`. Streams have no default timeout.
+</ParamField>
+
+<ParamField path="http_client" type="Optional[httpx.Client]">
+  A preconfigured `httpx.Client` (or `httpx.AsyncClient` for `AsyncFigranium`). Useful for tracing, retries, proxies, or test doubles. The SDK does not close a caller-supplied client.
+</ParamField>
+
+<ParamField path="headers" type="Optional[Mapping[str, str]]">
+  Default headers merged into every request. Per-call `headers` override these.
+</ParamField>
+
+## Option details
+
+### `base_url`
+
+```python filename.py
+from figranium import Figranium
+
+client = Figranium(base_url="https://figranium.example")
+```
+
+### `api_key` and `api_key_header`
+
+Pass `api_key` to authenticate every request with an API key. By default the key is sent as `Authorization: Bearer <key>`. Set `api_key_header="x-api-key"` if your deployment expects that header.
+
+```python filename.py
+client = Figranium(api_key="fig_...", api_key_header="x-api-key")
+```
+
+See [Authentication](/sdk/python/authentication) for how to create and manage API keys.
+
+### `timeout`
+
+Client-wide default timeout for non-stream requests, in seconds. Defaults to `30.0`. Streams have no default timeout; set a per-call `timeout` if you want a terminal deadline.
+
+```python filename.py
+client = Figranium(api_key="fig_...", timeout=60.0)
+```
+
+Individual requests can override this per call with `options={"timeout": 5.0}`. See [Request options](/sdk/python/request-options).
+
+### `http_client`
+
+Provide a preconfigured `httpx.Client` (or `httpx.AsyncClient` for `AsyncFigranium`). Useful for tracing, retries, proxies, or test doubles. The SDK does not close a caller-supplied client.
+
+```python filename.py
+import httpx
+from figranium import Figranium
+
+http = httpx.Client(proxies="http://proxy.example:8080")
+client = Figranium(api_key="fig_...", http_client=http)
+```
+
+### `headers`
+
+Default headers merged into every request. Per-call headers override these.
+
+```python filename.py
+client = Figranium(
+    api_key="fig_...",
+    headers={"x-client-name": "orders-worker"},
+)
+```
+
+## Complete example
+
+```python filename.py
+import os
+from figranium import Figranium
+
+client = Figranium(
+    base_url=os.environ.get("FIGRANIUM_BASE_URL", "http://localhost:11345"),
+    api_key=os.environ["FIGRANIUM_API_KEY"],
+    timeout=45.0,
+    headers={"x-client-name": "orders-worker"},
+)
+```
+
+## Client lifecycle
+
+Use the client as a context manager so it closes automatically, or call `.close()` explicitly.
+
+```python filename.py
+# Synchronous context manager
+with Figranium(api_key="fig_...") as client:
+    client.run_task("my-task")
+
+# Explicit close
+client = Figranium(api_key="fig_...")
+client.run_task("my-task")
+client.close()
+```
+
+For async code, use `async with`:
+
+```python filename.py
+import asyncio
+from figranium import AsyncFigranium
+
+async def main():
+    async with AsyncFigranium(api_key="fig_...") as client:
+        await client.run_task("my-task")
+
+asyncio.run(main())
+```
+
+## Client resources
+
+The `Figranium` instance exposes one property per resource, plus a few top-level convenience helpers.
+
+| Property | Purpose |
+| :-- | :-- |
+| [`tasks`](/sdk/python/resources/tasks) | List, save, version, update, delete, and execute tasks |
+| [`executions`](/sdk/python/resources/executions) | List, inspect, stop, delete, clear, and stream runs |
+| [`schedules`](/sdk/python/resources/schedules) | Configure, describe, disable, and inspect schedules |
+| [`captures`](/sdk/python/resources/captures) | List and delete recordings and screenshots; manage cookies |
+| [`browser`](/sdk/python/resources/browser) | Open browser sessions, highlight selectors, inspect headful sessions |
+| [`execution`](/sdk/python/resources/execution) | Direct `scrape`, `agent`, and `headful` execution endpoints |
+| [`health`](/sdk/python/resources/health) | Service health check |
+
+Top-level shortcuts:
+
+- `client.run_task(id, input?)` proxies to `tasks.run`.
+- `client.scrape(input)` proxies to `execution.scrape`.
+- `client.agent(input)` proxies to `execution.agent`.
+- `client.headful(input)` proxies to `execution.headful`.

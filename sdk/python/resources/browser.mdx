@@ -1,0 +1,173 @@
+---
+title: "BrowserResource: Headful Sessions and Inspection"
+sidebarTitle: "Browser"
+description: "Use the Figranium Python SDK to open browser sessions, inspect headful instances, highlight selectors, and stream live selector events from the server."
+---
+
+The `BrowserResource` on `client.browser` gives you programmatic control over browser sessions in the Figranium Python SDK. You can open headless or headful sessions, inspect the current headful state, highlight candidate selectors on a page, and stream live selector events during an active headful session.
+
+```python
+from figranium import Figranium
+
+client = Figranium(api_key="your-api-key")
+```
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`open`">
+    Opens a browser session. You can run in headless mode, headful mode, scrape mode, or agent mode.
+
+    - **HTTP endpoint:** `POST /api/browser/open`
+    - **Signature:** `open(input=None, *, options=None)`
+    - **Returns:** `BrowserSession` with `sessionId`, `status`, and optionally `wsEndpoint`.
+
+    ```python browser_open.py
+    session = client.browser.open({
+        "url": "https://example.com",
+        "mode": "headful",
+        "devTools": True,
+    })
+    
+    print(session["sessionId"], session["status"])
+    ```
+  </Accordion>
+
+  <Accordion title="`highlight`">
+    Highlights candidate selectors on a page and returns a DOM snapshot. Useful for building or debugging selector-based tasks.
+
+    - **HTTP endpoint:** `POST /api/inspector/highlight`
+    - **Signature:** `highlight(input, *, options=None)`
+    - **Returns:** A dict with `success`, a list of `SelectorCandidate` objects (`css`, optional `xpath` and `confidence`), and a `snapshot` string.
+
+    ```python browser_highlight.py
+    result = client.browser.highlight({
+        "url": "https://example.com",
+        "targetHint": "search input",
+    })
+    
+    for candidate in result["selectors"]:
+        print(candidate["css"], candidate.get("confidence"))
+    ```
+  </Accordion>
+
+  <Accordion title="`stop_headful`">
+    Stops the active headful browser session.
+
+    - **HTTP endpoint:** `POST /headful/stop`
+    - **Signature:** `stop_headful(*, options=None)`
+    - **Returns:** dict
+
+    ```python browser_stop_headful.py
+    client.browser.stop_headful()
+    ```
+  </Accordion>
+
+  <Accordion title="`headful_status`">
+    Checks whether the headful session is configured to use noVNC.
+
+    - **HTTP endpoint:** `GET /api/headful/status`
+    - **Signature:** `headful_status(*, options=None)`
+    - **Returns:** `{"useNovnc": bool}`
+
+    ```python browser_headful_status.py
+    status = client.browser.headful_status()
+    print(status["useNovnc"])
+    ```
+  </Accordion>
+
+  <Accordion title="`inspect`">
+    Inspects the current headful session and returns diagnostic information.
+
+    - **HTTP endpoint:** `POST /api/headful/inspect`
+    - **Signature:** `inspect(*, options=None)`
+    - **Returns:** dict
+
+    ```python browser_inspect.py
+    info = client.browser.inspect()
+    print(info)
+    ```
+  </Accordion>
+
+  <Accordion title="`vnc_password`">
+    Retrieves the VNC password for the current headful session.
+
+    - **HTTP endpoint:** `GET /api/headful/vnc-password`
+    - **Signature:** `vnc_password(*, options=None)`
+    - **Returns:** `{"password": str}`
+
+    ```python browser_vnc_password.py
+    result = client.browser.vnc_password()
+    print(result["password"])
+    ```
+  </Accordion>
+
+  <Accordion title="`selector_stream`">
+    Streams live selector events from the headful session as an iterator.
+
+    - **HTTP endpoint:** `GET /api/headful/selector_stream`
+    - **Signature:** `selector_stream(*, options=None)`
+    - **Returns:** `Iterator[StreamEvent]` on `Figranium`; `AsyncIterator[StreamEvent]` on `AsyncFigranium`
+
+    <Note>
+      This is a server-sent event stream. For details on iterating streams and handling timeouts, see [Streaming](/sdk/python/streaming).
+    </Note>
+
+    ```python browser_selector_stream_sync.py
+    for event in client.browser.selector_stream():
+        print(event["event"], event["data"])
+    ```
+
+    ```python browser_selector_stream_async.py
+    async for event in async_client.browser.selector_stream():
+        print(event["event"], event["data"])
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Headful debugging workflow
+
+A typical headful debugging session combines several `BrowserResource` methods to open a browser, inspect state, stream selector events, and clean up when finished.
+
+```python browser_workflow.py
+# 1. Open a headful session
+session = client.browser.open({
+    "url": "https://example.com",
+    "mode": "headful",
+})
+
+# 2. Check headful status and VNC access
+status = client.browser.headful_status()
+password = client.browser.vnc_password()["password"]
+
+# 3. Stream selector events while interacting with the page
+for event in client.browser.selector_stream():
+    print("selector event:", event["data"])
+
+# 4. Stop the session when done
+client.browser.stop_headful()
+```
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="Streaming" icon="cloud" href="/sdk/python/streaming">
+    Details on `Iterator[StreamEvent]` and `AsyncIterator[StreamEvent]`.
+  </Card>
+
+  <Card title="Request options" icon="http-get" href="/sdk/python/request-options">
+    Pass custom `headers` and per-request `timeout` overrides.
+  </Card>
+
+  <Card title="Errors" icon="alert-triangle" href="/sdk/python/errors">
+    Handle `FigraniumError` responses.
+  </Card>
+
+  <Card title="Headful Browser" icon="desktop" href="/headful-browser">
+    Learn about headful browser sessions in Figranium.
+  </Card>
+
+  <Card title="Highlight Tool" icon="mouse-pointer" href="/highlight-tool">
+    Use the highlight tool to build and debug selectors.
+  </Card>
+</CardGroup>

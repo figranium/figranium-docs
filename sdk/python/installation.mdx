@@ -1,0 +1,102 @@
+---
+title: "Install the Figranium Python SDK"
+sidebarTitle: "Installation"
+description: "Install figranium-sdk with pip, uv, poetry, or pipx. Requires Python 3.9+ and a reachable Figranium server. Verify with a health check."
+---
+
+The Figranium Python SDK installs from PyPI as `figranium-sdk`. It has a single runtime dependency on `httpx>=0.27,<1`, so it stays lightweight in your dependency tree.
+
+## Requirements
+
+- Python `3.9` or newer.
+- A running Figranium server that the client can reach at its `base_url`. Local installs default to `http://localhost:11345`.
+
+## Install
+
+<CodeGroup>
+
+```bash pip
+pip install figranium-sdk
+```
+
+```bash uv
+uv pip install figranium-sdk
+```
+
+```bash poetry
+poetry add figranium-sdk
+```
+
+```bash pipx
+pipx inject your-tool figranium-sdk
+```
+
+</CodeGroup>
+
+<Tip>
+  The package depends only on `httpx>=0.27,<1`. If your project already uses `httpx`, the SDK will share the same version range.
+</Tip>
+
+## Import styles
+
+Import the sync client, async client, helpers, and types from the `figranium` module.
+
+<CodeGroup>
+
+```python sync
+from figranium import Figranium, actions, variable, Task
+```
+
+```python async
+from figranium import AsyncFigranium
+```
+
+</CodeGroup>
+
+## Verify the install
+
+Call `health.check()` to confirm the SDK can reach your Figranium server.
+
+```python verify_sync.py
+import os
+from figranium import Figranium
+
+with Figranium(
+    base_url="http://localhost:11345",
+    api_key=os.environ["FIGRANIUM_API_KEY"],
+) as client:
+    status = client.health.check()
+    print(status)
+```
+
+A healthy Figranium instance returns a dict like `{"status": "ok"}`.
+
+For async environments, use `AsyncFigranium` with `asyncio.run`:
+
+```python verify_async.py
+import asyncio
+import os
+from figranium import AsyncFigranium
+
+async def main():
+    async with AsyncFigranium(
+        base_url="http://localhost:11345",
+        api_key=os.environ["FIGRANIUM_API_KEY"],
+    ) as client:
+        status = await client.health.check()
+        print(status)
+
+asyncio.run(main())
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/sdk/python/quickstart">
+    Save and run your first task with the SDK.
+  </Card>
+
+  <Card title="Client configuration" icon="user-cog" href="/sdk/python/client-configuration">
+    Configure `base_url`, timeouts, custom `httpx` clients, and default headers.
+  </Card>
+</CardGroup>

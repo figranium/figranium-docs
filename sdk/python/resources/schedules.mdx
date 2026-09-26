@@ -1,0 +1,248 @@
+---
+title: "SchedulesResource: Configure and Inspect Schedules"
+sidebarTitle: "Schedules"
+description: "Manage recurring task schedules with the Figranium Python SDK. List, set, delete, validate, and inspect cron or interval schedules for any task."
+---
+
+The `schedules` resource on the Figranium Python SDK lets you automate when tasks run. You can list every scheduled task, attach a recurring schedule to a specific task, delete it, validate a schedule before applying it, and inspect the overall scheduler health. All schedule payloads use the shared `Schedule` type, which supports interval, hourly, daily, weekly, monthly, and raw cron expressions.
+
+```python
+from figranium import Figranium
+import os
+
+client = Figranium(api_key=os.environ["FIGRANIUM_API_KEY"])
+```
+
+## Schedule type
+
+A `Schedule` object controls whether and how often a task runs automatically.
+
+```python
+from figranium import Schedule
+
+# Schedule is a TypedDict with these fields:
+#   enabled: bool
+#   frequency: "interval" | "hourly" | "daily" | "weekly" | "monthly"
+#   intervalMinutes: int
+#   hour: int
+#   minute: int
+#   daysOfWeek: list[int]
+#   dayOfMonth: int
+#   cron: str
+#   lastRun: str | None        # read-only
+#   lastRunStatus: str | None  # read-only
+#   lastRunDurationMs: int     # read-only
+#   nextRun: str | None        # read-only
+```
+
+- `enabled` : whether the schedule is active.
+- `frequency` : the recurrence pattern. Use `"interval"` for a simple minute-based timer, `"hourly"` / `"daily"` / `"weekly"` / `"monthly"` for calendar-based runs, or omit it and supply `cron` directly.
+- `intervalMinutes` : required when `frequency` is `"interval"`.
+- `hour` and `minute` : used with `"daily"`, `"weekly"`, and `"monthly"` to set the time of day.
+- `daysOfWeek` : array of weekday numbers (`0` = Sunday) for `"weekly"`.
+- `dayOfMonth` : day number (`1` to `31`) for `"monthly"`.
+- `cron` : a raw cron string when you need full control.
+- `lastRun`, `lastRunStatus`, `lastRunDurationMs`, `nextRun` : read-only fields returned by the server.
+
+### Examples
+
+Run a task every 15 minutes:
+
+```python interval_schedule.py
+from figranium import Figranium, Schedule
+import os
+
+client = Figranium(api_key=os.environ["FIGRANIUM_API_KEY"])
+
+interval_schedule: Schedule = {
+    "enabled": True,
+    "frequency": "interval",
+    "intervalMinutes": 15,
+}
+
+result = client.schedules.set("task-123", interval_schedule)
+print(result)
+```
+
+Run a task every Monday and Wednesday at 09:30:
+
+```python weekly_schedule.py
+weekly_schedule: Schedule = {
+    "enabled": True,
+    "frequency": "weekly",
+    "hour": 9,
+    "minute": 30,
+    "daysOfWeek": [1, 3],
+}
+
+result = client.schedules.set("task-123", weekly_schedule)
+print(result)
+```
+
+Run a task daily at 07:00 with a cron expression:
+
+```python cron_schedule.py
+cron_schedule: Schedule = {
+    "enabled": True,
+    "cron": "0 7 * * *",
+}
+
+result = client.schedules.set("task-123", cron_schedule)
+print(result)
+```
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`list`">
+    Retrieve all tasks that currently have a schedule configured.
+
+    - **HTTP endpoint:** `GET /api/schedules`
+    - **Signature:** `schedules.list(*, options=None)`
+
+    ```python list_schedules.py
+    result = client.schedules.list()
+    
+    for entry in result["schedules"]:
+        print(entry["taskId"], entry["taskName"], entry["schedule"]["enabled"])
+    ```
+
+    Returns an object with a `schedules` array. Each entry contains `taskId`, `taskName`, `mode`, and the attached `Schedule` object.
+  </Accordion>
+
+  <Accordion title="`set`">
+    Attach or update a schedule for a specific task.
+
+    - **HTTP endpoint:** `POST /api/schedules/{taskId}`
+    - **Signature:** `schedules.set(task_id, schedule, *, options=None)`
+
+    ```python set_schedule.py
+    from figranium import Schedule
+    
+    result = client.schedules.set("task-123", {
+        "enabled": True,
+        "frequency": "daily",
+        "hour": 7,
+        "minute": 0,
+    })
+    
+    print(result["nextRun"])  # timestamp of the next scheduled run
+    ```
+
+    Returns an object containing the saved `schedule`, a human-readable `description`, and the `nextRun` timestamp (or `None` if the schedule is disabled or invalid).
+  </Accordion>
+
+  <Accordion title="`delete`">
+    Remove a task's schedule entirely.
+
+    - **HTTP endpoint:** `DELETE /api/schedules/{taskId}`
+    - **Signature:** `schedules.delete(task_id, *, options=None)`
+
+    ```python delete_schedule.py
+    result = client.schedules.delete("task-123")
+    print(result["success"])
+    ```
+
+    Returns `{"success": bool}` indicating whether the schedule was removed.
+  </Accordion>
+
+  <Accordion title="`status`">
+    Inspect the current schedule for a single task, including its computed cron expression and validity.
+
+    - **HTTP endpoint:** `GET /api/schedules/{taskId}/status`
+    - **Signature:** `schedules.status(task_id, *, options=None)`
+
+    ```python schedule_status.py
+    status = client.schedules.status("task-123")
+    
+    print(status["isValid"], status["cron"], status["description"])
+    ```
+
+    Returns an object with the current `schedule`, the resolved `cron` string, a human-readable `description`, and an `isValid` flag.
+  </Accordion>
+
+  <Accordion title="`describe`">
+    Validate a schedule payload for a task without saving it. This is useful for previewing the next run time and confirming a cron expression before you call `set`.
+
+    - **HTTP endpoint:** `POST /api/schedules/{taskId}/describe`
+    - **Signature:** `schedules.describe(task_id, schedule, *, options=None)`
+
+    ```python describe_schedule.py
+    preview = client.schedules.describe("task-123", {
+        "enabled": True,
+        "frequency": "monthly",
+        "dayOfMonth": 1,
+        "hour": 6,
+        "minute": 0,
+    })
+    
+    print(preview["valid"], preview["cron"], preview["nextRun"])
+    ```
+
+    Returns an object with `valid`, `description`, `cron`, and `nextRun`. If `valid` is `False`, the schedule will not be accepted by `set`.
+  </Accordion>
+
+  <Accordion title="`overall_status`">
+    Get a high-level view of the scheduler state across all tasks.
+
+    - **HTTP endpoint:** `GET /api/schedules/status/all`
+    - **Signature:** `schedules.overall_status(*, options=None)`
+
+    ```python overall_status.py
+    status = client.schedules.overall_status()
+    print(status)
+    ```
+
+    Returns a plain dictionary. The exact fields depend on the server version; inspect the response to discover available keys.
+  </Accordion>
+</AccordionGroup>
+
+## Async usage
+
+All `schedules` methods are also available on `AsyncFigranium`. Use `await` for each call.
+
+```python async_schedules.py
+import asyncio
+from figranium import AsyncFigranium
+import os
+
+async def main():
+    async with AsyncFigranium(api_key=os.environ["FIGRANIUM_API_KEY"]) as client:
+        result = await client.schedules.set("task-123", {
+            "enabled": True,
+            "frequency": "daily",
+            "hour": 9,
+            "minute": 0,
+        })
+        print(result["nextRun"])
+
+asyncio.run(main())
+```
+
+## Error handling
+
+Schedule methods raise `FigraniumError` on failure. Common cases include a missing task ID (`404`) or an invalid schedule payload (`400`). See [Error handling](/sdk/python/errors) for retry guidance and error codes.
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="Tasks" icon="list-check" href="/sdk/python/resources/tasks">
+    Create and manage the tasks you schedule.
+  </Card>
+
+  <Card title="Executions" icon="bolt" href="/sdk/python/resources/executions">
+    Inspect the runs produced by scheduled tasks.
+  </Card>
+
+  <Card title="Request options" icon="sliders" href="/sdk/python/request-options">
+    Pass custom headers and per-request timeouts.
+  </Card>
+
+  <Card title="Task scheduling" icon="calendar" href="/task-scheduling">
+    Learn how scheduling works in Figranium.
+  </Card>
+
+  <Card title="Errors" icon="alert-triangle" href="/sdk/python/errors">
+    Handle FigraniumError responses.
+  </Card>
+</CardGroup>

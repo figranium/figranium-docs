@@ -4,7 +4,7 @@ sidebarTitle: "Tasks"
 description: "Reference for the TasksResource class in the Figranium JavaScript SDK. Create, update, version, and execute tasks with typed requests and responses."
 ---
 
-The `TasksResource` class is the primary way to manage Figranium tasks through the JavaScript SDK. Use it to list, create, update, version, and run tasks, as well as to generate selectors and scripts with AI assistance. Every method is typed against the Figranium API and accepts an optional [`RequestOptions`](/sdk/js/request-options) object as its final argument.
+The `TasksResource` class is the primary way to manage Figranium tasks through the JavaScript SDK. Use it to list, create, update, version, and run tasks. Every method is typed against the Figranium API and accepts an optional [`RequestOptions`](/sdk/js/request-options) object as its final argument.
 
 ```ts
 import { Figranium } from "@figranium/sdk";
@@ -164,36 +164,6 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     ```ts rollback-task.ts
     const restored = await figranium.tasks.rollback("task_123", "v_456");
     console.log(restored.id);
-    ```
-  </Accordion>
-
-  <Accordion title="`generateSelector`">
-    Use AI to generate a CSS selector for a specific action inside a task.
-
-    - **HTTP endpoint:** `POST /api/tasks/generate-selector`
-    - **Signature:** `generateSelector(input: { task: Task; actionIndex: number; prompt: string }, options?: RequestOptions): Promise<{ selector: string }>`
-
-    ```ts generate-selector.ts
-    const { selector } = await figranium.tasks.generateSelector({
-      task: savedTask,
-      actionIndex: 2,
-      prompt: "Target the primary search button",
-    });
-    console.log(selector);
-    ```
-  </Accordion>
-
-  <Accordion title="`generateScript`">
-    Generate a JavaScript extraction script from a natural language description.
-
-    - **HTTP endpoint:** `POST /api/tasks/generate-script`
-    - **Signature:** `generateScript(description: string, options?: RequestOptions): Promise<{ script: string }>`
-
-    ```ts generate-script.ts
-    const { script } = await figranium.tasks.generateScript(
-      "Extract all product names and prices from the page"
-    );
-    console.log(script);
     ```
   </Accordion>
 

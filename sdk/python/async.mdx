@@ -1,0 +1,122 @@
+---
+title: "Use the Async Figranium Client"
+sidebarTitle: "Async Client"
+description: "Use AsyncFigranium to call Figranium from async Python. Same constructor, same resources, same methods, but every call is awaited."
+---
+
+`AsyncFigranium` mirrors `Figranium` exactly: the same constructor keyword arguments, the same resource attributes, and the same method names. The only difference is that every network call returns an awaitable coroutine, and stream methods return `AsyncIterator` instead of `Iterator`.
+
+## Constructor
+
+The async client accepts the same options as the sync client. The `http_client` argument expects an `httpx.AsyncClient` instead of `httpx.Client`.
+
+```python filename.py
+import os
+import httpx
+from figranium import AsyncFigranium
+
+client = AsyncFigranium(
+    base_url="https://figranium.example",
+    api_key=os.environ["FIGRANIUM_API_KEY"],
+    timeout=45.0,
+    http_client=httpx.AsyncClient(proxies="http://proxy.example:8080"),
+)
+```
+
+## Context manager
+
+Use `async with` to ensure the client closes automatically:
+
+```python filename.py
+import asyncio
+import os
+from figranium import AsyncFigranium
+
+async def main():
+    async with AsyncFigranium(
+        base_url="http://localhost:11345",
+        api_key=os.environ["FIGRANIUM_API_KEY"],
+    ) as client:
+        result = await client.run_task("my-task")
+        print(result)
+
+asyncio.run(main())
+```
+
+You can also close explicitly:
+
+```python filename.py
+client = AsyncFigranium(api_key=os.environ["FIGRANIUM_API_KEY"])
+result = await client.run_task("my-task")
+await client.close()
+```
+
+## Await every call
+
+All resource methods are async. Await each one:
+
+```python filename.py
+tasks = await client.tasks.list()
+execution = await client.executions.get("exec-id")
+await client.executions.stop("run-id")
+```
+
+Top-level shortcuts are also async:
+
+```python filename.py
+result = await client.scrape({"url": "https://example.com"})
+result = await client.agent({"url": "https://example.com"})
+result = await client.headful({"url": "https://example.com"})
+```
+
+## Async streams
+
+Stream methods return `AsyncIterator[StreamEvent]`. Use `async for`:
+
+```python filename.py
+async for event in client.executions.stream():
+    print(event["event"], event["data"])
+```
+
+The same pattern works for `client.browser.selector_stream()`:
+
+```python filename.py
+async for event in client.browser.selector_stream():
+    print(event["event"], event["data"])
+```
+
+See [Streaming](/sdk/python/streaming) for event shape, terminal timeouts, and cancellation.
+
+## Error handling
+
+Async calls raise the same `FigraniumError` as the sync client:
+
+```python filename.py
+from figranium import AsyncFigranium, FigraniumError
+
+async def safe_run(client, task_id):
+    try:
+        return await client.run_task(task_id)
+    except FigraniumError as error:
+        if error.code == "TASK_NOT_FOUND":
+            return None
+        raise
+```
+
+See [Errors](/sdk/python/errors) for the full error shape.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Client configuration" icon="user-cog" href="/sdk/python/client-configuration">
+    All available client options, including `base_url` and `timeout`.
+  </Card>
+
+  <Card title="Streaming" icon="cloud" href="/sdk/python/streaming">
+    Consuming SSE events with sync and async iterators.
+  </Card>
+
+  <Card title="Tasks resource" icon="list-check" href="/sdk/python/resources/tasks">
+    Save, run, and manage tasks.
+  </Card>
+</CardGroup>

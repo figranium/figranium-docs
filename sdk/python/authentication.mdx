@@ -1,0 +1,58 @@
+---
+title: "Authenticate the Figranium Python SDK"
+sidebarTitle: "Authentication"
+description: "Authenticate the Figranium Python SDK with an API key. Header formats, switching between Authorization and x-api-key, and key management guidance."
+---
+
+The Figranium Python SDK authenticates with an API key. Create one in the Figranium web UI, then pass it to the client so every request is signed automatically.
+
+<Steps>
+  <Step title="Create an API key">
+    Sign into the Figranium web UI and generate an API key from Settings. Copy the value once; you will not see it again.
+  </Step>
+  <Step title="Pass the key to the client">
+    Provide `api_key` when constructing the client. Figranium sends it as `Authorization: Bearer <key>` by default.
+
+    ```python
+    import os
+    from figranium import Figranium
+    
+    client = Figranium(
+        base_url="http://localhost:11345",
+        api_key=os.environ["FIGRANIUM_API_KEY"],
+    )
+    ```
+  </Step>
+  <Step title="Switch to the x-api-key header (optional)">
+    Some deployments expect `x-api-key` instead of the `Authorization` header. Set `api_key_header="x-api-key"`:
+
+    ```python
+    Figranium(
+        api_key=os.environ["FIGRANIUM_API_KEY"],
+        api_key_header="x-api-key",
+    )
+    ```
+
+    Only `"authorization"` (default) and `"x-api-key"` are valid values.
+  </Step>
+</Steps>
+
+## What API keys can access
+
+API keys authenticate every task, execution, schedule, capture, browser, and execution endpoint exposed by the SDK. Server-administration operations (creating API keys, changing themes, configuring AI providers, and managing proxies) are performed in the Figranium web UI.
+
+<Warning>
+  Store API keys in environment variables or a secrets manager. Never commit keys to source control or expose them in client-side code.
+</Warning>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Client configuration" icon="user-cog" href="/sdk/python/client-configuration">
+    All available client options, including `base_url` and `timeout`.
+  </Card>
+
+  <Card title="API key" icon="key" href="/api-key">
+    How Figranium API keys work and how to manage them from the web UI.
+  </Card>
+</CardGroup>

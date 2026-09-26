@@ -1,0 +1,260 @@
+---
+title: "CabinetsResource: Manage Files, Zips, and Uploads"
+sidebarTitle: "Cabinets"
+description: "Manage Figranium Cabinets with the Python SDK: list, create, rename, clear, delete, update item status, ZIP/unzip, and build download URLs."
+---
+
+The `cabinets` resource on the Figranium Python SDK is the typed client for the Cabinets API. Cabinets are durable, installation-wide download queues. Tasks can route intercepted downloads into a selected Cabinet, and later actions can upload the newest unuploaded item from that queue.
+
+```python
+from figranium import Figranium
+import os
+
+client = Figranium(api_key=os.environ["FIGRANIUM_API_KEY"])
+```
+
+## Supported operations
+
+`cabinets` covers the Cabinet lifecycle and item-management API.
+
+<CardGroup cols={2}>
+  <Card title="Cabinet lifecycle" icon="folder-plus">
+    List, create, rename, migrate, clear, and delete Cabinets.
+  </Card>
+
+  <Card title="Item management" icon="list-check">
+    List Cabinet items, update upload status, and remove one or many items.
+  </Card>
+
+  <Card title="Archives" icon="archive">
+    Create ZIP archives and safely extract compatible archives.
+  </Card>
+
+  <Card title="Downloads" icon="download">
+    Build item download URLs for files stored in a Cabinet.
+  </Card>
+</CardGroup>
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`list`">
+    List all Cabinets.
+
+    - **HTTP endpoint:** `GET /api/cabinets`
+    - **Signature:** `cabinets.list(*, options=None)`
+
+    ```python list_cabinets.py
+    result = client.cabinets.list()
+    for cabinet in result["cabinets"]:
+        print(cabinet["id"], cabinet["name"])
+    ```
+  </Accordion>
+
+  <Accordion title="`create`">
+    Create a new Cabinet.
+
+    - **HTTP endpoint:** `POST /api/cabinets`
+    - **Signature:** `cabinets.create(name, *, options=None)`
+
+    ```python create_cabinet.py
+    result = client.cabinets.create("downloads-q3")
+    print(result["cabinet"]["id"])
+    ```
+  </Accordion>
+
+  <Accordion title="`rename`">
+    Rename an existing Cabinet.
+
+    - **HTTP endpoint:** `POST /api/cabinets/{cabinetId}/rename`
+    - **Signature:** `cabinets.rename(cabinet_id, name, *, options=None)`
+
+    ```python rename_cabinet.py
+    result = client.cabinets.rename("cab_01", "downloads-q4")
+    print(result["cabinet"]["name"])
+    ```
+  </Accordion>
+
+  <Accordion title="`delete`">
+    Delete a Cabinet. You can optionally migrate its items to another Cabinet first.
+
+    - **HTTP endpoint:** `DELETE /api/cabinets/{cabinetId}`
+    - **Signature:** `cabinets.delete(cabinet_id, *, target_cabinet_id=None, migrate=False, options=None)`
+
+    ```python delete_cabinet.py
+    # Delete a cabinet outright
+    result = client.cabinets.delete("cab_01")
+    
+    # Migrate items to another cabinet before deleting
+    result = client.cabinets.delete(
+        "cab_01",
+        target_cabinet_id="cab_02",
+        migrate=True,
+    )
+    ```
+
+    When `migrate=True`, items are moved to `target_cabinet_id` before the Cabinet is removed.
+  </Accordion>
+
+  <Accordion title="`list_items`">
+    List the items inside a Cabinet.
+
+    - **HTTP endpoint:** `GET /api/cabinets/{cabinetId}/items`
+    - **Signature:** `cabinets.list_items(cabinet_id, *, options=None)`
+
+    ```python list_items.py
+    result = client.cabinets.list_items("cab_01")
+    for item in result["items"]:
+        print(item["id"], item["name"], item["status"])
+    ```
+  </Accordion>
+
+  <Accordion title="`clear`">
+    Remove every item from a Cabinet.
+
+    - **HTTP endpoint:** `POST /api/cabinets/{cabinetId}/clear`
+    - **Signature:** `cabinets.clear(cabinet_id, *, options=None)`
+
+    ```python clear_cabinet.py
+    result = client.cabinets.clear("cab_01")
+    print(result["success"])
+    ```
+  </Accordion>
+
+  <Accordion title="`set_item_status`">
+    Update the status of one or more Cabinet items.
+
+    - **HTTP endpoint:** `POST /api/cabinets/{cabinetId}/items/status`
+    - **Signature:** `cabinets.set_item_status(cabinet_id, item_ids, status, *, options=None)`
+
+    ```python set_status.py
+    result = client.cabinets.set_item_status(
+        "cab_01",
+        ["item_1", "item_2"],
+        "uploaded",
+    )
+    print(result["success"])
+    ```
+
+    Valid statuses are `"pending"` and `"uploaded"`.
+  </Accordion>
+
+  <Accordion title="`remove_items`">
+    Remove specific items from a Cabinet.
+
+    - **HTTP endpoint:** `POST /api/cabinets/{cabinetId}/items/remove`
+    - **Signature:** `cabinets.remove_items(cabinet_id, item_ids, *, options=None)`
+
+    ```python remove_items.py
+    result = client.cabinets.remove_items("cab_01", ["item_1", "item_2"])
+    print(result["success"])
+    ```
+  </Accordion>
+
+  <Accordion title="`zip_items`">
+    Create a ZIP archive from selected Cabinet items.
+
+    - **HTTP endpoint:** `POST /api/cabinets/{cabinetId}/zip`
+    - **Signature:** `cabinets.zip_items(cabinet_id, item_ids, *, name=None, options=None)`
+
+    ```python zip_items.py
+    result = client.cabinets.zip_items(
+        "cab_01",
+        ["item_1", "item_2"],
+        name="archive.zip",
+    )
+    print(result)
+    ```
+  </Accordion>
+
+  <Accordion title="`unzip_item`">
+    Extract a ZIP archive that is stored as a Cabinet item.
+
+    - **HTTP endpoint:** `POST /api/cabinets/{cabinetId}/unzip/{itemId}`
+    - **Signature:** `cabinets.unzip_item(cabinet_id, item_id, *, options=None)`
+
+    ```python unzip_item.py
+    result = client.cabinets.unzip_item("cab_01", "zip_item_1")
+    print(result["success"])
+    ```
+  </Accordion>
+
+  <Accordion title="`get_item_download_url`">
+    Build a download URL for a Cabinet item. This method does **not** make an HTTP request. It returns a URL string synchronously.
+
+    - **Signature:** `cabinets.get_item_download_url(cabinet_id, item_id)`
+
+    ```python download_url.py
+    url = client.cabinets.get_item_download_url("cab_01", "item_1")
+    print(url)
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Use a Cabinet from a task
+
+Tasks can set `cabinetId` to select where intercepted browser downloads are stored:
+
+```python task_with_cabinet.py
+from figranium import Figranium, Task, actions
+import os
+
+client = Figranium(api_key=os.environ["FIGRANIUM_API_KEY"])
+
+task: Task = {
+    "name": "Download and reuse file",
+    "url": "https://example.com/export",
+    "mode": "agent",
+    "cabinetId": "cab_basic",
+    "actions": [
+        actions.click("#download"),
+        actions.upload(selector="input[type=file]"),
+        actions.finalize_uploads(),
+    ],
+}
+
+client.tasks.save(task)
+```
+
+If a task omits `cabinetId`, Figranium uses the instance's default Cabinet. An individual Upload action can override the task-level selection with its own `cabinetId`.
+
+## Upload status
+
+Cabinet items track whether they have been uploaded. The `upload` action normally selects the newest unuploaded item. You can mark an item uploaded immediately with `markAsUploaded`, or keep finalization separate and call `finalize_uploads` later in the workflow.
+
+<Tip>
+  Keep finalization separate when attaching a file and successfully submitting it are two different steps. That lets the workflow consume the Cabinet item only after the later step succeeds.
+</Tip>
+
+## Async usage
+
+All `cabinets` methods are also available on `AsyncFigranium`. Use `await` for each call.
+
+```python async_cabinets.py
+import asyncio
+from figranium import AsyncFigranium
+import os
+
+async def main():
+    async with AsyncFigranium(api_key=os.environ["FIGRANIUM_API_KEY"]) as client:
+        result = await client.cabinets.list()
+        print(len(result["cabinets"]), "cabinets")
+
+asyncio.run(main())
+```
+
+## Related resources
+
+<CardGroup cols={3}>
+  <Card title="Action helpers" icon="code" href="/sdk/python/actions">
+    Build Upload and Finalize Uploads actions.
+  </Card>
+
+  <Card title="Tasks resource" icon="list-check" href="/sdk/python/resources/tasks">
+    Save and run tasks that select a Cabinet with `cabinetId`.
+  </Card>
+
+  <Card title="File downloads" icon="download" href="/file-downloads">
+    Understand Cabinets, intercepted downloads, and the upload lifecycle.
+  </Card>
+</CardGroup>

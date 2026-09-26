@@ -1,0 +1,184 @@
+---
+title: "TasksResource: Manage and Run Figranium Tasks"
+sidebarTitle: "Tasks"
+description: "Reference for the TasksResource in the Figranium Python SDK. Create, update, version, and execute tasks with typed requests and responses."
+---
+
+The `TasksResource` on the Figranium Python SDK is the primary way to manage tasks. Use it to list, create, update, version, and run tasks. Every method accepts an optional `options` keyword for per-request overrides such as custom headers or timeouts. The async client (`AsyncFigranium`) exposes the same resource and methods, so you can `await client.tasks.save(...)` or `await client.tasks.run(...)` with identical signatures.
+
+```python
+import os
+from figranium import Figranium
+
+client = Figranium(api_key=os.environ["FIGRANIUM_API_KEY"])
+```
+
+<Note>
+  The client-level convenience `client.run_task(id, input)` proxies directly to `client.tasks.run(id, input)`.
+</Note>
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`list`">
+    Retrieve every task in the workspace.
+
+    - **HTTP endpoint:** `GET /api/tasks`
+    - **Signature:** `list(*, options=None) -> List[Task]`
+
+    ```python list_tasks.py
+    tasks = client.tasks.list()
+    print(len(tasks))
+    ```
+
+    Returns a list of [`Task`](/sdk/python/resources/tasks) objects.
+  </Accordion>
+
+  <Accordion title="`list_summaries`">
+    Fetch a lightweight summary of all tasks.
+
+    - **HTTP endpoint:** `GET /api/tasks/list`
+    - **Signature:** `list_summaries(*, options=None) -> {"tasks": List[TaskSummary]}`
+
+    ```python list_summaries.py
+    result = client.tasks.list_summaries()
+    for t in result["tasks"]:
+        print(t["id"], t["name"])
+    ```
+
+    Each `TaskSummary` contains `id`, `name`, and an optional `description`.
+  </Accordion>
+
+  <Accordion title="`save`">
+    Create or update a task. Pass `create_version=True` to snapshot the current version before saving.
+
+    - **HTTP endpoint:** `POST /api/tasks` (with `?version=true` when `create_version` is set)
+    - **Signature:** `save(task, *, create_version=False, options=None) -> Task`
+
+    ```python save_task.py
+    from figranium import actions, variable, Task
+    
+    task: Task = {
+        "name": "Search and extract",
+        "url": "https://example.com",
+        "mode": "agent",
+        "variables": {
+            "query": {"type": "string", "value": "figranium"},
+        },
+        "actions": [
+            actions.wait_for("#search"),
+            actions.type("#search", variable("query")),
+            actions.press("Enter", "#search"),
+            actions.get_content(".results", "resultText"),
+        ],
+    }
+    
+    saved = client.tasks.save(task, create_version=True)
+    print(saved["id"])
+    ```
+
+    Returns the saved `Task`, including any server-generated `id`. For more about building actions, see [`Actions`](/sdk/python/actions). For variable substitution, see [`Variables`](/sdk/python/variables).
+  </Accordion>
+
+  <Accordion title="`touch`">
+    Refresh a task's `last_opened` timestamp without changing its definition.
+
+    - **HTTP endpoint:** `POST /api/tasks/{id}/touch`
+    - **Signature:** `touch(task_id, *, options=None) -> Task`
+
+    ```python touch_task.py
+    updated = client.tasks.touch("task_123")
+    ```
+  </Accordion>
+
+  <Accordion title="`update`">
+    Apply a partial patch to an existing task.
+
+    - **HTTP endpoint:** `PATCH /api/tasks/{id}`
+    - **Signature:** `update(task_id, patch, *, options=None) -> {"id": str, "updatedAt": int, "status": str, "task": Task}`
+
+    ```python update_task.py
+    result = client.tasks.update("task_123", {
+        "name": "Renamed task",
+        "wait": 2000,
+    })
+    print(result["updatedAt"])
+    ```
+  </Accordion>
+
+  <Accordion title="`delete`">
+    Remove a task by ID.
+
+    - **HTTP endpoint:** `DELETE /api/tasks/{id}`
+    - **Signature:** `delete(task_id, *, options=None) -> {"id": str, "deleted": bool, "message": Optional[str]}`
+
+    ```python delete_task.py
+    result = client.tasks.delete("task_123")
+    print(result["deleted"], result.get("message"))
+    ```
+  </Accordion>
+
+  <Accordion title="`versions`">
+    List all saved versions for a task.
+
+    - **HTTP endpoint:** `GET /api/tasks/{id}/versions`
+    - **Signature:** `versions(task_id, *, options=None) -> {"versions": List[TaskVersion]}`
+
+    ```python list_versions.py
+    result = client.tasks.versions("task_123")
+    for v in result["versions"]:
+        print(v["id"], v["timestamp"], v["name"])
+    ```
+  </Accordion>
+
+  <Accordion title="`version`">
+    Retrieve a specific version snapshot.
+
+    - **HTTP endpoint:** `GET /api/tasks/{id}/versions/{versionId}`
+    - **Signature:** `version(task_id, version_id, *, options=None) -> {"snapshot": Task, "metadata": {"id": str, "timestamp": int}}`
+
+    ```python get_version.py
+    result = client.tasks.version("task_123", "v_456")
+    print(result["metadata"]["timestamp"], result["snapshot"]["name"])
+    ```
+  </Accordion>
+
+  <Accordion title="`clear_versions`">
+    Delete all stored versions for a task.
+
+    - **HTTP endpoint:** `POST /api/tasks/{id}/versions/clear`
+    - **Signature:** `clear_versions(task_id, *, options=None) -> {"success": bool}`
+
+    ```python clear_versions.py
+    result = client.tasks.clear_versions("task_123")
+    ```
+  </Accordion>
+
+  <Accordion title="`rollback`">
+    Restore a task to a previous version snapshot.
+
+    - **HTTP endpoint:** `POST /api/tasks/{id}/rollback`
+    - **Signature:** `rollback(task_id, version_id, *, options=None) -> Task`
+
+    ```python rollback_task.py
+    restored = client.tasks.rollback("task_123", "v_456")
+    print(restored["id"])
+    ```
+  </Accordion>
+
+  <Accordion title="`run`">
+    Execute a task and return its result. This is the public execution endpoint, reachable at `/tasks/{id}/api`.
+
+    - **HTTP endpoint:** `POST /tasks/{id}/api`
+    - **Signature:** `run(task_id, input=None, *, options=None) -> ExecutionResult`
+
+    ```python run_task.py
+    result = client.tasks.run("task_123", {
+        "variables": {"query": "browser automation"},
+    })
+    print(result["data"])
+    ```
+
+    The `input` object accepts `variables`, `taskVariables`, `webhookUrl`, and `runId`. For more about execution results and streaming, see [`ExecutionsResource`](/sdk/python/resources/executions). To learn about task variables and runtime substitution, see [`Variables`](/sdk/python/variables) and [`Actions`](/sdk/python/actions). For per-request overrides, see [`RequestOptions`](/sdk/python/request-options).
+  </Accordion>
+</AccordionGroup>

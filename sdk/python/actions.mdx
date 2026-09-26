@@ -1,0 +1,217 @@
+---
+title: "Task Action Helpers"
+sidebarTitle: "Actions"
+description: "Build Figranium task action lists with typed helpers. Navigation, interaction, extraction, control flow, HTTP, CAPTCHA, and file upload action factories from the Python SDK."
+---
+
+Tasks are executed as ordered lists of actions. The Python SDK exports typed factories under the `actions` namespace that generate correctly shaped action dicts with stable IDs, plus an `action()` helper for one-offs.
+
+## Import
+
+```python
+from figranium import action, actions, variable, Task
+```
+
+Every helper returns a plain action dict. Helpers assign a unique `id` if you do not pass one, so lists remain stable across saves.
+
+## Base options
+
+Every helper accepts an optional `base` keyword argument with common fields:
+
+```python
+from typing import Mapping, Any
+
+# Example: disable an action without removing it
+actions.click("#submit", base={"disabled": True})
+```
+
+Use `disabled: True` to keep an action in the list without executing it. You can also pass an explicit `"id"` in `base`.
+
+## Action types
+
+<CardGroup cols={2}>
+  <Card title="Navigation and interaction" icon="arrow-right" href="#navigation-and-interaction">
+    Navigate, click, type, press keys, wait, hover, and capture screenshots.
+  </Card>
+
+  <Card title="Extraction" icon="database" href="#extraction">
+    Read content, run JavaScript, and make HTTP requests.
+  </Card>
+
+  <Card title="Control flow" icon="stack-2" href="#control-flow">
+    Conditionals, loops, branches, repeats, and sub-task starts.
+  </Card>
+
+  <Card title="Variables and CAPTCHA" icon="lock" href="#variables">
+    Set and merge variables, plus CAPTCHA solving actions.
+  </Card>
+
+  <Card title="Files and Cabinets" icon="folder-open" href="#files-and-cabinets">
+    Upload the newest unuploaded Cabinet item and finalize attached items after success.
+  </Card>
+</CardGroup>
+
+## Navigation and interaction
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `actions.navigate(url, base=None)` | `navigate` | Navigate the current tab to `url`. |
+| `actions.click(selector, base=None)` | `click` | Click the element matched by `selector`. |
+| `actions.type(selector, value, mode="replace", base=None)` | `type` | Type into `selector`. `mode` is `"replace"` (default) or `"append"`. |
+| `actions.press(key, selector=None, base=None)` | `press` | Press a keyboard `key`, optionally targeting `selector`. |
+| `actions.wait(seconds, base=None)` | `wait` | Wait a fixed number of seconds. |
+| `actions.wait_for(selector, base=None)` | `wait_selector` | Wait until `selector` matches an element. |
+| `actions.hover(selector, base=None)` | `hover` | Hover over the element matched by `selector`. |
+| `actions.screenshot(name=None, base=None)` | `screenshot` | Capture a screenshot, optionally named. |
+
+## Extraction
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `actions.get_content(selector=None, var_name=None, base=None)` | `get_content` | Read visible text; store in `var_name` when set. |
+| `actions.javascript(script, var_name=None, base=None)` | `javascript` | Run `script` in the page; store the return value. |
+| `actions.request(url, *, method=None, headers=None, body=None, var_name=None, base=None)` | `http_request` | Perform an HTTP request; store the response in `var_name`. |
+
+`request` accepts `method`, `headers`, `body`, and `var_name`. `method` defaults to `GET`.
+
+## Control flow
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `actions.if_(condition, base=None)` | `if` | Begin a conditional block. |
+| `actions.while_(condition, base=None)` | `while` | Begin a loop block. |
+| `actions.else_(base=None)` | `else` | Else branch of the preceding `if`. |
+| `actions.end(base=None)` | `end` | Close the preceding block. |
+| `actions.repeat(count, base=None)` | `repeat` | Repeat the following block `count` times. |
+| `actions.stop(status="success", base=None)` | `stop` | Stop the task with a status (default `"success"`). |
+| `actions.start(task_id, base=None)` | `start` | Start a modular sub-task by ID. |
+
+Condition objects for `if_` and `while_` accept fields such as:
+
+```python
+{
+    "value": "...",               # Free-form expression, when supported
+    "selector": "...",            # Selector to test with an operator like "exists"
+    "conditionVar": "...",        # Variable name to test
+    "conditionVarType": "string" | "number" | "boolean",
+    "conditionOp": "...",         # See below
+    "conditionValue": "...",     # Comparison target
+}
+```
+
+Supported `conditionOp` values include:
+
+- Strings: `equals`, `not_equals`, `contains`, `starts_with`, `ends_with`, `matches`
+- Numbers: `equals`, `not_equals`, `gt`, `gte`, `lt`, `lte`
+- Booleans: `is_true`, `is_false`
+- Selectors: `exists`, `not_exists`
+
+## Variables
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `actions.set(var_name, value, base=None)` | `set` | Assign `value` to `var_name`. |
+| `actions.merge(var_name, value, base=None)` | `merge` | Merge `value` into an existing `var_name`. |
+
+The exported `variable(name)` helper produces the `{$name}` template token Figranium expects when a value should be substituted from a runtime variable:
+
+```python
+actions.type("#search", variable("query"))
+```
+
+See [Variables and templates](/sdk/python/variables) for more.
+
+## CAPTCHA
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `actions.solve_captcha(*, captcha_type=None, selector=None, var_name=None, timeout=None, base=None)` | `solve_captcha` | Solve a CAPTCHA challenge. |
+| `actions.wait_for_captcha(*, captcha_type=None, selector=None, var_name=None, timeout=None, base=None)` | `wait_for_captcha` | Wait for a CAPTCHA to appear. |
+
+`captcha_type` is one of `"recaptcha_v2"`, `"recaptcha_v3"`, `"hcaptcha"`, or `"turnstile"`. See [CAPTCHA Solving](/captcha-solving) for setup and return-value shape.
+
+## Files and Cabinets
+
+The SDK includes helpers for the Cabinet upload flow.
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `actions.upload(*, selector=None, cabinet_id=None, mark_as_uploaded=None, base=None)` | `upload` | Attach the newest unuploaded item from a Cabinet. |
+| `actions.finalize_uploads(base=None)` | `finalize_uploads` | Mark all Cabinet items attached during the current execution as uploaded. |
+
+When `cabinet_id` is omitted on an upload action, Figranium uses the task's `cabinetId`; if the task also omits it, the instance default Cabinet is used.
+
+Keeping finalization separate is useful when an upload should only be consumed after the surrounding workflow reaches a successful point.
+
+```python
+from figranium import actions, Task
+
+task: Task = {
+    "name": "Upload latest export",
+    "url": "https://example.com/upload",
+    "mode": "agent",
+    "cabinetId": "cab_basic",
+    "actions": [
+        actions.upload(selector="input[type=file]"),
+        actions.click("button[type=submit]"),
+        actions.finalize_uploads(),
+    ],
+}
+```
+
+See [Cabinets resource](/sdk/python/resources/cabinets) for full Cabinet operations.
+
+## Typed one-off actions
+
+For actions the helpers do not cover, use `action()` with a plain mapping:
+
+```python
+from figranium import action
+
+download = action({
+    "type": "wait_downloads",
+    "value": "10",  # seconds
+})
+```
+
+`action()` assigns an ID if you do not provide one and preserves all valid fields.
+
+## Full task example
+
+```python
+from figranium import actions, variable, Task
+
+task: Task = {
+    "name": "Search and screenshot",
+    "url": "https://example.com",
+    "mode": "agent",
+    "variables": {"query": {"type": "string", "value": "figranium"}},
+    "actions": [
+        actions.navigate("https://example.com"),
+        actions.wait_for("#search"),
+        actions.type("#search", variable("query")),
+        actions.press("Enter", "#search"),
+        actions.wait_for(".results"),
+        actions.if_({
+            "selector": ".no-results",
+            "conditionOp": "exists",
+        }),
+        actions.stop("no_results"),
+        actions.end(),
+        actions.get_content(".results", "resultText"),
+        actions.screenshot("results"),
+    ],
+}
+```
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Variables and templates" icon="variable" href="/sdk/python/variables">
+    Declare task variables and reference them with variable().
+  </Card>
+
+  <Card title="Tasks resource" icon="list-check" href="/sdk/python/resources/tasks">
+    Save, version, and execute tasks that use these actions.
+  </Card>
+</CardGroup>

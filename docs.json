@@ -162,12 +162,41 @@
                   "sdk/js/resources/schedules",
                   "sdk/js/resources/cabinets",
                   "sdk/js/resources/captures",
-                  "sdk/js/resources/credentials",
                   "sdk/js/resources/browser",
                   "sdk/js/resources/execution",
-                  "sdk/js/resources/settings",
-                  "sdk/js/resources/auth",
                   "sdk/js/resources/health"
+                ],
+                "icon": "tool"
+              }
+            ]
+          },
+          {
+            "group": "Python SDK",
+            "icon": "brand-python",
+            "pages": [
+              "sdk/python/overview",
+              "sdk/python/installation",
+              "quickstart",
+              "sdk/python/client-configuration",
+              "sdk/python/authentication",
+              "sdk/python/request-options",
+              "sdk/python/errors",
+              "sdk/python/streaming",
+              "sdk/python/async",
+              "sdk/python/actions",
+              "sdk/python/variables",
+              {
+                "group": "Resources",
+                "icon": "tool",
+                "pages": [
+                  "sdk/python/resources/tasks",
+                  "sdk/python/resources/executions",
+                  "sdk/python/resources/schedules",
+                  "sdk/python/resources/cabinets",
+                  "sdk/python/resources/captures",
+                  "sdk/python/resources/browser",
+                  "sdk/python/resources/execution",
+                  "sdk/python/resources/health"
                 ]
               }
             ]
