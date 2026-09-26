@@ -56,7 +56,12 @@ Use `disabled: True` to keep an action in the list without executing it. You can
 | Helper | Action type | Purpose |
 | :-- | :-- | :-- |
 | `actions.navigate(url, base=None)` | `navigate` | Navigate the current tab to `url`. |
-| `actions.click(selector, base=None)` | `click` | Click the element matched by `selector`. |
+| `actions.click(selector, click_type="single", base=None)` | `click` | Click the element matched by `selector`. `click_type` is `"single"` (default), `"double"`, or `"right"`. |
+| `actions.check(selector, base=None)` | `check` | Ensure the checkbox or control matched by `selector` is selected. |
+| `actions.uncheck(selector, base=None)` | `uncheck` | Ensure the checkbox or control matched by `selector` is clear. |
+| `actions.drag_and_drop(selector, target_selector, base=None)` | `drag_and_drop` | Drag `selector` onto `target_selector`. |
+| `actions.reload(base=None)` | `reload` | Reload the current page. |
+| `actions.select(selector, value, base=None)` | `select` | Select `value` in a native control matched by `selector`. |
 | `actions.type(selector, value, mode="replace", base=None)` | `type` | Type into `selector`. `mode` is `"replace"` (default) or `"append"`. |
 | `actions.press(key, selector=None, base=None)` | `press` | Press a keyboard `key`, optionally targeting `selector`. |
 | `actions.wait(seconds, base=None)` | `wait` | Wait a fixed number of seconds. |
@@ -85,6 +90,7 @@ Use `disabled: True` to keep an action in the list without executing it. You can
 | `actions.repeat(count, base=None)` | `repeat` | Repeat the following block `count` times. |
 | `actions.stop(status="success", base=None)` | `stop` | Stop the task with a status (default `"success"`). |
 | `actions.start(task_id, base=None)` | `start` | Start a modular sub-task by ID. |
+| `actions.do_nothing(base=None)` | `do_nothing` | Intentionally perform no operation. |
 
 Condition objects for `if_` and `while_` accept fields such as:
 
@@ -139,7 +145,7 @@ The SDK includes helpers for the Cabinet upload flow.
 | `actions.upload(*, selector=None, cabinet_id=None, mark_as_uploaded=None, base=None)` | `upload` | Attach the newest unuploaded item from a Cabinet. |
 | `actions.finalize_uploads(base=None)` | `finalize_uploads` | Mark all Cabinet items attached during the current execution as uploaded. |
 
-When `cabinet_id` is omitted on an upload action, Figranium uses the task's `cabinetId`; if the task also omits it, the instance default Cabinet is used.
+When `cabinet_id` is omitted on an upload action, Figranium uses the task's `downloadCabinetId`; if the task also omits it, the instance default Cabinet is used. `cabinetId` remains accepted as a legacy compatibility alias.
 
 Keeping finalization separate is useful when an upload should only be consumed after the surrounding workflow reaches a successful point.
 
@@ -150,7 +156,7 @@ task: Task = {
     "name": "Upload latest export",
     "url": "https://example.com/upload",
     "mode": "agent",
-    "cabinetId": "cab_basic",
+    "downloadCabinetId": "cab_basic",
     "actions": [
         actions.upload(selector="input[type=file]"),
         actions.click("button[type=submit]"),
