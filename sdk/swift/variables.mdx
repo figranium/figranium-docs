@@ -1,0 +1,107 @@
+---
+title: "Task Variables and Templates in Swift"
+sidebarTitle: "Variables"
+description: "Declare Figranium task variables, override them at runtime, and use the SDK variable() helper to build the {$name} template tokens actions expect."
+---
+
+Figranium tasks accept typed variables and reference them inside action values with a `{$name}` template. The Swift SDK ships a `variable()` helper that produces the correct token, plus typed shapes for declaring variables on a `Task`.
+
+## Declare task variables
+
+Task variables live under `Task.variables`. Each entry is a `TaskVariable` with a `type` and a default `value`.
+
+```swift
+import Figranium
+
+let task = Task(
+    name: "Search",
+    url: "https://example.com",
+    mode: "agent",
+    variables: [
+        "query": TaskVariable(type: "string", value: .string("figranium")),
+        "limit": TaskVariable(type: "number", value: .number(10)),
+        "strict": TaskVariable(type: "boolean", value: .bool(true)),
+    ]
+)
+```
+
+Variable `type` is `"string"`, `"number"`, or `"boolean"`. Additional fields are allowed on each variable entry, and unknown fields are preserved by the SDK's flexible task type.
+
+## Reference variables in actions
+
+Anywhere an action expects a string value, use `variable(name)` to reference a task variable. The helper returns `{$name}`.
+
+```swift
+import Figranium
+
+Actions.type("#search", value: variable("query"))
+Actions.set("activeQuery", value: variable("query"))
+Actions.request(
+    "https://api.example.com/search",
+    method: "POST",
+    body: "{\"q\": \"\(variable("query"))\"}"
+)
+```
+
+`variable("")` raises a precondition failure; names must not be empty or whitespace-only.
+
+## Override at runtime
+
+Pass `variables` when executing a task to override the defaults for a single run. Runtime variables use plain `JSONValue` values, not the typed `TaskVariable` shape used at declaration time.
+
+```swift
+let result = try await client.runTask(
+    "tsk_abc123",
+    input: ExecuteTaskOptions(
+        variables: [
+            "query": .string("browser automation"),
+            "limit": .number(25),
+        ]
+    )
+)
+```
+
+You can also pass `taskVariables`, which sets task-scoped defaults for the run without changing the saved task.
+
+```swift
+try await client.runTask(
+    "tsk_abc123",
+    input: ExecuteTaskOptions(
+        variables: ["query": .string("figranium")],
+        taskVariables: ["userAgent": .string("custom")]
+    )
+)
+```
+
+## Direct execution
+
+`scrape`, `agent`, and `headful` accept the same runtime variable shape when called directly:
+
+```swift
+try await client.scrape([
+    "url": .string("https://example.com"),
+    "variables": .object(["query": .string("figranium")]),
+])
+```
+
+See [Execution resource](/sdk/swift/resources/execution) for full input shapes.
+
+## Auto-created variables
+
+Some server-side flows auto-create variables (for example when a script writes a result to a new name). Those entries include `autoCreated: true`. The SDK preserves the flag on read and write.
+
+<Tip>
+  Use `variable()` for every template reference so your code stays type-safe and refactorable. Hard-coding `{$name}` strings is brittle when variable names change.
+</Tip>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Actions" icon="click" href="/sdk/swift/actions">
+    Every action helper that accepts a template value.
+  </Card>
+
+  <Card title="Tasks resource" icon="list-check" href="/sdk/swift/resources/tasks">
+    Full reference for saving and running tasks.
+  </Card>
+</CardGroup>

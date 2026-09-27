@@ -200,6 +200,42 @@
                 ]
               }
             ]
+          },
+          {
+            "group": "Swift SDK",
+            "icon": "brand-swift",
+            "pages": [
+              "sdk/swift/overview",
+              "sdk/swift/installation",
+              "sdk/swift/quickstart",
+              "sdk/swift/client-configuration",
+              "sdk/swift/authentication",
+              "sdk/swift/request-options",
+              "sdk/swift/errors",
+              "sdk/swift/streaming",
+              "sdk/swift/actions",
+              "sdk/swift/variables",
+              "sdk/swift/models",
+              "sdk/swift/app-intents",
+              "sdk/swift/foundation-models",
+              {
+                "group": "Resources",
+                "icon": "tool",
+                "pages": [
+                  "sdk/swift/resources/tasks",
+                  "sdk/swift/resources/executions",
+                  "sdk/swift/resources/schedules",
+                  "sdk/swift/resources/cabinets",
+                  "sdk/swift/resources/captures",
+                  "sdk/swift/resources/credentials",
+                  "sdk/swift/resources/browser",
+                  "sdk/swift/resources/execution",
+                  "sdk/swift/resources/settings",
+                  "sdk/swift/resources/auth",
+                  "sdk/swift/resources/health"
+                ]
+              }
+            ]
           }
         ]
       },

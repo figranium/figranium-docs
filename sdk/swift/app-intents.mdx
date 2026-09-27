@@ -1,0 +1,153 @@
+---
+title: "Integrate Figranium with Shortcuts and Siri using App Intents"
+sidebarTitle: "App Intents"
+description: "Configure FigraniumIntentClientProvider to expose RunFigraniumTaskIntent, StopFigraniumExecutionIntent, and GetFigraniumExecutionStatusIntent in Shortcuts and system experiences on Apple platforms."
+---
+
+On Apple platforms that support App Intents, the Figranium Swift SDK exposes three system intents: running a task, stopping an execution, and checking execution status. You provide the client through a `FigraniumIntentClientProvider` so your app controls authentication and secrets. Intents never accept credentials as parameters.
+
+<Note>
+  App Intents support is compiled only when `#if canImport(AppIntents)` is true. Server-side Swift deployments without App Intents use the rest of the SDK unchanged.
+</Note>
+
+## Configure the client provider
+
+Before the system can present any Figranium intent, call `FigraniumIntentConfiguration.configure(_:)` once at app launch with a provider that vends a configured `Figranium` client.
+
+```swift AppIntentProvider.swift
+import Figranium
+import AppIntents
+import Security
+
+struct KeychainFigraniumProvider: FigraniumIntentClientProvider {
+    func client() throws -> Figranium {
+        let apiKey = try loadKeychainItem(service: "com.example.figranium", account: "apiKey")
+        return Figranium(baseURL: "https://api.figranium.example.com", apiKey: apiKey)
+    }
+}
+
+// Call once, typically in application(_:didFinishLaunchingWithOptions:)
+FigraniumIntentConfiguration.configure(KeychainFigraniumProvider())
+```
+
+If you call an intent before configuring a provider, the SDK throws `FigraniumError` with code `INTENT_NOT_CONFIGURED`.
+
+## Available intents
+
+### RunFigraniumTaskIntent
+
+Starts a task and returns a spoken dialog with the outcome.
+
+**Signature:**
+
+```swift
+public struct RunFigraniumTaskIntent: AppIntent {
+    public static let title: LocalizedStringResource = "Run Figranium Task"
+    @Parameter(title: "Task") public var task: FigraniumTask
+    public init()
+    public init(task: FigraniumTask)
+    public func perform() async throws -> some IntentResult & ProvidesDialog
+}
+```
+
+- **Parameter:** `task` (type `FigraniumTask`) — an `AppEntity` populated from `FigraniumTaskQuery.suggestedEntities()`, which lists task summaries from the server.
+- **Result dialog:** `"<task.name> finished with <outcome>."`
+- **HTTP endpoint:** `POST /tasks/{id}/run` (via `client.runTask(_:)`)
+
+### StopFigraniumExecutionIntent
+
+Stops a running execution by its run ID.
+
+**Signature:**
+
+```swift
+public struct StopFigraniumExecutionIntent: AppIntent {
+    public static let title: LocalizedStringResource = "Stop Figranium Execution"
+    @Parameter(title: "Run ID") public var runID: String
+    public init()
+    public init(runID: String)
+    public func perform() async throws -> some IntentResult & ProvidesDialog
+}
+```
+
+- **Parameter:** `runID` — the execution identifier to stop.
+- **Result dialog:** `"Stopped Figranium execution."`
+- **HTTP endpoint:** `POST /executions/{runID}/stop`
+
+### GetFigraniumExecutionStatusIntent
+
+Reads the current status of an execution and speaks it back.
+
+**Signature:**
+
+```swift
+public struct GetFigraniumExecutionStatusIntent: AppIntent {
+    public static let title: LocalizedStringResource = "Get Figranium Execution Status"
+    @Parameter(title: "Execution ID") public var executionID: String
+    public init()
+    public init(executionID: String)
+    public func perform() async throws -> some IntentResult & ProvidesDialog
+}
+```
+
+- **Parameter:** `executionID` — the execution identifier to query.
+- **Result dialog:** `"Execution status: <status>."` (falls back to `outcome` or `unknown`)
+- **HTTP endpoint:** `GET /executions/{executionID}`
+
+## Task entity and query
+
+`FigraniumTask` is an `AppEntity` backed by `FigraniumTaskQuery`. The query fetches task summaries from the server and filters them by identifier.
+
+```swift
+public struct FigraniumTask: AppEntity, Identifiable, Sendable {
+    public var id: String
+    public var name: String
+    public init(id: String, name: String)
+}
+
+public struct FigraniumTaskQuery: EntityQuery {
+    public init()
+    public func entities(for identifiers: [String]) async throws -> [FigraniumTask]
+    public func suggestedEntities() async throws -> [FigraniumTask]
+}
+```
+
+- `suggestedEntities()` calls `client.tasks.listSummaries()`.
+- `entities(for:)` calls `client.tasks.list()` and filters by ID.
+
+## Register App Shortcuts
+
+Expose intents to the Shortcuts app with an `AppShortcutsProvider`.
+
+```swift FigraniumAppShortcuts.swift
+import AppIntents
+
+struct FigraniumAppShortcuts: AppShortcutsProvider {
+    static var appShortcuts: [AppShortcut] {
+        AppShortcut(
+            intent: RunFigraniumTaskIntent(),
+            phrases: ["Run a Figranium task"]
+        )
+        AppShortcut(
+            intent: StopFigraniumExecutionIntent(),
+            phrases: ["Stop my Figranium run"]
+        )
+        AppShortcut(
+            intent: GetFigraniumExecutionStatusIntent(),
+            phrases: ["Check my Figranium execution"]
+        )
+    }
+}
+```
+
+## Security notes
+
+- Keep API keys in the Keychain or another secure app-owned store.
+- Intents never accept credentials as parameters. The provider is the only path the SDK uses to obtain a client.
+- If the provider throws, the intent surfaces the error through the App Intents system dialog.
+
+## Error reference
+
+| Code | Meaning | What to do |
+| --- | --- | --- |
+| `INTENT_NOT_CONFIGURED` | `FigraniumIntentConfiguration.configure(_:)` was not called before invoking an intent. | Call configure at app launch with a valid `FigraniumIntentClientProvider`. |

@@ -1,0 +1,213 @@
+---
+title: "TasksResource: Manage and Run Figranium Tasks"
+sidebarTitle: "Tasks"
+description: "Reference for the TasksResource in the Figranium Swift SDK. List, create, update, version, and execute tasks with typed requests and responses using Swift concurrency."
+---
+
+The `TasksResource` on the Figranium Swift SDK is the primary way to manage tasks. Use it to list, create, update, version, and run tasks. Every method is `async throws` and accepts an optional `options` parameter for per-request overrides such as custom headers or timeouts. The client-level convenience `client.runTask(id:input:options:)` proxies directly to `client.tasks.run(id:input:options:)`.
+
+```swift TasksResource.swift
+import Figranium
+
+let client = Figranium(apiKey: "YOUR_API_KEY")
+```
+
+<Note>
+  The SDK's model type `Task` shadows Swift's concurrency `Task`. Use `Swift.Task { }` or `Figranium.Task` to disambiguate when necessary.
+</Note>
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`list`">
+    Retrieve every task in the workspace.
+
+    - **HTTP endpoint:** `GET /api/tasks`
+    - **Signature:** `func list(options: RequestOptions = .init()) async throws -> [Task]`
+
+    ```swift list_tasks.swift
+    let tasks = try await client.tasks.list()
+    print(tasks.count)
+    ```
+
+    Returns an array of [`Task`](/sdk/swift/models) structs.
+  </Accordion>
+
+  <Accordion title="`listSummaries`">
+    Fetch a lightweight summary of all tasks.
+
+    - **HTTP endpoint:** `GET /api/tasks/list`
+    - **Signature:** `func listSummaries(options: RequestOptions = .init()) async throws -> [TaskSummary]`
+
+    ```swift list_summaries.swift
+    let summaries = try await client.tasks.listSummaries()
+    for summary in summaries {
+        print(summary.id, summary.name)
+    }
+    ```
+
+    Each `TaskSummary` contains `id`, `name`, and an optional `description`.
+  </Accordion>
+
+  <Accordion title="`save`">
+    Create or update a task. Pass `createVersion: true` to snapshot the current version before saving.
+
+    - **HTTP endpoint:** `POST /api/tasks` (with `?version=true` when `createVersion` is set)
+    - **Signature:** `func save(_ task: Task, createVersion: Bool = false, options: RequestOptions = .init()) async throws -> Task`
+
+    ```swift save_task.swift
+    let task = Figranium.Task(
+        name: "Search and extract",
+        url: "https://example.com",
+        mode: "agent",
+        variables: [
+            "query": .init(type: "string", value: .string("figranium"))
+        ],
+        actions: [
+            Actions.waitFor("#search"),
+            Actions.type("#search", value: variable("query")),
+            Actions.press("Enter", selector: "#search"),
+            Actions.getContent(selector: ".results", varName: "resultText")
+        ]
+    )
+    
+    let saved = try await client.tasks.save(task, createVersion: true)
+    print(saved.id ?? "no id")
+    ```
+
+    Returns the saved `Task`, including any server-generated `id`. For more about building actions, see [`Actions`](/sdk/swift/actions). For variable substitution, see [`Variables`](/sdk/swift/variables).
+  </Accordion>
+
+  <Accordion title="`touch`">
+    Refresh a task's `last_opened` timestamp without changing its definition.
+
+    - **HTTP endpoint:** `POST /api/tasks/{id}/touch`
+    - **Signature:** `func touch(_ id: String, options: RequestOptions = .init()) async throws -> Task`
+
+    ```swift touch_task.swift
+    let updated = try await client.tasks.touch("task_123")
+    ```
+  </Accordion>
+
+  <Accordion title="`update`">
+    Apply a partial patch to an existing task.
+
+    - **HTTP endpoint:** `PATCH /api/tasks/{id}`
+    - **Signature:** `func update(_ id: String, patch: JSONObject, options: RequestOptions = .init()) async throws -> JSONObject`
+
+    ```swift update_task.swift
+    let result = try await client.tasks.update("task_123", patch: [
+        "name": .string("Renamed task"),
+        "wait": .number(2000)
+    ])
+    ```
+  </Accordion>
+
+  <Accordion title="`delete`">
+    Remove a task by ID.
+
+    - **HTTP endpoint:** `DELETE /api/tasks/{id}`
+    - **Signature:** `func delete(_ id: String, options: RequestOptions = .init()) async throws -> JSONObject`
+
+    ```swift delete_task.swift
+    let result = try await client.tasks.delete("task_123")
+    ```
+  </Accordion>
+
+  <Accordion title="`versions`">
+    List all saved versions for a task.
+
+    - **HTTP endpoint:** `GET /api/tasks/{id}/versions`
+    - **Signature:** `func versions(_ id: String, options: RequestOptions = .init()) async throws -> [TaskVersion]`
+
+    ```swift list_versions.swift
+    let versions = try await client.tasks.versions("task_123")
+    for version in versions {
+        print(version.id, version.timestamp, version.name ?? "")
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="`version`">
+    Retrieve a specific version snapshot.
+
+    - **HTTP endpoint:** `GET /api/tasks/{id}/versions/{versionId}`
+    - **Signature:** `func version(_ id: String, versionID: String, options: RequestOptions = .init()) async throws -> JSONObject`
+
+    ```swift get_version.swift
+    let result = try await client.tasks.version("task_123", versionID: "v_456")
+    ```
+  </Accordion>
+
+  <Accordion title="`clearVersions`">
+    Delete all stored versions for a task.
+
+    - **HTTP endpoint:** `POST /api/tasks/{id}/versions/clear`
+    - **Signature:** `func clearVersions(_ id: String, options: RequestOptions = .init()) async throws -> JSONObject`
+
+    ```swift clear_versions.swift
+    let result = try await client.tasks.clearVersions("task_123")
+    ```
+  </Accordion>
+
+  <Accordion title="`rollback`">
+    Restore a task to a previous version snapshot.
+
+    - **HTTP endpoint:** `POST /api/tasks/{id}/rollback`
+    - **Signature:** `func rollback(_ id: String, versionID: String, options: RequestOptions = .init()) async throws -> Task`
+
+    ```swift rollback_task.swift
+    let restored = try await client.tasks.rollback("task_123", versionID: "v_456")
+    print(restored.id ?? "no id")
+    ```
+  </Accordion>
+
+  <Accordion title="`generateSelector`">
+    Generate a CSS selector for a task action using an AI prompt.
+
+    - **HTTP endpoint:** `POST /api/tasks/generate-selector`
+    - **Signature:** `func generateSelector(task: Task, actionIndex: Int, prompt: String, options: RequestOptions = .init()) async throws -> String`
+
+    ```swift generate_selector.swift
+    let selector = try await client.tasks.generateSelector(
+        task: task,
+        actionIndex: 0,
+        prompt: "Find the main search input field"
+    )
+    print(selector)
+    ```
+
+    Returns the generated CSS selector string.
+  </Accordion>
+
+  <Accordion title="`generateScript`">
+    Generate a JavaScript extraction script from a description.
+
+    - **HTTP endpoint:** `POST /api/tasks/generate-script`
+    - **Signature:** `func generateScript(_ description: String, options: RequestOptions = .init()) async throws -> String`
+
+    ```swift generate_script.swift
+    let script = try await client.tasks.generateScript("Extract all product prices from the page")
+    print(script)
+    ```
+
+    Returns the generated script string.
+  </Accordion>
+
+  <Accordion title="`run`">
+    Execute a task and return its result. This is the public execution endpoint, reachable at `/tasks/{id}/api`.
+
+    - **HTTP endpoint:** `POST /tasks/{id}/api`
+    - **Signature:** `func run<Value: Codable & Sendable>(_ id: String, input: ExecuteTaskOptions = .init(), options: RequestOptions = .init()) async throws -> ExecutionResult<Value>`
+
+    ```swift run_task.swift
+    let result: ExecutionResult<JSONValue> = try await client.tasks.run(
+        "task_123",
+        input: .init(variables: ["query": .string("browser automation")])
+    )
+    print(result.data ?? .null)
+    ```
+
+    The `input` object accepts `variables`, `taskVariables`, `webhookUrl`, and `runId`. For more about execution results and streaming, see [`ExecutionsResource`](/sdk/swift/resources/executions). To learn about task variables and runtime substitution, see [`Variables`](/sdk/swift/variables) and [`Actions`](/sdk/swift/actions). For per-request overrides, see [`RequestOptions`](/sdk/swift/request-options).
+  </Accordion>
+</AccordionGroup>

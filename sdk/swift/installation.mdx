@@ -1,0 +1,84 @@
+---
+title: "Install the Figranium Swift SDK"
+sidebarTitle: "Installation"
+description: "Add the Figranium Swift package via Xcode or Package.swift. Requires Swift 6.0+ and macOS 13/iOS 16/tvOS 16/watchOS 9. Verify with a health check."
+---
+
+The Figranium Swift SDK installs from GitHub as a Swift Package Manager dependency. It has no external dependencies and builds on macOS, iOS, tvOS, watchOS, and server-side Swift.
+
+## Requirements
+
+- Swift 6.0 or newer.
+- Deployment target of macOS 13, iOS 16, tvOS 16, or watchOS 9.
+- A running Figranium server that the client can reach. Local installs default to `http://localhost:11345`.
+
+## Add the package
+
+### Xcode
+
+1. In Xcode, choose **File > Add Package Dependencies**.
+2. Enter `https://github.com/figranium/figranium-swift.git`.
+3. Select the `Figranium` library product and add it to your target.
+
+### Package.swift
+
+Add the dependency to your package manifest and list `Figranium` as a dependency of your target.
+
+```swift Package.swift
+// swift-tools-version: 6.0
+import PackageDescription
+
+let package = Package(
+    name: "MyApp",
+    platforms: [.macOS(.v13), .iOS(.v16), .tvOS(.v16), .watchOS(.v9)],
+    dependencies: [
+        .package(url: "https://github.com/figranium/figranium-swift.git", branch: "main"),
+    ],
+    targets: [
+        .executableTarget(
+            name: "MyApp",
+            dependencies: [
+                .product(name: "Figranium", package: "figranium-swift"),
+            ]
+        ),
+    ]
+)
+```
+
+<Tip>
+  No tagged version is assumed yet. Pin a version or commit once the repository publishes releases.
+</Tip>
+
+## Import
+
+Import `Figranium` in any file that uses the client.
+
+```swift
+import Figranium
+```
+
+## Verify the install
+
+Call `health.check()` to confirm the SDK can reach your Figranium server.
+
+```swift verify.swift
+import Figranium
+
+let client = Figranium()
+let status = try await client.health.check()
+print(status.status ?? "unknown")
+```
+
+A healthy Figranium instance returns a `HealthStatus` with `status` equal to `"ok"`.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/sdk/swift/quickstart">
+    Save and run your first task with the SDK.
+  </Card>
+
+  <Card title="Client configuration" icon="user-cog" href="/sdk/swift/client-configuration">
+    Configure `baseURL`, timeouts, custom `URLSession`, and default headers.
+  </Card>
+</CardGroup>

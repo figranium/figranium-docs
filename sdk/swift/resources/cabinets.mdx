@@ -1,0 +1,271 @@
+---
+title: "CabinetsResource: Manage Files, Zips, and Uploads"
+sidebarTitle: "Cabinets"
+description: "Manage Figranium Cabinets with the Swift SDK: list, create, rename, clear, delete, update item status, ZIP/unzip, and build download URLs."
+---
+
+The `cabinets` resource on the Figranium Swift SDK is the typed client for the Cabinets API. Cabinets are durable, installation-wide download queues. Tasks can route intercepted browser downloads into a selected Cabinet, and later actions can upload the newest unuploaded item from that queue.
+
+```swift main.swift
+import Figranium
+
+let client = Figranium(apiKey: ProcessInfo.processInfo.environment["FIGRANIUM_API_KEY"])
+```
+
+## Supported operations
+
+`cabinets` covers the Cabinet lifecycle and item-management API.
+
+<CardGroup cols={2}>
+  <Card title="Cabinet lifecycle" icon="folder-plus">
+    List, create, rename, migrate, clear, and delete Cabinets.
+  </Card>
+
+  <Card title="Item management" icon="list-check">
+    List Cabinet items, update upload status, and remove one or many items.
+  </Card>
+
+  <Card title="Archives" icon="archive">
+    Create ZIP archives and safely extract compatible archives.
+  </Card>
+
+  <Card title="Downloads" icon="download">
+    Build item download URLs for files stored in a Cabinet.
+  </Card>
+</CardGroup>
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`list`">
+    List all Cabinets.
+
+    - **HTTP endpoint:** `GET /api/cabinets`
+    - **Signature:** `cabinets.list(options: RequestOptions = .init()) async throws -> [Cabinet]`
+
+    ```swift list_cabinets.swift
+    let cabinets = try await client.cabinets.list()
+    for cabinet in cabinets {
+        print(cabinet.id, cabinet.name)
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="`create`">
+    Create a new Cabinet.
+
+    - **HTTP endpoint:** `POST /api/cabinets`
+    - **Signature:** `cabinets.create(_ name: String, options: RequestOptions = .init()) async throws -> Cabinet`
+
+    ```swift create_cabinet.swift
+    let cabinet = try await client.cabinets.create("downloads-q3")
+    print(cabinet.id)
+    ```
+  </Accordion>
+
+  <Accordion title="`rename`">
+    Rename an existing Cabinet.
+
+    - **HTTP endpoint:** `PATCH /api/cabinets/{cabinetId}`
+    - **Signature:** `cabinets.rename(_ id: String, name: String, options: RequestOptions = .init()) async throws -> Cabinet`
+
+    ```swift rename_cabinet.swift
+    let cabinet = try await client.cabinets.rename("cab_01", name: "downloads-q4")
+    print(cabinet.name)
+    ```
+  </Accordion>
+
+  <Accordion title="`delete`">
+    Delete a Cabinet. You can optionally migrate its items to another Cabinet first.
+
+    - **HTTP endpoint:** `DELETE /api/cabinets/{cabinetId}`
+    - **Signature:** `cabinets.delete(_ id: String, targetCabinetID: String? = nil, migrate: Bool = false, options: RequestOptions = .init()) async throws -> JSONObject`
+
+    ```swift delete_cabinet.swift
+    // Delete a cabinet outright
+    let result = try await client.cabinets.delete("cab_01")
+    
+    // Migrate items to another cabinet before deleting
+    let result = try await client.cabinets.delete(
+        "cab_01",
+        targetCabinetID: "cab_02",
+        migrate: true
+    )
+    ```
+
+    When `migrate` is `true`, items are moved to `targetCabinetID` before the Cabinet is removed.
+  </Accordion>
+
+  <Accordion title="`listItems`">
+    List the items inside a Cabinet.
+
+    - **HTTP endpoint:** `GET /api/cabinets/{cabinetId}/items`
+    - **Signature:** `cabinets.listItems(_ id: String, options: RequestOptions = .init()) async throws -> [CabinetItem]`
+
+    ```swift list_items.swift
+    let items = try await client.cabinets.listItems("cab_01")
+    for item in items {
+        print(item.id, item.name, item.status)
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="`clear`">
+    Remove every item from a Cabinet.
+
+    - **HTTP endpoint:** `POST /api/cabinets/{cabinetId}/clear`
+    - **Signature:** `cabinets.clear(_ id: String, options: RequestOptions = .init()) async throws -> JSONObject`
+
+    ```swift clear_cabinet.swift
+    let result = try await client.cabinets.clear("cab_01")
+    ```
+  </Accordion>
+
+  <Accordion title="`setItemStatus`">
+    Update the status of one or more Cabinet items.
+
+    - **HTTP endpoint:** `PATCH /api/cabinets/{cabinetId}/items/status`
+    - **Signature:** `cabinets.setItemStatus(_ cabinetID: String, itemIDs: [String], status: String, options: RequestOptions = .init()) async throws -> [CabinetItem]`
+
+    ```swift set_status.swift
+    let items = try await client.cabinets.setItemStatus(
+        "cab_01",
+        itemIDs: ["item_1", "item_2"],
+        status: "uploaded"
+    )
+    ```
+
+    Valid statuses are `"pending"` and `"uploaded"`.
+  </Accordion>
+
+  <Accordion title="`removeItems`">
+    Remove specific items from a Cabinet.
+
+    - **HTTP endpoint:** `DELETE /api/cabinets/{cabinetId}/items`
+    - **Signature:** `cabinets.removeItems(_ cabinetID: String, itemIDs: [String], options: RequestOptions = .init()) async throws -> JSONObject`
+
+    ```swift remove_items.swift
+    let result = try await client.cabinets.removeItems("cab_01", itemIDs: ["item_1", "item_2"])
+    ```
+  </Accordion>
+
+  <Accordion title="`zipItems`">
+    Create a ZIP archive from selected Cabinet items.
+
+    - **HTTP endpoint:** `POST /api/cabinets/{cabinetId}/zip`
+    - **Signature:** `cabinets.zipItems(_ cabinetID: String, itemIDs: [String], name: String? = nil, options: RequestOptions = .init()) async throws -> CabinetItem`
+
+    ```swift zip_items.swift
+    let archive = try await client.cabinets.zipItems(
+        "cab_01",
+        itemIDs: ["item_1", "item_2"],
+        name: "archive.zip"
+    )
+    ```
+  </Accordion>
+
+  <Accordion title="`unzipItem`">
+    Extract a ZIP archive that is stored as a Cabinet item.
+
+    - **HTTP endpoint:** `POST /api/cabinets/{cabinetId}/items/{itemId}/unzip`
+    - **Signature:** `cabinets.unzipItem(_ cabinetID: String, itemID: String, options: RequestOptions = .init()) async throws -> [CabinetItem]`
+
+    ```swift unzip_item.swift
+    let items = try await client.cabinets.unzipItem("cab_01", itemID: "zip_item_1")
+    ```
+  </Accordion>
+
+  <Accordion title="`downloadURL`">
+    Build a download URL for a Cabinet item. This method does **not** make an HTTP request. It returns a `URL` synchronously.
+
+    - **Signature:** `cabinets.downloadURL(cabinetID: String, itemID: String) -> URL`
+
+    ```swift download_url.swift
+    let url = client.cabinets.downloadURL(cabinetID: "cab_01", itemID: "item_1")
+    print(url.absoluteString)
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Use a Cabinet from a task
+
+Tasks can set `cabinetId` to select where intercepted browser downloads are stored:
+
+```swift task_with_cabinet.swift
+import Figranium
+
+let client = Figranium(apiKey: ProcessInfo.processInfo.environment["FIGRANIUM_API_KEY"])
+
+let task = Figranium.Task(
+    name: "Download and reuse file",
+    url: "https://example.com/export",
+    mode: "agent",
+    actions: [
+        Actions.click("#download"),
+        Actions.upload(selector: "input[type=file]"),
+        Actions.finalizeUploads(),
+    ]
+)
+// Note: the Task model is named Task in the SDK and shadows Swift's concurrency Task.
+// Use Swift.Task { } or Figranium.Task to disambiguate.
+
+var taskWithCabinet = task
+taskWithCabinet.cabinetId = "cab_basic"
+
+try await client.tasks.save(taskWithCabinet)
+```
+
+If a task omits `cabinetId`, Figranium uses the instance's default Cabinet. An individual Upload action can override the task-level selection with its own `cabinetId`.
+
+## Upload status
+
+Cabinet items track whether they have been uploaded. The `upload` action normally selects the newest unuploaded item. You can mark an item uploaded immediately with `markAsUploaded`, or keep finalization separate and call `finalizeUploads` later in the workflow.
+
+<Tip>
+  Keep finalization separate when attaching a file and successfully submitting it are two different steps. That lets the workflow consume the Cabinet item only after the later step succeeds.
+</Tip>
+
+## Models
+
+### `Cabinet`
+
+```swift
+public struct Cabinet: Codable, Sendable {
+    public var id: String
+    public var name: String
+    public var isDefault: Bool?
+    public var itemCount: Int?
+    public var createdAt: Double?
+}
+```
+
+### `CabinetItem`
+
+```swift
+public struct CabinetItem: Codable, Sendable {
+    public var id: String
+    public var name: String
+    public var kind: String
+    public var status: String
+    public var size: Int?
+    public var createdAt: Double?
+    public var sourceTaskId: String?
+    public var sourceRunId: String?
+}
+```
+
+## Related resources
+
+<CardGroup cols={3}>
+  <Card title="Action helpers" icon="code" href="/sdk/swift/actions">
+    Build Upload and Finalize Uploads actions.
+  </Card>
+
+  <Card title="Tasks resource" icon="list-check" href="/sdk/swift/resources/tasks">
+    Save and run tasks that select a Cabinet with `cabinetId`.
+  </Card>
+
+  <Card title="File downloads" icon="download" href="/file-downloads">
+    Understand Cabinets, intercepted downloads, and the upload lifecycle.
+  </Card>
+</CardGroup>

@@ -1,0 +1,348 @@
+---
+title: "Swift SDK Models and Data Types"
+sidebarTitle: "Models"
+description: "Reference for JSONValue, Task, ExecutionResult, Execution, and supporting structs in the Figranium Swift SDK. Exact fields, types, and defaults from the source."
+---
+
+The Figranium Swift SDK uses strongly typed structs and enums for all API payloads. This page documents the public model layer: the `JSONValue` enum, the `Task` struct (which shadows Swift's concurrency `Task`), execution types, and supporting configuration structs.
+
+## JSONValue
+
+`JSONValue` is a `Codable`, `Sendable`, `Equatable` enum that represents any JSON value the API may return or accept. It is the primary currency for unstructured and semi-structured data.
+
+```swift
+public enum JSONValue: Codable, Sendable, Equatable {
+    case string(String)
+    case number(Double)
+    case bool(Bool)
+    case array([JSONValue])
+    case object([String: JSONValue])
+    case null
+}
+```
+
+The SDK also provides two type aliases for convenience:
+
+```swift
+public typealias JSONObject = [String: JSONValue]
+public typealias RuntimeVariables = [String: JSONValue]
+```
+
+Use `JSONValue` when you need to accept or return arbitrary JSON shapes, such as task results, settings payloads, or proxy rotation configurations.
+
+## Task
+
+`Task` defines a browser automation workflow. It is `Codable`, `Sendable`, `Equatable`, and `Identifiable`.
+
+<Note>
+  The SDK's `Task` type shadows Swift's concurrency `Task`. Disambiguate with `Swift.Task` or `Figranium.Task` when needed.
+</Note>
+
+```swift
+public struct Task: Codable, Sendable, Equatable, Identifiable {
+    public var id: String?
+    public var name: String
+    public var description: String
+    public var url: String
+    public var mode: String
+    public var wait: Double?
+    public var selector: String?
+    public var rotateUserAgents: Bool?
+    public var rotateProxies: Bool?
+    public var rotateViewport: Bool?
+    public var humanTyping: Bool?
+    public var stealth: StealthConfig?
+    public var autoSolveCaptcha: Bool?
+    public var translation: TaskTranslation?
+    public var actions: [Action]?
+    public var variables: [String: TaskVariable]?
+    public var schedule: Schedule?
+    public var output: TaskOutput?
+    public var extractionScript: String?
+    public var extractionFormat: String?
+    public var includeHtml: Bool?
+    public var includeShadowDom: Bool?
+    public var disableRecording: Bool?
+    public var statelessExecution: Bool?
+    public var downloadCabinetId: String?
+    public var cabinetId: String?
+}
+```
+
+The designated initializer requires `name`, `url`, and `mode`. All other fields are optional.
+
+```swift
+public init(
+    name: String,
+    url: String,
+    mode: String,
+    description: String = "",
+    actions: [Action]? = nil,
+    variables: [String: TaskVariable]? = nil
+)
+```
+
+## Action
+
+`Action` is the atomic unit of a task. It is `Codable`, `Sendable`, `Equatable`, and `Identifiable`.
+
+```swift
+public struct Action: Codable, Sendable, Equatable, Identifiable {
+    public var id: String?
+    public var type: String
+    public var disabled: Bool?
+    public var selector: String?
+    public var targetSelector: String?
+    public var value: String?
+    public var clickType: String?
+    public var typeMode: String?
+    public var key: String?
+    public var varName: String?
+    public var method: String?
+    public var headers: String?
+    public var body: String?
+    public var conditionVar: String?
+    public var conditionVarType: String?
+    public var conditionOp: String?
+    public var conditionValue: String?
+    public var captchaType: String?
+    public var timeout: Double?
+    public var cabinetId: String?
+    public var markAsUploaded: Bool?
+}
+```
+
+The designated initializer requires `type`. All other fields are optional.
+
+```swift
+public init(
+    type: String,
+    id: String? = nil,
+    disabled: Bool? = nil,
+    selector: String? = nil,
+    targetSelector: String? = nil,
+    value: String? = nil,
+    clickType: String? = nil,
+    typeMode: String? = nil,
+    key: String? = nil,
+    varName: String? = nil,
+    method: String? = nil,
+    headers: String? = nil,
+    body: String? = nil,
+    conditionVar: String? = nil,
+    conditionVarType: String? = nil,
+    conditionOp: String? = nil,
+    conditionValue: String? = nil,
+    captchaType: String? = nil,
+    timeout: Double? = nil,
+    cabinetId: String? = nil,
+    markAsUploaded: Bool? = nil
+)
+```
+
+## TaskVariable
+
+`TaskVariable` declares a typed variable on a task.
+
+```swift
+public struct TaskVariable: Codable, Sendable, Equatable {
+    public var type: String
+    public var value: JSONValue
+    public var autoCreated: Bool?
+
+    public init(type: String, value: JSONValue, autoCreated: Bool? = nil)
+}
+```
+
+## ExecuteTaskOptions
+
+`ExecuteTaskOptions` is passed to `runTask` and other execution methods to override variables and configure the run.
+
+```swift
+public struct ExecuteTaskOptions: Codable, Sendable, Equatable {
+    public var variables: RuntimeVariables?
+    public var taskVariables: RuntimeVariables?
+    public var webhookUrl: String?
+    public var runId: String?
+
+    public init(
+        variables: RuntimeVariables? = nil,
+        taskVariables: RuntimeVariables? = nil,
+        webhookUrl: String? = nil,
+        runId: String? = nil
+    )
+}
+```
+
+## ExecutionResult
+
+`ExecutionResult` is the generic return type for task executions. `Value` must be `Codable & Sendable`.
+
+```swift
+public struct ExecutionResult<Value: Codable & Sendable>: Codable, Sendable {
+    public var data: Value?
+    public var outcome: String?
+    public var success: Bool?
+    public var error: String?
+    public var runId: String?
+
+    public init(
+        data: Value? = nil,
+        outcome: String? = nil,
+        success: Bool? = nil,
+        error: String? = nil,
+        runId: String? = nil
+    )
+}
+```
+
+## Execution
+
+`Execution` represents a single recorded run.
+
+```swift
+public struct Execution: Codable, Sendable {
+    public var id: String
+    public var timestamp: Double
+    public var method: String?
+    public var path: String?
+    public var status: String?
+    public var outcome: String?
+    public var durationMs: Double?
+    public var source: String?
+    public var mode: String?
+    public var taskId: String?
+    public var taskName: String?
+    public var url: String?
+    public var result: JSONValue?
+}
+```
+
+## StreamEvent
+
+`StreamEvent` wraps a Server-Sent Events payload. `Value` must be `Sendable`.
+
+```swift
+public struct StreamEvent<Value: Sendable>: Sendable {
+    public var data: Value
+    public var event: String?
+    public var id: String?
+    public var retry: Int?
+    public var raw: String
+}
+```
+
+The SDK uses `StreamEvent<JSONValue>` for execution and selector streams.
+
+## Supporting structs
+
+### StealthConfig
+
+```swift
+public struct StealthConfig: Codable, Sendable, Equatable {
+    public var allowTypos: Bool?
+    public var idleMovements: Bool?
+    public var overscroll: Bool?
+    public var deadClicks: Bool?
+    public var fatigue: Bool?
+    public var naturalTyping: Bool?
+    public var cursorGlide: Bool?
+    public var randomizeClicks: Bool?
+    public init()
+}
+```
+
+### TaskTranslation
+
+```swift
+public struct TaskTranslation: Codable, Sendable, Equatable {
+    public var enabled: Bool
+    public var targetLanguage: String
+    public init(enabled: Bool, targetLanguage: String)
+}
+```
+
+### TaskOutput
+
+```swift
+public struct TaskOutput: Codable, Sendable, Equatable {
+    public var provider: String
+    public var credentialId: String
+    public var tableId: String
+    public var onError: String?
+    public init(
+        provider: String = "baserow",
+        credentialId: String,
+        tableId: String,
+        onError: String? = nil
+    )
+}
+```
+
+### Schedule
+
+```swift
+public struct Schedule: Codable, Sendable, Equatable {
+    public var enabled: Bool
+    public var frequency: String?
+    public var intervalMinutes: Int?
+    public var hour: Int?
+    public var minute: Int?
+    public var daysOfWeek: [Int]?
+    public var dayOfMonth: Int?
+    public var cron: String?
+    public var lastRun: Double?
+    public var lastRunStatus: String?
+    public var lastRunDurationMs: Double?
+    public var nextRun: Double?
+
+    public init(
+        enabled: Bool,
+        frequency: String? = nil,
+        intervalMinutes: Int? = nil,
+        hour: Int? = nil,
+        minute: Int? = nil,
+        daysOfWeek: [Int]? = nil,
+        dayOfMonth: Int? = nil,
+        cron: String? = nil
+    )
+}
+```
+
+### Other types
+
+| Type | Key fields |
+| :-- | :-- |
+| `TaskSummary` | `id: String`, `name: String`, `description: String?` |
+| `TaskVersion` | `id: String`, `timestamp: Double`, `name: String?`, `mode: String?` |
+| `Cabinet` | `id: String`, `name: String`, `isDefault: Bool?`, `itemCount: Int?`, `createdAt: Double?` |
+| `CabinetItem` | `id: String`, `name: String`, `kind: String`, `status: String`, `size: Int?`, `createdAt: Double?`, `sourceTaskId: String?`, `sourceRunId: String?` |
+| `Capture` | `name: String`, `url: String`, `size: Int`, `modified: Double`, `type: String` |
+| `CredentialInput` | `name: String`, `provider: String`, `config: [String: String]` |
+| `Credential` | `id: String`, `name: String`, `provider: String`, `config: [String: String]` |
+| `BrowserSession` | `sessionId: String`, `status: String`, `wsEndpoint: String?` |
+| `SelectorCandidate` | `css: String`, `xpath: String?`, `confidence: Double?` |
+| `HealthStatus` | `status: String?`, `version: String?` |
+| `User` | `id: String?`, `name: String?`, `email: String?` |
+| `ProxyInput` | `server: String`, `username: String?`, `password: String?`, `label: String?`, `isRotatingPool: Bool?`, `estimatedPoolSize: Int?` |
+| `RequestOptions` | `headers: [String: String]`, `timeout: TimeInterval?` |
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Actions" icon="click" href="/sdk/swift/actions">
+    Build action lists with typed helpers.
+  </Card>
+
+  <Card title="Variables" icon="variable" href="/sdk/swift/variables">
+    Declare and reference task variables.
+  </Card>
+
+  <Card title="Tasks resource" icon="list-check" href="/sdk/swift/resources/tasks">
+    Save, version, and execute tasks.
+  </Card>
+
+  <Card title="Execution resource" icon="play" href="/sdk/swift/resources/execution">
+    Run scrape, agent, and headful executions.
+  </Card>
+</CardGroup>

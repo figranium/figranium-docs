@@ -1,0 +1,69 @@
+---
+title: "Figranium Swift SDK: Browser Automation for Apple Platforms"
+sidebarTitle: "Overview"
+description: "Official Swift SDK for the Figranium API. Async/await client for macOS, iOS, tvOS, watchOS, and server-side Swift with typed models and SSE streams."
+---
+
+The `Figranium` Swift package is the official Swift client for the Figranium API. It is built on Swift concurrency (`async`/`await`), ships with typed models for tasks, actions, and executions, and exposes execution and selector streams as `AsyncThrowingStream`. The SDK runs on macOS, iOS, tvOS, watchOS, and server-side Swift with zero external dependencies.
+
+## Highlights
+
+<CardGroup cols={2}>
+  <Card title="Native Swift concurrency" icon="brand-swift">
+    Every method is `async throws`. Execution and selector streams surface as `AsyncThrowingStream<StreamEvent<JSONValue>, Error>` that you iterate with `for try await`.
+  </Card>
+
+  <Card title="Zero dependencies" icon="package">
+    The package depends only on Foundation. No third-party HTTP or JSON libraries are required, so it stays lightweight in your dependency tree.
+  </Card>
+
+  <Card title="Custom URLSession" icon="world">
+    Pass your own `URLSession` for custom delegate behavior, certificate pinning, or test doubles. The SDK never replaces a caller-supplied session.
+  </Card>
+
+  <Card title="Abortable streams" icon="cloud-x">
+    Cancelling the consuming `Task` cancels the underlying stream. `executions.watch(_:interval:)` polls and yields only on status change, finishing when the run ends.
+  </Card>
+</CardGroup>
+
+## Package facts
+
+| Field | Value |
+| :-- | :-- |
+| Package | `Figranium` |
+| Import | `Figranium` |
+| Swift tools | `6.0` |
+| Platforms | macOS 13, iOS 16, tvOS 16, watchOS 9 |
+| Dependencies | None |
+| License | Apache-2.0 |
+| Repository | [figranium/figranium-swift](https://github.com/figranium/figranium-swift) |
+
+## What you can do with the SDK
+
+- Save, update, version, and roll back tasks with typed `Task` and `Action` values.
+- Run tasks with runtime variables, or call `scrape`, `agent`, and `headful` directly for one-off executions.
+- Stream live execution and selector events over Server-Sent Events.
+- Manage schedules, captures, cookies, output credentials, and Cabinets.
+- Select a per-task Cabinet for intercepted downloads and build typed upload actions.
+- Open and inspect headful browser sessions.
+- Administer settings (API keys, AI providers, proxies, theme) with a browser session.
+
+## Where to go next
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/sdk/swift/installation">
+    Add the package in Xcode or Swift Package Manager and confirm your environment can reach Figranium.
+  </Card>
+
+  <Card title="Quickstart" icon="rocket" href="/sdk/swift/quickstart">
+    Build, save, and run a typed task in a few minutes.
+  </Card>
+
+  <Card title="Client configuration" icon="user-cog" href="/sdk/swift/client-configuration">
+    Configure `baseURL`, timeouts, custom `URLSession`, and default headers.
+  </Card>
+
+  <Card title="Resources" icon="tool" href="/sdk/swift/resources/tasks">
+    Reference for every resource exposed on the `Figranium` client.
+  </Card>
+</CardGroup>

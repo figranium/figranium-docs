@@ -1,0 +1,85 @@
+---
+title: "Expose Figranium tasks as a Foundation Models tool"
+sidebarTitle: "Foundation Models"
+description: "Use RunFigraniumTaskTool to let Apple Intelligence invoke approved Figranium browser automation tasks from a LanguageModelSession on iOS 26+, macOS 26+, and visionOS 26+."
+---
+
+On iOS 26+, macOS 26+, and visionOS 26+, the Figranium Swift SDK provides `RunFigraniumTaskTool`, a constrained Foundation Models tool that lets Apple Intelligence invoke pre-approved browser automation tasks. The tool is compiled only when `FoundationModels` and `FoundationModelsMacros` are available, so it does not affect builds on earlier platforms.
+
+<Note>
+  This feature requires `import FoundationModels` and the `@Generable` macro from `FoundationModelsMacros`. It is unavailable on tvOS, watchOS, and earlier Apple platform versions.
+</Note>
+
+## Tool overview
+
+`RunFigraniumTaskTool` exposes a single callable action named `run_figranium_task`. The model can only invoke tasks you explicitly allow through `allowedTaskIDs`. The tool returns a JSON-encoded `ExecutionResult<JSONValue>` string, so the model receives structured outcome data without direct access to browser internals or credentials.
+
+```swift RunFigraniumTaskTool.swift
+@available(iOS 26.0, macOS 26.0, visionOS 26.0, *)
+public struct RunFigraniumTaskTool: Tool {
+    public let client: Figranium
+    public let allowedTaskIDs: Set<String>
+    public init(client: Figranium, allowedTaskIDs: Set<String>)
+    public var name: String { "run_figranium_task" }
+    public var description: String { "Runs an approved deterministic Figranium browser automation task and returns its JSON result." }
+    public var parameters: GenerationSchema { Arguments.generationSchema }
+    public func call(arguments: Arguments) async throws -> String
+}
+```
+
+**Tool parameters:**
+
+<ParamField body="taskID" type="String" required>
+  The identifier of a pre-approved Figranium task to run. The model receives this as a guided parameter.
+</ParamField>
+
+**Returns:** A JSON-encoded `ExecutionResult<JSONValue>` string. If encoding fails, it returns `"{}"`.
+
+**Throws:** `FigraniumError` with code `TASK_NOT_ALLOWED` if the requested `taskID` is not in `allowedTaskIDs`.
+
+## Attach the tool to a language model session
+
+Create a tool instance with your client and an allowlist, then pass it into a `LanguageModelSession`.
+
+```swift FoundationModelsExample.swift
+import FoundationModels
+import Figranium
+
+@available(iOS 26.0, macOS 26.0, visionOS 26.0, *)
+func askModelToRunTask(client: Figranium) async throws {
+    let tool = RunFigraniumTaskTool(
+        client: client,
+        allowedTaskIDs: ["search-task", "scrape-pricing"]
+    )
+
+    let session = LanguageModelSession(tools: [tool])
+    let response = try await session.respond(to: "Run the search task for Swift SDK docs.")
+    print(response.text)
+}
+```
+
+The model decides when to invoke the tool based on the user prompt. Because only `taskID` is exposed, the model cannot construct arbitrary actions or access credentials.
+
+## Availability guard
+
+Because the tool is conditionally compiled, wrap usage in an availability check or keep it in a file compiled only for the supported platforms.
+
+```swift
+#if canImport(FoundationModels) && canImport(FoundationModelsMacros)
+import FoundationModels
+import Figranium
+
+@available(iOS 26.0, macOS 26.0, visionOS 26.0, *)
+struct TaskToolProvider {
+    static func makeTool(client: Figranium) -> RunFigraniumTaskTool {
+        RunFigraniumTaskTool(client: client, allowedTaskIDs: ["approved-task-id"])
+    }
+}
+#endif
+```
+
+## Error reference
+
+| Code | Meaning | What to do |
+| --- | --- | --- |
+| `TASK_NOT_ALLOWED` | The model requested a task ID that is not in `allowedTaskIDs`. | Verify the task ID is in the allowlist, or expand `allowedTaskIDs` if the task should be permitted. |

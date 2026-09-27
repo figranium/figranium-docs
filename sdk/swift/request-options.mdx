@@ -1,0 +1,116 @@
+---
+title: "Per-Request Options in the Figranium Swift SDK"
+sidebarTitle: "Request Options"
+description: "Pass timeout and headers per call in the Figranium Swift SDK. Override timeouts, inject one-off headers, and handle request aborts and network errors."
+---
+
+Every SDK method accepts an optional `options` argument that controls per-call timeouts and one-off headers. The same `RequestOptions` shape works for regular requests and for Server-Sent Events streams.
+
+## RequestOptions
+
+```swift
+import Figranium
+
+let options = RequestOptions(
+    headers: ["x-correlation-id": "req-42"],
+    timeout: 10
+)
+```
+
+`RequestOptions` is a `Sendable` struct with two optional fields:
+
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `headers` | `[String: String]` | Extra headers merged over the client's default headers for this call. |
+| `timeout` | `TimeInterval?` | Overrides the client-wide default timeout for this call, in seconds. Streams default to no timeout when `nil`. |
+
+## Override timeout per call
+
+Use `timeout` to set a shorter or longer bound for a single request.
+
+```swift Client.swift
+import Figranium
+
+let client = Figranium(apiKey: ProcessInfo.processInfo.environment["FIGRANIUM_API_KEY"]!)
+
+// Use a 5-second timeout for this call only
+try await client.tasks.list(options: .init(timeout: 5))
+```
+
+The client-wide default is `30` seconds. See [Client configuration](/sdk/swift/client-configuration) for setting the default.
+
+## Inject one-off headers
+
+Use `headers` to add request correlation IDs, feature flags, or override a default value once.
+
+```swift Client.swift
+try await client.tasks.list(
+    options: .init(headers: ["x-correlation-id": "req-42"])
+)
+```
+
+## Combining options
+
+Pass both fields together when needed:
+
+```swift Client.swift
+try await client.tasks.save(
+    task,
+    createVersion: true,
+    options: .init(
+        timeout: 10,
+        headers: ["x-run-id": "run-123"]
+    )
+)
+```
+
+## Header merge order
+
+The SDK builds the final header set in this order. Each step can overwrite the previous one:
+
+1. Client default headers (`headers` passed to the initializer)
+2. `accept: application/json` (regular requests) or `accept: text/event-stream` (streams)
+3. Per-call `options.headers`
+4. Authentication header (`Authorization` or `x-api-key`) from `FigraniumAuthentication`
+
+## Timeout and cancellation semantics
+
+Swift concurrency uses structured cancellation. When a request exceeds the configured timeout, or when the calling `Task` is cancelled, the SDK raises `FigraniumError` with `code: "REQUEST_ABORTED"`.
+
+- When a request exceeds the configured timeout, the SDK raises `FigraniumError(code: "REQUEST_ABORTED")`.
+- When the request cannot reach the server (DNS failure, connection refused, TLS error), the SDK raises `FigraniumError(code: "NETWORK_ERROR")`.
+- When the consuming `Task` is cancelled, the SDK catches the `CancellationError` and raises `FigraniumError(code: "REQUEST_ABORTED")`.
+
+```swift Client.swift
+import Figranium
+
+let client = Figranium(apiKey: ProcessInfo.processInfo.environment["FIGRANIUM_API_KEY"]!)
+
+do {
+    try await client.runTask("slow-task", options: .init(timeout: 5))
+} catch let error as FigraniumError {
+    if error.code == "REQUEST_ABORTED" {
+        print("The request timed out or was cancelled")
+    } else if error.code == "NETWORK_ERROR" {
+        print("Figranium is unreachable")
+    }
+}
+```
+
+## Stream timeouts
+
+Streams have no default timeout. Pass `options: .init(timeout: 60)` when you want a terminal deadline. The stream raises `FigraniumError(code: "REQUEST_ABORTED")` when the timer fires.
+
+```swift Client.swift
+for try await event in client.executions.stream(options: .init(timeout: 60)) {
+    print(event.data)
+}
+```
+
+See [Streaming](/sdk/swift/streaming) for more on consuming SSE events.
+
+<Tip>
+  Use `timeout` for hard deadlines on individual requests. For long-running streams, prefer cancelling the consuming `Task` so you can stop cleanly when your application state changes.
+</Tip>
+
+See [Errors](/sdk/swift/errors) for the full error shape.

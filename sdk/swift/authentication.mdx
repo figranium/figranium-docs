@@ -1,0 +1,128 @@
+---
+title: "Authenticate the Figranium Swift SDK"
+sidebarTitle: "Authentication"
+description: "Authenticate the Figranium Swift SDK with API keys, session cookies, or no auth. Header formats, keychain storage, and session login flow."
+---
+
+The Figranium Swift SDK offers three authentication modes via the `FigraniumAuthentication` enum. Every request is signed automatically based on the mode you choose when creating the client.
+
+## Authentication modes
+
+| Mode | Behavior |
+| :-- | :-- |
+| `.apiKey(String, header: String = "authorization")` | Sends the key in the named header. When the header is `authorization`, the value is `Bearer <key>`. For any other header name, the raw key is sent. |
+| `.session` | Sends no auth header. Relies on cookies managed by the shared `URLSession`. Use this after calling `auth.login`. |
+| `.none` | Sends no auth header. Use for unauthenticated endpoints such as health checks, or when the server has no auth configured. |
+
+## Create an API key
+
+Sign into the Figranium web UI and generate an API key from **Settings**. Copy the value once; you will not see it again.
+
+## Pass an API key
+
+Use the convenience initializer or the designated initializer with `.apiKey`:
+
+```swift Client.swift
+import Figranium
+
+let client = Figranium(
+    baseURL: "http://localhost:11345",
+    apiKey: ProcessInfo.processInfo.environment["FIGRANIUM_API_KEY"]!
+)
+```
+
+By default the SDK sends `Authorization: Bearer <key>`. You can also construct the enum directly:
+
+```swift Client.swift
+let client = Figranium(
+    baseURL: URL(string: "http://localhost:11345")!,
+    authentication: .apiKey("YOUR_API_KEY")
+)
+```
+
+## Switch to x-api-key
+
+Some deployments expect `x-api-key` instead of `Authorization`. Pass the header name explicitly:
+
+```swift Client.swift
+let client = Figranium(
+    baseURL: "http://localhost:11345",
+    apiKey: "YOUR_API_KEY",
+    apiKeyHeader: "x-api-key"
+)
+```
+
+When the header is anything other than `authorization`, the SDK sends the raw key without a `Bearer` prefix.
+
+## Session authentication
+
+For cookie-based sessions, authenticate with `.session` and call `auth.login` before making protected requests:
+
+```swift Client.swift
+let client = Figranium(
+    baseURL: "http://localhost:11345",
+    authentication: .session
+)
+
+let result = try await client.auth.login(
+    email: "user@example.com",
+    password: "secret"
+)
+```
+
+The login response sets session cookies in the shared `URLSession`, which are then sent on subsequent requests automatically.
+
+## Store keys in the Keychain
+
+On Apple platforms, store API keys in the Keychain instead of hard-coding them or keeping them in `UserDefaults`:
+
+```swift Keychain.swift
+import Security
+
+func saveKey(_ key: String, service: String, account: String) -> OSStatus {
+    let data = Data(key.utf8)
+    let query: [String: Any] = [
+        kSecClass as String: kSecClassGenericPassword,
+        kSecAttrService as String: service,
+        kSecAttrAccount as String: account,
+        kSecValueData as String: data
+    ]
+    SecItemDelete(query as CFDictionary)
+    return SecItemAdd(query as CFDictionary, nil)
+}
+
+func loadKey(service: String, account: String) -> String? {
+    let query: [String: Any] = [
+        kSecClass as String: kSecClassGenericPassword,
+        kSecAttrService as String: service,
+        kSecAttrAccount as String: account,
+        kSecReturnData as String: true,
+        kSecMatchLimit as String: kSecMatchLimitOne
+    ]
+    var result: AnyObject?
+    SecItemCopyMatching(query as CFDictionary, &result)
+    return (result as? Data).flatMap { String(data: $0, encoding: .utf8) }
+}
+```
+
+Retrieve the key at runtime and pass it to the client initializer.
+
+## What API keys can access
+
+API keys authenticate every task, execution, schedule, capture, browser, and execution endpoint exposed by the SDK. Server-administration operations (creating API keys, changing themes, configuring AI providers, and managing proxies) are performed in the Figranium web UI.
+
+<Warning>
+  Store API keys in environment variables or the Keychain. Never commit keys to source control or expose them in client-side code.
+</Warning>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Client configuration" icon="user-cog" href="/sdk/swift/client-configuration">
+    All available client options, including `baseURL` and `timeout`.
+  </Card>
+
+  <Card title="API key" icon="key" href="/api-key">
+    How Figranium API keys work and how to manage them from the web UI.
+  </Card>
+</CardGroup>

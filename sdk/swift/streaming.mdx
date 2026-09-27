@@ -1,0 +1,123 @@
+---
+title: "Stream Executions and Selector Events in Swift"
+sidebarTitle: "Streaming"
+description: "Consume Figranium Server-Sent Events with the Swift SDK. Execution and selector streams as AsyncThrowingStream, event parsing, polling with watch, and cancellation via Task."
+---
+
+Figranium exposes two Server-Sent Events endpoints, and the Swift SDK surfaces both as `AsyncThrowingStream<StreamEvent<JSONValue>, Error>`. You consume them with `for try await`, and you cancel them by cancelling the surrounding `Task`.
+
+## Streams
+
+| Method | Endpoint | Purpose |
+| :-- | :-- | :-- |
+| `client.executions.stream()` | `/api/executions/stream` | Live execution lifecycle events |
+| `client.browser.selectorStream()` | `/api/headful/selector_stream` | Selector events from a headful browser session |
+
+Both take an optional `options` argument (`headers`, `timeout`).
+
+## StreamEvent shape
+
+```swift
+public struct StreamEvent<Value: Sendable>: Sendable {
+    public var data: Value
+    public var event: String?
+    public var id: String?
+    public var retry: Int?
+    public var raw: String
+}
+```
+
+The SDK parses the `data:` lines as JSON into `JSONValue`. If parsing fails, `data` falls back to a `.string` containing the raw payload, and `raw` still contains the original text.
+
+## Consume execution events
+
+<Steps>
+  <Step title="Create a client">
+    Initialize the SDK with your API key.
+
+    ```swift Client.swift
+    import Figranium
+    
+    let client = Figranium(
+        baseURL: "http://localhost:11345",
+        apiKey: ProcessInfo.processInfo.environment["FIGRANIUM_API_KEY"]!
+    )
+    ```
+  </Step>
+  <Step title="Iterate the stream">
+    Use `for try await` to consume events as they arrive.
+
+    ```swift Client.swift
+    for try await event in client.executions.stream() {
+        print(event.event ?? "message", event.data)
+    }
+    ```
+
+    Iteration ends when the server closes the connection or when the stream throws an error. Cancelling the surrounding `Task` aborts the underlying request.
+  </Step>
+</Steps>
+
+## Terminal timeouts
+
+Streams have no default timeout. Pass `options: .init(timeout: 60)` when you want a hard deadline; the stream raises `FigraniumError(code: "REQUEST_ABORTED")` when the timer fires:
+
+```swift Client.swift
+for try await event in client.executions.stream(options: .init(timeout: 60)) {
+    print(event.data)
+}
+```
+
+## Cancel a stream
+
+In Swift, cancellation is done by cancelling the `Task` that owns the loop. The SDK wires `continuation.onTermination` to `task.cancel()`, so the underlying network request is aborted immediately.
+
+```swift Client.swift
+let streamTask = Task {
+    for try await event in client.executions.stream() {
+        if isTerminal(event) {
+            break
+        }
+        handle(event)
+    }
+}
+
+// Later, when your application state changes:
+streamTask.cancel()
+```
+
+## Watch an execution with polling
+
+`executions.watch` polls `get` at a configurable interval and yields `Execution` only when the status changes. It finishes automatically when the outcome or status is `success`, `error`, `stopped`, `crashed`, or `anti_bot`.
+
+```swift Client.swift
+for try await execution in client.executions.watch("exec-id", interval: .seconds(1)) {
+    print(execution.status ?? execution.outcome ?? "unknown")
+}
+```
+
+Cancelling the consuming `Task` also cancels the polling loop and any in-flight request.
+
+## Selector stream from a headful browser
+
+The selector stream reports element highlights from a headful browser session. Use it to power visual inspectors:
+
+```swift Client.swift
+for try await event in client.browser.selectorStream() {
+    print(event.event ?? "message", event.data)
+}
+```
+
+See [Browser resource](/sdk/swift/resources/browser) for opening, inspecting, and stopping headful sessions.
+
+## Errors
+
+Streams raise `FigraniumError` in the same conditions as regular requests:
+
+- `REQUEST_ABORTED`: the terminal `timeout` fired, or the consuming `Task` was cancelled.
+- `NETWORK_ERROR`: the stream could not reach the server.
+
+See [Errors](/sdk/swift/errors) for the full error shape.
+
+<Tip>
+  For long-running streams, prefer cancelling the consuming `Task` over a short `timeout` so you can stop cleanly when your application state changes.
+</Tip>

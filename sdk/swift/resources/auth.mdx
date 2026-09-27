@@ -1,0 +1,151 @@
+---
+title: "AuthResource: Session Authentication Flow"
+sidebarTitle: "Auth"
+description: "Manage session-based authentication with the Figranium Swift SDK. Check setup, create accounts, log in, log out, and inspect the current user."
+---
+
+The `AuthResource` on `client.auth` handles session-based authentication. Use it to check whether the server is already configured, create the first admin account, log in with email and password, log out, and inspect the currently authenticated user. These methods pair naturally with `.session` authentication, which relies on URLSession cookie management instead of API keys.
+
+```swift AuthResource.swift
+import Figranium
+
+let client = Figranium(authentication: .session)
+```
+
+<Note>
+  Session authentication uses URLSession's cookie jar. After a successful `login` call, subsequent requests on the same `URLSession` automatically include the session cookie. Create the client with `authentication: .session` and a shared or custom `URLSession` to preserve cookies across calls.
+</Note>
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`checkSetup`">
+    Checks whether the Figranium server has been set up with an initial admin account.
+
+    - **HTTP endpoint:** `GET /api/auth/check-setup`
+    - **Signature:** `checkSetup(options: RequestOptions = .init()) async throws -> JSONObject`
+    - **Returns:** `JSONObject` containing `setupComplete` as a boolean.
+
+    ```swift check_setup.swift
+    let result = try await client.auth.checkSetup()
+    if case let .bool(complete) = result["setupComplete"] {
+        print("Server configured:", complete)
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="`setup`">
+    Creates the initial admin account on a fresh Figranium server. This can only be called when `checkSetup` returns `setupComplete: false`.
+
+    - **HTTP endpoint:** `POST /api/auth/setup`
+    - **Signature:** `setup(name: String, email: String, password: String, options: RequestOptions = .init()) async throws -> JSONObject`
+    - **Returns:** `JSONObject` with user details and session information.
+
+    ```swift setup.swift
+    let result = try await client.auth.setup(
+        name: "Admin",
+        email: "admin@example.com",
+        password: "secure-password"
+    )
+    print(result)
+    ```
+  </Accordion>
+
+  <Accordion title="`login`">
+    Authenticates with email and password, establishing a session cookie for subsequent requests.
+
+    - **HTTP endpoint:** `POST /api/auth/login`
+    - **Signature:** `login(email: String, password: String, options: RequestOptions = .init()) async throws -> JSONObject`
+    - **Returns:** `JSONObject` with user details and session information.
+
+    ```swift login.swift
+    let result = try await client.auth.login(
+        email: "admin@example.com",
+        password: "secure-password"
+    )
+    print(result)
+    ```
+  </Accordion>
+
+  <Accordion title="`logout`">
+    Ends the current session and invalidates the session cookie.
+
+    - **HTTP endpoint:** `POST /api/auth/logout`
+    - **Signature:** `logout(options: RequestOptions = .init()) async throws -> JSONObject`
+    - **Returns:** `JSONObject`
+
+    ```swift logout.swift
+    let result = try await client.auth.logout()
+    ```
+  </Accordion>
+
+  <Accordion title="`me`">
+    Returns the currently authenticated user's profile.
+
+    - **HTTP endpoint:** `GET /api/auth/me`
+    - **Signature:** `me(options: RequestOptions = .init()) async throws -> JSONObject`
+    - **Returns:** `JSONObject` with `id`, `name`, `email`, and other user fields.
+
+    ```swift me.swift
+    let user = try await client.auth.me()
+    if case let .string(email) = user["email"] {
+        print("Logged in as:", email)
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Session authentication workflow
+
+A typical session-based workflow checks setup status, creates or logs into an account, then performs authenticated operations on other resources.
+
+```swift session_workflow.swift
+let client = Figranium(authentication: .session)
+
+// 1. Check if the server needs initial setup
+let setupStatus = try await client.auth.checkSetup()
+if case let .bool(false) = setupStatus["setupComplete"] {
+    let _ = try await client.auth.setup(
+        name: "Admin",
+        email: "admin@example.com",
+        password: "secure-password"
+    )
+}
+
+// 2. Log in
+let _ = try await client.auth.login(
+    email: "admin@example.com",
+    password: "secure-password"
+)
+
+// 3. Verify the session
+let user = try await client.auth.me()
+print(user)
+
+// 4. Use other resources with the same session
+let tasks = try await client.tasks.list()
+print(tasks.count)
+
+// 5. Log out when finished
+let _ = try await client.auth.logout()
+```
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="lock" href="/sdk/swift/authentication">
+    Compare API key and session authentication strategies.
+  </Card>
+
+  <Card title="Client configuration" icon="user-cog" href="/sdk/swift/client-configuration">
+    Configure `URLSession`, base URL, and default headers.
+  </Card>
+
+  <Card title="Request options" icon="sliders" href="/sdk/swift/request-options">
+    Pass custom headers and per-request timeouts.
+  </Card>
+
+  <Card title="Errors" icon="alert-triangle" href="/sdk/swift/errors">
+    Handle `FigraniumError` responses, including auth failures.
+  </Card>
+</CardGroup>

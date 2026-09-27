@@ -1,0 +1,112 @@
+---
+title: "ExecutionResource: Direct Scrape, Agent, and Headful Runs"
+sidebarTitle: "Execution"
+description: "Run one-off browser automation with the Figranium Swift SDK. Use scrape, agent, and headful methods without creating a saved task."
+---
+
+The `ExecutionResource` provides direct, stateless endpoints for running browser automation without saving a task first. You can scrape a page, run an agent session, or launch a headful browser in a single call. The `Figranium` client also exposes these as top-level shortcuts: `client.scrape()`, `client.agent()`, and `client.headful()`.
+
+<Note>
+  `ExecutionResource` (singular) is for **direct runs**. For saved-task execution, see [`TasksResource`](/sdk/swift/resources/tasks). For execution history and live streams, see [`ExecutionsResource`](/sdk/swift/resources/executions).
+</Note>
+
+```swift ExecutionResource.swift
+import Figranium
+
+let client = Figranium(apiKey: "your-api-key")
+```
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`scrape`">
+    ```swift
+    scrape<Value: Codable & Sendable>(_ input: JSONObject, options: RequestOptions = .init()) async throws -> ExecutionResult<Value>
+    ```
+
+    Performs a one-off scrape by sending `POST /scrape`. Pass a `url`, a `selector` for DOM extraction, or an `extractionScript` for custom parsing. You can also inject runtime [variables](/sdk/swift/variables) via `variables` or `taskVariables`.
+
+    ```swift scrape_by_selector.swift
+    let result: ExecutionResult<JSONValue> = try await client.execution.scrape([
+        "url": .string("https://news.ycombinator.com"),
+        "selector": .string(".titleline > a"),
+        "variables": .object(["limit": .number(5)]),
+    ])
+    print(result.data)
+    ```
+
+    ```swift scrape_by_script.swift
+    let result: ExecutionResult<JSONValue> = try await client.execution.scrape([
+        "url": .string("https://example.com"),
+        "extractionScript": .string("""
+            const items = Array.from(document.querySelectorAll('.item'));
+            return items.map(el => el.textContent?.trim());
+        """),
+    ])
+    print(result.data)
+    ```
+  </Accordion>
+
+  <Accordion title="`agent`">
+    ```swift
+    agent<Value: Codable & Sendable>(_ input: JSONObject, options: RequestOptions = .init()) async throws -> ExecutionResult<Value>
+    ```
+
+    Runs a one-off agent session by sending `POST /agent`. The agent navigates and interacts autonomously based on the provided input. You can supply a `runId` to correlate or resume a specific run.
+
+    ```swift agent_run.swift
+    let result: ExecutionResult<JSONValue> = try await client.execution.agent([
+        "url": .string("https://example.com"),
+        "runId": .string("run-2024-001"),
+    ])
+    print(result.success, result.data)
+    ```
+  </Accordion>
+
+  <Accordion title="`headful`">
+    ```swift
+    headful<Value: Codable & Sendable>(_ input: JSONObject, options: RequestOptions = .init()) async throws -> ExecutionResult<Value>
+    ```
+
+    Launches a headful (visible) browser session by sending `POST /headful`. Pass a starting `url` and optional runtime [variables](/sdk/swift/variables). This is useful when you need to interact with a live browser window or debug visually.
+
+    ```swift headful_run.swift
+    let result: ExecutionResult<JSONValue> = try await client.execution.headful([
+        "url": .string("https://example.com/login"),
+        "variables": .object(["username": .string("alice")]),
+    ])
+    print(result.runId, result.data)
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Top-level shortcuts
+
+`Figranium` mirrors these methods at the client root so you can call them directly without reaching into `execution`:
+
+```swift shortcuts.swift
+let scrapeResult: ExecutionResult<JSONValue> = try await client.scrape([
+    "url": .string("https://example.com"),
+    "selector": .string("h1"),
+])
+let agentResult: ExecutionResult<JSONValue> = try await client.agent([
+    "url": .string("https://example.com"),
+])
+let headfulResult: ExecutionResult<JSONValue> = try await client.headful([
+    "url": .string("https://example.com"),
+])
+```
+
+## Return type
+
+All three methods return `ExecutionResult<Value>`, which includes the following fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `data` | `Value?` | The result payload from the run. |
+| `outcome` | `TaskOutcome?` | One of `"success"`, `"error"`, `"stopped"`, `"crashed"`, or `"anti_bot"`. |
+| `success` | `Bool?` | Whether the execution completed successfully. |
+| `error` | `String?` | Error message if the run failed. |
+| `runId` | `String?` | Correlation ID for the execution. |
+
+For error handling, see [`/sdk/swift/errors`](/sdk/swift/errors). For request options such as custom `headers` and `timeout`, see [`/sdk/swift/request-options`](/sdk/swift/request-options).

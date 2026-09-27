@@ -1,0 +1,141 @@
+---
+title: "ExecutionsResource: List, Inspect, and Stream Runs"
+sidebarTitle: "Executions"
+description: "Manage Figranium task executions with the Swift SDK. List, get, delete, clear, stop, stream, and watch execution events in real time with Swift concurrency."
+---
+
+The `ExecutionsResource` on the Figranium Swift SDK gives you full visibility and control over every task run. Use it to list past executions, inspect a single run, clean up history, stop active runs, subscribe to a live Server-Sent Events stream of execution updates, and watch a specific execution by polling for status changes.
+
+```swift ExecutionsResource.swift
+import Figranium
+
+let client = Figranium(apiKey: "YOUR_API_KEY")
+```
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`list`">
+    - **HTTP endpoint:** `GET /api/executions/list` (default) or `GET /api/executions`
+    - **Signature:** `func list(apiKeyRoute: Bool = true, options: RequestOptions = .init()) async throws -> [Execution]`
+
+    Returns a list of executions. By default it calls `GET /api/executions/list`, which is the route intended for API-key access. If you pass `apiKeyRoute: false`, the SDK switches to `GET /api/executions` instead.
+
+    <Note>
+      Most callers should leave `apiKeyRoute` at its default (`true`). Only override it when your deployment requires the alternate route.
+    </Note>
+
+    ```swift list_executions.swift
+    // Default route: GET /api/executions/list
+    let executions = try await client.executions.list()
+    print(executions.first?.runId ?? "", executions.first?.status ?? "")
+    
+    // Alternate route: GET /api/executions
+    let altExecutions = try await client.executions.list(apiKeyRoute: false)
+    ```
+  </Accordion>
+
+  <Accordion title="`get`">
+    - **HTTP endpoint:** `GET /api/executions/{id}`
+    - **Signature:** `func get(_ id: String, options: RequestOptions = .init()) async throws -> Execution`
+
+    Fetches a single execution by its ID.
+
+    ```swift get_execution.swift
+    let execution = try await client.executions.get("exec_01JXYZ")
+    print(execution.status ?? "", execution.durationMs ?? 0)
+    ```
+  </Accordion>
+
+  <Accordion title="`delete`">
+    - **HTTP endpoint:** `DELETE /api/executions/{id}`
+    - **Signature:** `func delete(_ id: String, options: RequestOptions = .init()) async throws -> JSONObject`
+
+    Removes a single execution record.
+
+    ```swift delete_execution.swift
+    let result = try await client.executions.delete("exec_01JXYZ")
+    ```
+  </Accordion>
+
+  <Accordion title="`clear`">
+    - **HTTP endpoint:** `POST /api/executions/clear`
+    - **Signature:** `func clear(options: RequestOptions = .init()) async throws -> JSONObject`
+
+    Deletes all executions in bulk.
+
+    ```swift clear_executions.swift
+    let result = try await client.executions.clear()
+    ```
+  </Accordion>
+
+  <Accordion title="`stop`">
+    - **HTTP endpoint:** `POST /api/executions/stop`
+    - **Signature:** `func stop(runID: String, options: RequestOptions = .init()) async throws -> JSONObject`
+
+    Sends a stop signal to an active run.
+
+    ```swift stop_execution.swift
+    let result = try await client.executions.stop(runID: "run_abc123")
+    ```
+  </Accordion>
+
+  <Accordion title="`stream`">
+    - **HTTP endpoint:** `GET /api/executions/stream`
+    - **Signature:** `func stream(options: RequestOptions = .init()) -> AsyncThrowingStream<StreamEvent<JSONValue>, Error>`
+
+    Opens a Server-Sent Events connection and yields each event as it arrives. The stream stays open until the server closes the connection, the consumer stops iterating, or the request is aborted. The stream sends only `accept` and auth headers, not default or per-call headers, and uses `options.timeout`.
+
+    For details on the `StreamEvent` shape and how cancellation works, see [Streaming](/sdk/swift/streaming). For error handling, see [Errors](/sdk/swift/errors).
+
+    ```swift stream_executions.swift
+    do {
+        for try await event in client.executions.stream(options: .init(timeout: 60)) {
+            print(event.event ?? "", event.data)
+        }
+    } catch let error as FigraniumError {
+        // FigraniumError with code "REQUEST_ABORTED" when timed out
+        print(error)
+    }
+    ```
+
+    Cancelling the consuming `Swift.Task` cancels the stream.
+  </Accordion>
+
+  <Accordion title="`watch`">
+    - **HTTP endpoint:** `GET /api/executions/{id}` (polled)
+    - **Signature:** `func watch(_ executionID: String, interval: Duration = .seconds(1), options: RequestOptions = .init()) -> AsyncThrowingStream<Execution, Error>`
+
+    Polls `get` at the given interval and yields an `Execution` only when the status changes. The stream finishes automatically when the execution reaches an outcome or status of `success`, `error`, `stopped`, `crashed`, or `anti_bot`. Cancelling the consuming `Swift.Task` cancels the polling loop.
+
+    ```swift watch_execution.swift
+    for try await execution in client.executions.watch("exec_01JXYZ", interval: .seconds(2)) {
+        print(execution.status ?? "unknown")
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## End-to-end example
+
+This example lists recent executions, inspects the newest one, and stops it if it is still running.
+
+```swift execution_workflow.swift
+// 1) List recent executions (default API-key route)
+let executions = try await client.executions.list()
+
+if executions.isEmpty {
+    print("No executions yet.")
+} else {
+    // 2) Inspect the most recent run
+    let latest = executions[0]
+    let detail = try await client.executions.get(latest.id)
+    print("Run \(detail.runId ?? "") status: \(detail.status ?? "unknown")")
+
+    // 3) Stop if still active
+    if detail.status == "running" {
+        let stopResult = try await client.executions.stop(runID: detail.runId ?? "")
+        print("Stop requested")
+    }
+}
+```

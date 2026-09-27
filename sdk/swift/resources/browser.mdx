@@ -1,0 +1,177 @@
+---
+title: "BrowserResource: Headful Sessions and Inspection"
+sidebarTitle: "Browser"
+description: "Control browser sessions with the Figranium Swift SDK. Open sessions, inspect headful state, highlight selectors, stream live events, and retrieve VNC credentials."
+---
+
+The `BrowserResource` on `client.browser` gives you programmatic control over browser sessions in the Figranium Swift SDK. You can open headless or headful sessions, inspect the current headful state, highlight candidate selectors on a page, and stream live selector events during an active headful session.
+
+```swift BrowserResource.swift
+import Figranium
+
+let client = Figranium(apiKey: "your-api-key")
+```
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`open`">
+    Opens a browser session. You can run in headless mode, headful mode, scrape mode, or agent mode.
+
+    - **HTTP endpoint:** `POST /api/browser/open`
+    - **Signature:** `open(_ input: JSONObject = [:], options: RequestOptions = .init()) async throws -> BrowserSession`
+    - **Returns:** `BrowserSession` with `sessionId`, `status`, and optionally `wsEndpoint`.
+
+    ```swift browser_open.swift
+    let session = try await client.browser.open([
+        "url": .string("https://example.com"),
+        "mode": .string("headful"),
+        "devTools": .bool(true),
+    ])
+    
+    print(session.sessionId, session.status)
+    ```
+  </Accordion>
+
+  <Accordion title="`highlight`">
+    Highlights candidate selectors on a page and returns a DOM snapshot. Useful for building or debugging selector-based tasks.
+
+    - **HTTP endpoint:** `POST /api/inspector/highlight`
+    - **Signature:** `highlight(_ input: JSONObject, options: RequestOptions = .init()) async throws -> JSONObject`
+    - **Returns:** A `JSONObject` with `success`, a list of `SelectorCandidate` objects (`css`, optional `xpath` and `confidence`), and a `snapshot` string.
+
+    ```swift browser_highlight.swift
+    let result = try await client.browser.highlight([
+        "url": .string("https://example.com"),
+        "targetHint": .string("search input"),
+    ])
+    
+    if case let .array(selectors) = result["selectors"] {
+        for case let .object(candidate) in selectors {
+            if case let .string(css) = candidate["css"] {
+                print(css)
+            }
+        }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="`stopHeadful`">
+    Stops the active headful browser session.
+
+    - **HTTP endpoint:** `POST /headful/stop`
+    - **Signature:** `stopHeadful(options: RequestOptions = .init()) async throws -> JSONObject`
+    - **Returns:** `JSONObject`
+
+    ```swift browser_stop_headful.swift
+    let result = try await client.browser.stopHeadful()
+    ```
+  </Accordion>
+
+  <Accordion title="`headfulStatus`">
+    Checks whether the headful session is configured to use noVNC.
+
+    - **HTTP endpoint:** `GET /api/headful/status`
+    - **Signature:** `headfulStatus(options: RequestOptions = .init()) async throws -> JSONObject`
+    - **Returns:** `JSONObject` containing `useNovnc` as a boolean.
+
+    ```swift browser_headful_status.swift
+    let status = try await client.browser.headfulStatus()
+    if case let .bool(useNovnc) = status["useNovnc"] {
+        print(useNovnc)
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="`inspect`">
+    Inspects the current headful session and returns diagnostic information.
+
+    - **HTTP endpoint:** `POST /api/headful/inspect`
+    - **Signature:** `inspect(options: RequestOptions = .init()) async throws -> JSONObject`
+    - **Returns:** `JSONObject`
+
+    ```swift browser_inspect.swift
+    let info = try await client.browser.inspect()
+    print(info)
+    ```
+  </Accordion>
+
+  <Accordion title="`vncPassword`">
+    Retrieves the VNC password for the current headful session.
+
+    - **HTTP endpoint:** `GET /api/headful/vnc-password`
+    - **Signature:** `vncPassword(options: RequestOptions = .init()) async throws -> String`
+    - **Returns:** `String` containing the password.
+
+    ```swift browser_vnc_password.swift
+    let password = try await client.browser.vncPassword()
+    print(password)
+    ```
+  </Accordion>
+
+  <Accordion title="`selectorStream`">
+    Streams live selector events from the headful session as an `AsyncThrowingStream`.
+
+    - **HTTP endpoint:** `GET /api/headful/selector_stream`
+    - **Signature:** `selectorStream(options: RequestOptions = .init()) -> AsyncThrowingStream<StreamEvent<JSONValue>, Error>`
+    - **Returns:** `AsyncThrowingStream<StreamEvent<JSONValue>, Error>`
+
+    <Note>
+      This is a server-sent event stream. For details on iterating streams and handling timeouts, see [Streaming](/sdk/swift/streaming).
+    </Note>
+
+    ```swift browser_selector_stream.swift
+    for try await event in client.browser.selectorStream() {
+        print(event.event ?? "", event.data)
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Headful debugging workflow
+
+A typical headful debugging session combines several `BrowserResource` methods to open a browser, inspect state, stream selector events, and clean up when finished.
+
+```swift browser_workflow.swift
+// 1. Open a headful session
+let session = try await client.browser.open([
+    "url": .string("https://example.com"),
+    "mode": .string("headful"),
+])
+
+// 2. Check headful status and VNC access
+let status = try await client.browser.headfulStatus()
+let password = try await client.browser.vncPassword()
+
+// 3. Stream selector events while interacting with the page
+for try await event in client.browser.selectorStream() {
+    print("selector event:", event.data)
+}
+
+// 4. Stop the session when done
+let _ = try await client.browser.stopHeadful()
+```
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="Streaming" icon="cloud" href="/sdk/swift/streaming">
+    Details on `AsyncThrowingStream<StreamEvent<JSONValue>, Error>`.
+  </Card>
+
+  <Card title="Request options" icon="http-get" href="/sdk/swift/request-options">
+    Pass custom `headers` and per-request `timeout` overrides.
+  </Card>
+
+  <Card title="Errors" icon="alert-triangle" href="/sdk/swift/errors">
+    Handle `FigraniumError` responses.
+  </Card>
+
+  <Card title="Headful Browser" icon="desktop" href="/headful-browser">
+    Learn about headful browser sessions in Figranium.
+  </Card>
+
+  <Card title="Highlight Tool" icon="mouse-pointer" href="/highlight-tool">
+    Use the highlight tool to build and debug selectors.
+  </Card>
+</CardGroup>

@@ -1,0 +1,174 @@
+---
+title: "Figranium Swift SDK Quickstart"
+sidebarTitle: "Quickstart"
+description: "Get started with the Figranium Swift SDK: create a client, define and save a task with Actions, run it with variables, and read the ExecutionResult."
+---
+
+The Figranium Swift SDK lets you drive a Figranium server from Swift: build tasks with typed action helpers, run them with `async`/`await`, and stream results. This quickstart walks you from an empty project to running your first task in a handful of lines.
+
+## Prerequisites
+
+- Swift 6.0 or later
+- macOS 13, iOS 16, tvOS 16, or watchOS 9 deployment target
+- A running Figranium instance (`http://localhost:11345` by default)
+- An API key generated from the Figranium web UI
+
+<Steps>
+  <Step title="Install the SDK">
+    Add the package in Xcode or Swift Package Manager. See [Installation](/sdk/swift/installation) for the full manifest snippet.
+
+    ```swift Package.swift
+    dependencies: [
+        .package(url: "https://github.com/figranium/figranium-swift.git", branch: "main"),
+    ]
+    ```
+  </Step>
+  <Step title="Create a client">
+    Store your API key securely (for example, in the Keychain or environment) so it never lands in source control.
+
+    ```swift quickstart.swift
+    import Figranium
+    
+    let client = Figranium(
+        baseURL: "http://localhost:11345",
+        apiKey: ProcessInfo.processInfo.environment["FIGRANIUM_API_KEY"]
+    )
+    ```
+
+    See [Client configuration](/sdk/swift/client-configuration) for every constructor option and [Authentication](/sdk/swift/authentication) for API key setup.
+  </Step>
+  <Step title="Define and save a task">
+    Use `Actions` helpers to describe the browser workflow. `variable("query")` produces the template token `{$query}` that is replaced at runtime.
+
+    ```swift quickstart.swift
+    let task = Task(
+        name: "Search example",
+        url: "https://example.com",
+        mode: "scrape",
+        variables: [
+            "query": TaskVariable(type: "string", value: .string("figranium")),
+        ],
+        actions: [
+            Actions.type("#search", value: variable("query")),
+            Actions.click("button[type=submit]"),
+            Actions.waitFor(".results"),
+            Actions.getContent(selector: ".results", varName: "html"),
+        ]
+    )
+    
+    let saved = try await client.tasks.save(task)
+    ```
+
+    See [Actions](/sdk/swift/actions) for every helper and [Variables](/sdk/swift/variables) for typed variable declarations.
+
+    <Note>
+      The SDK's model type `Task` shadows Swift's concurrency `Task`. Use `Swift.Task { }` or `Figranium.Task` to disambiguate when necessary.
+    </Note>
+  </Step>
+  <Step title="Run the task">
+    Use `runTask` (a shortcut for `client.tasks.run`) and pass runtime variable overrides in `ExecuteTaskOptions`.
+
+    ```swift quickstart.swift
+    let result: ExecutionResult<JSONValue> = try await client.runTask(
+        saved.id!,
+        input: .init(variables: ["query": .string("browser automation")])
+    )
+    
+    print(result.success ?? false, result.outcome ?? "")
+    print(result.data)
+    ```
+  </Step>
+  <Step title="Watch the execution">
+    Poll the execution and yield only when the status changes. The stream finishes when the run reaches a terminal state.
+
+    ```swift quickstart.swift
+    for try await execution in client.executions.watch(result.runId ?? "") {
+        print(execution.status ?? "", execution.outcome ?? "")
+    }
+    ```
+
+    See [Streaming](/sdk/swift/streaming) for `executions.stream()` and `browser.selectorStream()`.
+  </Step>
+  <Step title="Handle errors">
+    Every HTTP, transport, and timeout failure throws `FigraniumError`. Inspect `code` and `status` to branch on the failure kind.
+
+    ```swift quickstart.swift
+    do {
+        let result = try await client.runTask(saved.id!, input: .init())
+    } catch let error as FigraniumError {
+        print(error.status, error.code ?? "", error.requestID ?? "")
+    }
+    ```
+
+    See [Errors](/sdk/swift/errors) for the full list of codes.
+  </Step>
+</Steps>
+
+## Complete example
+
+```swift quickstart.swift
+import Figranium
+
+let client = Figranium(
+    baseURL: "http://localhost:11345",
+    apiKey: ProcessInfo.processInfo.environment["FIGRANIUM_API_KEY"]
+)
+
+let task = Task(
+    name: "Search example",
+    url: "https://example.com",
+    mode: "scrape",
+    variables: [
+        "query": TaskVariable(type: "string", value: .string("figranium")),
+    ],
+    actions: [
+        Actions.type("#search", value: variable("query")),
+        Actions.click("button[type=submit]"),
+        Actions.waitFor(".results"),
+        Actions.getContent(selector: ".results", varName: "html"),
+    ]
+)
+
+do {
+    let saved = try await client.tasks.save(task)
+    let result: ExecutionResult<JSONValue> = try await client.runTask(
+        saved.id!,
+        input: .init(variables: ["query": .string("browser automation")])
+    )
+    print(result.data)
+} catch let error as FigraniumError {
+    print("[\(error.status)] \(error.code ?? ""): \(error)")
+}
+```
+
+## Direct execution without saving
+
+For one-off runs, skip `tasks.save` and call `client.scrape`, `client.agent`, or `client.headful` directly. These use the same task shape, but the server does not persist them.
+
+```swift direct.swift
+let result: ExecutionResult<JSONValue> = try await client.scrape([
+    "url": .string("https://example.com"),
+    "selector": .string("body"),
+])
+print(result.data)
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Action helpers" icon="archery-arrow" href="/sdk/swift/actions">
+    Every helper you can use to build a task, from navigation to CAPTCHA solving.
+  </Card>
+
+  <Card title="Streaming" icon="cloud" href="/sdk/swift/streaming">
+    Iterate over live executions with `client.executions.stream()`.
+  </Card>
+
+  <Card title="Handle errors" icon="alert-triangle" href="/sdk/swift/errors">
+    `FigraniumError` fields, codes, and cancellation semantics.
+  </Card>
+
+  <Card title="Tasks resource" icon="list-check" href="/sdk/swift/resources/tasks">
+    Save, version, list, and run tasks programmatically.
+  </Card>
+</CardGroup>

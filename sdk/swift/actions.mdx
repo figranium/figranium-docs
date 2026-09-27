@@ -1,0 +1,202 @@
+---
+title: "Build Task Actions with the Swift SDK"
+sidebarTitle: "Actions"
+description: "Use the Actions enum to build Figranium task actions in Swift. Navigation, interaction, extraction, control flow, HTTP, CAPTCHA, and upload helpers with auto-generated IDs."
+---
+
+Figranium tasks are executed as ordered lists of actions. The Swift SDK exports typed static builders on the `Actions` enum that generate correctly shaped `Action` values with stable IDs, plus an `action()` helper for one-offs.
+
+## Import
+
+```swift
+import Figranium
+```
+
+Every helper returns an `Action` struct. Helpers assign a unique `id` if you do not pass one, so lists remain stable across saves.
+
+## Action types
+
+<CardGroup cols={2}>
+  <Card title="Navigation and interaction" icon="arrow-right" href="#navigation-and-interaction">
+    Navigate, click, type, press keys, wait, hover, and capture screenshots.
+  </Card>
+
+  <Card title="Extraction" icon="database" href="#extraction">
+    Read content, run JavaScript, parse CSV, and make HTTP requests.
+  </Card>
+
+  <Card title="Control flow" icon="stack-2" href="#control-flow">
+    Conditionals, loops, branches, repeats, and sub-task starts.
+  </Card>
+
+  <Card title="Variables and CAPTCHA" icon="lock" href="#variables-and-captcha">
+    Set and merge variables, plus CAPTCHA solving actions.
+  </Card>
+
+  <Card title="Files and Cabinets" icon="folder-open" href="#files-and-cabinets">
+    Upload the newest unuploaded Cabinet item and finalize attached items after success.
+  </Card>
+</CardGroup>
+
+## Navigation and interaction
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `Actions.navigate(_ url: String)` | `navigate` | Navigate the current tab to `url`. |
+| `Actions.click(_ selector: String, kind: String = "single")` | `click` | Click the element matched by `selector`. `kind` is `"single"` (default) or `"double"`. |
+| `Actions.type(_ selector: String, value: String, mode: String = "replace")` | `type` | Type into `selector`. `mode` is `"replace"` (default) or `"append"`. |
+| `Actions.press(_ key: String, selector: String? = nil)` | `press` | Press a keyboard `key`, optionally targeting `selector`. |
+| `Actions.wait(_ seconds: Double)` | `wait` | Wait a fixed number of seconds. |
+| `Actions.waitFor(_ selector: String)` | `wait_selector` | Wait until `selector` matches an element. |
+| `Actions.waitForDownloads(_ timeout: Double? = nil)` | `wait_downloads` | Wait for downloads to complete, optionally with a timeout in seconds. |
+| `Actions.hover(_ selector: String)` | `hover` | Hover over the element matched by `selector`. |
+| `Actions.screenshot(_ name: String? = nil)` | `screenshot` | Capture a screenshot, optionally named. |
+| `Actions.reload()` | `reload` | Reload the current page. |
+| `Actions.check(_ selector: String)` | `check` | Check a checkbox or radio input. |
+| `Actions.uncheck(_ selector: String)` | `uncheck` | Uncheck a checkbox or radio input. |
+| `Actions.select(_ selector: String, value: String)` | `select` | Select an option in a dropdown. |
+| `Actions.dragAndDrop(_ selector: String, to target: String)` | `drag_and_drop` | Drag an element to another element. |
+| `Actions.scroll(selector: String? = nil, value: String? = nil)` | `scroll` | Scroll the page or an element. |
+
+## Extraction
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `Actions.getContent(selector: String? = nil, varName: String? = nil)` | `get_content` | Read visible text; store in `varName` when set. |
+| `Actions.javascript(_ script: String, varName: String? = nil)` | `javascript` | Run `script` in the page; store the return value. |
+| `Actions.csv(_ value: String? = nil, selector: String? = nil, varName: String? = nil)` | `csv` | Parse CSV content or from a selector; store in `varName`. |
+| `Actions.request(_ url: String, method: String? = nil, headers: String? = nil, body: String? = nil, varName: String? = nil)` | `http_request` | Perform an HTTP request; store the response in `varName`. |
+
+`request` accepts `method`, `headers`, `body`, and `varName`. `method` defaults to `GET` when omitted by the server.
+
+## Control flow
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `Actions.if(selector: String? = nil, value: String? = nil, variable: String? = nil, variableType: String? = nil, operation: String? = nil, comparisonValue: String? = nil)` | `if` | Begin a conditional block. |
+| `Actions.while(selector: String? = nil, value: String? = nil, variable: String? = nil, variableType: String? = nil, operation: String? = nil, comparisonValue: String? = nil)` | `while` | Begin a loop block. |
+| `Actions.elseBlock()` | `else` | Else branch of the preceding `if`. |
+| `Actions.end()` | `end` | Close the preceding block. |
+| `Actions.repeatCount(_ count: Int)` | `repeat` | Repeat the following block `count` times. |
+| `Actions.forEach(selector: String? = nil, value: String? = nil, varName: String? = nil)` | `foreach` | Iterate over a selector result or value. |
+| `Actions.stop(_ outcome: String = "success")` | `stop` | Stop the task with an outcome (default `"success"`). |
+| `Actions.start(_ taskId: String)` | `start` | Start a modular sub-task by ID. |
+| `Actions.onError(_ value: String? = nil)` | `on_error` | Set an error handler for the following block. |
+| `Actions.doNothing()` | `do_nothing` | A no-op action. |
+
+Condition fields for `if` and `while` accept:
+
+- `selector`: a CSS selector to test
+- `value`: a free-form expression, when supported
+- `variable`: a variable name to test
+- `variableType`: `"string"`, `"number"`, or `"boolean"`
+- `operation`: the comparison operator
+- `comparisonValue`: the comparison target
+
+Supported `operation` values include:
+
+- Strings: `equals`, `not_equals`, `contains`, `starts_with`, `ends_with`, `matches`
+- Numbers: `equals`, `not_equals`, `gt`, `gte`, `lt`, `lte`
+- Booleans: `is_true`, `is_false`
+- Selectors: `exists`, `not_exists`
+
+## Variables and CAPTCHA
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `Actions.set(_ name: String, value: String)` | `set` | Assign `value` to `name`. |
+| `Actions.merge(_ name: String, value: String)` | `merge` | Merge `value` into an existing variable `name`. |
+| `Actions.solveCaptcha(captchaType: String? = nil, selector: String? = nil, varName: String? = nil, timeout: Double? = nil)` | `solve_captcha` | Solve a CAPTCHA challenge. |
+| `Actions.waitForCaptcha(captchaType: String? = nil, selector: String? = nil, varName: String? = nil, timeout: Double? = nil)` | `wait_captcha` | Wait for a CAPTCHA to appear. |
+
+`captchaType` is one of `"recaptcha_v2"`, `"recaptcha_v3"`, `"hcaptcha"`, or `"turnstile"`. See [CAPTCHA Solving](/captcha-solving) for setup and return-value shape.
+
+The exported `variable(name)` helper produces the `{$name}` template token Figranium expects when a value should be substituted from a runtime variable:
+
+```swift
+Actions.type("#search", value: variable("query"))
+```
+
+See [Variables and templates](/sdk/swift/variables) for more.
+
+## Files and Cabinets
+
+The SDK includes helpers for the Cabinet upload flow.
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `Actions.upload(selector: String? = nil, cabinetId: String? = nil, markAsUploaded: Bool? = nil)` | `upload` | Attach the newest unuploaded item from a Cabinet. |
+| `Actions.finalizeUploads()` | `finalize_uploads` | Mark all Cabinet items attached during the current execution as uploaded. |
+
+When `cabinetId` is omitted on an upload action, Figranium uses the task's `cabinetId`; if the task also omits it, the instance default Cabinet is used.
+
+Keeping finalization separate is useful when an upload should only be consumed after the surrounding workflow reaches a successful point.
+
+```swift
+import Figranium
+
+let task = Task(
+    name: "Upload latest export",
+    url: "https://example.com/upload",
+    mode: "agent",
+    actions: [
+        Actions.upload(selector: "input[type=file]"),
+        Actions.click("button[type=submit]"),
+        Actions.finalizeUploads(),
+    ]
+)
+```
+
+See [Cabinets resource](/sdk/swift/resources/cabinets) for full Cabinet operations.
+
+## Typed one-off actions
+
+For actions the helpers do not cover, construct an `Action` directly:
+
+```swift
+let download = Action(
+    type: "wait_downloads",
+    value: "10"
+)
+```
+
+`Actions.action(_ value: Action)` assigns an ID if you do not provide one and preserves all valid fields.
+
+## Full task example
+
+```swift
+import Figranium
+
+let task = Task(
+    name: "Search and screenshot",
+    url: "https://example.com",
+    mode: "agent",
+    variables: [
+        "query": TaskVariable(type: "string", value: .string("figranium"))
+    ],
+    actions: [
+        Actions.navigate("https://example.com"),
+        Actions.waitFor("#search"),
+        Actions.type("#search", value: variable("query")),
+        Actions.press("Enter", selector: "#search"),
+        Actions.waitFor(".results"),
+        Actions.if(selector: ".no-results", operation: "exists"),
+        Actions.stop("no_results"),
+        Actions.end(),
+        Actions.getContent(selector: ".results", varName: "resultText"),
+        Actions.screenshot("results"),
+    ]
+)
+```
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Variables and templates" icon="variable" href="/sdk/swift/variables">
+    Declare task variables and reference them with variable().
+  </Card>
+
+  <Card title="Tasks resource" icon="list-check" href="/sdk/swift/resources/tasks">
+    Save, version, and execute tasks that use these actions.
+  </Card>
+</CardGroup>

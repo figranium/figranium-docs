@@ -1,0 +1,167 @@
+---
+title: "CapturesResource: Recordings, Screenshots, and Cookies"
+sidebarTitle: "Captures"
+description: "Use the Figranium Swift SDK to list captures, delete recordings, manage browser cookies, and clear screenshots. Covers every CapturesResource method with typed examples."
+---
+
+The `captures` resource on the Figranium Swift SDK gives you access to recordings, screenshots, and browser cookies produced during task executions. You can list captures for a specific run, delete individual files, inspect stored cookies, and bulk-clear screenshots or cookies when you need to reclaim space or reset state.
+
+```swift main.swift
+import Figranium
+
+let client = Figranium(apiKey: ProcessInfo.processInfo.environment["FIGRANIUM_API_KEY"])
+```
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`list`">
+    Returns all captures, including recordings and screenshots. Optionally filter by `runID`.
+
+    - **HTTP endpoint:** `GET /api/data/captures` (with `runId` query parameter when set)
+    - **Signature:** `captures.list(runID: String? = nil, options: RequestOptions = .init()) async throws -> [Capture]`
+
+    ```swift list_captures.swift
+    let captures = try await client.captures.list(runID: "run_abc123")
+    
+    for capture in captures {
+        print("\(capture.type): \(capture.name) (\(capture.size) bytes)")
+    }
+    ```
+
+    Each capture entry contains `name`, `url`, `size`, `modified`, and `type` (`"recording"` or `"screenshot"`).
+  </Accordion>
+
+  <Accordion title="`screenshots`">
+    Returns only screenshot captures, omitting recordings.
+
+    - **HTTP endpoint:** `GET /api/data/screenshots`
+    - **Signature:** `captures.screenshots(options: RequestOptions = .init()) async throws -> [Capture]`
+
+    ```swift list_screenshots.swift
+    let screenshots = try await client.captures.screenshots()
+    
+    for shot in screenshots {
+        print("\(shot.name): \(shot.url)")
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="`delete`">
+    Delete a single capture by its name.
+
+    - **HTTP endpoint:** `DELETE /api/data/captures/{name}`
+    - **Signature:** `captures.delete(_ name: String, options: RequestOptions = .init()) async throws -> JSONObject`
+
+    ```swift delete_capture.swift
+    let result = try await client.captures.delete("run_abc123_recording.webm")
+    ```
+  </Accordion>
+
+  <Accordion title="`cookies`">
+    List stored browser cookies and their origins.
+
+    - **HTTP endpoint:** `GET /api/data/cookies`
+    - **Signature:** `captures.cookies(options: RequestOptions = .init()) async throws -> JSONObject`
+
+    ```swift list_cookies.swift
+    let result = try await client.captures.cookies()
+    print("Found cookies across origins")
+    ```
+  </Accordion>
+
+  <Accordion title="`deleteCookie`">
+    Remove a specific cookie by name, optionally scoped to a domain and path.
+
+    - **HTTP endpoint:** `POST /api/data/cookies/delete`
+    - **Signature:** `captures.deleteCookie(name: String, domain: String? = nil, path: String? = nil, options: RequestOptions = .init()) async throws -> JSONObject`
+
+    ```swift delete_cookie.swift
+    let result = try await client.captures.deleteCookie(
+        "session_id",
+        domain: "example.com",
+        path: "/"
+    )
+    ```
+  </Accordion>
+
+  <Accordion title="`clear`">
+    Delete all screenshots at once.
+
+    - **HTTP endpoint:** `POST /api/data/clear-screenshots`
+    - **Signature:** `captures.clear(options: RequestOptions = .init()) async throws -> JSONObject`
+
+    ```swift clear_screenshots.swift
+    let result = try await client.captures.clear()
+    ```
+  </Accordion>
+
+  <Accordion title="`clearCookies`">
+    Delete all stored cookies.
+
+    - **HTTP endpoint:** `POST /api/data/clear-cookies`
+    - **Signature:** `captures.clearCookies(options: RequestOptions = .init()) async throws -> JSONObject`
+
+    ```swift clear_cookies.swift
+    let result = try await client.captures.clearCookies()
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Working example: list captures for a run and delete cookies
+
+This example combines `list` and `deleteCookie` to clean up after a run: it lists captures for a specific run, then removes a session cookie for the target domain.
+
+```swift cleanup_after_run.swift
+let captures = try await client.captures.list(runID: "run_abc123")
+
+let recording = captures.first { $0.type == "recording" }
+if let recording = recording {
+    print("Recording: \(recording.name) (\(recording.size) bytes)")
+}
+
+let deleteResult = try await client.captures.deleteCookie(
+    "auth_token",
+    domain: "example.com"
+)
+
+print("Cookie deleted")
+```
+
+## Model
+
+### `Capture`
+
+```swift
+public struct Capture: Codable, Sendable {
+    public var name: String
+    public var url: String
+    public var size: Int
+    public var modified: Double
+    public var type: String
+}
+```
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="Request options" icon="sliders" href="/sdk/swift/request-options">
+    Pass custom headers and per-request timeouts.
+  </Card>
+
+  <Card title="Errors" icon="alert-triangle" href="/sdk/swift/errors">
+    Handle FigraniumError responses.
+  </Card>
+
+  <Card title="Executions" icon="bolt" href="/sdk/swift/resources/executions">
+    Start runs that produce captures.
+  </Card>
+
+  <Card title="Captures and storage" icon="hard-drive" href="/captures-and-storage">
+    Learn how Figranium stores recordings and screenshots.
+  </Card>
+
+  <Card title="Session state" icon="cookie" href="/session-state">
+    Understand how cookies and session state work in Figranium.
+  </Card>
+</CardGroup>

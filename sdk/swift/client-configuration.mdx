@@ -1,0 +1,163 @@
+---
+title: "Configure the Figranium Swift SDK Client"
+sidebarTitle: "Client"
+description: "Configure the Figranium Swift SDK: baseURL, authentication, timeouts, custom URLSession, default headers, and per-request options."
+---
+
+The `Figranium` class is a `final` class with two initializers: a designated initializer that accepts a `URL` and an authentication enum, and a convenience initializer that accepts a `String` base URL and an optional API key. Every option is optional, and the SDK falls back to sensible defaults so a local install works with `Figranium()`.
+
+## Initializers
+
+### Designated initializer
+
+```swift Client.swift
+public init(
+    baseURL: URL = URL(string: "http://localhost:11345")!,
+    authentication: FigraniumAuthentication = .none,
+    headers: [String: String] = [:],
+    timeout: TimeInterval = 30,
+    session: URLSession = .shared
+)
+```
+
+<ParamField path="baseURL" type="URL">
+  Absolute URL of your Figranium server. Must use `http` or `https` (enforced with a `precondition`). Defaults to `http://localhost:11345`.
+</ParamField>
+
+<ParamField path="authentication" type="FigraniumAuthentication">
+  Authentication strategy. Defaults to `.none`. See [Authentication](/sdk/swift/authentication) for details.
+</ParamField>
+
+<ParamField path="headers" type="[String: String]">
+  Default headers merged into every request. Per-call `RequestOptions.headers` override these.
+</ParamField>
+
+<ParamField path="timeout" type="TimeInterval">
+  Client-wide default timeout for non-stream requests, in seconds. Defaults to `30`.
+</ParamField>
+
+<ParamField path="session" type="URLSession">
+  The `URLSession` used for all network requests. Defaults to `.shared`. The SDK never replaces a caller-supplied session.
+</ParamField>
+
+### Convenience initializer
+
+```swift Client.swift
+public convenience init(
+    baseURL: String = "http://localhost:11345",
+    apiKey: String? = nil,
+    apiKeyHeader: String = "authorization",
+    timeout: TimeInterval = 30
+)
+```
+
+<ParamField path="baseURL" type="String">
+  Absolute URL of your Figranium server as a string. Must be a valid URL (enforced with a `precondition`). Defaults to `"http://localhost:11345"`.
+</ParamField>
+
+<ParamField path="apiKey" type="String?">
+  API key sent as `Authorization: Bearer <key>` by default. When `nil`, authentication is `.none`.
+</ParamField>
+
+<ParamField path="apiKeyHeader" type="String">
+  Header name for the API key. Defaults to `"authorization"`. Set to `"x-api-key"` if your deployment expects that header.
+</ParamField>
+
+<ParamField path="timeout" type="TimeInterval">
+  Client-wide default timeout for non-stream requests, in seconds. Defaults to `30`.
+</ParamField>
+
+## Option details
+
+### `baseURL`
+
+```swift example.swift
+let client = Figranium(baseURL: URL(string: "https://figranium.example")!)
+```
+
+### `authentication`
+
+The `FigraniumAuthentication` enum has three cases:
+
+- `.apiKey(String, header: String = "authorization")` sends the key as `Authorization: Bearer <key>` when the header is `"authorization"`, or as the raw key for any other header name.
+- `.session` sends no auth header and relies on `URLSession` cookies.
+- `.none` sends no auth header.
+
+```swift example.swift
+let client = Figranium(
+    authentication: .apiKey("fig_...", header: "x-api-key")
+)
+```
+
+See [Authentication](/sdk/swift/authentication) for how to create and manage API keys.
+
+### `timeout`
+
+Client-wide default timeout for non-stream requests, in seconds. Defaults to `30`. Streams have no default timeout; set a per-call `timeout` in `RequestOptions` if you want a terminal deadline.
+
+```swift example.swift
+let client = Figranium(apiKey: "fig_...", timeout: 60)
+```
+
+Individual requests can override this per call with `options: .init(timeout: 5)`. See [Request options](/sdk/swift/request-options).
+
+### `session`
+
+Provide a preconfigured `URLSession` for custom delegate behavior, certificate pinning, or test doubles. The SDK never replaces a caller-supplied session.
+
+```swift example.swift
+let config = URLSessionConfiguration.default
+config.timeoutIntervalForRequest = 45
+let session = URLSession(configuration: config)
+let client = Figranium(session: session)
+```
+
+### `headers`
+
+Default headers merged into every request. Per-call headers override these.
+
+```swift example.swift
+let client = Figranium(
+    apiKey: "fig_...",
+    headers: ["x-client-name": "orders-worker"]
+)
+```
+
+## Complete example
+
+```swift example.swift
+import Figranium
+
+let client = Figranium(
+    baseURL: "https://figranium.example",
+    apiKey: ProcessInfo.processInfo.environment["FIGRANIUM_API_KEY"],
+    apiKeyHeader: "authorization",
+    timeout: 45,
+    headers: ["x-client-name": "orders-worker"]
+)
+```
+
+## Client resources
+
+The `Figranium` instance exposes one lazy property per resource, plus a few top-level convenience helpers.
+
+| Property | Purpose |
+| :-- | :-- |
+| [`auth`](/sdk/swift/resources/auth) | Check setup, log in, log out, and inspect the current user |
+| [`tasks`](/sdk/swift/resources/tasks) | List, save, version, update, delete, and execute tasks |
+| [`executions`](/sdk/swift/resources/executions) | List, inspect, stop, delete, clear, stream, and watch runs |
+| [`schedules`](/sdk/swift/resources/schedules) | Configure, describe, disable, and inspect schedules |
+| [`captures`](/sdk/swift/resources/captures) | List and delete recordings and screenshots; manage cookies |
+| [`cabinets`](/sdk/swift/resources/cabinets) | Manage file Cabinets and their items |
+| [`credentials`](/sdk/swift/resources/credentials) | Create and manage output credentials |
+| [`browser`](/sdk/swift/resources/browser) | Open browser sessions, highlight selectors, inspect headful sessions |
+| [`execution`](/sdk/swift/resources/execution) | Direct `scrape`, `agent`, and `headful` execution endpoints |
+| [`settings`](/sdk/swift/resources/settings) | Administer API keys, AI providers, proxies, and theme |
+| [`health`](/sdk/swift/resources/health) | Service health check |
+
+Top-level shortcuts:
+
+- `client.runTask(_:input:options:)` proxies to `tasks.run`.
+- `client.scrape(_:options:)` proxies to `execution.scrape`.
+- `client.agent(_:options:)` proxies to `execution.agent`.
+- `client.headful(_:options:)` proxies to `execution.headful`.

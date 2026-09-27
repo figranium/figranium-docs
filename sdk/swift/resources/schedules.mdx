@@ -1,0 +1,207 @@
+---
+title: "SchedulesResource: Configure and Inspect Schedules"
+sidebarTitle: "Schedules"
+description: "Manage recurring task schedules with the Figranium Swift SDK. List, set, delete, validate, and inspect cron or interval schedules for any task using typed structs."
+---
+
+The `schedules` resource on the Figranium Swift SDK lets you automate when tasks run. You can list every scheduled task, attach a recurring schedule to a specific task, delete it, validate a schedule before applying it, and inspect the overall scheduler health. All schedule payloads use the shared `Schedule` struct, which supports interval, hourly, daily, weekly, monthly, and raw cron expressions.
+
+```swift SchedulesResource.swift
+import Figranium
+
+let client = Figranium(apiKey: "YOUR_API_KEY")
+```
+
+## Schedule struct
+
+A `Schedule` struct controls whether and how often a task runs automatically.
+
+```swift Schedule.swift
+public struct Schedule: Codable, Sendable, Equatable {
+    public var enabled: Bool
+    public var frequency: String?
+    public var intervalMinutes: Int?
+    public var hour: Int?
+    public var minute: Int?
+    public var daysOfWeek: [Int]?
+    public var dayOfMonth: Int?
+    public var cron: String?
+    public var lastRun: Double?
+    public var lastRunStatus: String?
+    public var lastRunDurationMs: Double?
+    public var nextRun: Double?
+}
+```
+
+- `enabled`: whether the schedule is active.
+- `frequency`: the recurrence pattern. Use `"interval"` for a simple minute-based timer, `"hourly"` / `"daily"` / `"weekly"` / `"monthly"` for calendar-based runs, or omit it and supply `cron` directly.
+- `intervalMinutes`: required when `frequency` is `"interval"`.
+- `hour` and `minute`: used with `"daily"`, `"weekly"`, and `"monthly"` to set the time of day.
+- `daysOfWeek`: array of weekday numbers (`0` = Sunday) for `"weekly"`.
+- `dayOfMonth`: day number (`1` to `31`) for `"monthly"`.
+- `cron`: a raw cron string when you need full control.
+- `lastRun`, `lastRunStatus`, `lastRunDurationMs`, `nextRun`: read-only fields returned by the server.
+
+### Examples
+
+Run a task every 15 minutes:
+
+```swift interval_schedule.swift
+let intervalSchedule = Schedule(
+    enabled: true,
+    frequency: "interval",
+    intervalMinutes: 15
+)
+
+let result = try await client.schedules.set("task-123", schedule: intervalSchedule)
+print(result)
+```
+
+Run a task every Monday and Wednesday at 09:30:
+
+```swift weekly_schedule.swift
+let weeklySchedule = Schedule(
+    enabled: true,
+    frequency: "weekly",
+    hour: 9,
+    minute: 30,
+    daysOfWeek: [1, 3]
+)
+
+let result = try await client.schedules.set("task-123", schedule: weeklySchedule)
+print(result)
+```
+
+Run a task daily at 07:00 with a cron expression:
+
+```swift cron_schedule.swift
+let cronSchedule = Schedule(
+    enabled: true,
+    cron: "0 7 * * *"
+)
+
+let result = try await client.schedules.set("task-123", schedule: cronSchedule)
+print(result)
+```
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`list`">
+    Retrieve all tasks that currently have a schedule configured.
+
+    - **HTTP endpoint:** `GET /api/schedules`
+    - **Signature:** `func list(options: RequestOptions = .init()) async throws -> JSONObject`
+
+    ```swift list_schedules.swift
+    let result = try await client.schedules.list()
+    ```
+
+    Returns a `JSONObject` with a `schedules` array. Each entry contains `taskId`, `taskName`, `mode`, and the attached `Schedule` object.
+  </Accordion>
+
+  <Accordion title="`set`">
+    Attach or update a schedule for a specific task.
+
+    - **HTTP endpoint:** `POST /api/schedules/{taskId}`
+    - **Signature:** `func set(_ taskID: String, schedule: Schedule, options: RequestOptions = .init()) async throws -> JSONObject`
+
+    ```swift set_schedule.swift
+    let result = try await client.schedules.set("task-123", schedule: .init(
+        enabled: true,
+        frequency: "daily",
+        hour: 7,
+        minute: 0
+    ))
+    ```
+
+    Returns a `JSONObject` containing the saved `schedule`, a human-readable `description`, and the `nextRun` timestamp (or `nil` if the schedule is disabled or invalid).
+  </Accordion>
+
+  <Accordion title="`delete`">
+    Remove a task's schedule entirely.
+
+    - **HTTP endpoint:** `DELETE /api/schedules/{taskId}`
+    - **Signature:** `func delete(_ taskID: String, options: RequestOptions = .init()) async throws -> JSONObject`
+
+    ```swift delete_schedule.swift
+    let result = try await client.schedules.delete("task-123")
+    ```
+
+    Returns `{"success": bool}` indicating whether the schedule was removed.
+  </Accordion>
+
+  <Accordion title="`status`">
+    Inspect the current schedule for a single task, including its computed cron expression and validity.
+
+    - **HTTP endpoint:** `GET /api/schedules/{taskId}/status`
+    - **Signature:** `func status(_ taskID: String, options: RequestOptions = .init()) async throws -> JSONObject`
+
+    ```swift schedule_status.swift
+    let status = try await client.schedules.status("task-123")
+    ```
+
+    Returns a `JSONObject` with the current `schedule`, the resolved `cron` string, a human-readable `description`, and an `isValid` flag.
+  </Accordion>
+
+  <Accordion title="`describe`">
+    Validate a schedule payload for a task without saving it. This is useful for previewing the next run time and confirming a cron expression before you call `set`.
+
+    - **HTTP endpoint:** `POST /api/schedules/{taskId}/describe`
+    - **Signature:** `func describe(_ taskID: String, schedule: Schedule, options: RequestOptions = .init()) async throws -> JSONObject`
+
+    ```swift describe_schedule.swift
+    let preview = try await client.schedules.describe("task-123", schedule: .init(
+        enabled: true,
+        frequency: "monthly",
+        dayOfMonth: 1,
+        hour: 6,
+        minute: 0
+    ))
+    ```
+
+    Returns a `JSONObject` with `valid`, `description`, `cron`, and `nextRun`. If `valid` is `false`, the schedule will not be accepted by `set`.
+  </Accordion>
+
+  <Accordion title="`overallStatus`">
+    Get a high-level view of the scheduler state across all tasks.
+
+    - **HTTP endpoint:** `GET /api/schedules/status/all`
+    - **Signature:** `func overallStatus(options: RequestOptions = .init()) async throws -> JSONObject`
+
+    ```swift overall_status.swift
+    let status = try await client.schedules.overallStatus()
+    print(status)
+    ```
+
+    Returns a plain `JSONObject`. The exact fields depend on the server version; inspect the response to discover available keys.
+  </Accordion>
+</AccordionGroup>
+
+## Error handling
+
+Schedule methods throw `FigraniumError` on failure. Common cases include a missing task ID (`404`) or an invalid schedule payload (`400`). See [Error handling](/sdk/swift/errors) for retry guidance and error codes.
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="Tasks" icon="list-check" href="/sdk/swift/resources/tasks">
+    Create and manage the tasks you schedule.
+  </Card>
+
+  <Card title="Executions" icon="bolt" href="/sdk/swift/resources/executions">
+    Inspect the runs produced by scheduled tasks.
+  </Card>
+
+  <Card title="Request options" icon="sliders" href="/sdk/swift/request-options">
+    Pass custom headers and per-request timeouts.
+  </Card>
+
+  <Card title="Task scheduling" icon="calendar" href="/task-scheduling">
+    Learn how scheduling works in Figranium.
+  </Card>
+
+  <Card title="Errors" icon="alert-triangle" href="/sdk/swift/errors">
+    Handle FigraniumError responses.
+  </Card>
+</CardGroup>
