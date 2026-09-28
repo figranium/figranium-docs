@@ -1,0 +1,77 @@
+---
+title: "Figranium SDKs: JavaScript, Python, and Swift Clients"
+sidebarTitle: "Introduction"
+description: "Choose an official Figranium SDK for JavaScript, Python, or Swift. Compare runtimes, install commands, and shared features for automating browser tasks."
+---
+
+Figranium ships official SDKs for JavaScript, Python, and Swift. Each SDK wraps the same Figranium REST and Server-Sent Events API, so you can save and run tasks, stream execution events, and manage schedules, captures, and Cabinets from the language you already use.
+
+## Choose an SDK
+
+<CardGroup cols={3}>
+  <Card title="JavaScript SDK" icon="brand-javascript" href="/sdk/js/overview">
+    `@figranium/sdk` for Node.js 18+ and modern browsers. TypeScript first, ESM and CommonJS, no runtime dependencies.
+  </Card>
+
+  <Card title="Python SDK" icon="brand-python" href="/sdk/python/overview">
+    `figranium-sdk` for Python 3.9+. Sync and async clients built on `httpx`, with `TypedDict` types.
+  </Card>
+
+  <Card title="Swift SDK" icon="brand-swift" href="/sdk/swift/overview">
+    `Figranium` package for macOS, iOS, tvOS, watchOS, and server-side Swift. Native `async`/`await`, zero dependencies.
+  </Card>
+</CardGroup>
+
+## Compare SDKs
+
+| | JavaScript | Python | Swift |
+| :-- | :-- | :-- | :-- |
+| Package | `@figranium/sdk` | `figranium-sdk` | `Figranium` |
+| Runtime | Node.js 18+, browsers | Python 3.9+ | Swift 6.0, macOS 13, iOS 16, tvOS 16, watchOS 9 |
+| Dependencies | None | `httpx>=0.27,<1` | None (Foundation only) |
+| Async model | Promises, `AsyncIterable` streams | Sync `Figranium` and async `AsyncFigranium` | `async throws`, `AsyncThrowingStream` |
+| License | Apache-2.0 | Apache-2.0 | Apache-2.0 |
+| Repository | [figranium-js](https://github.com/figranium/figranium-js) | [figranium-py](https://github.com/figranium/figranium-py) | [figranium-swift](https://github.com/figranium/figranium-swift) |
+
+## Install
+
+<CodeGroup>
+
+```bash npm (JavaScript)
+npm install @figranium/sdk
+```
+
+```bash pip (Python)
+```
+
+```swift Package.swift (Swift)
+```
+
+</CodeGroup>
+
+## What every SDK can do
+
+- Save, update, version, and roll back tasks.
+- Run tasks with runtime variables, or call `scrape`, `agent`, and `headful` directly.
+- Stream live execution and selector events over Server-Sent Events.
+- Manage schedules, captures, cookies, output credentials, and Cabinets.
+- Open and inspect headful browser sessions.
+- Administer settings such as API keys, AI providers, proxies, and theme.
+
+## Before you start
+
+<Steps>
+  <Step title="Run a Figranium server">
+    Every SDK talks to a running Figranium instance. Local installs listen on `http://localhost:11345` by default. See [Docker Compose](/docker-compose) to set one up.
+  </Step>
+  <Step title="Create an API key">
+    Generate a key so the SDK can authenticate requests. See [API key](/api-key).
+  </Step>
+  <Step title="Follow your SDK's quickstart">
+    Build and run your first task with the [JavaScript](/sdk/js/quickstart), [Python](/sdk/python/quickstart), or [Swift](/sdk/swift/quickstart) quickstart.
+  </Step>
+</Steps>
+
+<Tip>
+  Prefer calling HTTP directly? The [REST API](/rest-api) exposes the same endpoints the SDKs wrap.
+</Tip>

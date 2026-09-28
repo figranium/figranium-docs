@@ -141,6 +141,13 @@
         "icon": "sdk",
         "groups": [
           {
+            "group": "Introduction",
+            "icon": "info-circle",
+            "pages": [
+              "sdk/overview"
+            ]
+          },
+          {
             "group": "JavaScript SDK",
             "icon": "brand-javascript",
             "pages": [
