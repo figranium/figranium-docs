@@ -1,12 +1,14 @@
 ---
-title: "Figranium SDKs: JavaScript, Python, Swift, and Kotlin"
+title: "Figranium SDKs and Libraries: JS, Python, Swift, Kotlin"
 sidebarTitle: "Introduction"
-description: "Choose an official Figranium SDK for JavaScript, Python, Swift, or Kotlin. Compare runtimes, install commands, and shared features for automating browser tasks."
+description: "Pick an official Figranium SDK for JavaScript, Python, Swift, or Kotlin, or embed the Fiptcha CAPTCHA library in your own Playwright automation."
 ---
 
-Figranium ships official SDKs for JavaScript, Python, Swift, and Kotlin. Each SDK wraps the same Figranium REST and Server-Sent Events API, so you can save and run tasks, stream execution events, and manage schedules, captures, and Cabinets from the language you already use.
+Figranium offers two kinds of libraries. The **SDKs** connect your code to a running Figranium server, so you can save and run tasks, stream execution events, and manage schedules, captures, and Cabinets from JavaScript, Python, Swift, or Kotlin. **Fiptcha** is a standalone Node.js library that solves CAPTCHAs locally inside your own Playwright automation, with no Figranium server required.
 
 ## Choose an SDK
+
+Every SDK wraps the same Figranium REST and Server-Sent Events API, so features match across languages. Pick the one that fits your stack.
 
 <CardGroup cols={2}>
   <Card title="JavaScript SDK" icon="brand-javascript" href="/sdk/js/overview">
@@ -37,7 +39,7 @@ Figranium ships official SDKs for JavaScript, Python, Swift, and Kotlin. Each SD
 | License | Apache-2.0 | Apache-2.0 | Apache-2.0 | Apache-2.0 |
 | Repository | [figranium-js](https://github.com/figranium/figranium-js) | [figranium-py](https://github.com/figranium/figranium-py) | [figranium-swift](https://github.com/figranium/figranium-swift) | [figranium-kotlin](https://github.com/figranium/figranium-kotlin) |
 
-## Install
+## Install an SDK
 
 <CodeGroup>
 
@@ -85,3 +87,21 @@ implementation("dev.figranium:figranium:0.1.0")
 <Tip>
   Prefer calling HTTP directly? The [REST API](/rest-api) exposes the same endpoints the SDKs wrap.
 </Tip>
+
+## Fiptcha: local CAPTCHA solving
+
+Fiptcha is the CAPTCHA engine behind Figranium, published as its own Apache-2.0 npm package. Unlike the SDKs, it doesn't call a Figranium server. You pass it a Playwright-compatible page, and it solves reCAPTCHA v2, hCaptcha, and Cloudflare Turnstile in place.
+
+```bash
+npm install fiptcha
+```
+
+<CardGroup cols={2}>
+  <Card title="Fiptcha Overview" icon="robot" href="/fiptcha/overview">
+    Install Fiptcha, see supported challenges, and run your first solve.
+  </Card>
+
+  <Card title="solveLocalCaptcha" icon="code" href="/fiptcha/solve-local-captcha">
+    Options, return value, errors, and integration patterns.
+  </Card>
+</CardGroup>

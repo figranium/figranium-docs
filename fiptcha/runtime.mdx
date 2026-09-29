@@ -1,0 +1,74 @@
+---
+title: "Fiptcha Models, Companion Runtime, and Troubleshooting"
+sidebarTitle: "Models & Runtime"
+description: "How Fiptcha downloads vision models, sizes memory, runs the optional companion and Apple Silicon MLX runtime, and how to fix common solve failures."
+---
+
+Fiptcha picks a vision backend at runtime based on available resources and fetches model weights only when a challenge needs them. This page covers memory sizing, caching, the optional companion process, and fixes for common failures.
+
+## Models and memory requirements
+
+Fiptcha does not bundle large model weights into the npm package. Required assets are acquired when needed.
+
+The runtime chooses an appropriate backend based on available resources. A provider-advertised **2 GB** machine is interpreted using decimal sizing (2,000,000,000 bytes, about 1907 MiB) rather than requiring 2048 MiB.
+
+<Tip>
+  If your application runs in an ephemeral container, persist the model/cache directory so models do not need to be downloaded again on every container recreation.
+</Tip>
+
+## Inspect the runtime environment
+
+Run the included resource probe:
+
+```bash
+npm run probe
+```
+
+This is useful in containers and VMs where cgroup or container limits may differ from the physical host's reported memory.
+
+## Companion runtime
+
+Fiptcha includes an optional companion process for environments that need it. Ordinary Node.js integrations do not need it unless they use that runtime path.
+
+<Steps>
+  <Step title="Install companion requirements">
+    ```bash
+    npm run companion:install
+    ```
+  </Step>
+  <Step title="Start the companion">
+    ```bash
+    npm run companion:start
+    ```
+
+    For the Docker-oriented path:
+
+    ```bash
+    npm run companion:start:docker
+    ```
+  </Step>
+</Steps>
+
+## Apple Silicon and MLX
+
+Fiptcha supports an optional MLX runtime for compatible Apple Silicon environments. Consumers that do not use MLX can ignore it.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Local solver does not support ..." icon="alert-triangle">
+    Check that `captchaType` is exactly one of `recaptcha_v2`, `hcaptcha`, or `turnstile`.
+  </Accordion>
+
+  <Accordion title="vision backend unavailable" icon="cpu">
+    The challenge requires the image-solving path, but Fiptcha could not prepare a supported vision backend. Check available memory, model availability and downloads, and the output of `npm run probe`.
+  </Accordion>
+
+  <Accordion title="Challenge appears but no token is returned" icon="clock">
+    Increase the solve timeout and collect the `logs` array. Also verify that the challenge family still matches the provider structure expected by the current Fiptcha version.
+  </Accordion>
+
+  <Accordion title="Models download repeatedly in containers" icon="download">
+    Persist the model/cache storage used by the runtime instead of recreating it with every ephemeral container.
+  </Accordion>
+</AccordionGroup>

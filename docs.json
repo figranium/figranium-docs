@@ -137,8 +137,8 @@
         ]
       },
       {
-        "tab": "SDK",
-        "icon": "sdk",
+        "tab": "SDKs & Libraries",
+        "icon": "books",
         "groups": [
           {
             "group": "Introduction",
@@ -277,6 +277,15 @@
                   "sdk/kotlin/resources/health"
                 ]
               }
+            ]
+          },
+          {
+            "group": "Fiptcha",
+            "icon": "robot",
+            "pages": [
+              "fiptcha/overview",
+              "fiptcha/solve-local-captcha",
+              "fiptcha/runtime"
             ]
           }
         ]

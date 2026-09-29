@@ -1,0 +1,125 @@
+---
+title: "solveLocalCaptcha: Fiptcha API Reference and Usage"
+sidebarTitle: "solveLocalCaptcha"
+description: "Reference for Fiptcha's solveLocalCaptcha(page, options): the captchaType, timeout, and logs options, the returned token object, and thrown errors."
+---
+
+`solveLocalCaptcha(page, options)` is Fiptcha's main integration API. It takes an active Playwright-compatible page, solves the requested challenge in place, and resolves with the token.
+
+```js
+const { solveLocalCaptcha } = require('fiptcha');
+
+const result = await solveLocalCaptcha(page, {
+  captchaType: 'hcaptcha',
+  timeout: 60_000,
+  logs: []
+});
+```
+
+## Arguments
+
+<ParamField path="page" type="Page" required>
+  An active Playwright-compatible page. Fiptcha uses page and frame APIs, locators, mouse interaction, evaluation, and timeouts against this object.
+</ParamField>
+
+<ParamField path="options.captchaType" type="string" required>
+  The challenge to solve. One of `recaptcha_v2`, `hcaptcha`, or `turnstile`.
+</ParamField>
+
+<ParamField path="options.timeout" default="60000" type="number">
+  Maximum solve time in milliseconds.
+</ParamField>
+
+<ParamField path="options.logs" type="string[]">
+  Optional array. Fiptcha appends diagnostic messages to it while solving.
+</ParamField>
+
+```js Collecting diagnostics
+const logs = [];
+
+await solveLocalCaptcha(page, {
+  captchaType: 'recaptcha_v2',
+  logs
+});
+
+console.log(logs);
+```
+
+## Return value
+
+A successful solve returns an object similar to:
+
+```js
+{
+  token: '...',
+  provider: 'local',
+  model: 'owlvit', // only when a vision backend was used
+  device: 'cpu'
+}
+```
+
+<ResponseField name="token" type="string">
+  The CAPTCHA response token.
+</ResponseField>
+
+<ResponseField name="provider" type="string">
+  The route that produced the token. Always `local`.
+</ResponseField>
+
+<ResponseField name="model" type="string">
+  The vision model used, such as `owlvit`. Omitted when no vision model was needed.
+</ResponseField>
+
+<ResponseField name="device" type="string">
+  `browser`, `cpu`, or the active inference device.
+</ResponseField>
+
+## Errors
+
+`solveLocalCaptcha` throws when:
+
+- the requested CAPTCHA type is unsupported;
+- a challenge never exposes a usable token or image challenge;
+- a required vision backend cannot be prepared;
+- the challenge ends without producing a token;
+- Turnstile does not issue a token after browser interaction.
+
+Wrap solves in your application's normal error handling:
+
+```js
+try {
+  const result = await solveLocalCaptcha(page, {
+    captchaType: 'recaptcha_v2',
+    timeout: 60_000
+  });
+
+  console.log(result.token);
+} catch (error) {
+  console.error('CAPTCHA solve failed:', error.message);
+}
+```
+
+## Integration pattern
+
+Keep orchestration outside Fiptcha and call it at your browser/runtime boundary:
+
+```js
+const { solveLocalCaptcha } = require('fiptcha');
+
+async function handleCaptcha(page, captchaType) {
+  const logs = [];
+
+  const result = await solveLocalCaptcha(page, {
+    captchaType,
+    timeout: 60_000,
+    logs
+  });
+
+  return {
+    token: result.token,
+    diagnostics: logs
+  };
+}
+```
+
+Your application remains responsible for launching browsers, navigation, deciding when CAPTCHA handling runs, retries, proxies, persistence, and mapping Fiptcha errors and results into your own execution model.
