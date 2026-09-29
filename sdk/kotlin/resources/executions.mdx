@@ -1,0 +1,170 @@
+---
+title: "ExecutionsResource: List, Stream, and Watch Task Runs"
+sidebarTitle: "Executions"
+description: "Manage Figranium task executions with the Kotlin SDK. List, inspect, stop, stream live events, and watch terminal outcomes using coroutine Flow and polling."
+---
+
+The `ExecutionsResource` on the Figranium Kotlin SDK gives you full visibility and control over every task run. Use it to list past executions, inspect a single run, clean up history, stop active runs, subscribe to a live Server-Sent Events stream of execution updates, and watch a specific execution by polling for status changes.
+
+```kotlin ExecutionsResource.kt
+import dev.figranium.sdk.*
+
+val client = Figranium(
+    authentication = FigraniumAuthentication.ApiKey("YOUR_API_KEY")
+)
+```
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`list`">
+    - **HTTP endpoint:** `GET /api/executions/list` (default) or `GET /api/executions`
+    - **Signature:** `suspend fun list(apiKeyRoute: Boolean = true, options: RequestOptions = RequestOptions()): List<Execution>`
+
+    Returns a list of executions. By default it calls `GET /api/executions/list`, which is the route intended for API-key access. If you pass `apiKeyRoute = false`, the SDK switches to `GET /api/executions` instead.
+
+    <Note>
+      Most callers should leave `apiKeyRoute` at its default (`true`). Only override it when your deployment requires the alternate route.
+    </Note>
+
+    ```kotlin list_executions.kt
+    // Default route: GET /api/executions/list
+    val executions = client.executions.list()
+    println("${executions.firstOrNull()?.runId} ${executions.firstOrNull()?.status}")
+    
+    // Alternate route: GET /api/executions
+    val altExecutions = client.executions.list(apiKeyRoute = false)
+    ```
+  </Accordion>
+
+  <Accordion title="`get`">
+    - **HTTP endpoint:** `GET /api/executions/{id}`
+    - **Signature:** `suspend fun get(id: String, options: RequestOptions = RequestOptions()): Execution`
+
+    Fetches a single execution by its ID.
+
+    ```kotlin get_execution.kt
+    val execution = client.executions.get("exec_01JXYZ")
+    println("${execution.status} ${execution.durationMs}")
+    ```
+  </Accordion>
+
+  <Accordion title="`delete`">
+    - **HTTP endpoint:** `DELETE /api/executions/{id}`
+    - **Signature:** `suspend fun delete(id: String, options: RequestOptions = RequestOptions()): JsonObject`
+
+    Removes a single execution record.
+
+    ```kotlin delete_execution.kt
+    val result = client.executions.delete("exec_01JXYZ")
+    ```
+  </Accordion>
+
+  <Accordion title="`clear`">
+    - **HTTP endpoint:** `POST /api/executions/clear`
+    - **Signature:** `suspend fun clear(options: RequestOptions = RequestOptions()): JsonObject`
+
+    Deletes all executions in bulk.
+
+    ```kotlin clear_executions.kt
+    val result = client.executions.clear()
+    ```
+  </Accordion>
+
+  <Accordion title="`stop`">
+    - **HTTP endpoint:** `POST /api/executions/stop`
+    - **Signature:** `suspend fun stop(runId: String, options: RequestOptions = RequestOptions()): JsonObject`
+
+    Sends a stop signal to an active run.
+
+    ```kotlin stop_execution.kt
+    val result = client.executions.stop(runId = "run_abc123")
+    ```
+  </Accordion>
+
+  <Accordion title="`stream`">
+    - **HTTP endpoint:** `GET /api/executions/stream`
+    - **Signature:** `fun stream(options: RequestOptions = RequestOptions()): Flow<StreamEvent<JsonElement>>`
+
+    Opens a Server-Sent Events connection and yields each event as it arrives. The stream stays open until the server closes the connection, the consumer stops collecting, or the request is cancelled. The stream sends only `accept` and auth headers, not default or per-call headers, and uses `options.timeoutMillis`.
+
+    For details on the `StreamEvent` shape and how cancellation works, see [Streaming](/sdk/kotlin/streaming). For error handling, see [Errors](/sdk/kotlin/errors).
+
+    ```kotlin stream_executions.kt
+    import kotlinx.coroutines.flow.catch
+    import kotlinx.coroutines.flow.collect
+    
+    client.executions.stream(options = RequestOptions(timeoutMillis = 60_000))
+        .catch { e ->
+            if (e is FigraniumException && e.code == "REQUEST_ABORTED") {
+                println("Stream timed out or was cancelled")
+            }
+        }
+        .collect { event ->
+            println("${event.event} ${event.data}")
+        }
+    ```
+
+    Cancelling the collecting coroutine cancels the stream.
+  </Accordion>
+
+  <Accordion title="`watch`">
+    - **HTTP endpoint:** `GET /api/executions/{id}` (polled)
+    - **Signature:** `fun watch(executionId: String, intervalMillis: Long = 1_000, options: RequestOptions = RequestOptions()): Flow<Execution>`
+
+    Polls `get` at the given interval and yields an `Execution` only when the status changes. The stream finishes automatically when the execution reaches an outcome or status of `success`, `error`, `stopped`, `crashed`, or `anti_bot`. Cancelling the collecting coroutine cancels the polling loop.
+
+    ```kotlin watch_execution.kt
+    import kotlinx.coroutines.flow.collect
+    
+    client.executions.watch("exec_01JXYZ", intervalMillis = 2_000)
+        .collect { execution ->
+            println(execution.status)
+        }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## End-to-end example
+
+This example lists recent executions, inspects the newest one, and stops it if it is still running.
+
+```kotlin execution_workflow.kt
+// 1) List recent executions (default API-key route)
+val executions = client.executions.list()
+
+if (executions.isEmpty()) {
+    println("No executions yet.")
+} else {
+    // 2) Inspect the most recent run
+    val latest = executions[0]
+    val detail = client.executions.get(latest.id)
+    println("Run ${detail.runId} status: ${detail.status}")
+
+    // 3) Stop if still active
+    if (detail.status == "running") {
+        val stopResult = client.executions.stop(runId = detail.runId ?: "")
+        println("Stop requested")
+    }
+}
+```
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="Tasks" icon="list-check" href="/sdk/kotlin/resources/tasks">
+    Create and manage the tasks you execute.
+  </Card>
+
+  <Card title="Streaming" icon="cloud-x" href="/sdk/kotlin/streaming">
+    Collect execution and selector streams with Flow.
+  </Card>
+
+  <Card title="Request options" icon="sliders" href="/sdk/kotlin/request-options">
+    Pass custom headers and per-request timeouts.
+  </Card>
+
+  <Card title="Errors" icon="alert-triangle" href="/sdk/kotlin/errors">
+    Handle FigraniumException responses.
+  </Card>
+</CardGroup>

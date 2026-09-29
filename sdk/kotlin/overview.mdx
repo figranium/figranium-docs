@@ -1,0 +1,71 @@
+---
+title: "Figranium Kotlin SDK: Browser Automation for Kotlin & Android"
+sidebarTitle: "Overview"
+description: "Official Kotlin SDK for the Figranium API. Coroutines on OkHttp, kotlinx.serialization models, action builders, Flow streams, and optional Android AppFunctions integration."
+---
+
+The Figranium Kotlin SDK is the official Kotlin client for the Figranium API. It is built on Kotlin coroutines, ships with `kotlinx.serialization` models for tasks and actions, and exposes execution streams as `Flow`. The SDK supports Android projects (API 23+) and also runs on the JVM. An optional `figranium-appfunctions` artifact adds Android AppFunctions integration for system assistants and agents (Android API 36+).
+
+## Highlights
+
+<CardGroup cols={2}>
+  <Card title="Native Kotlin coroutines" icon="brand-kotlin">
+    Every method is `suspend`. Execution and selector streams surface as `Flow<StreamEvent<JsonElement>>` that you collect with standard flow operators.
+  </Card>
+
+  <Card title="Type-safe serialization" icon="text-size">
+    All request and response models use `kotlinx.serialization`. The SDK serializes and deserializes JSON automatically so you work with typed Kotlin classes.
+  </Card>
+
+  <Card title="Custom OkHttp client" icon="plug">
+    Pass your own `OkHttpClient` for custom interceptors, certificate pinning, or test doubles. The SDK respects the caller-supplied client.
+  </Card>
+
+  <Card title="Cancellable streams" icon="cloud-x">
+    Cancelling the collecting coroutine cancels the underlying stream. `executions.watch(executionId, intervalMillis)` polls and emits only on status change, finishing when the run ends.
+  </Card>
+</CardGroup>
+
+## Package facts
+
+| Field | Value |
+| :-- | :-- |
+| Artifact | `dev.figranium:figranium:0.1.0` |
+| Import | `dev.figranium.sdk.*` |
+| Kotlin | `2.2+` |
+| JVM toolchain | `17` |
+| Android minSdk | `23` (AppFunctions `36+`) |
+| Dependencies | `okhttp` `5.1.0`, `kotlinx-serialization-json` `1.9.0`, `kotlinx-coroutines-core` `1.10.2` |
+| License | Apache-2.0 |
+| Repository | [figranium/figranium-kotlin](https://github.com/figranium/figranium-kotlin) |
+
+## What you can do with the SDK
+
+- Save, update, version, and roll back tasks with typed `Task` and `Action` values.
+- Run tasks with runtime variables, or call `scrape`, `agent`, and `headful` directly for one-off executions.
+- Stream live execution events and headful selector events as `Flow`.
+- Manage schedules, captures, cookies, output credentials, and Cabinets.
+- Select a per-task Cabinet for intercepted downloads and build typed upload actions.
+- Open and inspect headful browser sessions.
+- Administer settings (API keys, AI providers, proxies, theme) with a browser session.
+- Expose approved Figranium tasks to Android system assistants via AppFunctions (optional).
+
+## Where to go next
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/sdk/kotlin/installation">
+    Add the Gradle dependency and confirm your environment can reach Figranium.
+  </Card>
+
+  <Card title="Quickstart" icon="rocket" href="/sdk/kotlin/quickstart">
+    Build, save, and run a typed task in a few minutes.
+  </Card>
+
+  <Card title="Client configuration" icon="user-cog" href="/sdk/kotlin/client-configuration">
+    Configure `baseUrl`, timeouts, custom `OkHttpClient`, and default headers.
+  </Card>
+
+  <Card title="Resources" icon="tool" href="/sdk/kotlin/resources/tasks">
+    Reference for every resource exposed on the `Figranium` client.
+  </Card>
+</CardGroup>

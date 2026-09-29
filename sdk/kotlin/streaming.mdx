@@ -1,0 +1,149 @@
+---
+title: "Stream Executions and Selector Events in Kotlin"
+sidebarTitle: "Streaming"
+description: "Consume Figranium Server-Sent Events with the Kotlin SDK. Execution and selector streams as cold Flow on Dispatchers.IO, event parsing, polling with watch, and cancellation."
+---
+
+Figranium exposes two Server-Sent Events endpoints, and the Kotlin SDK surfaces both as cold `Flow<StreamEvent<JsonElement>>` backed by OkHttp. You consume them with `collect`, and cancellation stops the underlying call immediately.
+
+## Streams
+
+| Method | Endpoint | Purpose |
+| :-- | :-- | :-- |
+| `client.executions.stream()` | `/api/executions/stream` | Live execution lifecycle events |
+| `client.browser.selectorStream()` | `/api/headful/selector_stream` | Selector events from a headful browser session |
+
+Both take an optional `options` argument (`headers`, `timeoutMillis`).
+
+## StreamEvent shape
+
+```kotlin Models.kt
+data class StreamEvent<T>(
+    val data: T,
+    val event: String? = null,
+    val id: String? = null,
+    val retry: Int? = null,
+    val raw: String
+)
+```
+
+The SDK parses the `data:` lines as JSON into `JsonElement`. If parsing fails, `data` falls back to a `JsonPrimitive` containing the raw payload, and `raw` still contains the original text.
+
+## Consume execution events
+
+<Steps>
+  <Step title="Create a client">
+    Initialize the SDK with your API key.
+
+    ```kotlin Client.kt
+    import dev.figranium.sdk.Figranium
+    import dev.figranium.sdk.FigraniumAuthentication
+    
+    val client = Figranium(
+        baseUrl = "http://localhost:11345",
+        authentication = FigraniumAuthentication.ApiKey(System.getenv("FIGRANIUM_API_KEY")),
+    )
+    ```
+  </Step>
+  <Step title="Collect the stream">
+    Use `collect` to consume events as they arrive inside a coroutine.
+
+    ```kotlin Client.kt
+    import kotlinx.coroutines.flow.collect
+    
+    client.executions.stream().collect { event ->
+        println("${event.event ?: "message"}: ${event.data}")
+    }
+    ```
+
+    Collection ends when the server closes the connection or when the coroutine is cancelled. The Flow is cold, so collection starts the underlying request.
+  </Step>
+</Steps>
+
+## No read timeout
+
+Streams set OkHttp `readTimeout` to 0 so they can run indefinitely. You do not need to pass a special `timeoutMillis` in `RequestOptions` for long-lived streams. Normal request timeouts apply only to API calls that are not streaming.
+
+```kotlin Client.kt
+// This stream will not time out even though the default timeout is 30 seconds.
+client.executions.stream().collect { event ->
+    handle(event)
+}
+```
+
+## Cancel a stream
+
+Cancel the coroutine that collects the Flow. The SDK uses `callbackFlow` with `awaitClose { call.cancel() }`, so the underlying OkHttp call is aborted as soon as collection stops.
+
+```kotlin Client.kt
+import kotlinx.coroutines.*
+
+val job = launch {
+    client.executions.stream().collect { event ->
+        if (isTerminal(event)) {
+            // Exiting the collector cancels the Flow.
+            return@collect
+        }
+        handle(event)
+    }
+}
+
+// Later, when your application state changes:
+job.cancel()
+```
+
+## Watch an execution with polling
+
+`executions.watch` polls `get` at a configurable interval and yields `Execution` only when the status changes. It finishes automatically when the outcome or status reaches a terminal state (`success`, `error`, `stopped`, `crashed`, or `anti_bot`).
+
+```kotlin Client.kt
+client.executions.watch(
+    executionId = "exec-id",
+    intervalMillis = 1_000,
+).collect { execution ->
+    println(execution.status ?: execution.outcome ?: "unknown")
+}
+```
+
+Cancelling the collecting coroutine also cancels the polling loop and any in-flight request.
+
+## Selector stream from a headful browser
+
+The selector stream reports element highlights from a headful browser session. Use it to power visual inspectors:
+
+```kotlin Client.kt
+client.browser.selectorStream().collect { event ->
+    println("${event.event ?: "message"}: ${event.data}")
+}
+```
+
+See [Browser resource](/sdk/kotlin/resources/browser) for opening, inspecting, and stopping headful sessions.
+
+## Errors
+
+Streams raise `FigraniumException` in the same conditions as regular requests:
+
+- `NETWORK_ERROR`: the stream could not reach the server.
+- Any non-2xx HTTP response from the server.
+
+See [Errors](/sdk/kotlin/errors) for the full error shape.
+
+<Tip>
+  For long-running streams, prefer cancelling the collecting coroutine over setting a short `timeoutMillis` in `RequestOptions` so you can stop cleanly when your application state changes.
+</Tip>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Errors" icon="alert-triangle" href="/sdk/kotlin/errors">
+    `FigraniumException` fields, codes, and retry guidance.
+  </Card>
+
+  <Card title="Browser resource" icon="browser" href="/sdk/kotlin/resources/browser">
+    Open, inspect, and stream headful browser sessions.
+  </Card>
+
+  <Card title="Executions resource" icon="play" href="/sdk/kotlin/resources/executions">
+    List, stop, delete, and watch executions.
+  </Card>
+</CardGroup>

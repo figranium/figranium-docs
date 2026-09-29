@@ -1,0 +1,205 @@
+---
+title: "Build Task Actions with the Kotlin SDK"
+sidebarTitle: "Actions"
+description: "Use the Actions object to build Figranium task actions in Kotlin. Navigation, interaction, extraction, control flow, HTTP, CAPTCHA, and upload helpers with auto-generated IDs."
+---
+
+Figranium tasks are executed as ordered lists of actions. The Kotlin SDK exports typed static builders on the `Actions` object that generate correctly shaped `Action` values with stable IDs, plus an `action()` helper for one-offs.
+
+## Import
+
+```kotlin
+import dev.figranium.sdk.Actions
+import dev.figranium.sdk.action
+import dev.figranium.sdk.variable
+```
+
+Every helper returns an `Action` data class. Helpers assign a unique `id` if you do not pass one, so lists remain stable across saves. The auto-generated ID format is `act_<type>_<uuid>`.
+
+## Action types
+
+<CardGroup cols={2}>
+  <Card title="Navigation and interaction" icon="arrow-right" href="#navigation-and-interaction">
+    Navigate, click, type, press keys, wait, hover, and capture screenshots.
+  </Card>
+
+  <Card title="Extraction" icon="database" href="#extraction">
+    Read content, run JavaScript, parse CSV, and make HTTP requests.
+  </Card>
+
+  <Card title="Control flow" icon="stack-2" href="#control-flow">
+    Conditionals, loops, branches, repeats, and sub-task starts.
+  </Card>
+
+  <Card title="Variables and CAPTCHA" icon="lock" href="#variables-and-captcha">
+    Set and merge variables, plus CAPTCHA solving actions.
+  </Card>
+
+  <Card title="Files and Cabinets" icon="folder-open" href="#files-and-cabinets">
+    Upload the newest unuploaded Cabinet item and finalize attached items after success.
+  </Card>
+</CardGroup>
+
+## Navigation and interaction
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `Actions.navigate(url: String)` | `navigate` | Navigate the current tab to `url`. |
+| `Actions.click(selector: String, kind: String = "single")` | `click` | Click the element matched by `selector`. `kind` is `"single"` (default) or `"double"`. |
+| `Actions.type(selector: String, value: String, mode: String = "replace")` | `type` | Type into `selector`. `mode` is `"replace"` (default) or `"append"`. |
+| `Actions.press(key: String, selector: String? = null)` | `press` | Press a keyboard `key`, optionally targeting `selector`. |
+| `Actions.wait(seconds: Double)` | `wait` | Wait a fixed number of seconds. |
+| `Actions.waitFor(selector: String)` | `wait_selector` | Wait until `selector` matches an element. |
+| `Actions.waitForDownloads(timeout: Double? = null)` | `wait_downloads` | Wait for downloads to complete, optionally with a timeout in seconds. |
+| `Actions.hover(selector: String)` | `hover` | Hover over the element matched by `selector`. |
+| `Actions.screenshot(name: String? = null)` | `screenshot` | Capture a screenshot, optionally named. |
+| `Actions.reload()` | `reload` | Reload the current page. |
+| `Actions.check(selector: String)` | `check` | Check a checkbox or radio input. |
+| `Actions.uncheck(selector: String)` | `uncheck` | Uncheck a checkbox or radio input. |
+| `Actions.select(selector: String, value: String)` | `select` | Select an option in a dropdown. |
+| `Actions.dragAndDrop(selector: String, to: String)` | `drag_and_drop` | Drag an element to another element. |
+| `Actions.scroll(selector: String? = null, value: String? = null)` | `scroll` | Scroll the page or an element. |
+
+## Extraction
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `Actions.getContent(selector: String? = null, varName: String? = null)` | `get_content` | Read visible text; store in `varName` when set. |
+| `Actions.javascript(script: String, varName: String? = null)` | `javascript` | Run `script` in the page; store the return value. |
+| `Actions.csv(value: String? = null, selector: String? = null, varName: String? = null)` | `csv` | Parse CSV content or from a selector; store in `varName`. |
+| `Actions.request(url: String, method: String? = null, headers: String? = null, body: String? = null, varName: String? = null)` | `http_request` | Perform an HTTP request; store the response in `varName`. |
+
+`request` accepts `method`, `headers`, `body`, and `varName`. `method` defaults to `GET` when omitted by the server.
+
+## Control flow
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `Actions.ifAction(selector: String? = null, value: String? = null, variable: String? = null, variableType: String? = null, operation: String? = null, comparisonValue: String? = null)` | `if` | Begin a conditional block. |
+| `Actions.whileAction(selector: String? = null, value: String? = null, variable: String? = null, variableType: String? = null, operation: String? = null, comparisonValue: String? = null)` | `while` | Begin a loop block. |
+| `Actions.elseBlock()` | `else` | Else branch of the preceding `if`. |
+| `Actions.end()` | `end` | Close the preceding block. |
+| `Actions.repeatCount(count: Int)` | `repeat` | Repeat the following block `count` times. |
+| `Actions.forEach(selector: String? = null, value: String? = null, varName: String? = null)` | `foreach` | Iterate over a selector result or value. |
+| `Actions.stop(outcome: String = "success")` | `stop` | Stop the task with an outcome (default `"success"`). |
+| `Actions.start(taskId: String)` | `start` | Start a modular sub-task by ID. |
+| `Actions.onError(value: String? = null)` | `on_error` | Set an error handler for the following block. |
+| `Actions.doNothing()` | `do_nothing` | A no-op action. |
+
+Condition fields for `ifAction` and `whileAction` accept:
+
+- `selector`: a CSS selector to test
+- `value`: a free-form expression, when supported
+- `variable`: a variable name to test
+- `variableType`: `"string"`, `"number"`, or `"boolean"`
+- `operation`: the comparison operator
+- `comparisonValue`: the comparison target
+
+Supported `operation` values include:
+
+- Strings: `equals`, `not_equals`, `contains`, `starts_with`, `ends_with`, `matches`
+- Numbers: `equals`, `not_equals`, `gt`, `gte`, `lt`, `lte`
+- Booleans: `is_true`, `is_false`
+- Selectors: `exists`, `not_exists`
+
+## Variables and CAPTCHA
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `Actions.set(name: String, value: String)` | `set` | Assign `value` to `name`. |
+| `Actions.merge(name: String, value: String)` | `merge` | Merge `value` into an existing variable `name`. |
+| `Actions.solveCaptcha(captchaType: String? = null, selector: String? = null, varName: String? = null, timeout: Double? = null)` | `solve_captcha` | Solve a CAPTCHA challenge. |
+| `Actions.waitForCaptcha(captchaType: String? = null, selector: String? = null, varName: String? = null, timeout: Double? = null)` | `wait_captcha` | Wait for a CAPTCHA to appear. |
+
+`captchaType` is one of `"recaptcha_v2"`, `"recaptcha_v3"`, `"hcaptcha"`, or `"turnstile"`. See [CAPTCHA Solving](/captcha-solving) for setup and return-value shape.
+
+The exported `variable(name)` helper produces the `{$name}` template token Figranium expects when a value should be substituted from a runtime variable:
+
+```kotlin
+Actions.type("#search", variable("query"))
+```
+
+See [Variables and templates](/sdk/kotlin/variables) for more.
+
+## Files and Cabinets
+
+The SDK includes helpers for the Cabinet upload flow.
+
+| Helper | Action type | Purpose |
+| :-- | :-- | :-- |
+| `Actions.upload(selector: String? = null, cabinetId: String? = null, markAsUploaded: Boolean? = null)` | `upload` | Attach the newest unuploaded item from a Cabinet. |
+| `Actions.finalizeUploads()` | `finalize_uploads` | Mark all Cabinet items attached during the current execution as uploaded. |
+
+When `cabinetId` is omitted on an upload action, Figranium uses the task's `cabinetId`; if the task also omits it, the instance default Cabinet is used.
+
+Keeping finalization separate is useful when an upload should only be consumed after the surrounding workflow reaches a successful point.
+
+```kotlin
+import dev.figranium.sdk.Actions
+import dev.figranium.sdk.Task
+
+val task = Task(
+    name = "Upload latest export",
+    url = "https://example.com/upload",
+    mode = "agent",
+    actions = listOf(
+        Actions.upload(selector = "input[type=file]"),
+        Actions.click("button[type=submit]"),
+        Actions.finalizeUploads(),
+    )
+)
+```
+
+See [Cabinets resource](/sdk/kotlin/resources/cabinets) for full Cabinet operations.
+
+## Typed one-off actions
+
+For actions the helpers do not cover, construct an `Action` directly:
+
+```kotlin
+val download = Action(
+    type = "wait_downloads",
+    value = "10"
+)
+```
+
+`Actions.action(value: Action)` assigns an ID if you do not provide one and preserves all valid fields.
+
+## Full task example
+
+```kotlin
+import dev.figranium.sdk.*
+
+val task = Task(
+    name = "Search and screenshot",
+    url = "https://example.com",
+    mode = "agent",
+    variables = mapOf(
+        "query" to TaskVariable(type = "string", value = JsonPrimitive("figranium"))
+    ),
+    actions = listOf(
+        Actions.navigate("https://example.com"),
+        Actions.waitFor("#search"),
+        Actions.type("#search", variable("query")),
+        Actions.press("Enter", "#search"),
+        Actions.waitFor(".results"),
+        Actions.ifAction(selector = ".no-results", operation = "exists"),
+        Actions.stop("no_results"),
+        Actions.end(),
+        Actions.getContent(selector = ".results", varName = "resultText"),
+        Actions.screenshot("results"),
+    )
+)
+```
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Variables and templates" icon="variable" href="/sdk/kotlin/variables">
+    Declare task variables and reference them with variable().
+  </Card>
+
+  <Card title="Tasks resource" icon="list-check" href="/sdk/kotlin/resources/tasks">
+    Save, version, and execute tasks that use these actions.
+  </Card>
+</CardGroup>

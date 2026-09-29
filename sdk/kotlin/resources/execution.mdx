@@ -1,0 +1,166 @@
+---
+title: "ExecutionResource: Direct Scrape, Agent, and Headful Runs"
+sidebarTitle: "Execution"
+description: "Run one-off browser automation with the Figranium Kotlin SDK. Use scrape, agent, and headful methods without creating a saved task."
+---
+
+The `ExecutionResource` provides direct, stateless endpoints for running browser automation without saving a task first. You can scrape a page, run an agent session, or launch a headful browser in a single call. The `Figranium` client also exposes these as top-level shortcuts: `client.scrape()`, `client.agent()`, and `client.headful()`.
+
+<Note>
+  `ExecutionResource` (singular) is for **direct runs**. For saved-task execution, see [`TasksResource`](/sdk/kotlin/resources/tasks). For execution history and live streams, see [`ExecutionsResource`](/sdk/kotlin/resources/executions).
+</Note>
+
+```kotlin
+import dev.figranium.sdk.Figranium
+import dev.figranium.sdk.FigraniumAuthentication
+
+val client = Figranium(
+    authentication = FigraniumAuthentication.ApiKey("your-api-key"),
+)
+```
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`scrape`">
+    ```kotlin
+    suspend inline fun <reified T> scrape(
+        input: JSONObject,
+        options: RequestOptions = RequestOptions(),
+    ): ExecutionResult<T>
+    ```
+
+    Performs a one-off scrape by sending `POST /scrape`. Pass a `url`, a `selector` for DOM extraction, or an `extractionScript` for custom parsing. You can also inject runtime [variables](/sdk/kotlin/variables) via `variables` or `taskVariables`.
+
+    ```kotlin scrape_by_selector.kt
+    import kotlinx.serialization.json.*
+    
+    val result = client.execution.scrape<JsonElement>(
+        mapOf(
+            "url" to JsonPrimitive("https://news.ycombinator.com"),
+            "selector" to JsonPrimitive(".titleline > a"),
+            "variables" to buildJsonObject { put("limit", 5) },
+        ),
+    )
+    println(result.data)
+    ```
+
+    ```kotlin scrape_by_script.kt
+    val result = client.execution.scrape<JsonElement>(
+        mapOf(
+            "url" to JsonPrimitive("https://example.com"),
+            "extractionScript" to JsonPrimitive(
+                """
+                const items = Array.from(document.querySelectorAll('.item'));
+                return items.map(el => el.textContent?.trim());
+                """.trimIndent(),
+            ),
+        ),
+    )
+    println(result.data)
+    ```
+  </Accordion>
+
+  <Accordion title="`agent`">
+    ```kotlin
+    suspend inline fun <reified T> agent(
+        input: JSONObject,
+        options: RequestOptions = RequestOptions(),
+    ): ExecutionResult<T>
+    ```
+
+    Runs a one-off agent session by sending `POST /agent`. The agent navigates and interacts autonomously based on the provided input. You can supply a `runId` to correlate or resume a specific run.
+
+    ```kotlin agent_run.kt
+    val result = client.execution.agent<JsonElement>(
+        mapOf(
+            "url" to JsonPrimitive("https://example.com"),
+            "runId" to JsonPrimitive("run-2024-001"),
+        ),
+    )
+    println(result.success)
+    println(result.data)
+    ```
+  </Accordion>
+
+  <Accordion title="`headful`">
+    ```kotlin
+    suspend inline fun <reified T> headful(
+        input: JSONObject,
+        options: RequestOptions = RequestOptions(),
+    ): ExecutionResult<T>
+    ```
+
+    Launches a headful (visible) browser session by sending `POST /headful`. Pass a starting `url` and optional runtime [variables](/sdk/kotlin/variables). This is useful when you need to interact with a live browser window or debug visually.
+
+    ```kotlin headful_run.kt
+    val result = client.execution.headful<JsonElement>(
+        mapOf(
+            "url" to JsonPrimitive("https://example.com/login"),
+            "variables" to buildJsonObject { put("username", "alice") },
+        ),
+    )
+    println(result.runId)
+    println(result.data)
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Top-level shortcuts
+
+`Figranium` mirrors these methods at the client root so you can call them directly without reaching into `execution`:
+
+```kotlin shortcuts.kt
+val scrapeResult = client.scrape<JsonElement>(
+    mapOf(
+        "url" to JsonPrimitive("https://example.com"),
+        "selector" to JsonPrimitive("h1"),
+    ),
+)
+
+val agentResult = client.agent<JsonElement>(
+    mapOf(
+        "url" to JsonPrimitive("https://example.com"),
+    ),
+)
+
+val headfulResult = client.headful<JsonElement>(
+    mapOf(
+        "url" to JsonPrimitive("https://example.com"),
+    ),
+)
+```
+
+## Return type
+
+All three methods return `ExecutionResult<T>`, which includes the following fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `data` | `T?` | The result payload from the run. |
+| `outcome` | `String?` | One of `"success"`, `"error"`, `"stopped"`, `"crashed"`, or `"anti_bot"`. |
+| `success` | `Boolean?` | Whether the execution completed successfully. |
+| `error` | `String?` | Error message if the run failed. |
+| `runId` | `String?` | Correlation ID for the execution. |
+
+For error handling, see [`/sdk/kotlin/errors`](/sdk/kotlin/errors). For request options such as custom `headers` and `timeout`, see [`/sdk/kotlin/request-options`](/sdk/kotlin/request-options).
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="Tasks" icon="list-check" href="/sdk/kotlin/resources/tasks">
+    Create, save, and execute named tasks.
+  </Card>
+
+  <Card title="Executions" icon="play" href="/sdk/kotlin/resources/executions">
+    List, inspect, and stream execution history.
+  </Card>
+
+  <Card title="Request options" icon="sliders" href="/sdk/kotlin/request-options">
+    Pass custom headers and per-request timeouts.
+  </Card>
+
+  <Card title="Errors" icon="alert-triangle" href="/sdk/kotlin/errors">
+    Handle `FigraniumException` responses.
+  </Card>
+</CardGroup>

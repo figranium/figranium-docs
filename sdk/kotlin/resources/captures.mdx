@@ -1,0 +1,170 @@
+---
+title: "CapturesResource: Recordings, Screenshots, and Cookies"
+sidebarTitle: "Captures"
+description: "Use the Figranium Kotlin SDK to list captures, delete recordings, manage browser cookies, and clear screenshots. Covers every CapturesResource method with typed examples."
+---
+
+The `captures` resource on the Figranium Kotlin SDK gives you access to recordings, screenshots, and browser cookies produced during task executions. You can list captures for a specific run, delete individual files, inspect stored cookies, and bulk-clear screenshots or cookies when you need to reclaim space or reset state.
+
+```kotlin main.kt
+import dev.figranium.sdk.Figranium
+
+val client = Figranium(
+    authentication = FigraniumAuthentication.ApiKey(System.getenv("FIGRANIUM_API_KEY")),
+)
+```
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`list`">
+    Returns all captures, including recordings and screenshots. Optionally filter by `runId`.
+
+    - **HTTP endpoint:** `GET /api/data/captures` (with `runId` query parameter when set)
+    - **Signature:** `captures.list(runId: String? = null, options: RequestOptions = RequestOptions()): List<Capture>`
+
+    ```kotlin list_captures.kt
+    val captures = client.captures.list(runId = "run_abc123")
+    
+    for (capture in captures) {
+        println("${capture.type}: ${capture.name} (${capture.size} bytes)")
+    }
+    ```
+
+    Each capture entry contains `name`, `url`, `size`, `modified`, and `type` (`"recording"` or `"screenshot"`).
+  </Accordion>
+
+  <Accordion title="`screenshots`">
+    Returns only screenshot captures, omitting recordings.
+
+    - **HTTP endpoint:** `GET /api/data/screenshots`
+    - **Signature:** `captures.screenshots(options: RequestOptions = RequestOptions()): List<Capture>`
+
+    ```kotlin list_screenshots.kt
+    val screenshots = client.captures.screenshots()
+    
+    for (shot in screenshots) {
+        println("${shot.name}: ${shot.url}")
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="`delete`">
+    Delete a single capture by its name.
+
+    - **HTTP endpoint:** `DELETE /api/data/captures/{name}`
+    - **Signature:** `captures.delete(name: String, options: RequestOptions = RequestOptions()): JsonObject`
+
+    ```kotlin delete_capture.kt
+    val result = client.captures.delete("run_abc123_recording.webm")
+    ```
+  </Accordion>
+
+  <Accordion title="`cookies`">
+    List stored browser cookies and their origins.
+
+    - **HTTP endpoint:** `GET /api/data/cookies`
+    - **Signature:** `captures.cookies(options: RequestOptions = RequestOptions()): JsonObject`
+
+    ```kotlin list_cookies.kt
+    val result = client.captures.cookies()
+    println("Found cookies across origins")
+    ```
+  </Accordion>
+
+  <Accordion title="`deleteCookie`">
+    Remove a specific cookie by name, optionally scoped to a domain and path.
+
+    - **HTTP endpoint:** `POST /api/data/cookies/delete`
+    - **Signature:** `captures.deleteCookie(name: String, domain: String? = null, path: String? = null, options: RequestOptions = RequestOptions()): JsonObject`
+
+    ```kotlin delete_cookie.kt
+    val result = client.captures.deleteCookie(
+        "session_id",
+        domain = "example.com",
+        path = "/"
+    )
+    ```
+  </Accordion>
+
+  <Accordion title="`clear`">
+    Delete all screenshots at once.
+
+    - **HTTP endpoint:** `POST /api/data/clear-screenshots`
+    - **Signature:** `captures.clear(options: RequestOptions = RequestOptions()): JsonObject`
+
+    ```kotlin clear_screenshots.kt
+    val result = client.captures.clear()
+    ```
+  </Accordion>
+
+  <Accordion title="`clearCookies`">
+    Delete all stored cookies.
+
+    - **HTTP endpoint:** `POST /api/data/clear-cookies`
+    - **Signature:** `captures.clearCookies(options: RequestOptions = RequestOptions()): JsonObject`
+
+    ```kotlin clear_cookies.kt
+    val result = client.captures.clearCookies()
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Working example: list captures for a run and delete cookies
+
+This example combines `list` and `deleteCookie` to clean up after a run: it lists captures for a specific run, then removes a session cookie for the target domain.
+
+```kotlin cleanup_after_run.kt
+val captures = client.captures.list(runId = "run_abc123")
+
+val recording = captures.firstOrNull { it.type == "recording" }
+if (recording != null) {
+    println("Recording: ${recording.name} (${recording.size} bytes)")
+}
+
+val deleteResult = client.captures.deleteCookie(
+    "auth_token",
+    domain = "example.com"
+)
+
+println("Cookie deleted")
+```
+
+## Model
+
+### `Capture`
+
+```kotlin
+@Serializable
+data class Capture(
+    val name: String,
+    val url: String,
+    val size: Int,
+    val modified: Double,
+    val type: String
+)
+```
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="Request options" icon="sliders" href="/sdk/kotlin/request-options">
+    Pass custom headers and per-request timeouts.
+  </Card>
+
+  <Card title="Errors" icon="alert-triangle" href="/sdk/kotlin/errors">
+    Handle FigraniumException responses.
+  </Card>
+
+  <Card title="Executions" icon="bolt" href="/sdk/kotlin/resources/executions">
+    Start runs that produce captures.
+  </Card>
+
+  <Card title="Captures and storage" icon="hard-drive" href="/captures-and-storage">
+    Learn how Figranium stores recordings and screenshots.
+  </Card>
+
+  <Card title="Session state" icon="cookie" href="/session-state">
+    Understand how cookies and session state work in Figranium.
+  </Card>
+</CardGroup>

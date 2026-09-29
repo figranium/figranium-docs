@@ -1,0 +1,270 @@
+---
+title: "Kotlin SDK Models and Data Types"
+sidebarTitle: "Models"
+description: "Reference for JSONObject, Task, ExecutionResult, Execution, and supporting data classes and typealiases in the Figranium Kotlin SDK. Exact fields, types, and defaults from the source."
+---
+
+The Figranium Kotlin SDK uses strongly typed data classes, typealiases, and kotlinx.serialization for all API payloads. This page documents the public model layer: JSON typealiases, the `Task` data class, execution types, and supporting configuration structs.
+
+## Typealiases
+
+The SDK provides two typealiases for convenience:
+
+```kotlin Models.kt
+typealias JSONObject = Map<String, JsonElement>
+typealias RuntimeVariables = Map<String, JsonElement>
+typealias TaskMode = String
+typealias TaskOutcome = String
+```
+
+Use `JSONObject` when you need to accept or return arbitrary JSON shapes, such as task inputs or settings payloads. `RuntimeVariables` is the type for variable overrides at execution time.
+
+## TaskVariable
+
+`TaskVariable` declares a typed variable on a task.
+
+```kotlin Models.kt
+@Serializable
+data class TaskVariable(
+    val type: String,
+    val value: JsonElement,
+    val autoCreated: Boolean? = null
+)
+```
+
+## Task
+
+`Task` defines a browser automation workflow. It is a `@Serializable` data class with all properties exposed directly.
+
+```kotlin Models.kt
+@Serializable
+data class Task(
+    val name: String,
+    val url: String,
+    val mode: String,
+    val description: String = "",
+    val id: String? = null,
+    val wait: Double? = null,
+    val selector: String? = null,
+    val rotateUserAgents: Boolean? = null,
+    val rotateProxies: Boolean? = null,
+    val rotateViewport: Boolean? = null,
+    val humanTyping: Boolean? = null,
+    val stealth: StealthConfig? = null,
+    val autoSolveCaptcha: Boolean? = null,
+    val translation: TaskTranslation? = null,
+    val actions: List<Action>? = null,
+    val variables: Map<String, TaskVariable>? = null,
+    val schedule: Schedule? = null,
+    val output: TaskOutput? = null,
+    val extractionScript: String? = null,
+    val extractionFormat: String? = null,
+    val includeHtml: Boolean? = null,
+    val includeShadowDom: Boolean? = null,
+    val disableRecording: Boolean? = null,
+    val statelessExecution: Boolean? = null,
+    val downloadCabinetId: String? = null,
+    val cabinetId: String? = null,
+)
+```
+
+The primary constructor requires `name`, `url`, and `mode`. All other fields are optional and default to `null`.
+
+## Action
+
+`Action` is the atomic unit of a task. It is a `@Serializable` data class.
+
+```kotlin Models.kt
+@Serializable
+data class Action(
+    val type: String,
+    val id: String? = null,
+    val disabled: Boolean? = null,
+    val selector: String? = null,
+    val targetSelector: String? = null,
+    val value: String? = null,
+    val clickType: String? = null,
+    val typeMode: String? = null,
+    val key: String? = null,
+    val varName: String? = null,
+    val method: String? = null,
+    val headers: String? = null,
+    val body: String? = null,
+    val conditionVar: String? = null,
+    val conditionVarType: String? = null,
+    val conditionOp: String? = null,
+    val conditionValue: String? = null,
+    val captchaType: String? = null,
+    val timeout: Double? = null,
+    val cabinetId: String? = null,
+    val markAsUploaded: Boolean? = null,
+)
+```
+
+The primary constructor requires `type`. All other fields are optional. The `Actions` object helpers auto-generate an `id` in the format `act_<type>_<uuid>` when `id` is `null`.
+
+## ExecuteTaskOptions
+
+`ExecuteTaskOptions` is passed to `runTask` and other execution methods to override variables and configure the run.
+
+```kotlin Models.kt
+@Serializable
+data class ExecuteTaskOptions(
+    val variables: RuntimeVariables? = null,
+    val taskVariables: RuntimeVariables? = null,
+    val webhookUrl: String? = null,
+    val runId: String? = null
+)
+```
+
+## ExecutionResult
+
+`ExecutionResult` is the generic return type for task executions. `T` is the deserialized data type.
+
+```kotlin Models.kt
+@Serializable
+data class ExecutionResult<T>(
+    val data: T? = null,
+    val outcome: String? = null,
+    val success: Boolean? = null,
+    val error: String? = null,
+    val runId: String? = null
+)
+```
+
+## Execution
+
+`Execution` represents a single recorded run.
+
+```kotlin Models.kt
+@Serializable
+data class Execution(
+    val id: String,
+    val timestamp: Double,
+    val method: String? = null,
+    val path: String? = null,
+    val status: String? = null,
+    val outcome: String? = null,
+    val durationMs: Double? = null,
+    val source: String? = null,
+    val mode: String? = null,
+    val taskId: String? = null,
+    val taskName: String? = null,
+    val url: String? = null,
+    val result: JsonElement? = null
+)
+```
+
+## StreamEvent
+
+`StreamEvent` wraps a Server-Sent Events payload.
+
+```kotlin Models.kt
+data class StreamEvent<T>(
+    val data: T,
+    val event: String? = null,
+    val id: String? = null,
+    val retry: Int? = null,
+    val raw: String
+)
+```
+
+The SDK uses `StreamEvent<JsonElement>` for execution and selector streams.
+
+## Supporting data classes
+
+### StealthConfig
+
+```kotlin Models.kt
+@Serializable
+data class StealthConfig(
+    val allowTypos: Boolean? = null,
+    val idleMovements: Boolean? = null,
+    val overscroll: Boolean? = null,
+    val deadClicks: Boolean? = null,
+    val fatigue: Boolean? = null,
+    val naturalTyping: Boolean? = null,
+    val cursorGlide: Boolean? = null,
+    val randomizeClicks: Boolean? = null,
+)
+```
+
+### TaskTranslation
+
+```kotlin Models.kt
+@Serializable
+data class TaskTranslation(
+    val enabled: Boolean,
+    val targetLanguage: String
+)
+```
+
+### TaskOutput
+
+```kotlin Models.kt
+@Serializable
+data class TaskOutput(
+    val provider: String = "baserow",
+    val credentialId: String,
+    val tableId: String,
+    val onError: String? = null
+)
+```
+
+### Schedule
+
+```kotlin Models.kt
+@Serializable
+data class Schedule(
+    val enabled: Boolean,
+    val frequency: String? = null,
+    val intervalMinutes: Int? = null,
+    val hour: Int? = null,
+    val minute: Int? = null,
+    val daysOfWeek: List<Int>? = null,
+    val dayOfMonth: Int? = null,
+    val cron: String? = null,
+    val lastRun: Double? = null,
+    val lastRunStatus: String? = null,
+    val lastRunDurationMs: Double? = null,
+    val nextRun: Double? = null,
+)
+```
+
+### Other types
+
+| Type | Key fields |
+| :-- | :-- |
+| `TaskSummary` | `id: String`, `name: String`, `description: String?` |
+| `TaskVersion` | `id: String`, `timestamp: Double`, `name: String?`, `mode: String?` |
+| `Cabinet` | `id: String`, `name: String`, `isDefault: Boolean?`, `itemCount: Int?`, `createdAt: Double?` |
+| `CabinetItem` | `id: String`, `name: String`, `kind: String`, `status: String`, `size: Int?`, `createdAt: Double?`, `sourceTaskId: String?`, `sourceRunId: String?` |
+| `Capture` | `name: String`, `url: String`, `size: Int`, `modified: Double`, `type: String` |
+| `CredentialInput` | `name: String`, `provider: String`, `config: Map<String, String>` |
+| `Credential` | `id: String`, `name: String`, `provider: String`, `config: Map<String, String>` |
+| `BrowserSession` | `sessionId: String`, `status: String`, `wsEndpoint: String?` |
+| `SelectorCandidate` | `css: String`, `xpath: String?`, `confidence: Double?` |
+| `HealthStatus` | `status: String`, `version: String?` |
+| `User` | `id: String`, `name: String?`, `email: String?` |
+| `ProxyInput` | `server: String`, `username: String?`, `password: String?`, `label: String?`, `isRotatingPool: Boolean?`, `estimatedPoolSize: Int?` |
+| `RequestOptions` | `headers: Map<String, String>`, `timeoutMillis: Long?` |
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Actions" icon="click" href="/sdk/kotlin/actions">
+    Build action lists with typed helpers.
+  </Card>
+
+  <Card title="Variables" icon="variable" href="/sdk/kotlin/variables">
+    Declare and reference task variables.
+  </Card>
+
+  <Card title="Tasks resource" icon="list-check" href="/sdk/kotlin/resources/tasks">
+    Save, version, and execute tasks.
+  </Card>
+
+  <Card title="Execution resource" icon="play" href="/sdk/kotlin/resources/execution">
+    Run scrape, agent, and headful executions.
+  </Card>
+</CardGroup>

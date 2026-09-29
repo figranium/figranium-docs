@@ -1,0 +1,187 @@
+---
+title: "Figranium Kotlin SDK Quickstart"
+sidebarTitle: "Quickstart"
+description: "Get started with the Figranium Kotlin SDK: create a client, define and save a task with Actions, run it with variables, and read the ExecutionResult."
+---
+
+The Figranium Kotlin SDK lets you drive a Figranium server from Kotlin: build tasks with typed action helpers, run them with coroutines, and stream results as `Flow`. This quickstart walks you from an empty project to running your first task in a handful of lines.
+
+## Prerequisites
+
+- Kotlin 2.2 or later
+- A JVM toolchain of 17 (or Android minSdk 23)
+- A running Figranium instance (`http://localhost:11345` by default)
+- An API key generated from the Figranium web UI
+
+<Steps>
+  <Step title="Install the SDK">
+    Add the Gradle dependency. See [Installation](/sdk/kotlin/installation) for the full manifest snippet.
+
+    ```kotlin build.gradle.kts
+    dependencies {
+        implementation("dev.figranium:figranium:0.1.0")
+    }
+    ```
+  </Step>
+  <Step title="Create a client">
+    Store your API key securely (for example, in environment variables or Android Keystore) so it never lands in source control.
+
+    ```kotlin quickstart.kt
+    import dev.figranium.sdk.*
+    import kotlinx.serialization.json.*
+    
+    val client = Figranium(
+        baseUrl = "http://localhost:11345",
+        authentication = FigraniumAuthentication.ApiKey(
+            value = System.getenv("FIGRANIUM_API_KEY") ?: ""
+        ),
+    )
+    ```
+
+    See [Client configuration](/sdk/kotlin/client-configuration) for every constructor option and [Authentication](/sdk/kotlin/authentication) for API key setup.
+  </Step>
+  <Step title="Define and save a task">
+    Use `Actions` helpers to describe the browser workflow. `variable("query")` produces the template token `{\$query}` that is replaced at runtime.
+
+    ```kotlin quickstart.kt
+    val task = Task(
+        name = "Search example",
+        url = "https://example.com",
+        mode = "scrape",
+        variables = mapOf(
+            "query" to TaskVariable(type = "string", value = JsonPrimitive("figranium")),
+        ),
+        actions = listOf(
+            Actions.type("#search", variable("query")),
+            Actions.click("button[type=submit]"),
+            Actions.waitFor(".results"),
+            Actions.getContent(selector = ".results", varName = "html"),
+        )
+    )
+    
+    val saved = client.tasks.save(task)
+    ```
+
+    See [Actions](/sdk/kotlin/actions) for every helper and [Variables](/sdk/kotlin/variables) for typed variable declarations.
+  </Step>
+  <Step title="Run the task">
+    Use `runTask` (a shortcut for `client.tasks.run`) and pass runtime variable overrides in `ExecuteTaskOptions`.
+
+    ```kotlin quickstart.kt
+    import kotlinx.serialization.json.JsonElement
+    
+    val result: ExecutionResult<JsonElement> = client.runTask(
+        id = saved.id!!,
+        input = ExecuteTaskOptions(
+            variables = mapOf("query" to JsonPrimitive("browser automation"))
+        ),
+    )
+    
+    println(result.success)
+    println(result.outcome)
+    println(result.data)
+    ```
+  </Step>
+  <Step title="Watch the execution">
+    Poll the execution and emit only when the status changes. The flow finishes when the run reaches a terminal state.
+
+    ```kotlin quickstart.kt
+    client.executions.watch(result.runId ?: "").collect { execution ->
+        println("${execution.status} ${execution.outcome}")
+    }
+    ```
+
+    See [Streaming](/sdk/kotlin/streaming) for `executions.stream()` and `browser.selectorStream()`.
+  </Step>
+  <Step title="Handle errors">
+    Every HTTP, transport, and timeout failure throws `FigraniumException`. Inspect `status` and `code` to branch on the failure kind.
+
+    ```kotlin quickstart.kt
+    try {
+        val result = client.runTask<JsonElement>(saved.id!!, ExecuteTaskOptions())
+    } catch (error: FigraniumException) {
+        println("${error.status} ${error.code} ${error.requestId}")
+    }
+    ```
+
+    See [Errors](/sdk/kotlin/errors) for the full list of codes.
+  </Step>
+</Steps>
+
+## Complete example
+
+```kotlin quickstart.kt
+import dev.figranium.sdk.*
+import kotlinx.serialization.json.*
+
+val client = Figranium(
+    baseUrl = "http://localhost:11345",
+    authentication = FigraniumAuthentication.ApiKey(
+        value = System.getenv("FIGRANIUM_API_KEY") ?: ""
+    ),
+)
+
+val task = Task(
+    name = "Search example",
+    url = "https://example.com",
+    mode = "scrape",
+    variables = mapOf(
+        "query" to TaskVariable(type = "string", value = JsonPrimitive("figranium")),
+    ),
+    actions = listOf(
+        Actions.type("#search", variable("query")),
+        Actions.click("button[type=submit]"),
+        Actions.waitFor(".results"),
+        Actions.getContent(selector = ".results", varName = "html"),
+    )
+)
+
+try {
+    val saved = client.tasks.save(task)
+    val result: ExecutionResult<JsonElement> = client.runTask(
+        id = saved.id!!,
+        input = ExecuteTaskOptions(
+            variables = mapOf("query" to JsonPrimitive("browser automation"))
+        ),
+    )
+    println(result.data)
+} catch (error: FigraniumException) {
+    println("[${error.status}] ${error.code}: ${error.message}")
+}
+```
+
+## Direct execution without saving
+
+For one-off runs, skip `tasks.save` and call `client.scrape`, `client.agent`, or `client.headful` directly. These use the same task shape, but the server does not persist them.
+
+```kotlin direct.kt
+import kotlinx.serialization.json.*
+
+val result: ExecutionResult<JsonElement> = client.scrape(
+    input = mapOf(
+        "url" to JsonPrimitive("https://example.com"),
+        "selector" to JsonPrimitive("body"),
+    )
+)
+println(result.data)
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Action helpers" icon="archery-arrow" href="/sdk/kotlin/actions">
+    Every helper you can use to build a task, from navigation to CAPTCHA solving.
+  </Card>
+
+  <Card title="Streaming" icon="cloud" href="/sdk/kotlin/streaming">
+    Collect live executions with `client.executions.stream()`.
+  </Card>
+
+  <Card title="Handle errors" icon="alert-triangle" href="/sdk/kotlin/errors">
+    `FigraniumException` fields, codes, and cancellation semantics.
+  </Card>
+
+  <Card title="Tasks resource" icon="list-check" href="/sdk/kotlin/resources/tasks">
+    Save, version, list, and run tasks programmatically.
+  </Card>
+</CardGroup>

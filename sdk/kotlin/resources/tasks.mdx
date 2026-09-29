@@ -1,0 +1,257 @@
+---
+title: "TasksResource: Manage, Version, and Execute Figranium Tasks"
+sidebarTitle: "Tasks"
+description: "Reference for the TasksResource in the Figranium Kotlin SDK. List, save, version, generate selectors, and execute tasks with typed coroutine methods and request options."
+---
+
+The `TasksResource` on the Figranium Kotlin SDK is the primary way to manage tasks. Use it to list, create, update, version, and run tasks. Every method is `suspend` and accepts an optional `options` parameter for per-request overrides such as custom headers or timeouts. The client-level convenience `client.runTask(id, input, options)` proxies directly to `client.tasks.run(id, input, options)`.
+
+```kotlin TasksResource.kt
+import dev.figranium.sdk.*
+
+val client = Figranium(
+    authentication = FigraniumAuthentication.ApiKey("YOUR_API_KEY")
+)
+```
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`list`">
+    Retrieve every task in the workspace.
+
+    - **HTTP endpoint:** `GET /api/tasks`
+    - **Signature:** `suspend fun list(options: RequestOptions = RequestOptions()): List<Task>`
+
+    ```kotlin list_tasks.kt
+    val tasks = client.tasks.list()
+    println(tasks.size)
+    ```
+
+    Returns a list of [`Task`](/sdk/kotlin/models) values.
+  </Accordion>
+
+  <Accordion title="`listSummaries`">
+    Fetch a lightweight summary of all tasks.
+
+    - **HTTP endpoint:** `GET /api/tasks/list`
+    - **Signature:** `suspend fun listSummaries(options: RequestOptions = RequestOptions()): List<TaskSummary>`
+
+    ```kotlin list_summaries.kt
+    val summaries = client.tasks.listSummaries()
+    for (summary in summaries) {
+        println("${summary.id} ${summary.name}")
+    }
+    ```
+
+    Each `TaskSummary` contains `id`, `name`, and an optional `description`.
+  </Accordion>
+
+  <Accordion title="`save`">
+    Create or update a task. Pass `createVersion = true` to snapshot the current version before saving.
+
+    - **HTTP endpoint:** `POST /api/tasks` (with `?version=true` when `createVersion` is set)
+    - **Signature:** `suspend fun save(task: Task, createVersion: Boolean = false, options: RequestOptions = RequestOptions()): Task`
+
+    ```kotlin save_task.kt
+    val task = Task(
+        name = "Search and extract",
+        url = "https://example.com",
+        mode = "agent",
+        variables = mapOf(
+            "query" to TaskVariable(type = "string", value = JsonPrimitive("figranium"))
+        ),
+        actions = listOf(
+            Actions.waitFor("#search"),
+            Actions.type("#search", value = variable("query")),
+            Actions.press("Enter", selector = "#search"),
+            Actions.getContent(selector = ".results", varName = "resultText")
+        )
+    )
+    
+    val saved = client.tasks.save(task, createVersion = true)
+    println(saved.id)
+    ```
+
+    Returns the saved `Task`, including any server-generated `id`. For more about building actions, see [`Actions`](/sdk/kotlin/actions). For variable substitution, see [`Variables`](/sdk/kotlin/variables).
+  </Accordion>
+
+  <Accordion title="`touch`">
+    Refresh a task's `last_opened` timestamp without changing its definition.
+
+    - **HTTP endpoint:** `POST /api/tasks/{id}/touch`
+    - **Signature:** `suspend fun touch(id: String, options: RequestOptions = RequestOptions()): Task`
+
+    ```kotlin touch_task.kt
+    val updated = client.tasks.touch("task_123")
+    ```
+  </Accordion>
+
+  <Accordion title="`update`">
+    Apply a partial patch to an existing task.
+
+    - **HTTP endpoint:** `PATCH /api/tasks/{id}`
+    - **Signature:** `suspend fun update(id: String, patch: JsonObject, options: RequestOptions = RequestOptions()): JsonObject`
+
+    ```kotlin update_task.kt
+    val result = client.tasks.update(
+        "task_123",
+        patch = buildJsonObject {
+            put("name", JsonPrimitive("Renamed task"))
+            put("wait", JsonPrimitive(2000))
+        }
+    )
+    ```
+  </Accordion>
+
+  <Accordion title="`delete`">
+    Remove a task by ID.
+
+    - **HTTP endpoint:** `DELETE /api/tasks/{id}`
+    - **Signature:** `suspend fun delete(id: String, options: RequestOptions = RequestOptions()): JsonObject`
+
+    ```kotlin delete_task.kt
+    val result = client.tasks.delete("task_123")
+    ```
+  </Accordion>
+
+  <Accordion title="`versions`">
+    List all saved versions for a task.
+
+    - **HTTP endpoint:** `GET /api/tasks/{id}/versions`
+    - **Signature:** `suspend fun versions(id: String, options: RequestOptions = RequestOptions()): List<TaskVersion>`
+
+    ```kotlin list_versions.kt
+    val versions = client.tasks.versions("task_123")
+    for (version in versions) {
+        println("${version.id} ${version.timestamp} ${version.name}")
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="`version`">
+    Retrieve a specific version snapshot.
+
+    - **HTTP endpoint:** `GET /api/tasks/{id}/versions/{versionId}`
+    - **Signature:** `suspend fun version(id: String, versionId: String, options: RequestOptions = RequestOptions()): JsonObject`
+
+    ```kotlin get_version.kt
+    val result = client.tasks.version("task_123", versionId = "v_456")
+    ```
+  </Accordion>
+
+  <Accordion title="`clearVersions`">
+    Delete all stored versions for a task.
+
+    - **HTTP endpoint:** `POST /api/tasks/{id}/versions/clear`
+    - **Signature:** `suspend fun clearVersions(id: String, options: RequestOptions = RequestOptions()): JsonObject`
+
+    ```kotlin clear_versions.kt
+    val result = client.tasks.clearVersions("task_123")
+    ```
+  </Accordion>
+
+  <Accordion title="`rollback`">
+    Restore a task to a previous version snapshot.
+
+    - **HTTP endpoint:** `POST /api/tasks/{id}/rollback`
+    - **Signature:** `suspend fun rollback(id: String, versionId: String, options: RequestOptions = RequestOptions()): Task`
+
+    ```kotlin rollback_task.kt
+    val restored = client.tasks.rollback("task_123", versionId = "v_456")
+    println(restored.id)
+    ```
+  </Accordion>
+
+  <Accordion title="`generateSelector`">
+    Generate a CSS selector for a task action using an AI prompt.
+
+    - **HTTP endpoint:** `POST /api/tasks/generate-selector`
+    - **Signature:** `suspend fun generateSelector(task: Task, actionIndex: Int, prompt: String, options: RequestOptions = RequestOptions()): String`
+
+    ```kotlin generate_selector.kt
+    val selector = client.tasks.generateSelector(
+        task = task,
+        actionIndex = 0,
+        prompt = "Find the main search input field"
+    )
+    println(selector)
+    ```
+
+    Returns the generated CSS selector string.
+  </Accordion>
+
+  <Accordion title="`generateScript`">
+    Generate a JavaScript extraction script from a description.
+
+    - **HTTP endpoint:** `POST /api/tasks/generate-script`
+    - **Signature:** `suspend fun generateScript(description: String, options: RequestOptions = RequestOptions()): String`
+
+    ```kotlin generate_script.kt
+    val script = client.tasks.generateScript("Extract all product prices from the page")
+    println(script)
+    ```
+
+    Returns the generated script string.
+  </Accordion>
+
+  <Accordion title="`run`">
+    Execute a task and return its result. This is the public execution endpoint, reachable at `/tasks/{id}/api`.
+
+    - **HTTP endpoint:** `POST /tasks/{id}/api`
+    - **Signature:** `suspend inline fun <reified T> run(id: String, input: ExecuteTaskOptions = ExecuteTaskOptions(), options: RequestOptions = RequestOptions()): ExecutionResult<T>`
+
+    ```kotlin run_task.kt
+    val result: ExecutionResult<JsonElement> = client.tasks.run(
+        "task_123",
+        input = ExecuteTaskOptions(
+            variables = mapOf("query" to JsonPrimitive("browser automation"))
+        )
+    )
+    println(result.data)
+    ```
+
+    The `input` object accepts `variables`, `taskVariables`, `webhookUrl`, and `runId`. For more about execution results and streaming, see [`ExecutionsResource`](/sdk/kotlin/resources/executions). To learn about task variables and runtime substitution, see [`Variables`](/sdk/kotlin/variables) and [`Actions`](/sdk/kotlin/actions). For per-request overrides, see [`RequestOptions`](/sdk/kotlin/request-options).
+  </Accordion>
+</AccordionGroup>
+
+## Client shortcut
+
+The `Figranium` client exposes `runTask` as a convenience wrapper around `tasks.run`:
+
+```kotlin shortcut.kt
+val result: ExecutionResult<JsonElement> = client.runTask(
+    "task_123",
+    input = ExecuteTaskOptions(
+        variables = mapOf("query" to JsonPrimitive("browser automation"))
+    )
+)
+```
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="Actions" icon="click" href="/sdk/kotlin/actions">
+    Build action lists with typed helpers.
+  </Card>
+
+  <Card title="Variables" icon="variable" href="/sdk/kotlin/variables">
+    Declare and reference task variables.
+  </Card>
+
+  <Card title="Executions" icon="bolt" href="/sdk/kotlin/resources/executions">
+    Inspect the runs produced by task execution.
+  </Card>
+
+  <Card title="Models" icon="file-type-json" href="/sdk/kotlin/models">
+    Reference for Task, Action, TaskVariable, and supporting types.
+  </Card>
+
+  <Card title="Request options" icon="sliders" href="/sdk/kotlin/request-options">
+    Pass custom headers and per-request timeouts.
+  </Card>
+
+  <Card title="Errors" icon="alert-triangle" href="/sdk/kotlin/errors">
+    Handle FigraniumException responses.
+  </Card>
+</CardGroup>

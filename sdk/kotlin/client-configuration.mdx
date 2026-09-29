@@ -1,0 +1,161 @@
+---
+title: "Configure the Figranium Kotlin SDK Client"
+sidebarTitle: "Client"
+description: "Configure the Figranium Kotlin SDK: baseUrl, authentication, default headers, timeout, custom OkHttpClient, and kotlinx.serialization.Json settings."
+---
+
+The `Figranium` class is the coroutine-first entry point for the Kotlin SDK. It is created with a single constructor that accepts every configuration option as an optional argument, so a local install works with `Figranium()`. The constructor uses `@JvmOverloads` for clean Java interop.
+
+## Constructor
+
+```kotlin Figranium.kt
+@JvmOverloads
+class Figranium(
+    baseUrl: String = DEFAULT_BASE_URL,
+    private val authentication: FigraniumAuthentication = FigraniumAuthentication.None,
+    private val headers: Map<String, String> = emptyMap(),
+    private val timeoutMillis: Long = 30_000,
+    private val httpClient: OkHttpClient = OkHttpClient(),
+    @PublishedApi internal val json: Json = Json { ignoreUnknownKeys = true; explicitNulls = false; encodeDefaults = false },
+)
+```
+
+<ParamField path="baseUrl" type="String">
+  Absolute URL of your Figranium server. Trailing slashes are trimmed automatically. Defaults to `http://localhost:11345`.
+</ParamField>
+
+<ParamField path="authentication" type="FigraniumAuthentication">
+  Authentication strategy. Defaults to `FigraniumAuthentication.None`. See [Authentication](/sdk/kotlin/authentication) for details.
+</ParamField>
+
+<ParamField path="headers" type="Map<String, String>">
+  Default headers merged into every request. Per-call `RequestOptions.headers` override these.
+</ParamField>
+
+<ParamField path="timeoutMillis" type="Long">
+  Client-wide default timeout for non-stream requests, in milliseconds. Defaults to `30_000`.
+</ParamField>
+
+<ParamField path="httpClient" type="OkHttpClient">
+  The underlying `OkHttpClient` used for all network requests. Defaults to a new `OkHttpClient()`. The SDK never replaces a caller-supplied client.
+</ParamField>
+
+<ParamField path="json" type="kotlinx.serialization.json.Json">
+  kotlinx-serialization `Json` instance used for encoding and decoding. Defaults to `Json { ignoreUnknownKeys = true; explicitNulls = false; encodeDefaults = false }`.
+</ParamField>
+
+## Option details
+
+### `baseUrl`
+
+Pass the absolute URL of your Figranium server. The constructor trims any trailing slash before converting it to `okhttp3.HttpUrl`.
+
+```kotlin example.kt
+val client = Figranium(baseUrl = "https://figranium.example")
+```
+
+### `authentication`
+
+The `FigraniumAuthentication` sealed interface has three implementations:
+
+- `FigraniumAuthentication.ApiKey(value, header = "authorization")` sends the key as `Authorization: Bearer <key>` when the header is `"authorization"`, or as the raw key for any other header name.
+- `FigraniumAuthentication.Session` sends no auth header and relies on `OkHttpClient` cookies.
+- `FigraniumAuthentication.None` sends no auth header.
+
+```kotlin example.kt
+val client = Figranium(
+    authentication = FigraniumAuthentication.ApiKey(
+        value = "fig_...",
+        header = "x-api-key"
+    )
+)
+```
+
+See [Authentication](/sdk/kotlin/authentication) for how to create and manage API keys.
+
+### `timeoutMillis`
+
+Client-wide default timeout for non-stream requests, in milliseconds. Defaults to `30_000`. Streams have no default timeout; set a per-call `timeoutMillis` in `RequestOptions` if you want a terminal deadline.
+
+```kotlin example.kt
+val client = Figranium(
+    authentication = FigraniumAuthentication.ApiKey("fig_..."),
+    timeoutMillis = 60_000
+)
+```
+
+Individual requests can override this per call with `options = RequestOptions(timeoutMillis = 5_000)`. See [Request options](/sdk/kotlin/request-options).
+
+### `httpClient`
+
+Provide a preconfigured `OkHttpClient` for custom interceptors, certificate pinning, timeouts, or test doubles. The SDK never replaces a caller-supplied client.
+
+```kotlin example.kt
+val httpClient = OkHttpClient.Builder()
+    .connectTimeout(10, TimeUnit.SECONDS)
+    .readTimeout(45, TimeUnit.SECONDS)
+    .build()
+
+val client = Figranium(httpClient = httpClient)
+```
+
+### `headers`
+
+Default headers merged into every request. Per-call headers override these.
+
+```kotlin example.kt
+val client = Figranium(
+    authentication = FigraniumAuthentication.ApiKey("fig_..."),
+    headers = mapOf("x-client-name" to "orders-worker")
+)
+```
+
+## Complete example
+
+```kotlin example.kt
+import dev.figranium.sdk.*
+
+val client = Figranium(
+    baseUrl = "https://figranium.example",
+    authentication = FigraniumAuthentication.ApiKey(
+        value = System.getenv("FIGRANIUM_API_KEY")!!
+    ),
+    timeoutMillis = 45_000,
+    headers = mapOf("x-client-name" to "orders-worker")
+)
+```
+
+## Client resources
+
+The `Figranium` instance exposes one property per resource, plus a few top-level convenience helpers.
+
+| Property | Purpose |
+| :-- | :-- |
+| [`auth`](/sdk/kotlin/resources/auth) | Check setup, log in, log out, and inspect the current user |
+| [`tasks`](/sdk/kotlin/resources/tasks) | List, save, version, update, delete, and execute tasks |
+| [`executions`](/sdk/kotlin/resources/executions) | List, inspect, stop, delete, clear, stream, and watch runs |
+| [`schedules`](/sdk/kotlin/resources/schedules) | Configure, describe, disable, and inspect schedules |
+| [`captures`](/sdk/kotlin/resources/captures) | List and delete recordings and screenshots; manage cookies |
+| [`cabinets`](/sdk/kotlin/resources/cabinets) | Manage file Cabinets and their items |
+| [`credentials`](/sdk/kotlin/resources/credentials) | Create and manage output credentials |
+| [`browser`](/sdk/kotlin/resources/browser) | Open browser sessions, highlight selectors, inspect headful sessions |
+| [`execution`](/sdk/kotlin/resources/execution) | Direct `scrape`, `agent`, and `headful` execution endpoints |
+| [`settings`](/sdk/kotlin/resources/settings) | Administer API keys, AI providers, proxies, and theme |
+| [`health`](/sdk/kotlin/resources/health) | Service health check |
+
+Top-level shortcuts:
+
+- `client.runTask(id, input, options)` proxies to `tasks.run`.
+- `client.scrape(input, options)` proxies to `execution.scrape`.
+- `client.agent(input, options)` proxies to `execution.agent`.
+- `client.headful(input, options)` proxies to `execution.headful`.
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/sdk/kotlin/authentication">
+    How to authenticate with API keys, sessions, or no auth.
+  </Card>
+
+  <Card title="Request Options" icon="sliders" href="/sdk/kotlin/request-options">
+    Override timeouts and headers on individual requests.
+  </Card>
+</CardGroup>

@@ -1,0 +1,274 @@
+---
+title: "CabinetsResource: Manage Files, Zips, and Uploads"
+sidebarTitle: "Cabinets"
+description: "Manage Figranium Cabinets with the Kotlin SDK: list, create, rename, clear, delete, update item status, ZIP/unzip, and build download URLs."
+---
+
+The `cabinets` resource on the Figranium Kotlin SDK is the typed client for the Cabinets API. Cabinets are durable, installation-wide download queues. Tasks can route intercepted browser downloads into a selected Cabinet, and later actions can upload the newest unuploaded item from that queue.
+
+```kotlin main.kt
+import dev.figranium.sdk.Figranium
+
+val client = Figranium(
+    authentication = FigraniumAuthentication.ApiKey(System.getenv("FIGRANIUM_API_KEY")),
+)
+```
+
+## Supported operations
+
+`cabinets` covers the Cabinet lifecycle and item-management API.
+
+<CardGroup cols={2}>
+  <Card title="Cabinet lifecycle" icon="folder-plus">
+    List, create, rename, migrate, clear, and delete Cabinets.
+  </Card>
+
+  <Card title="Item management" icon="list-check">
+    List Cabinet items, update upload status, and remove one or many items.
+  </Card>
+
+  <Card title="Archives" icon="archive">
+    Create ZIP archives and safely extract compatible archives.
+  </Card>
+
+  <Card title="Downloads" icon="download">
+    Build item download URLs for files stored in a Cabinet.
+  </Card>
+</CardGroup>
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`list`">
+    List all Cabinets.
+
+    - **HTTP endpoint:** `GET /api/cabinets`
+    - **Signature:** `cabinets.list(options: RequestOptions = RequestOptions()): List<Cabinet>`
+
+    ```kotlin list_cabinets.kt
+    val cabinets = client.cabinets.list()
+    for (cabinet in cabinets) {
+        println("${cabinet.id} ${cabinet.name}")
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="`create`">
+    Create a new Cabinet.
+
+    - **HTTP endpoint:** `POST /api/cabinets`
+    - **Signature:** `cabinets.create(name: String, options: RequestOptions = RequestOptions()): Cabinet`
+
+    ```kotlin create_cabinet.kt
+    val cabinet = client.cabinets.create("downloads-q3")
+    println(cabinet.id)
+    ```
+  </Accordion>
+
+  <Accordion title="`rename`">
+    Rename an existing Cabinet.
+
+    - **HTTP endpoint:** `PATCH /api/cabinets/{cabinetId}`
+    - **Signature:** `cabinets.rename(id: String, name: String, options: RequestOptions = RequestOptions()): Cabinet`
+
+    ```kotlin rename_cabinet.kt
+    val cabinet = client.cabinets.rename("cab_01", name = "downloads-q4")
+    println(cabinet.name)
+    ```
+  </Accordion>
+
+  <Accordion title="`delete`">
+    Delete a Cabinet. You can optionally migrate its items to another Cabinet first.
+
+    - **HTTP endpoint:** `DELETE /api/cabinets/{cabinetId}`
+    - **Signature:** `cabinets.delete(id: String, targetCabinetId: String? = null, migrate: Boolean = false, options: RequestOptions = RequestOptions()): JsonObject`
+
+    ```kotlin delete_cabinet.kt
+    // Delete a cabinet outright
+    val result = client.cabinets.delete("cab_01")
+    
+    // Migrate items to another cabinet before deleting
+    val result = client.cabinets.delete(
+        "cab_01",
+        targetCabinetId = "cab_02",
+        migrate = true
+    )
+    ```
+
+    When `migrate` is `true`, items are moved to `targetCabinetId` before the Cabinet is removed.
+  </Accordion>
+
+  <Accordion title="`listItems`">
+    List the items inside a Cabinet.
+
+    - **HTTP endpoint:** `GET /api/cabinets/{cabinetId}/items`
+    - **Signature:** `cabinets.listItems(id: String, options: RequestOptions = RequestOptions()): List<CabinetItem>`
+
+    ```kotlin list_items.kt
+    val items = client.cabinets.listItems("cab_01")
+    for (item in items) {
+        println("${item.id} ${item.name} ${item.status}")
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="`clear`">
+    Remove every item from a Cabinet.
+
+    - **HTTP endpoint:** `POST /api/cabinets/{cabinetId}/clear`
+    - **Signature:** `cabinets.clear(id: String, options: RequestOptions = RequestOptions()): JsonObject`
+
+    ```kotlin clear_cabinet.kt
+    val result = client.cabinets.clear("cab_01")
+    ```
+  </Accordion>
+
+  <Accordion title="`setItemStatus`">
+    Update the status of one or more Cabinet items.
+
+    - **HTTP endpoint:** `PATCH /api/cabinets/{cabinetId}/items/status`
+    - **Signature:** `cabinets.setItemStatus(cabinetId: String, itemIds: List<String>, status: String, options: RequestOptions = RequestOptions()): List<CabinetItem>`
+
+    ```kotlin set_status.kt
+    val items = client.cabinets.setItemStatus(
+        "cab_01",
+        itemIds = listOf("item_1", "item_2"),
+        status = "uploaded"
+    )
+    ```
+
+    Valid statuses are `"pending"` and `"uploaded"`.
+  </Accordion>
+
+  <Accordion title="`removeItems`">
+    Remove specific items from a Cabinet.
+
+    - **HTTP endpoint:** `DELETE /api/cabinets/{cabinetId}/items`
+    - **Signature:** `cabinets.removeItems(cabinetId: String, itemIds: List<String>, options: RequestOptions = RequestOptions()): JsonObject`
+
+    ```kotlin remove_items.kt
+    val result = client.cabinets.removeItems("cab_01", itemIds = listOf("item_1", "item_2"))
+    ```
+  </Accordion>
+
+  <Accordion title="`zipItems`">
+    Create a ZIP archive from selected Cabinet items.
+
+    - **HTTP endpoint:** `POST /api/cabinets/{cabinetId}/zip`
+    - **Signature:** `cabinets.zipItems(cabinetId: String, itemIds: List<String>, name: String? = null, options: RequestOptions = RequestOptions()): CabinetItem`
+
+    ```kotlin zip_items.kt
+    val archive = client.cabinets.zipItems(
+        "cab_01",
+        itemIds = listOf("item_1", "item_2"),
+        name = "archive.zip"
+    )
+    ```
+  </Accordion>
+
+  <Accordion title="`unzipItem`">
+    Extract a ZIP archive that is stored as a Cabinet item.
+
+    - **HTTP endpoint:** `POST /api/cabinets/{cabinetId}/items/{itemId}/unzip`
+    - **Signature:** `cabinets.unzipItem(cabinetId: String, itemId: String, options: RequestOptions = RequestOptions()): List<CabinetItem>`
+
+    ```kotlin unzip_item.kt
+    val items = client.cabinets.unzipItem("cab_01", itemId = "zip_item_1")
+    ```
+  </Accordion>
+
+  <Accordion title="`downloadUrl`">
+    Build a download URL for a Cabinet item. This method does **not** make an HTTP request. It returns a `String` synchronously.
+
+    - **Signature:** `cabinets.downloadUrl(cabinetId: String, itemId: String): String`
+
+    ```kotlin download_url.kt
+    val url = client.cabinets.downloadUrl("cab_01", "item_1")
+    println(url)
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Use a Cabinet from a task
+
+Tasks can set `cabinetId` to select where intercepted browser downloads are stored:
+
+```kotlin task_with_cabinet.kt
+import dev.figranium.sdk.Figranium
+import dev.figranium.sdk.Actions
+
+val client = Figranium(
+    authentication = FigraniumAuthentication.ApiKey(System.getenv("FIGRANIUM_API_KEY")),
+)
+
+val task = Task(
+    name = "Download and reuse file",
+    url = "https://example.com/export",
+    mode = "agent",
+    actions = listOf(
+        Actions.click("#download"),
+        Actions.upload(selector = "input[type=file]"),
+        Actions.finalizeUploads(),
+    ),
+    cabinetId = "cab_basic"
+)
+
+client.tasks.save(task)
+```
+
+If a task omits `cabinetId`, Figranium uses the instance's default Cabinet. An individual Upload action can override the task-level selection with its own `cabinetId`.
+
+## Upload status
+
+Cabinet items track whether they have been uploaded. The `upload` action normally selects the newest unuploaded item. You can mark an item uploaded immediately with `markAsUploaded`, or keep finalization separate and call `finalizeUploads` later in the workflow.
+
+<Tip>
+  Keep finalization separate when attaching a file and successfully submitting it are two different steps. That lets the workflow consume the Cabinet item only after the later step succeeds.
+</Tip>
+
+## Models
+
+### `Cabinet`
+
+```kotlin
+@Serializable
+data class Cabinet(
+    val id: String,
+    val name: String,
+    val isDefault: Boolean? = null,
+    val itemCount: Int? = null,
+    val createdAt: Double? = null
+)
+```
+
+### `CabinetItem`
+
+```kotlin
+@Serializable
+data class CabinetItem(
+    val id: String,
+    val name: String,
+    val kind: String,
+    val status: String,
+    val size: Int? = null,
+    val createdAt: Double? = null,
+    val sourceTaskId: String? = null,
+    val sourceRunId: String? = null
+)
+```
+
+## Related resources
+
+<CardGroup cols={3}>
+  <Card title="Action helpers" icon="code" href="/sdk/kotlin/actions">
+    Build Upload and Finalize Uploads actions.
+  </Card>
+
+  <Card title="Tasks resource" icon="list-check" href="/sdk/kotlin/resources/tasks">
+    Save and run tasks that select a Cabinet with `cabinetId`.
+  </Card>
+
+  <Card title="File downloads" icon="download" href="/file-downloads">
+    Understand Cabinets, intercepted downloads, and the upload lifecycle.
+  </Card>
+</CardGroup>

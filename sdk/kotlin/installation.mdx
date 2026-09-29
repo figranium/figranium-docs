@@ -1,0 +1,100 @@
+---
+title: "Install the Figranium Kotlin SDK"
+sidebarTitle: "Installation"
+description: "Add the Figranium Kotlin SDK via Gradle. Includes Kotlin 2.2+, Android minSdk 23, optional appfunctions with KSP. Verify with a health check."
+---
+
+The Figranium Kotlin SDK is published to Maven Central. It requires Kotlin 2.2 or newer, a JVM toolchain of 17, and Android minSdk 23 if you target Android. Add the `figranium` artifact (and optionally `figranium-appfunctions`) to your Gradle build.
+
+## Requirements
+
+- Kotlin 2.2 or newer.
+- Gradle build with Kotlin 1.9 or Android Gradle Plugin 9.x.
+- Android minSdk 23 (or a plain JVM project).
+- A running Figranium server that the client can reach. Local installs default to `http://localhost:11345`.
+
+## Add the dependency
+
+### Kotlin DSL
+
+Add `figranium` to your `dependencies` block. The SDK types are `suspend` functions that you call inside a coroutine scope.
+
+```kotlin build.gradle.kts
+dependencies {
+    implementation("dev.figranium:figranium:0.1.0")
+}
+```
+
+### Groovy DSL
+
+```groovy build.gradle
+dependencies {
+    implementation 'dev.figranium:figranium:0.1.0'
+}
+```
+
+### Block dependencies
+
+| Artifact | Coordinate | Purpose |
+| :-- | :-- | :-- |
+| Core SDK | `dev.figranium:figranium:0.1.0` | Client, resources, actions, models, streams |
+| AppFunctions | `dev.figranium:figranium-appfunctions:0.1.0` | Android AppFunctions integration (optional) |
+
+## Optional: Android AppFunctions
+
+Add the `figranium-appfunctions` artifact and the KSP plugin with the `appfunctions-compiler` processor. AppFunctions require Android 16 (API 36+).
+
+```kotlin build.gradle.kts
+plugins {
+    id("com.google.devtools.ksp") version "2.2.20-2.0.3"
+}
+
+dependencies {
+    implementation("dev.figranium:figranium-appfunctions:0.1.0")
+    ksp("androidx.appfunctions:appfunctions-compiler:1.0.0-alpha10")
+}
+```
+
+<Tip>
+  `figranium-appfunctions` re-exports the core SDK so you only need to declare the AppFunctions artifact if you use it.
+</Tip>
+
+## Import
+
+Import the SDK package in any Kotlin file that uses the client.
+
+```kotlin
+import dev.figranium.sdk.*
+```
+
+For AppFunctions, also import the appfunctions package.
+
+```kotlin
+import dev.figranium.sdk.appfunctions.*
+```
+
+## Verify the install
+
+Call `health.check()` to confirm the SDK can reach your Figranium server.
+
+```kotlin verify.kt
+import dev.figranium.sdk.*
+
+val client = Figranium()
+val status = client.health.check()
+println(status.status)
+```
+
+A healthy Figranium instance returns a `HealthStatus` with `status` equal to `"ok"`.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/sdk/kotlin/quickstart">
+    Save and run your first task with the SDK.
+  </Card>
+
+  <Card title="Client configuration" icon="user-cog" href="/sdk/kotlin/client-configuration">
+    Configure `baseUrl`, timeouts, custom `OkHttpClient`, and default headers.
+  </Card>
+</CardGroup>

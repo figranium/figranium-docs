@@ -1,0 +1,126 @@
+---
+title: "Per-Request Options in the Figranium Kotlin SDK"
+sidebarTitle: "Request Options"
+description: "Pass timeout and headers per call in the Figranium Kotlin SDK. Override timeouts, inject one-off headers, and understand header merge order."
+---
+
+Every SDK method accepts an optional `options` argument that controls per-call timeouts and one-off headers. The same `RequestOptions` shape works for regular requests and for Kotlin Flow streams.
+
+## RequestOptions
+
+```kotlin
+import dev.figranium.sdk.*
+
+val options = RequestOptions(
+    headers = mapOf("x-correlation-id" to "req-42"),
+    timeoutMillis = 10_000
+)
+```
+
+`RequestOptions` is a data class with two optional fields:
+
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `headers` | `Map<String, String>` | Extra headers merged over the client's default headers for this call. |
+| `timeoutMillis` | `Long?` | Overrides the client-wide default timeout for this call, in milliseconds. Streams default to no timeout when `null`. |
+
+## Override timeout per call
+
+Use `timeoutMillis` to set a shorter or longer bound for a single request.
+
+```kotlin Client.kt
+import dev.figranium.sdk.*
+
+val client = Figranium(
+    authentication = FigraniumAuthentication.ApiKey(System.getenv("FIGRANIUM_API_KEY")!!)
+)
+
+// Use a 5-second timeout for this call only
+client.tasks.list(options = RequestOptions(timeoutMillis = 5_000))
+```
+
+The client-wide default is `30_000` milliseconds. See [Client configuration](/sdk/kotlin/client-configuration) for setting the default.
+
+## Inject one-off headers
+
+Use `headers` to add request correlation IDs, feature flags, or override a default value once.
+
+```kotlin Client.kt
+client.tasks.list(
+    options = RequestOptions(headers = mapOf("x-correlation-id" to "req-42"))
+)
+```
+
+## Combining options
+
+Pass both fields together when needed:
+
+```kotlin Client.kt
+client.tasks.save(
+    task = task,
+    createVersion = true,
+    options = RequestOptions(
+        timeoutMillis = 10_000,
+        headers = mapOf("x-run-id" to "run-123")
+    )
+)
+```
+
+## Header merge order
+
+The SDK builds the final header set in this order. Each step can overwrite the previous one:
+
+1. Client default headers (`headers` passed to the constructor)
+2. `accept: application/json` (regular requests) or `accept: text/event-stream` (streams)
+3. Per-call `options.headers`
+4. Authentication header (`Authorization` or `x-api-key`) from `FigraniumAuthentication`
+
+## Timeout and cancellation semantics
+
+When a request exceeds the configured timeout, the underlying `OkHttpClient` throws an `IOException` (for example, `java.net.SocketTimeoutException`). `FigraniumException` extends `IOException`, so transport failures surface naturally through the same catch block.
+
+When the consuming coroutine is cancelled, the active `Call` is cancelled automatically and the flow or suspend function throws a `CancellationException`.
+
+```kotlin Client.kt
+import dev.figranium.sdk.*
+import java.io.IOException
+
+val client = Figranium(
+    authentication = FigraniumAuthentication.ApiKey(System.getenv("FIGRANIUM_API_KEY")!!)
+)
+
+try {
+    client.runTask("slow-task", options = RequestOptions(timeoutMillis = 5_000))
+} catch (e: FigraniumException) {
+    println("Figranium error: ${e.message}")
+} catch (e: IOException) {
+    println("Network or timeout failure: ${e.message}")
+}
+```
+
+## Stream timeouts
+
+Streams have no default timeout. Pass `options = RequestOptions(timeoutMillis = 60_000)` when you want a terminal deadline. The underlying `OkHttpClient` cancel or timeout will surface as an `IOException`.
+
+```kotlin Client.kt
+client.executions.stream(options = RequestOptions(timeoutMillis = 60_000))
+    .collect { event ->
+        println(event.data)
+    }
+```
+
+See [Streaming](/sdk/kotlin/streaming) for more on consuming SSE events.
+
+<Tip>
+  Use `timeoutMillis` for hard deadlines on individual requests. For long-running streams, prefer cancelling the consuming coroutine scope so you can stop cleanly when your application state changes.
+</Tip>
+
+<CardGroup cols={2}>
+  <Card title="Client Configuration" icon="user-cog" href="/sdk/kotlin/client-configuration">
+    Set client-wide defaults for timeout, headers, and auth.
+  </Card>
+
+  <Card title="Errors" icon="alert-circle" href="/sdk/kotlin/errors">
+    Learn how FigraniumException and transport failures are surfaced.
+  </Card>
+</CardGroup>

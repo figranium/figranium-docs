@@ -1,0 +1,184 @@
+---
+title: "BrowserResource: Headful Sessions and Inspection"
+sidebarTitle: "Browser"
+description: "Control browser sessions with the Figranium Kotlin SDK. Open sessions, inspect headful state, highlight selectors, stream live events, and retrieve VNC credentials."
+---
+
+The `browser` resource on the Figranium Kotlin SDK gives you programmatic control over browser sessions. You can open headless or headful sessions, inspect the current headful state, highlight candidate selectors on a page, and stream live selector events during an active headful session.
+
+```kotlin main.kt
+import dev.figranium.sdk.Figranium
+
+val client = Figranium(
+    authentication = FigraniumAuthentication.ApiKey("your-api-key"),
+)
+```
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`open`">
+    Opens a browser session. You can run in headless mode, headful mode, scrape mode, or agent mode.
+
+    - **HTTP endpoint:** `POST /api/browser/open`
+    - **Signature:** `open(input: JsonObject = JsonObject(emptyMap()), options: RequestOptions = RequestOptions()): BrowserSession`
+    - **Returns:** `BrowserSession` with `sessionId`, `status`, and optionally `wsEndpoint`.
+
+    ```kotlin browser_open.kt
+    val session = client.browser.open(
+        buildJsonObject {
+            put("url", "https://example.com")
+            put("mode", "headful")
+            put("devTools", true)
+        }
+    )
+    
+    println("${session.sessionId} ${session.status}")
+    ```
+  </Accordion>
+
+  <Accordion title="`highlight`">
+    Highlights candidate selectors on a page and returns a DOM snapshot. Useful for building or debugging selector-based tasks.
+
+    - **HTTP endpoint:** `POST /api/inspector/highlight`
+    - **Signature:** `highlight(input: JsonObject, options: RequestOptions = RequestOptions()): JsonObject`
+    - **Returns:** A `JsonObject` with selectors and a snapshot.
+
+    ```kotlin browser_highlight.kt
+    val result = client.browser.highlight(
+        buildJsonObject {
+            put("url", "https://example.com")
+            put("targetHint", "search input")
+        }
+    )
+    
+    val selectors = result["selectors"]?.jsonArray
+    selectors?.forEach { candidate ->
+        val css = candidate.jsonObject["css"]?.jsonPrimitive?.content
+        println(css)
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="`stopHeadful`">
+    Stops the active headful browser session.
+
+    - **HTTP endpoint:** `POST /headful/stop`
+    - **Signature:** `stopHeadful(options: RequestOptions = RequestOptions()): JsonObject`
+    - **Returns:** `JsonObject`
+
+    ```kotlin browser_stop_headful.kt
+    val result = client.browser.stopHeadful()
+    ```
+  </Accordion>
+
+  <Accordion title="`headfulStatus`">
+    Checks whether the headful session is configured to use noVNC.
+
+    - **HTTP endpoint:** `GET /api/headful/status`
+    - **Signature:** `headfulStatus(options: RequestOptions = RequestOptions()): JsonObject`
+    - **Returns:** `JsonObject` containing `useNovnc` as a boolean.
+
+    ```kotlin browser_headful_status.kt
+    val status = client.browser.headfulStatus()
+    val useNovnc = status["useNovnc"]?.jsonPrimitive?.content?.toBooleanStrictOrNull()
+    println(useNovnc)
+    ```
+  </Accordion>
+
+  <Accordion title="`inspect`">
+    Inspects the current headful session and returns diagnostic information.
+
+    - **HTTP endpoint:** `POST /api/headful/inspect`
+    - **Signature:** `inspect(options: RequestOptions = RequestOptions()): JsonObject`
+    - **Returns:** `JsonObject`
+
+    ```kotlin browser_inspect.kt
+    val info = client.browser.inspect()
+    println(info)
+    ```
+  </Accordion>
+
+  <Accordion title="`vncPassword`">
+    Retrieves the VNC password for the current headful session.
+
+    - **HTTP endpoint:** `GET /api/headful/vnc-password`
+    - **Signature:** `vncPassword(options: RequestOptions = RequestOptions()): String`
+    - **Returns:** `String` containing the password.
+
+    ```kotlin browser_vnc_password.kt
+    val password = client.browser.vncPassword()
+    println(password)
+    ```
+  </Accordion>
+
+  <Accordion title="`selectorStream`">
+    Streams live selector events from the headful session as a `Flow<StreamEvent<JsonElement>>`.
+
+    - **HTTP endpoint:** `GET /api/headful/selector_stream`
+    - **Signature:** `selectorStream(options: RequestOptions = RequestOptions()): Flow<StreamEvent<JsonElement>>`
+    - **Returns:** `Flow<StreamEvent<JsonElement>>`
+
+    <Note>
+      This is a server-sent event stream. For details on collecting flows and handling timeouts, see [Streaming](/sdk/kotlin/streaming).
+    </Note>
+
+    ```kotlin browser_selector_stream.kt
+    client.browser.selectorStream().collect { event ->
+        println("${event.event} ${event.data}")
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Headful debugging workflow
+
+A typical headful debugging session combines several `BrowserResource` methods to open a browser, inspect state, stream selector events, and clean up when finished.
+
+```kotlin browser_workflow.kt
+import kotlinx.serialization.json.*
+
+// 1. Open a headful session
+val session = client.browser.open(
+    buildJsonObject {
+        put("url", "https://example.com")
+        put("mode", "headful")
+    }
+)
+
+// 2. Check headful status and VNC access
+val status = client.browser.headfulStatus()
+val password = client.browser.vncPassword()
+
+// 3. Stream selector events while interacting with the page
+client.browser.selectorStream().collect { event ->
+    println("selector event: ${event.data}")
+}
+
+// 4. Stop the session when done
+client.browser.stopHeadful()
+```
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="Streaming" icon="cloud" href="/sdk/kotlin/streaming">
+    Details on `Flow<StreamEvent<JsonElement>>`.
+  </Card>
+
+  <Card title="Request options" icon="http-get" href="/sdk/kotlin/request-options">
+    Pass custom `headers` and per-request `timeout` overrides.
+  </Card>
+
+  <Card title="Errors" icon="alert-triangle" href="/sdk/kotlin/errors">
+    Handle `FigraniumException` responses.
+  </Card>
+
+  <Card title="Headful Browser" icon="desktop" href="/headful-browser">
+    Learn about headful browser sessions in Figranium.
+  </Card>
+
+  <Card title="Highlight Tool" icon="mouse-pointer" href="/highlight-tool">
+    Use the highlight tool to build and debug selectors.
+  </Card>
+</CardGroup>

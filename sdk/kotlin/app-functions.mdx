@@ -1,0 +1,164 @@
+---
+title: "Integrate Figranium with Android AppFunctions and system assistants"
+sidebarTitle: "AppFunctions"
+description: "Configure FigraniumAppFunctionConfiguration to expose runFigraniumTask as an Android AppFunction. Control the task allowlist, enable or disable the function, and keep credentials out of parameters."
+---
+
+On Android 16 (API 36) and later, the Figranium Kotlin SDK exposes a single system AppFunction for running an approved deterministic task. You provide the client through a `FigraniumAppFunctionClientProvider` so your app controls authentication and secrets. AppFunctions never accept credentials as parameters.
+
+<Note>
+  AppFunctions support requires Android API 36+ (compileSdk 37). On devices with an older version, `FigraniumAppFunctions.setEnabled` is a no-op and the base SDK works unchanged.
+</Note>
+
+## Install the integration
+
+Add the optional `figranium-appfunctions` artifact and KSP in your module's `build.gradle.kts`.
+
+```kotlin build.gradle.kts
+plugins {
+    id("com.google.devtools.ksp") version "2.2.20-2.0.3"
+}
+
+dependencies {
+    implementation("dev.figranium:figranium-appfunctions:0.1.0")
+    ksp("androidx.appfunctions:appfunctions-compiler:1.0.0-alpha10")
+}
+```
+
+The KSP compiler generates the service metadata from the `@AppFunctionServiceEntryPoint` annotation. For more on Android platform setup, see the [Android AppFunctions documentation](https://developer.android.com/ai/appfunctions).
+
+## Configure the client provider
+
+Before the system can invoke any Figranium AppFunction, call `FigraniumAppFunctionConfiguration.configure(_:)` once from `Application.onCreate` with a provider that vends a configured `Figranium` client.
+
+```kotlin MyApplication.kt
+import android.app.Application
+import dev.figranium.sdk.Figranium
+import dev.figranium.sdk.FigraniumAuthentication
+import dev.figranium.sdk.appfunctions.FigraniumAppFunctionConfiguration
+import dev.figranium.sdk.appfunctions.FigraniumAppFunctionClientProvider
+import dev.figranium.sdk.appfunctions.FigraniumAppFunctions
+
+class MyApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+
+        FigraniumAppFunctionConfiguration.configure(
+            FigraniumAppFunctionClientProvider {
+                Figranium(
+                    baseUrl = "https://api.figranium.example.com",
+                    authentication = FigraniumAuthentication.ApiKey(loadKeyFromKeystore()),
+                )
+            }
+        )
+
+        FigraniumAppFunctions.configure(setOf("lookup-order", "check-inventory"))
+        // Enable the generated AppFunction when ready
+        // lifecycleScope.launch { FigraniumAppFunctions.setEnabled(this@MyApplication, enabled = true) }
+    }
+}
+```
+
+If an AppFunction is invoked before configuration completes, the SDK throws an `IllegalStateException` with the message: `Configure FigraniumAppFunctionConfiguration before invoking Figranium AppFunctions.`
+
+## Service and available AppFunction
+
+### BaseFigraniumAppFunctionService
+
+Extend this abstract service in your app to host the generated AppFunction entry point. KSP processes the `@AppFunctionServiceEntryPoint` annotation and generates the corresponding metadata XML.
+
+**Signature:**
+
+```kotlin
+@RequiresApi(36)
+@AppFunctionServiceEntryPoint(
+    serviceName = "FigraniumAppFunctionService",
+    appFunctionXmlFileName = "figranium_app_functions"
+)
+abstract class BaseFigraniumAppFunctionService : AppFunctionService()
+```
+
+- The `@AppFunction` method is declared with `isEnabled = false`. It is disabled by default.
+- The service requires API 36 at runtime.
+
+### runFigraniumTask
+
+Runs one explicitly approved deterministic Figranium task.
+
+**Signature:**
+
+```kotlin
+@AppFunction(isEnabled = false, isDescribedByKDoc = true)
+suspend fun runFigraniumTask(parameters: RunFigraniumTaskParameters): FigraniumAppFunctionResult
+```
+
+- **Parameter:** `RunFigraniumTaskParameters` with a single `taskId` field, the ID of an app-approved deterministic task.
+- **Returns:** `FigraniumAppFunctionResult` containing:
+  - `outcome` (`String`): the Figranium execution outcome such as `success` or `error`. Falls back to `unknown` when the server omits it.
+  - `data` (`String?`): JSON output from the approved task.
+  - `runId` (`String?`): the run ID, if returned by Figranium.
+- **HTTP endpoint:** `POST /tasks/{id}/api` (via `client.runTask<JsonObject>(taskId)`)
+
+### Data types
+
+```kotlin
+@AppFunctionSerializable
+data class RunFigraniumTaskParameters(
+    val taskId: String,
+)
+
+@AppFunctionSerializable
+data class FigraniumAppFunctionResult(
+    val outcome: String,
+    val data: String? = null,
+    val runId: String? = null,
+)
+```
+
+## Control the task allowlist and availability
+
+`FigraniumAppFunctions` is an object that manages which tasks assistants are allowed to run.
+
+```kotlin
+FigraniumAppFunctions.configure(setOf("lookup-order", "check-inventory"))
+```
+
+- Only task IDs present in the configured set can be executed through AppFunctions.
+- Calling `runFigraniumTask` with a task ID outside the allowlist throws an `IllegalStateException` with the message: `This task is not approved for AppFunctions execution.`
+
+### Enable or disable the AppFunction
+
+```kotlin
+// In a coroutine scope, such as lifecycleScope
+FigraniumAppFunctions.setEnabled(context, enabled = true)
+```
+
+- `setEnabled` is safe to call on devices below API 36 (it returns immediately with no effect).
+- When enabled, the generated AppFunction becomes discoverable by Android assistants and agents.
+
+## Security notes
+
+- Keep API keys in Android Keystore-backed storage or another secure app-owned store. Never pass credentials as AppFunction parameters.
+- The allowlist means an assistant can run only the tasks your app explicitly approves. It cannot create arbitrary browser actions or read Figranium credentials.
+- If the provider throws, the exception propagates through the AppFunction runtime.
+
+## Error reference
+
+| Condition | Meaning | What to do |
+| --- | --- | --- |
+| `IllegalStateException`: "Configure FigraniumAppFunctionConfiguration before invoking Figranium AppFunctions." | `FigraniumAppFunctionConfiguration.configure(_:)` was not called before the AppFunction was invoked. | Call `configure` in `Application.onCreate` with a valid `FigraniumAppFunctionClientProvider`. |
+| `IllegalStateException`: "This task is not approved for AppFunctions execution." | The `taskId` is not in the allowlist configured with `FigraniumAppFunctions.configure(allowedTaskIds)`. | Add the task ID to the allowlist, or verify the ID passed by the caller. |
+
+<CardGroup>
+  <Card title="Tasks" icon="list-check" href="/sdk/kotlin/resources/tasks">
+    Save, run, and manage deterministic tasks to allowlist for AppFunctions.
+  </Card>
+
+  <Card title="Client configuration" icon="settings" href="/sdk/kotlin/client-configuration">
+    Review base URL, timeouts, and custom headers for the Figranium client.
+  </Card>
+
+  <Card title="Actions" icon="bolt" href="/sdk/kotlin/actions">
+    Build deterministic action sequences for tasks that you expose through AppFunctions.
+  </Card>
+</CardGroup>

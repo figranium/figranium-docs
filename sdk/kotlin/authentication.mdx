@@ -1,0 +1,121 @@
+---
+title: "Authenticate the Figranium Kotlin SDK"
+sidebarTitle: "Authentication"
+description: "Authenticate the Figranium Kotlin SDK with API keys, session cookies, or no auth. Header formats, secure storage with Android Keystore, and session login flow."
+---
+
+The Figranium Kotlin SDK offers three authentication modes via the `FigraniumAuthentication` sealed interface. Every request is signed automatically based on the mode you choose when creating the client.
+
+## Authentication modes
+
+| Mode | Behavior |
+| :-- | :-- |
+| `FigraniumAuthentication.ApiKey(value, header = "authorization")` | Sends the key in the named header. When the header is `authorization`, the value is `Bearer <key>`. For any other header name, the raw key is sent. |
+| `FigraniumAuthentication.Session` | Sends no auth header. Relies on cookies managed by the underlying `OkHttpClient` cookie jar. Use this after calling `auth.login`. |
+| `FigraniumAuthentication.None` | Sends no auth header. Use for unauthenticated endpoints such as health checks, or when the server has no auth configured. |
+
+## Create an API key
+
+Sign into the Figranium web UI and generate an API key from **Settings**. Copy the value once; you will not see it again.
+
+## Pass an API key
+
+Create a client with `FigraniumAuthentication.ApiKey`.
+
+```kotlin Client.kt
+import dev.figranium.sdk.*
+
+val client = Figranium(
+    baseUrl = "http://localhost:11345",
+    authentication = FigraniumAuthentication.ApiKey(
+        value = System.getenv("FIGRANIUM_API_KEY")!!
+    )
+)
+```
+
+By default the SDK sends `Authorization: Bearer <key>`. You can also pass a custom header name explicitly.
+
+## Switch to x-api-key
+
+Some deployments expect `x-api-key` instead of `Authorization`. Pass the header name explicitly:
+
+```kotlin Client.kt
+val client = Figranium(
+    baseUrl = "http://localhost:11345",
+    authentication = FigraniumAuthentication.ApiKey(
+        value = "YOUR_API_KEY",
+        header = "x-api-key"
+    )
+)
+```
+
+When the header is anything other than `authorization`, the SDK sends the raw key without a `Bearer` prefix.
+
+## Session authentication
+
+For cookie-based sessions, authenticate with `Session` and call `auth.login` before making protected requests:
+
+```kotlin Client.kt
+val client = Figranium(
+    baseUrl = "http://localhost:11345",
+    authentication = FigraniumAuthentication.Session
+)
+
+val result = client.auth.login(
+    email = "user@example.com",
+    password = "secret"
+)
+```
+
+The login response sets session cookies in the `OkHttpClient` cookie jar, which are then sent on subsequent requests automatically.
+
+## Store keys securely
+
+On Android, store API keys in the Android Keystore or EncryptedSharedPreferences instead of hard-coding them or keeping them in plaintext SharedPreferences. Retrieve the key at runtime and pass it to the client constructor.
+
+```kotlin SecureStorage.kt
+import android.content.Context
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
+
+fun getFigraniumClient(context: Context): Figranium {
+    val masterKey = MasterKey.Builder(context)
+        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+        .build()
+
+    val prefs = EncryptedSharedPreferences.create(
+        context,
+        "figranium_secure",
+        masterKey,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    )
+
+    val apiKey = prefs.getString("api_key", null)
+        ?: throw IllegalStateException("API key not set")
+
+    return Figranium(
+        authentication = FigraniumAuthentication.ApiKey(apiKey)
+    )
+}
+```
+
+On server-side JVM code, read keys from environment variables or a secrets manager and pass them directly to the constructor.
+
+## What API keys can access
+
+API keys authenticate every task, execution, schedule, capture, browser, and execution endpoint exposed by the SDK. Server-administration operations (creating API keys, changing themes, configuring AI providers, and managing proxies) are performed in the Figranium web UI.
+
+<Warning>
+  Store API keys in environment variables, Android Keystore, or a secrets manager. Never commit keys to source control or expose them in client-side code.
+</Warning>
+
+<CardGroup cols={2}>
+  <Card title="Client Configuration" icon="user-cog" href="/sdk/kotlin/client-configuration">
+    All available client options, including `baseUrl` and `timeoutMillis`.
+  </Card>
+
+  <Card title="API Key" icon="key" href="/api-key">
+    How Figranium API keys work and how to manage them from the web UI.
+  </Card>
+</CardGroup>

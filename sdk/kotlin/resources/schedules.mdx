@@ -1,0 +1,216 @@
+---
+title: "SchedulesResource: Configure and Inspect Recurring Tasks"
+sidebarTitle: "Schedules"
+description: "Manage recurring task schedules with the Figranium Kotlin SDK. List, set, delete, validate, and inspect cron or interval schedules using typed Schedule models."
+---
+
+The `schedules` resource on the Figranium Kotlin SDK lets you automate when tasks run. You can list every scheduled task, attach a recurring schedule to a specific task, delete it, validate a schedule before applying it, and inspect the overall scheduler health. All schedule payloads use the shared `Schedule` data class, which supports interval, hourly, daily, weekly, monthly, and raw cron expressions.
+
+```kotlin SchedulesResource.kt
+import dev.figranium.sdk.*
+
+val client = Figranium(
+    authentication = FigraniumAuthentication.ApiKey("YOUR_API_KEY")
+)
+```
+
+## Schedule data class
+
+A `Schedule` value controls whether and how often a task runs automatically.
+
+```kotlin Schedule.kt
+@Serializable
+data class Schedule(
+    val enabled: Boolean,
+    val frequency: String? = null,
+    val intervalMinutes: Int? = null,
+    val hour: Int? = null,
+    val minute: Int? = null,
+    val daysOfWeek: List<Int>? = null,
+    val dayOfMonth: Int? = null,
+    val cron: String? = null,
+    val lastRun: Double? = null,
+    val lastRunStatus: String? = null,
+    val lastRunDurationMs: Double? = null,
+    val nextRun: Double? = null,
+)
+```
+
+- `enabled`: whether the schedule is active.
+- `frequency`: the recurrence pattern. Use `"interval"` for a simple minute-based timer, `"hourly"` / `"daily"` / `"weekly"` / `"monthly"` for calendar-based runs, or omit it and supply `cron` directly.
+- `intervalMinutes`: required when `frequency` is `"interval"`.
+- `hour` and `minute`: used with `"daily"`, `"weekly"`, and `"monthly"` to set the time of day.
+- `daysOfWeek`: list of weekday numbers (`0` = Sunday) for `"weekly"`.
+- `dayOfMonth`: day number (`1` to `31`) for `"monthly"`.
+- `cron`: a raw cron string when you need full control.
+- `lastRun`, `lastRunStatus`, `lastRunDurationMs`, `nextRun`: read-only fields returned by the server.
+
+### Examples
+
+Run a task every 15 minutes:
+
+```kotlin interval_schedule.kt
+val intervalSchedule = Schedule(
+    enabled = true,
+    frequency = "interval",
+    intervalMinutes = 15
+)
+
+val result = client.schedules.set("task-123", schedule = intervalSchedule)
+println(result)
+```
+
+Run a task every Monday and Wednesday at 09:30:
+
+```kotlin weekly_schedule.kt
+val weeklySchedule = Schedule(
+    enabled = true,
+    frequency = "weekly",
+    hour = 9,
+    minute = 30,
+    daysOfWeek = listOf(1, 3)
+)
+
+val result = client.schedules.set("task-123", schedule = weeklySchedule)
+println(result)
+```
+
+Run a task daily at 07:00 with a cron expression:
+
+```kotlin cron_schedule.kt
+val cronSchedule = Schedule(
+    enabled = true,
+    cron = "0 7 * * *"
+)
+
+val result = client.schedules.set("task-123", schedule = cronSchedule)
+println(result)
+```
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`list`">
+    Retrieve all tasks that currently have a schedule configured.
+
+    - **HTTP endpoint:** `GET /api/schedules`
+    - **Signature:** `suspend fun list(options: RequestOptions = RequestOptions()): JsonObject`
+
+    ```kotlin list_schedules.kt
+    val result = client.schedules.list()
+    ```
+
+    Returns a `JsonObject` with a `schedules` array. Each entry contains `taskId`, `taskName`, `mode`, and the attached `Schedule` object.
+  </Accordion>
+
+  <Accordion title="`set`">
+    Attach or update a schedule for a specific task.
+
+    - **HTTP endpoint:** `POST /api/schedules/{taskId}`
+    - **Signature:** `suspend fun set(taskId: String, schedule: Schedule, options: RequestOptions = RequestOptions()): JsonObject`
+
+    ```kotlin set_schedule.kt
+    val result = client.schedules.set(
+        "task-123",
+        schedule = Schedule(
+            enabled = true,
+            frequency = "daily",
+            hour = 7,
+            minute = 0
+        )
+    )
+    ```
+
+    Returns a `JsonObject` containing the saved `schedule`, a human-readable `description`, and the `nextRun` timestamp (or `null` if the schedule is disabled or invalid).
+  </Accordion>
+
+  <Accordion title="`delete`">
+    Remove a task's schedule entirely.
+
+    - **HTTP endpoint:** `DELETE /api/schedules/{taskId}`
+    - **Signature:** `suspend fun delete(taskId: String, options: RequestOptions = RequestOptions()): JsonObject`
+
+    ```kotlin delete_schedule.kt
+    val result = client.schedules.delete("task-123")
+    ```
+
+    Returns `{"success": bool}` indicating whether the schedule was removed.
+  </Accordion>
+
+  <Accordion title="`status`">
+    Inspect the current schedule for a single task, including its computed cron expression and validity.
+
+    - **HTTP endpoint:** `GET /api/schedules/{taskId}/status`
+    - **Signature:** `suspend fun status(taskId: String, options: RequestOptions = RequestOptions()): JsonObject`
+
+    ```kotlin schedule_status.kt
+    val status = client.schedules.status("task-123")
+    ```
+
+    Returns a `JsonObject` with the current `schedule`, the resolved `cron` string, a human-readable `description`, and an `isValid` flag.
+  </Accordion>
+
+  <Accordion title="`describe`">
+    Validate a schedule payload for a task without saving it. This is useful for previewing the next run time and confirming a cron expression before you call `set`.
+
+    - **HTTP endpoint:** `POST /api/schedules/{taskId}/describe`
+    - **Signature:** `suspend fun describe(taskId: String, schedule: Schedule, options: RequestOptions = RequestOptions()): JsonObject`
+
+    ```kotlin describe_schedule.kt
+    val preview = client.schedules.describe(
+        "task-123",
+        schedule = Schedule(
+            enabled = true,
+            frequency = "monthly",
+            dayOfMonth = 1,
+            hour = 6,
+            minute = 0
+        )
+    )
+    ```
+
+    Returns a `JsonObject` with `valid`, `description`, `cron`, and `nextRun`. If `valid` is `false`, the schedule will not be accepted by `set`.
+  </Accordion>
+
+  <Accordion title="`overallStatus`">
+    Get a high-level view of the scheduler state across all tasks.
+
+    - **HTTP endpoint:** `GET /api/schedules/status/all`
+    - **Signature:** `suspend fun overallStatus(options: RequestOptions = RequestOptions()): JsonObject`
+
+    ```kotlin overall_status.kt
+    val status = client.schedules.overallStatus()
+    println(status)
+    ```
+
+    Returns a plain `JsonObject`. The exact fields depend on the server version; inspect the response to discover available keys.
+  </Accordion>
+</AccordionGroup>
+
+## Error handling
+
+Schedule methods throw `FigraniumException` on failure. Common cases include a missing task ID (`404`) or an invalid schedule payload (`400`). See [Errors](/sdk/kotlin/errors) for retry guidance and error codes.
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="Tasks" icon="list-check" href="/sdk/kotlin/resources/tasks">
+    Create and manage the tasks you schedule.
+  </Card>
+
+  <Card title="Executions" icon="bolt" href="/sdk/kotlin/resources/executions">
+    Inspect the runs produced by scheduled tasks.
+  </Card>
+
+  <Card title="Request options" icon="sliders" href="/sdk/kotlin/request-options">
+    Pass custom headers and per-request timeouts.
+  </Card>
+
+  <Card title="Task scheduling" icon="calendar" href="/task-scheduling">
+    Learn how scheduling works in Figranium.
+  </Card>
+
+  <Card title="Errors" icon="alert-triangle" href="/sdk/kotlin/errors">
+    Handle FigraniumException responses.
+  </Card>
+</CardGroup>

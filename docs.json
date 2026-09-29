@@ -243,6 +243,41 @@
                 ]
               }
             ]
+          },
+          {
+            "group": "Kotlin SDK",
+            "icon": "brand-kotlin",
+            "pages": [
+              "sdk/kotlin/overview",
+              "sdk/kotlin/installation",
+              "sdk/kotlin/quickstart",
+              "sdk/kotlin/client-configuration",
+              "sdk/kotlin/authentication",
+              "sdk/kotlin/request-options",
+              "sdk/kotlin/errors",
+              "sdk/kotlin/streaming",
+              "sdk/kotlin/actions",
+              "sdk/kotlin/variables",
+              "sdk/kotlin/models",
+              "sdk/kotlin/app-functions",
+              {
+                "group": "Resources",
+                "icon": "tool",
+                "pages": [
+                  "sdk/kotlin/resources/tasks",
+                  "sdk/kotlin/resources/executions",
+                  "sdk/kotlin/resources/schedules",
+                  "sdk/kotlin/resources/cabinets",
+                  "sdk/kotlin/resources/captures",
+                  "sdk/kotlin/resources/credentials",
+                  "sdk/kotlin/resources/browser",
+                  "sdk/kotlin/resources/execution",
+                  "sdk/kotlin/resources/settings",
+                  "sdk/kotlin/resources/auth",
+                  "sdk/kotlin/resources/health"
+                ]
+              }
+            ]
           }
         ]
       },
@@ -317,5 +352,12 @@
       "x": "https://x.com/figranium",
       "youtube": "https://youtube.com/@Figranium"
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/sdk/kotlin",
+      "destination": "/sdk/kotlin/overview",
+      "permanent": false
+    }
+  ]
 }

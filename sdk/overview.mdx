@@ -1,14 +1,14 @@
 ---
-title: "Figranium SDKs: JavaScript, Python, and Swift Clients"
+title: "Figranium SDKs: JavaScript, Python, Swift, and Kotlin"
 sidebarTitle: "Introduction"
-description: "Choose an official Figranium SDK for JavaScript, Python, or Swift. Compare runtimes, install commands, and shared features for automating browser tasks."
+description: "Choose an official Figranium SDK for JavaScript, Python, Swift, or Kotlin. Compare runtimes, install commands, and shared features for automating browser tasks."
 ---
 
-Figranium ships official SDKs for JavaScript, Python, and Swift. Each SDK wraps the same Figranium REST and Server-Sent Events API, so you can save and run tasks, stream execution events, and manage schedules, captures, and Cabinets from the language you already use.
+Figranium ships official SDKs for JavaScript, Python, Swift, and Kotlin. Each SDK wraps the same Figranium REST and Server-Sent Events API, so you can save and run tasks, stream execution events, and manage schedules, captures, and Cabinets from the language you already use.
 
 ## Choose an SDK
 
-<CardGroup cols={3}>
+<CardGroup cols={2}>
   <Card title="JavaScript SDK" icon="brand-javascript" href="/sdk/js/overview">
     `@figranium/sdk` for Node.js 18+ and modern browsers. TypeScript first, ESM and CommonJS, no runtime dependencies.
   </Card>
@@ -20,18 +20,22 @@ Figranium ships official SDKs for JavaScript, Python, and Swift. Each SDK wraps 
   <Card title="Swift SDK" icon="brand-swift" href="/sdk/swift/overview">
     `Figranium` package for macOS, iOS, tvOS, watchOS, and server-side Swift. Native `async`/`await`, zero dependencies.
   </Card>
+
+  <Card title="Kotlin SDK" icon="brand-kotlin" href="/sdk/kotlin/overview">
+    `dev.figranium:figranium` for Kotlin and Android API 23+. Coroutines on OkHttp, `Flow` streams, optional Android AppFunctions.
+  </Card>
 </CardGroup>
 
 ## Compare SDKs
 
-| | JavaScript | Python | Swift |
-| :-- | :-- | :-- | :-- |
-| Package | `@figranium/sdk` | `figranium-sdk` | `Figranium` |
-| Runtime | Node.js 18+, browsers | Python 3.9+ | Swift 6.0, macOS 13, iOS 16, tvOS 16, watchOS 9 |
-| Dependencies | None | `httpx>=0.27,<1` | None (Foundation only) |
-| Async model | Promises, `AsyncIterable` streams | Sync `Figranium` and async `AsyncFigranium` | `async throws`, `AsyncThrowingStream` |
-| License | Apache-2.0 | Apache-2.0 | Apache-2.0 |
-| Repository | [figranium-js](https://github.com/figranium/figranium-js) | [figranium-py](https://github.com/figranium/figranium-py) | [figranium-swift](https://github.com/figranium/figranium-swift) |
+|  | JavaScript | Python | Swift | Kotlin |
+| :-- | :-- | :-- | :-- | :-- |
+| Package | `@figranium/sdk` | `figranium-sdk` | `Figranium` | `dev.figranium:figranium` |
+| Runtime | Node.js 18+, browsers | Python 3.9+ | Swift 6.0, macOS 13, iOS 16, tvOS 16, watchOS 9 | Kotlin 2.2+, Android API 23+ |
+| Dependencies | None | `httpx>=0.27,<1` | None (Foundation only) | OkHttp, kotlinx.serialization, kotlinx.coroutines |
+| Async model | Promises, `AsyncIterable` streams | Sync `Figranium` and async `AsyncFigranium` | `async throws`, `AsyncThrowingStream` | `suspend` functions, `Flow` streams |
+| License | Apache-2.0 | Apache-2.0 | Apache-2.0 | Apache-2.0 |
+| Repository | [figranium-js](https://github.com/figranium/figranium-js) | [figranium-py](https://github.com/figranium/figranium-py) | [figranium-swift](https://github.com/figranium/figranium-swift) | [figranium-kotlin](https://github.com/figranium/figranium-kotlin) |
 
 ## Install
 
@@ -47,6 +51,10 @@ pip install figranium-sdk
 
 ```swift Package.swift (Swift)
 .package(url: "https://github.com/figranium/figranium-swift.git", branch: "main")
+```
+
+```kotlin build.gradle.kts (Kotlin)
+implementation("dev.figranium:figranium:0.1.0")
 ```
 
 </CodeGroup>
@@ -70,7 +78,7 @@ pip install figranium-sdk
     Generate a key so the SDK can authenticate requests. See [API key](/api-key).
   </Step>
   <Step title="Follow your SDK's quickstart">
-    Build and run your first task with the [JavaScript](/sdk/js/quickstart), [Python](/sdk/python/quickstart), or [Swift](/sdk/swift/quickstart) quickstart.
+    Build and run your first task with the [JavaScript](/sdk/js/quickstart), [Python](/sdk/python/quickstart), [Swift](/sdk/swift/quickstart), or [Kotlin](/sdk/kotlin/quickstart) quickstart.
   </Step>
 </Steps>
 

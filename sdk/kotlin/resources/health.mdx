@@ -1,0 +1,90 @@
+---
+title: "HealthResource: Service Status Check"
+sidebarTitle: "Health"
+description: "Use the HealthResource to verify that a Figranium server is running and reachable. No authentication is required."
+---
+
+The `HealthResource` on `client.health` provides a lightweight liveness probe for any Figranium instance. Call `check()` to confirm the server is up, read its version, and verify that your SDK install and network path are working. No API key is required.
+
+## Client setup
+
+```kotlin HealthResource.kt
+import dev.figranium.sdk.Figranium
+
+val client = Figranium()
+```
+
+## Methods
+
+<AccordionGroup>
+  <Accordion title="`check`">
+    ```kotlin
+    suspend fun check(options: RequestOptions = RequestOptions()): HealthStatus
+    ```
+
+    Performs a `GET /api/health` request and returns the server's health status. This is the fastest way to verify connectivity and SDK configuration.
+
+    ### Returns
+
+    `HealthStatus` with these fields:
+
+    - `status`: a human-readable status string such as `"ok"`
+    - `version`: the running Figranium server version
+
+    ### Example: verify connectivity
+
+    ```kotlin health_check.kt
+    val status = client.health.check()
+    println(status.status)   // "ok"
+    println(status.version)  // "0.14.4"
+    ```
+
+    ### Example: no authentication needed
+
+    Because `check()` requires no authentication, you can call it before the user has signed in or provided an API key:
+
+    ```kotlin health_no_auth.kt
+    val client = Figranium(baseUrl = "https://figranium.example")
+    val status = client.health.check()
+    println(status.status)
+    ```
+
+    ### Example: handle transport failures
+
+    Wrap `check()` in a `try/catch` to detect network or DNS issues. Transport failures surface as `FigraniumException` with `code: "NETWORK_ERROR"`:
+
+    ```kotlin health_transport.kt
+    val client = Figranium(baseUrl = "https://figranium.example")
+    
+    try {
+        val status = client.health.check()
+        println("Server is up: ${status.status}")
+    } catch (error: FigraniumException) {
+        if (error.code == "NETWORK_ERROR") {
+            println("Cannot reach the Figranium server. Check the baseUrl and network.")
+        }
+        throw error
+    }
+    ```
+
+    <Note>
+      The `check()` method accepts the standard `RequestOptions` as its `options` argument, so you can pass custom `headers` or a per-request `timeout` when needed.
+    </Note>
+  </Accordion>
+</AccordionGroup>
+
+## Related resources
+
+<CardGroup cols={2}>
+  <Card title="Errors" icon="alert-triangle" href="/sdk/kotlin/errors">
+    Handle `FigraniumException` responses, including `NETWORK_ERROR`.
+  </Card>
+
+  <Card title="Request options" icon="http-get" href="/sdk/kotlin/request-options">
+    Pass custom `headers` and per-request `timeout` overrides.
+  </Card>
+
+  <Card title="Client configuration" icon="user-cog" href="/sdk/kotlin/client-configuration">
+    Configure `baseUrl`, timeouts, and default headers.
+  </Card>
+</CardGroup>
