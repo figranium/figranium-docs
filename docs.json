@@ -278,15 +278,6 @@
                 ]
               }
             ]
-          },
-          {
-            "group": "Fiptcha",
-            "icon": "robot",
-            "pages": [
-              "fiptcha/overview",
-              "fiptcha/solve-local-captcha",
-              "fiptcha/runtime"
-            ]
           }
         ]
       },

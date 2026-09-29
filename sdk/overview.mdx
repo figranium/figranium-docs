@@ -1,10 +1,10 @@
 ---
-title: "Figranium SDKs and Libraries: JS, Python, Swift, Kotlin"
+title: "Figranium SDKs: JavaScript, Python, Swift, and Kotlin"
 sidebarTitle: "Introduction"
-description: "Pick an official Figranium SDK for JavaScript, Python, Swift, or Kotlin, or embed the Fiptcha CAPTCHA library in your own Playwright automation."
+description: "Choose an official Figranium SDK for JavaScript, Python, Swift, or Kotlin. Compare runtimes, install commands, and shared features for automating browser tasks."
 ---
 
-Figranium offers two kinds of libraries. The **SDKs** connect your code to a running Figranium server, so you can save and run tasks, stream execution events, and manage schedules, captures, and Cabinets from JavaScript, Python, Swift, or Kotlin. **Fiptcha** is a standalone Node.js library that solves CAPTCHAs locally inside your own Playwright automation, with no Figranium server required.
+Figranium's official SDKs connect your code to a running Figranium server. Use them to save and run tasks, stream execution events, and manage schedules, captures, and Cabinets from JavaScript, Python, Swift, or Kotlin, without hand-writing HTTP requests.
 
 ## Choose an SDK
 
@@ -87,21 +87,3 @@ implementation("dev.figranium:figranium:0.1.0")
 <Tip>
   Prefer calling HTTP directly? The [REST API](/rest-api) exposes the same endpoints the SDKs wrap.
 </Tip>
-
-## Fiptcha: local CAPTCHA solving
-
-Fiptcha is the CAPTCHA engine behind Figranium, published as its own Apache-2.0 npm package. Unlike the SDKs, it doesn't call a Figranium server. You pass it a Playwright-compatible page, and it solves reCAPTCHA v2, hCaptcha, and Cloudflare Turnstile in place.
-
-```bash
-npm install fiptcha
-```
-
-<CardGroup cols={2}>
-  <Card title="Fiptcha Overview" icon="robot" href="/fiptcha/overview">
-    Install Fiptcha, see supported challenges, and run your first solve.
-  </Card>
-
-  <Card title="solveLocalCaptcha" icon="code" href="/fiptcha/solve-local-captcha">
-    Options, return value, errors, and integration patterns.
-  </Card>
-</CardGroup>
