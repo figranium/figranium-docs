@@ -1,7 +1,7 @@
 ---
 title: "TasksResource: Manage, Version, and Execute Figranium Tasks"
 sidebarTitle: "Tasks"
-description: "Reference for the TasksResource in the Figranium Kotlin SDK. List, save, version, generate selectors, and execute tasks with typed coroutine methods and request options."
+description: "Reference for the TasksResource in the Figranium Kotlin SDK. List, save, update, version, roll back, and execute tasks with typed coroutine methods and request options."
 ---
 
 The `TasksResource` on the Figranium Kotlin SDK is the primary way to manage tasks. Use it to list, create, update, version, and run tasks. Every method is `suspend` and accepts an optional `options` parameter for per-request overrides such as custom headers or timeouts. The client-level convenience `client.runTask(id, input, options)` proxies directly to `client.tasks.run(id, input, options)`.
@@ -161,38 +161,6 @@ val client = Figranium(
     val restored = client.tasks.rollback("task_123", versionId = "v_456")
     println(restored.id)
     ```
-  </Accordion>
-
-  <Accordion title="`generateSelector`">
-    Generate a CSS selector for a task action using an AI prompt.
-
-    - **HTTP endpoint:** `POST /api/tasks/generate-selector`
-    - **Signature:** `suspend fun generateSelector(task: Task, actionIndex: Int, prompt: String, options: RequestOptions = RequestOptions()): String`
-
-    ```kotlin generate_selector.kt
-    val selector = client.tasks.generateSelector(
-        task = task,
-        actionIndex = 0,
-        prompt = "Find the main search input field"
-    )
-    println(selector)
-    ```
-
-    Returns the generated CSS selector string.
-  </Accordion>
-
-  <Accordion title="`generateScript`">
-    Generate a JavaScript extraction script from a description.
-
-    - **HTTP endpoint:** `POST /api/tasks/generate-script`
-    - **Signature:** `suspend fun generateScript(description: String, options: RequestOptions = RequestOptions()): String`
-
-    ```kotlin generate_script.kt
-    val script = client.tasks.generateScript("Extract all product prices from the page")
-    println(script)
-    ```
-
-    Returns the generated script string.
   </Accordion>
 
   <Accordion title="`run`">

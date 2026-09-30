@@ -41,6 +41,7 @@
             "icon": "tools",
             "pages": [
               "ui-tour",
+              "scrape-vs-agent",
               "action-blocks",
               "selectors",
               "highlight-tool",
@@ -234,10 +235,8 @@
                   "sdk/swift/resources/schedules",
                   "sdk/swift/resources/cabinets",
                   "sdk/swift/resources/captures",
-                  "sdk/swift/resources/credentials",
                   "sdk/swift/resources/browser",
                   "sdk/swift/resources/execution",
-                  "sdk/swift/resources/settings",
                   "sdk/swift/resources/auth",
                   "sdk/swift/resources/health"
                 ]
@@ -269,10 +268,8 @@
                   "sdk/kotlin/resources/schedules",
                   "sdk/kotlin/resources/cabinets",
                   "sdk/kotlin/resources/captures",
-                  "sdk/kotlin/resources/credentials",
                   "sdk/kotlin/resources/browser",
                   "sdk/kotlin/resources/execution",
-                  "sdk/kotlin/resources/settings",
                   "sdk/kotlin/resources/auth",
                   "sdk/kotlin/resources/health"
                 ]

@@ -162,38 +162,6 @@ let client = Figranium(apiKey: "YOUR_API_KEY")
     ```
   </Accordion>
 
-  <Accordion title="`generateSelector`">
-    Generate a CSS selector for a task action using an AI prompt.
-
-    - **HTTP endpoint:** `POST /api/tasks/generate-selector`
-    - **Signature:** `func generateSelector(task: Task, actionIndex: Int, prompt: String, options: RequestOptions = .init()) async throws -> String`
-
-    ```swift generate_selector.swift
-    let selector = try await client.tasks.generateSelector(
-        task: task,
-        actionIndex: 0,
-        prompt: "Find the main search input field"
-    )
-    print(selector)
-    ```
-
-    Returns the generated CSS selector string.
-  </Accordion>
-
-  <Accordion title="`generateScript`">
-    Generate a JavaScript extraction script from a description.
-
-    - **HTTP endpoint:** `POST /api/tasks/generate-script`
-    - **Signature:** `func generateScript(_ description: String, options: RequestOptions = .init()) async throws -> String`
-
-    ```swift generate_script.swift
-    let script = try await client.tasks.generateScript("Extract all product prices from the page")
-    print(script)
-    ```
-
-    Returns the generated script string.
-  </Accordion>
-
   <Accordion title="`run`">
     Execute a task and return its result. This is the public execution endpoint, reachable at `/tasks/{id}/api`.
 

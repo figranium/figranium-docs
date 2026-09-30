@@ -28,7 +28,7 @@ public typealias JSONObject = [String: JSONValue]
 public typealias RuntimeVariables = [String: JSONValue]
 ```
 
-Use `JSONValue` when you need to accept or return arbitrary JSON shapes, such as task results, settings payloads, or proxy rotation configurations.
+Use `JSONValue` when you need to accept or return arbitrary JSON shapes, such as task inputs or task results.
 
 ## Task
 
@@ -318,13 +318,9 @@ public struct Schedule: Codable, Sendable, Equatable {
 | `Cabinet` | `id: String`, `name: String`, `isDefault: Bool?`, `itemCount: Int?`, `createdAt: Double?` |
 | `CabinetItem` | `id: String`, `name: String`, `kind: String`, `status: String`, `size: Int?`, `createdAt: Double?`, `sourceTaskId: String?`, `sourceRunId: String?` |
 | `Capture` | `name: String`, `url: String`, `size: Int`, `modified: Double`, `type: String` |
-| `CredentialInput` | `name: String`, `provider: String`, `config: [String: String]` |
-| `Credential` | `id: String`, `name: String`, `provider: String`, `config: [String: String]` |
 | `BrowserSession` | `sessionId: String`, `status: String`, `wsEndpoint: String?` |
 | `SelectorCandidate` | `css: String`, `xpath: String?`, `confidence: Double?` |
 | `HealthStatus` | `status: String?`, `version: String?` |
-| `User` | `id: String?`, `name: String?`, `email: String?` |
-| `ProxyInput` | `server: String`, `username: String?`, `password: String?`, `label: String?`, `isRotatingPool: Bool?`, `estimatedPoolSize: Int?` |
 | `RequestOptions` | `headers: [String: String]`, `timeout: TimeInterval?` |
 
 ## Related

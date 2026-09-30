@@ -17,7 +17,7 @@ typealias TaskMode = String
 typealias TaskOutcome = String
 ```
 
-Use `JSONObject` when you need to accept or return arbitrary JSON shapes, such as task inputs or settings payloads. `RuntimeVariables` is the type for variable overrides at execution time.
+Use `JSONObject` when you need to accept or return arbitrary JSON shapes, such as task inputs or execution results. `RuntimeVariables` is the type for variable overrides at execution time.
 
 ## TaskVariable
 
@@ -240,13 +240,9 @@ data class Schedule(
 | `Cabinet` | `id: String`, `name: String`, `isDefault: Boolean?`, `itemCount: Int?`, `createdAt: Double?` |
 | `CabinetItem` | `id: String`, `name: String`, `kind: String`, `status: String`, `size: Int?`, `createdAt: Double?`, `sourceTaskId: String?`, `sourceRunId: String?` |
 | `Capture` | `name: String`, `url: String`, `size: Int`, `modified: Double`, `type: String` |
-| `CredentialInput` | `name: String`, `provider: String`, `config: Map<String, String>` |
-| `Credential` | `id: String`, `name: String`, `provider: String`, `config: Map<String, String>` |
 | `BrowserSession` | `sessionId: String`, `status: String`, `wsEndpoint: String?` |
 | `SelectorCandidate` | `css: String`, `xpath: String?`, `confidence: Double?` |
 | `HealthStatus` | `status: String`, `version: String?` |
-| `User` | `id: String`, `name: String?`, `email: String?` |
-| `ProxyInput` | `server: String`, `username: String?`, `password: String?`, `label: String?`, `isRotatingPool: Boolean?`, `estimatedPoolSize: Int?` |
 | `RequestOptions` | `headers: Map<String, String>`, `timeoutMillis: Long?` |
 
 ## Related

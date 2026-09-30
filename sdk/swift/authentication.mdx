@@ -60,7 +60,7 @@ For cookie-based sessions, authenticate with `.session` and call `auth.login` be
 
 ```swift Client.swift
 let client = Figranium(
-    baseURL: "http://localhost:11345",
+    baseURL: URL(string: "http://localhost:11345")!,
     authentication: .session
 )
 

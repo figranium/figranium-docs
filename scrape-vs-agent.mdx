@@ -1,0 +1,100 @@
+---
+title: "Scrape vs. Agent Mode: Choosing the Right Task Mode"
+sidebarTitle: "Scrape vs. Agent"
+description: "Compare Figranium's Scrape and Agent task modes: browserless HTTP extraction versus full Playwright automation, with features, trade-offs, and API usage."
+---
+
+Figranium tasks run in one of two main modes. **Scrape** mode fetches a page over HTTP and parses the HTML without launching a browser. **Agent** mode drives a real Playwright Chromium browser through a sequence of action blocks you define. This page compares the two so you can pick the right mode for each task.
+
+<CardGroup cols={2}>
+  <Card title="Scrape" icon="bolt">
+    A lightweight, browserless runner for fast single-page data extraction. It fetches HTML with `got-scraping` (with proxy and user-agent rotation) and parses it with Cheerio.
+  </Card>
+
+  <Card title="Agent" icon="robot">
+    A full browser runner built on Playwright. It executes your action blocks step by step, including clicks, typing, navigation, JavaScript, and control flow such as `If`, `While`, and `Loop`.
+  </Card>
+</CardGroup>
+
+<Note>
+  Agent mode is not autonomous AI decision making. Every step and branch is defined by you and replays the same way on every run.
+</Note>
+
+## Feature comparison
+
+|  | Scrape | Agent |
+| --- | --- | --- |
+| **Engine** | `got-scraping` + Cheerio | Playwright (Chromium) |
+| **Launches a browser** | No | Yes |
+| **Renders client-side JavaScript** | No, parses the raw HTTP response | Yes |
+| **Action blocks and control flow** | No | Yes |
+| **Extraction** | CSS selector or extraction script | [Visual or JavaScript extraction](/data-extraction) in the page context |
+| **Proxy and user-agent rotation** | Yes | Yes |
+| [**Stealth plugin**](/stealth-mode) | No | Yes |
+| [**CAPTCHA solving**](/captcha-solving) | No | Yes |
+| [**Cookie-consent auto-dismissal**](/stealth-mode#cookie-consent-auto-dismissal) | No, there is no browser to render banners | Yes, always on |
+| [**Page translation**](/page-translation) | No, HTTP-only | Yes, opt-in per task |
+| **Network interception** | No | Yes |
+| **Persistent profile (stateful runs)** | `data/browser-profile-scrape` | `data/browser-profile` |
+| **Picks up [headful](/headful-browser) cookies** | Yes | Yes |
+| [**Stateless execution**](/stateless-execution) | Supported | Supported |
+| **Direct API endpoint** | `POST /scrape` | `POST /agent` |
+
+## When to use Scrape
+
+Choose Scrape mode when the data you need is present in the page's initial HTML response.
+
+- You are extracting content from a single, server-rendered page.
+- You want the lowest resource usage and fastest runs, since no browser process starts.
+- You do not need to click, type, scroll, or wait for elements to appear.
+- The target site does not require CAPTCHA solving or browser fingerprint evasion.
+
+## When to use Agent
+
+Choose Agent mode when the page needs a real browser or the workflow involves interaction.
+
+- The content is loaded by client-side JavaScript or AJAX after the initial response.
+- You need to log in, fill forms, paginate, or follow a multi-step flow.
+- You need branching, loops, or [error handling](/error-handling) between steps.
+- The site uses bot detection, cookie banners, or CAPTCHAs.
+- You want to run custom [JavaScript](/javascript-execution) inside the page.
+
+<Tip>
+  Start with Scrape for simple extraction. If the fields come back empty because the content is rendered client-side, switch the task to Agent mode and add a **Wait for Selector** block before extraction.
+</Tip>
+
+## Switching modes
+
+In the task editor, use the **Mode Selector** to switch between `Agent` and `Scraper`. Tasks created through the [REST API](/rest-api) set the mode with the `mode` field, which accepts `scrape`, `agent`, or `headful`.
+
+To run a one-off job without saving a task, call the direct execution endpoints:
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST http://localhost:11345/scrape \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $FIGRANIUM_API_KEY" \
+  -d '{ "url": "https://example.com", "selector": "h1" }'
+```
+
+```ts JavaScript SDK
+const scrapeResult = await figranium.scrape({ url: "https://example.com", selector: "h1" });
+const agentResult = await figranium.agent({ url: "https://example.com" });
+```
+
+</CodeGroup>
+
+See [ExecutionResource](/sdk/js/resources/execution) for the full SDK reference.
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Action Blocks" icon="cube" href="/action-blocks">
+    The building blocks available in Agent mode.
+  </Card>
+
+  <Card title="Architecture" icon="sitemap" href="/architecture">
+    How the Scrape and Agent runners fit into Figranium.
+  </Card>
+</CardGroup>
