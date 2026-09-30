@@ -161,11 +161,11 @@ curl --proxy "http://user:pass@proxy-host:port" -o /dev/null -s -w "%{time_total
 
 Figranium stores execution records in `data/executions.json` (or in PostgreSQL). Over time, this file can grow large and slow down the dashboard.
 
-- Set up a periodic cleanup from **Settings \> Data \> Clear Execution History**.
+- Clear history manually from **Settings > Advanced > Maintenance > Clear execution history**.
 
 ### Screenshot and Recording Cleanup
 
-Recordings (video files) can be large. Regularly purge them from **Settings > Data > Clear Screenshots & Recordings**.
+Recordings (video files) can be large. Figranium deletes captures, recordings, and execution history older than the [retention period](/captures-and-storage#automatic-retention) (7 days by default). Shorten the period in **Settings > Advanced** for high-volume workloads, or clear captures manually under **Maintenance**.
 
 ### PostgreSQL for Scale
 
@@ -215,6 +215,8 @@ services:
 <Warning>
   Chromium is memory-hungry. Running it with less than 512MB of RAM will cause frequent crashes.
 </Warning>
+
+Figranium reads Docker memory limits and picks a safe number of concurrent browsers automatically. For example, a container limited to 2 GB runs one execution at a time and queues the rest. Raising the memory limit raises the automatic concurrency. See [Host-aware resource protection](/configuration#host-aware-resource-protection).
 
 ---
 

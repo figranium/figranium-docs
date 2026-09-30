@@ -30,7 +30,28 @@ Returns the server status and storage backend connectivity. Use this endpoint fo
 {
   "status": "ok",
   "uptime": 3600,
-  "storage": "json"
+  "version": "0.19.0",
+  "storage": "json",
+  "protection": {
+    "totalMb": 4096,
+    "availableMb": 2900,
+    "cpuCount": 2,
+    "cpuLoad": 0.35,
+    "reserveMb": 615,
+    "maxConcurrent": 2,
+    "pressure": "Normal",
+    "maxQueue": 50,
+    "queueTimeoutMs": 600000,
+    "active": 1,
+    "queued": 0
+  },
+  "captcha": {
+    "healthy": true,
+    "activeTier": "owlvit",
+    "backend": "onnx",
+    "device": "cpu",
+    "error": null
+  }
 }
 ```
 
@@ -49,10 +70,26 @@ Returns the server status and storage backend connectivity. Use this endpoint fo
 | :-- | :-- |
 | `status` | `"ok"` or `"degraded"` |
 | `uptime` | Server uptime in seconds |
+| `version` | Running Figranium version |
 | `storage` | `"json"` (file-based) or `"postgres"` |
 | `storage_error` | Present only when the database is unreachable |
+| `protection` | Non-sensitive [resource protection](/configuration#host-aware-resource-protection) state: detected memory and CPU, `maxConcurrent`, `pressure` (`"Normal"` or `"Busy"`), and `active` and `queued` execution counts |
+| `captcha` | Local CAPTCHA solver status (`healthy`, `activeTier`, `backend`, `device`, `error`). Capacity is detected once after boot. Values depend on your host. |
 
 Returns HTTP `200` when healthy and `503` when degraded. This endpoint does not require authentication.
+
+### `GET /api/capabilities`
+
+Describes the features and action schemas supported by the running server. Use it to check what an instance supports before building tasks. This endpoint does not require authentication.
+
+### Capacity and timeout errors
+
+Execution endpoints can return these errors when [resource protection](/configuration#host-aware-resource-protection) is active:
+
+| Status | Error code | Cause |
+| :-- | :-- | :-- |
+| `503` | `RESOURCE_CAPACITY_EXCEEDED` | The execution queue is full, or the run waited longer than `EXECUTION_QUEUE_TIMEOUT_MS`. The response includes `retryAfterMs` and a `Retry-After` header. |
+| `504` | `EXECUTION_TIMEOUT` | A non-headful run exceeded `EXECUTION_TIMEOUT_MS` and was stopped. |
 
 ---
 
@@ -299,11 +336,48 @@ If enabled, authentication must be provided via one of the following methods:
 
 <AccordionGroup>
   <Accordion title="GET /api/data/captures">
-    Lists all captured files (screenshots, recordings).
+    Lists all captured files (screenshots, recordings). Accepts an API key or a signed-in session.
   </Accordion>
 
   <Accordion title="DELETE /api/data/captures/:name">
     Deletes a specific capture file.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## System settings
+
+<AccordionGroup>
+  <Accordion title="GET /api/settings/system">
+    Returns the retention setting along with resource protection, CAPTCHA capacity, and last cleanup status.
+
+    **Response**:
+
+    ```json
+    {
+      "retentionDays": 7,
+      "protection": { "maxConcurrent": 2, "pressure": "Normal", "active": 0, "queued": 0 },
+      "captcha": { "healthy": true, "activeTier": "owlvit" },
+      "cleanup": { "lastRunAt": 1790000000000, "deletedCaptures": 12, "deletedExecutions": 40, "error": null }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="POST /api/settings/system">
+    Saves the shared [retention period](/captures-and-storage#automatic-retention) for captures and execution history. If the new period is shorter than the old one, cleanup runs immediately and the response includes the result.
+
+    **Body**:
+
+    ```json
+    { "retentionDays": 14 }
+    ```
+
+    | Field | Type | Required | Description |
+    | :-- | :-- | :-- | :-- |
+    | `retentionDays` | integer or null | Yes | Days to keep data, from `1` to `365`. Use `null` to keep data forever. |
+
+    Returns `400 INVALID_SYSTEM_SETTINGS` for values outside the range.
   </Accordion>
 </AccordionGroup>
 

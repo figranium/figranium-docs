@@ -50,6 +50,16 @@ Open **Cabinets** from the application sidebar to manage durable downloaded file
   </Card>
 </CardGroup>
 
+### Cabinet context menu
+
+Right-click a Cabinet in the sidebar to **Rename**, **Clear**, or **Delete** it. An empty Cabinet shows a crossed-out folder icon.
+
+When you delete a Cabinet, you choose a replacement Cabinet. You can migrate the items into it or delete them with the Cabinet. Any task or Upload action that referenced the deleted Cabinet is pointed at the replacement Cabinet.
+
+<Warning>
+  The default Cabinet cannot be deleted, from the UI or the API. At least one Cabinet must always remain.
+</Warning>
+
 <Note>
   Individual Cabinets have direct, reload-safe URLs. If a Cabinet URL points to an invalid Cabinet, Figranium falls back to the default Cabinet.
 </Note>

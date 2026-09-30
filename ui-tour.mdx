@@ -139,13 +139,13 @@ Cabinets are durable, installation-wide download queues used by browser download
 - **Per-task routing**: Choose which Cabinet receives intercepted downloads from a task.
 - **Upload status**: Items can be marked uploaded or unuploaded so later Upload actions can pick the latest pending file.
 - **Archives**: Create ZIP archives from Cabinet items and extract ZIP files from the Cabinets workspace.
-- **Management**: Create, rename, clear, or delete Cabinets and manage individual items without deleting the task that produced them.
+- **Management**: Create Cabinets, and right-click a Cabinet in the sidebar to rename, clear, or delete it. The default Cabinet cannot be deleted. Manage individual items without deleting the task that produced them.
 
 See [Downloads and Cabinets](/file-downloads) for the full workflow.
 
 ## Settings (`/settings`)
 
-Global configuration for the Figranium instance. Each settings tab (**System**, **Data**, **Proxies**) displays a semantic icon alongside its label so you can identify sections at a glance.
+Global configuration for the Figranium instance. Each settings tab (**System**, **Data**, **Advanced**, **Proxies**) displays a semantic icon alongside its label so you can identify sections at a glance.
 
 - **System**:
   - **API Keys**: A unified panel for managing all keys and provider connections:
@@ -164,6 +164,12 @@ Global configuration for the Figranium instance. Each settings tab (**System**, 
     - **Decode**: If the value is URL-encoded or Base64, decode it inline.
     - **Delete**: Remove an individual cookie.
   - **Keyboard navigation**: All cookies panel buttons support keyboard navigation with visible focus indicators. Hover over any button to see a tooltip describing its action.
+- **Advanced** (`/settings/advanced`, added in v0.19):
+
+  - **Account**: Change your sign-in email or password. Enter your current password, then click **Save account**. New passwords must be 8 to 128 characters.
+  - **Data retention**: Choose how long captures and execution history are kept (default 7 days). See [Automatic Retention](/captures-and-storage#automatic-retention).
+  - **Maintenance**: **Clear captures**, **Clear execution history**, or **Clear all workspace data**. Clearing all data requires your current password and removes tasks, executions, credentials, API keys, AI provider keys and models, captures, Cabinets, browser profiles, saved proxies, and settings. Your account and current sign-in are kept.
+  - **CAPTCHA assistance**: Shows the local CAPTCHA solver tier, backend, and device detected at startup, or **Unavailable** when the host cannot run it.
 - **Proxies**:
   - **Add Proxy**: Input HTTP/SOCKS proxies. The button disables until a server address is provided and shows a loading spinner during submission.
   - **Import**: Bulk add proxies from a list.

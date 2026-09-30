@@ -10,14 +10,35 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   Figranium releases continuously. Major features are announced here as they ship. Check back weekly for new capabilities.
 </Note>
 
-<Update label="2026-09-30" description="This week">
+<Update label="2026-09-30" description="v0.19.0">
+  ## Features
+
+  ### Host-aware resource protection
+
+  Figranium now sizes browser concurrency to your host automatically, using available memory (including Docker cgroup limits) and CPU count. Extra runs wait in a first-in, first-out queue that pauses under memory or CPU pressure. A full queue or long wait returns `503 RESOURCE_CAPACITY_EXCEEDED` with a `Retry-After` header, and non-headful runs that exceed 15 minutes stop with `504 EXECUTION_TIMEOUT`. Tune it with `MAX_CONCURRENT_EXECUTIONS`, `MAX_EXECUTION_QUEUE`, `EXECUTION_QUEUE_TIMEOUT_MS`, `EXECUTION_TIMEOUT_MS`, `RESOURCE_MEMORY_RESERVE_MB`, `RESOURCE_CPU_THRESHOLD`, and `RESOURCE_PROBE_INTERVAL_MS`. See [Host-aware resource protection](/configuration#host-aware-resource-protection).
+
+  ### Automatic data retention
+
+  Captures, recordings, and execution history are now deleted automatically after 7 days by default. Choose 1 to 365 days or **Never** in **Settings > Advanced**. Cleanup runs at startup and hourly for JSON and PostgreSQL storage. See [Automatic Retention](/captures-and-storage#automatic-retention).
+
+  ### Advanced settings
+
+  A new **Settings > Advanced** page lets you change your account email and password, set data retention, clear captures or execution history, clear all workspace data (with password confirmation), and see local CAPTCHA solver capacity. See [UI Tour](/ui-tour#settings-settings).
+
+  ### Cabinet context menus
+
+  Right-click a Cabinet in the sidebar to rename, clear, or delete it. The default Cabinet is protected from deletion in the UI and API. See [Cabinets workspace](/file-downloads#cabinets-workspace).
+
   ## Updates
 
   - **API key access to executions, captures, and Cabinets**: `GET /api/executions/:id`, `GET /api/data/captures`, and `GET /api/cabinets` now accept an [API key](/api-key) as well as a signed-in session. Scripts, SDKs, and integrations can fetch run logs and results, list captures, and list Cabinets without a browser login. See [REST API](/rest-api#executions) and [Cabinets](/sdk/js/resources/cabinets).
   - **Settings buttons**: the **Regenerate** API key button and the **Add Proxy** button now use a blue primary style, so the main action on each settings panel is easier to spot. See [API key](/api-key) and [Proxy rotation](/proxy-rotation).
+  - **Health and system APIs**: `GET /api/health` now reports `version`, non-sensitive resource `protection` state, and local `captcha` capacity. New `GET` and `POST /api/settings/system` endpoints read and save retention, and `GET /api/capabilities` describes runtime features. See [REST API](/rest-api#health).
+  - **Bounded execution history**: stored execution records are capped at 256 KB and extraction workers have bounded output and memory, so an oversized result can no longer destabilize the server. See [Execution Logs](/captures-and-storage#execution-logs).
 
   ## Fixes
 
+  - **Theme readability**: AI Model controls are readable in Light and Solarized Light, and the decorative dot grid was removed from sign-in screens.
   - **Extraction script logging**: [extraction scripts](/data-extraction) now support `console.info()` and `console.debug()`. Scripts that call these methods no longer fail. Their messages appear in the extraction logs with `log`, `warn`, and `error` output.
 </Update>
 

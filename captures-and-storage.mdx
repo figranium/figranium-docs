@@ -83,6 +83,23 @@ If you enable `statelessExecution` in a task, it will launch a fully ephemeral i
 
 ## Storage Management
 
+### Automatic Retention
+
+Starting in v0.19, Figranium deletes old captures and execution history automatically. The default retention period is **7 days**.
+
+To change it, open **Settings > Advanced**, pick a period under **Data retention** (1, 3, 7, 14, 30, 90, or 365 days, or **Never**), and click **Save retention**.
+
+- Cleanup runs at startup and then every hour.
+- It removes capture files in `public/captures`, `src/public/captures`, and `data/recordings` that are older than the retention period, plus matching execution records. Both JSON and PostgreSQL storage are supported.
+- Shortening the period asks for confirmation and runs cleanup immediately.
+- The panel shows when cleanup last ran and how many captures and executions it removed. Open execution lists update live after pruning.
+
+<Warning>
+  Retention cleanup permanently deletes data. Choose **Never** if you manage cleanup yourself.
+</Warning>
+
+You can also read and set retention through [`GET` and `POST /api/settings/system`](/rest-api#system-settings).
+
 ### File Cleanup
 
 Screenshots, videos, and downloaded files accumulate in `public/captures`. Video recordings are stored separately in `data/recordings`. You can delete or download them:
@@ -99,8 +116,12 @@ When you clear captures — whether from the **Captures** tab or from **Settings
 
 ### Execution Logs
 
-Execution metadata is stored in `data/executions.json`. Browser session profiles are stored separately in `data/browser-profile*` directories and are not affected by execution log rotation. This file grows over time. Figranium automatically rotates logs (configurable via `MAX_EXECUTIONS` in `server/constants.js`, default 500) to prevent unlimited growth.
+Execution metadata is stored in `data/executions.json`. Browser session profiles are stored separately in `data/browser-profile*` directories and are not affected by execution log rotation. This file grows over time. Figranium keeps at most 500 execution records (`MAX_EXECUTIONS` in `server/constants.js`) and also prunes records older than the [retention period](#automatic-retention).
+
+Each stored execution record is capped at 256 KB (override with `MAX_PERSISTED_EXECUTION_BYTES`). When a result is larger, Figranium keeps the run in history but replaces the HTML and data with a truncation notice, keeps the first 20 log lines, and marks the result `truncated: true`. The full result is still returned to the caller that ran the task. This keeps an oversized payload from destabilizing the server.
+
+To clear history manually, use **Clear execution history** under **Maintenance** in **Settings > Advanced**.
 
 <Note>
-  Screenshots, videos, and downloaded files accumulate over time. Monitor disk usage on your host and clear old captures regularly, or automate cleanup outside Figranium if you run high-volume tasks.
+  Downloaded files stored in [Cabinets](/file-downloads) are not affected by retention. Monitor disk usage on your host if you run high-volume tasks.
 </Note>

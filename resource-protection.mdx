@@ -1,0 +1,330 @@
+---
+title: "Memory, Concurrency, and Execution Queue in Figranium"
+sidebarTitle: "Resource Protection"
+description: "How Figranium measures host memory and CPU, sizes browser concurrency, queues runs under pressure, and returns 503 and 504 errors. Includes tuning examples."
+---
+
+Starting in v0.19, Figranium protects its host from running more Chromium processes than it can handle. A resource monitor measures memory and CPU, a concurrency limit is derived from those numbers, and an execution queue holds extra runs until capacity frees up. This page explains each part, how they interact, and how to tune them for your deployment.
+
+<CardGroup cols={2}>
+  <Card title="Resource monitor" icon="activity" href="#resource-monitor">
+    How memory, cgroup limits, and CPU load are measured.
+  </Card>
+  <Card title="Concurrency limit" icon="adjustments" href="#automatic-concurrency-limit">
+    How many runs can execute at once on your host.
+  </Card>
+  <Card title="Execution queue" icon="list-numbers" href="#execution-queue">
+    How extra runs wait, and when they are rejected.
+  </Card>
+  <Card title="Tuning" icon="settings" href="#tuning-for-your-deployment">
+    Environment variables and recommended settings.
+  </Card>
+</CardGroup>
+
+## How it fits together
+
+Every execution request passes through a single gate before a browser is launched:
+
+1. The gate checks the latest resource snapshot. If the host is not under pressure and fewer runs are active than the concurrency limit, the run starts immediately.
+2. Otherwise, the run joins the end of a first-in, first-out (FIFO) queue.
+3. When a run finishes, or the monitor sees resources change, Figranium takes a fresh snapshot and starts queued runs in order until the limit is reached or pressure returns.
+4. If the queue is full, or a run waits too long, the request is rejected with `503 RESOURCE_CAPACITY_EXCEEDED`.
+5. Once running, a non-headful execution is stopped if it exceeds the execution timeout and returns `504 EXECUTION_TIMEOUT`.
+
+### What goes through the gate
+
+| Entry point | Gated | Execution timeout |
+| :-- | :-- | :-- |
+| `POST /api/tasks/:id/api` (and the legacy `/tasks/:id/api`) | Yes | Yes |
+| Editor runs in Agent and Scrape mode | Yes | Yes |
+| Headful runs | Yes | No |
+| **Run through block** tester in the action modal | Yes | Yes |
+| [Scheduled tasks](/task-scheduling) | Yes | Yes |
+
+Scheduled runs share the same queue as API and editor runs. If a scheduled run is rejected because capacity is exceeded, it is recorded as a failed execution in the history and the schedule continues to its next run.
+
+<Note>
+  Rate limiting is applied before the gate. A request that exceeds `DATA_RATE_LIMIT_MAX` is rejected with `429` without entering the queue. See [Configuration](/configuration#rate-limiting).
+</Note>
+
+## Resource monitor
+
+The resource monitor starts when the server boots and samples the host every `RESOURCE_PROBE_INTERVAL_MS` (30 seconds by default). Figranium also takes a fresh sample every time a run finishes.
+
+Each sample records:
+
+| Measurement | How it is calculated |
+| :-- | :-- |
+| **Total memory** | The host's total memory, or the container's memory limit if that is lower. |
+| **Available memory** | The host's free memory, or the remaining room under the container limit (limit minus current usage), whichever is lower. |
+| **CPU count** | Number of logical CPUs visible to the process. |
+| **CPU load** | The 1-minute load average divided by the CPU count. A value of `1.0` means every core is busy. |
+
+### Container-aware memory
+
+In Docker and other container runtimes, the host's total memory is misleading: a container limited to 2 GB on a 64 GB server should behave like a 2 GB machine. Figranium reads Linux cgroup memory limits directly, supporting both cgroup v1 and v2.
+
+It walks from the process's own cgroup up to the root and uses the **smallest** limit it finds. This covers nested cgroups and limits changed at runtime with `docker update --memory`. If no limit is set, the host values are used.
+
+### Memory reserve
+
+Figranium keeps a memory reserve free for the operating system, the Node.js server, and the database. The reserve is the larger of:
+
+- `RESOURCE_MEMORY_RESERVE_MB` (default `512`)
+- 15% of total memory
+
+| Total memory | Reserve |
+| :-- | :-- |
+| 2 GB | 512 MB |
+| 4 GB | 615 MB |
+| 8 GB | 1,229 MB |
+| 16 GB | 2,458 MB |
+
+### Pressure
+
+The host is considered under pressure (`"Busy"`) when either condition is true:
+
+- Available memory is below the reserve.
+- CPU load is at or above `RESOURCE_CPU_THRESHOLD` (default `0.9`).
+
+Otherwise, pressure is `"Normal"`. While the host is under pressure, **no new runs start**, even if there are free slots. Runs already in progress continue. New requests go to the queue.
+
+<Info>
+  Pressure counts all memory use on the host or container, not just Figranium's browsers. Another process using a lot of memory can pause the queue.
+</Info>
+
+<Note>
+  On Windows hosts, Node.js does not report a load average, so CPU load is always `0` and only the memory check applies.
+</Note>
+
+## Automatic concurrency limit
+
+The concurrency limit is the maximum number of executions that can run at the same time. Figranium derives it from total memory and CPU count:
+
+| Total memory | Concurrency limit |
+| :-- | :-- |
+| 2.5 GB (2,560 MB) or less | 1 |
+| More than 2.5 GB and less than 6 GB | 2, or the CPU count if lower |
+| 6 GB or more | The smallest of: 4, CPU count minus 1 (at least 1), and (total memory minus reserve) divided by 768 MB |
+
+The 768 MB figure is the memory budgeted for each Chromium execution. The limit is never lower than 1 and never higher than 4 unless you set it yourself.
+
+### Examples
+
+| Host | Calculation | Limit |
+| :-- | :-- | :-- |
+| 1 GB VPS, 1 CPU | 2.5 GB or less | 1 |
+| 2 GB container, 2 CPUs | 2.5 GB or less | 1 |
+| 4 GB, 1 CPU | min(2, 1) | 1 |
+| 4 GB, 4 CPUs | min(2, 4) | 2 |
+| 6 GB, 2 CPUs | min(4, 2 − 1, (6,144 − 922) ÷ 768 = 6) | 1 |
+| 8 GB, 4 CPUs | min(4, 4 − 1, (8,192 − 1,229) ÷ 768 = 9) | 3 |
+| 16 GB, 8 CPUs | min(4, 8 − 1, (16,384 − 2,458) ÷ 768 = 18) | 4 |
+
+<Tip>
+  On hosts with 6 GB or more, the CPU count often decides the limit, because one core is kept for the server itself. A 6 GB machine with 2 CPUs runs one execution at a time. Add a CPU or set `MAX_CONCURRENT_EXECUTIONS` if you want more.
+</Tip>
+
+### Overriding the limit
+
+Set `MAX_CONCURRENT_EXECUTIONS` to a positive integer to replace the automatic limit. Pressure checks still apply: the queue pauses when memory or CPU is under pressure, even below your limit.
+
+```bash .env
+MAX_CONCURRENT_EXECUTIONS=6
+```
+
+<Warning>
+  Each Chromium execution can use 500 MB to 1 GB of memory, more with video recording or heavy pages. Setting the limit above what your host can hold can lead to browser crashes (`Target closed`) or `ENOMEM` errors. See [Host Specifications](/host-specs).
+</Warning>
+
+## Execution queue
+
+Runs that cannot start immediately wait in a FIFO queue. They start in the order they arrived.
+
+### When queued runs start
+
+Figranium tries to start queued runs:
+
+- **When a run finishes.** A fresh resource sample is taken first.
+- **When the monitor sees a change.** On each probe, if available memory or total memory changed by 128 MB or more, CPU load changed, or the container limit changed, the queue is checked again.
+
+If the host is under pressure at that moment, nothing starts and the queue waits for the next check. Otherwise, queued runs start until the concurrency limit is reached.
+
+### Queue limits
+
+| Setting | Default | Effect |
+| :-- | :-- | :-- |
+| `MAX_EXECUTION_QUEUE` | `50` | Maximum number of waiting runs. A new request that arrives when the queue is full is rejected immediately. |
+| `EXECUTION_QUEUE_TIMEOUT_MS` | `600000` (10 minutes) | Maximum time a run can wait. When it expires, the run is removed from the queue and rejected. |
+
+### HTTP behavior while queued
+
+A queued API request keeps its HTTP connection open until the run starts and finishes. From the caller's point of view, a queued request is simply a slow request. The worst case is the queue timeout plus the execution timeout (25 minutes with the defaults).
+
+<Tip>
+  Set your HTTP client's timeout longer than the time you expect runs to wait and execute. If your client disconnects, Figranium frees that run's slot right away. The browser work may keep going in the background, so the host can briefly run more than the limit.
+</Tip>
+
+### Rejection response
+
+When the queue is full or a run times out in the queue, Figranium responds with:
+
+```http
+HTTP/1.1 503 Service Unavailable
+Retry-After: 600
+Content-Type: application/json
+
+{
+  "error": "RESOURCE_CAPACITY_EXCEEDED",
+  "retryAfterMs": 600000
+}
+```
+
+`Retry-After` (in seconds) and `retryAfterMs` are both set to the queue timeout. Treat them as an upper bound: capacity often frees up sooner. For retry logic, use exponential backoff capped at the `Retry-After` value, or poll `GET /api/health` and retry when `queued` drops below `maxQueue`.
+
+### Shutdown
+
+When the server shuts down, every waiting run is rejected with `RESOURCE_CAPACITY_EXCEEDED` so callers are not left hanging. The queue lives in memory and does not survive a restart; callers must resubmit.
+
+## Execution timeout
+
+Once a run starts, `EXECUTION_TIMEOUT_MS` (default `900000`, 15 minutes) limits how long it can run. When the timeout is reached, Figranium asks the runner to stop and responds with:
+
+```json
+{ "error": "EXECUTION_TIMEOUT", "outcome": "crashed" }
+```
+
+The response has status `504`. The run's slot is released so the next queued run can start.
+
+Headful runs have no execution timeout, because they are interactive sessions you control. They still take a concurrency slot while active.
+
+## Memory safeguards for results
+
+Large results are also bounded so that a single run cannot exhaust server memory:
+
+- **Extraction workers** have bounded output and heap size. An oversized extraction fails for that run only.
+- **Execution history** records are capped at 256 KB each (`MAX_PERSISTED_EXECUTION_BYTES`). Larger results are stored with the HTML and data replaced by a truncation notice and only the first 20 log lines kept. See [Execution Logs](/captures-and-storage#execution-logs).
+- **Retention** deletes captures, recordings, and execution history older than the configured period (7 days by default). See [Automatic Retention](/captures-and-storage#automatic-retention).
+
+## Monitoring
+
+`GET /api/health` includes a `protection` object with the current state. It does not require authentication, so you can use it from load balancers and uptime monitors.
+
+```json
+{
+  "status": "ok",
+  "protection": {
+    "totalMb": 4096,
+    "availableMb": 2900,
+    "cgroupLimitMb": 4096,
+    "cgroupUsedMb": 1196,
+    "cpuCount": 4,
+    "cpuLoad": 0.35,
+    "reserveMb": 615,
+    "maxConcurrent": 2,
+    "pressure": "Normal",
+    "maxQueue": 50,
+    "queueTimeoutMs": 600000,
+    "active": 2,
+    "queued": 3
+  }
+}
+```
+
+| Field | Description |
+| :-- | :-- |
+| `totalMb` | Effective total memory (container limit if lower than host memory) |
+| `availableMb` | Effective available memory |
+| `cgroupLimitMb` / `cgroupUsedMb` | Container limit and usage, or `null` when no limit is detected |
+| `cpuCount` / `cpuLoad` | Logical CPUs and normalized 1-minute load |
+| `reserveMb` | Memory reserve used for the pressure check |
+| `maxConcurrent` | Current concurrency limit |
+| `pressure` | `"Normal"` or `"Busy"` |
+| `maxQueue` / `queueTimeoutMs` | Queue size and wait limits |
+| `active` / `queued` | Runs executing now and runs waiting |
+
+The same object is returned by `GET /api/settings/system`. See [REST API](/rest-api#health).
+
+### What to watch
+
+- **`pressure` stays `"Busy"`**: the host is short on memory or CPU. Check `availableMb` against `reserveMb` and `cpuLoad` against your threshold.
+- **`queued` grows steadily**: runs arrive faster than they finish. Add capacity, spread out schedules, or shorten tasks.
+- **`active` is below `maxConcurrent` while `queued` is above 0**: the queue is paused by pressure, not by the limit.
+
+## Tuning for your deployment
+
+| Variable | Default | Description |
+| :-- | :-- | :-- |
+| `MAX_CONCURRENT_EXECUTIONS` | automatic | Fixed concurrency limit. Replaces the automatic calculation. |
+| `MAX_EXECUTION_QUEUE` | `50` | Maximum waiting runs. |
+| `EXECUTION_QUEUE_TIMEOUT_MS` | `600000` | Maximum wait in the queue, in milliseconds. |
+| `EXECUTION_TIMEOUT_MS` | `900000` | Maximum runtime for non-headful runs, in milliseconds. |
+| `RESOURCE_MEMORY_RESERVE_MB` | `512` | Minimum memory reserve. The effective reserve is the larger of this and 15% of total memory. |
+| `RESOURCE_CPU_THRESHOLD` | `0.9` | Normalized CPU load that pauses the queue. |
+| `RESOURCE_PROBE_INTERVAL_MS` | `30000` | How often resources are sampled, in milliseconds. |
+
+<AccordionGroup>
+  <Accordion title="Small VPS or 2 GB container">
+    Keep the defaults. Figranium runs one execution at a time and queues the rest. If you use video recording or visit heavy pages, raise the reserve so the queue pauses earlier:
+
+    ```bash .env
+    RESOURCE_MEMORY_RESERVE_MB=768
+    ```
+  </Accordion>
+
+  <Accordion title="Bursty schedules (many tasks at the same minute)">
+    Allow a deeper queue and longer waits so bursts are absorbed instead of rejected:
+
+    ```bash .env
+    MAX_EXECUTION_QUEUE=200
+    EXECUTION_QUEUE_TIMEOUT_MS=1800000
+    ```
+
+    Staggering cron times by a few minutes is usually more effective.
+  </Accordion>
+
+  <Accordion title="Large dedicated server">
+    The automatic limit tops out at 4. On a machine with plenty of memory and cores, set a higher limit and let the pressure checks guard against overload:
+
+    ```bash .env
+    MAX_CONCURRENT_EXECUTIONS=8
+    ```
+  </Accordion>
+
+  <Accordion title="Long-running tasks">
+    Raise the execution timeout for tasks that crawl many pages or wait for slow downloads:
+
+    ```bash .env
+    EXECUTION_TIMEOUT_MS=3600000
+    ```
+  </Accordion>
+
+  <Accordion title="Shared host with other busy services">
+    Other processes raise CPU load and can keep the queue paused. Raise the threshold slightly, or give Figranium its own container with CPU and memory limits:
+
+    ```bash .env
+    RESOURCE_CPU_THRESHOLD=1.2
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  The local CAPTCHA model tier is also chosen from memory, but only once at startup. After resizing a host or container, restart Figranium to re-detect CAPTCHA capacity. See [CAPTCHA Solving](/captcha-solving).
+</Note>
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Configuration" icon="settings" href="/configuration#execution">
+    All execution environment variables.
+  </Card>
+  <Card title="Host Specifications" icon="server" href="/host-specs">
+    Recommended hardware for your workload.
+  </Card>
+  <Card title="Performance" icon="bolt" href="/performance">
+    Make tasks faster and lighter.
+  </Card>
+  <Card title="Troubleshooting" icon="help" href="/troubleshooting#executions-return-503-resource_capacity_exceeded">
+    Fix capacity and timeout errors.
+  </Card>
+</CardGroup>

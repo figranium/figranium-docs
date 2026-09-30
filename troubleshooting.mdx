@@ -171,6 +171,21 @@ Common issues and their solutions when running Figranium.
       - **Fix**: Wrap it in an On Error block with a fallback, or reduce the timeout.
     - **Cause 3**: A download action waiting for a file that never triggers.
       - **Fix**: Check that the target element actually initiates a download.
+    - **Note**: Since v0.19, non-headful runs are stopped after `EXECUTION_TIMEOUT_MS` (15 minutes by default) and return `504 EXECUTION_TIMEOUT`. Raise the value in your `.env` if a task legitimately needs longer. See [Configuration](/configuration#execution).
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Executions return 503 (`RESOURCE_CAPACITY_EXCEEDED`)
+
+<AccordionGroup>
+  <Accordion title="Runs are queued or rejected under load">
+    - **Cause**: Figranium's host-aware resource protection limits how many browsers run at once. Extra runs wait in a queue, which pauses when memory or CPU is under pressure. When the queue is full (50 by default) or a run waits more than 10 minutes, the request is rejected with `503`.
+    - **Fix**:
+      - Retry after the number of seconds in the `Retry-After` header.
+      - Check `protection` in [`GET /api/health`](/rest-api#health) to see `maxConcurrent`, `pressure`, `active`, and `queued`.
+      - Spread out scheduled tasks, add memory to the host or container, or adjust `MAX_CONCURRENT_EXECUTIONS`, `MAX_EXECUTION_QUEUE`, and `EXECUTION_QUEUE_TIMEOUT_MS`. See [Host-aware resource protection](/configuration#host-aware-resource-protection).
   </Accordion>
 </AccordionGroup>
 

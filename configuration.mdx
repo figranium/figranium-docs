@@ -12,7 +12,7 @@ Figranium uses environment variables to configure key aspects of the server and 
   </Card>
 
   <Card title="Execution" icon="bolt" href="#execution">
-    Concurrency limits and task queue behavior.
+    Host-aware concurrency, queueing, and execution timeouts.
   </Card>
 
   <Card title="Rate Limiting" icon="shield" href="#rate-limiting">
@@ -32,7 +32,7 @@ Figranium uses environment variables to configure key aspects of the server and 
   </Card>
 
   <Card title="CAPTCHA Solving" icon="key" href="#captcha-solving">
-    Remote provider, local model, and Apple companionRemote endpoint and local model solver settings.
+    Remote provider, local model, and Apple companion settings.
   </Card>
 
   <Card title="PostgreSQL" icon="database" href="#database-postgresql">
@@ -57,11 +57,27 @@ Figranium uses environment variables to configure key aspects of the server and 
 
 | **Variable** | **Default Value** | **Description** |
 | :-- | :-- | :-- |
-| `MAX_CONCURRENT_EXECUTIONS` | _(unlimited)_ | Maximum number of tasks that can run simultaneously. Excess requests are queued until a slot is available. |
+| `MAX_CONCURRENT_EXECUTIONS` | host-aware | Override the automatic limit on how many browser executions run at once. |
+| `MAX_EXECUTION_QUEUE` | `50` | Maximum number of executions that can wait for capacity. New work beyond this receives `503`. |
+| `EXECUTION_QUEUE_TIMEOUT_MS` | `600000` (10 min) | Maximum time an execution can wait in the queue before it is rejected. |
+| `EXECUTION_TIMEOUT_MS` | `900000` (15 min) | Maximum runtime for a non-headful execution. Runs that exceed it are stopped and return `504 EXECUTION_TIMEOUT`. |
+| `RESOURCE_MEMORY_RESERVE_MB` | max(512 MB, 15% of memory) | Minimum memory headroom kept free for the host. |
+| `RESOURCE_CPU_THRESHOLD` | `0.9` | Normalized CPU load (load average divided by CPU count) at which Figranium pauses dequeuing. |
+| `RESOURCE_PROBE_INTERVAL_MS` | `30000` | How often runtime resource protection samples memory and CPU. |
 
-When set, Figranium queues incoming execution requests that exceed the limit and processes them in order as slots free up. Leave unset (or set to `0`) for unlimited concurrency. This is the default and matches the behavior of earlier versions.
+### Host-aware resource protection
 
-This is useful when running on resource-constrained hosts or when you want to prevent a burst of scheduled tasks from overwhelming the browser pool.
+Starting in v0.19, Figranium protects the host from running too many Chromium processes at once. It reads available memory (including Docker cgroup limits) and CPU count, then picks a conservative concurrency limit automatically:
+
+| **Available memory** | **Automatic concurrency** |
+| :-- | :-- |
+| 2.5 GB or less | 1 |
+| Under 6 GB | 2 (or the CPU count, if lower) |
+| 6 GB or more | Up to 4, bounded by CPU count minus one and the memory left after the reserve (about 768 MB per execution) |
+
+Executions beyond the limit wait in a first-in, first-out queue. When free memory drops below the reserve or CPU load reaches `RESOURCE_CPU_THRESHOLD`, the queue pauses until pressure eases. If the queue is full or an execution waits longer than `EXECUTION_QUEUE_TIMEOUT_MS`, the request returns `503` with `RESOURCE_CAPACITY_EXCEEDED` and a `Retry-After` header. On shutdown, queued executions are released cleanly.
+
+Set `MAX_CONCURRENT_EXECUTIONS` to a positive integer to replace the automatic limit. You can check the current limit, pressure, and queue length from [`GET /api/health`](/rest-api#health). For an in-depth explanation and tuning examples, see [Resource Protection](/resource-protection).
 
 ## Rate Limiting
 
@@ -147,7 +163,10 @@ AUTH_RATE_LIMIT_MAX=20
 DATA_RATE_LIMIT_MAX=500
 NOVNC_PORT=54311
 SESSION_COOKIE_SECURE=true
+
+# Optional: override automatic resource protection
 MAX_CONCURRENT_EXECUTIONS=3
+EXECUTION_TIMEOUT_MS=900000
 
 # Optional PostgreSQL configuration (Recommended: Neon)
 DB_TYPE=postgres
