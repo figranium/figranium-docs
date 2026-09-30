@@ -200,7 +200,7 @@
       "post": {
         "tags": ["Settings"],
         "summary": "Save shared capture and execution retention",
-        "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "retentionDays": { "type": ["integer", "null"], "minimum": 1, "maximum": 365 } } } } } },
+        "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "retentionDays": { "type": "integer", "nullable": true, "minimum": 1, "maximum": 365, "description": "Days to keep captures and execution history. Use null to keep data forever." } } } } } },
         "responses": { "200": { "description": "Saved" }, "400": { "$ref": "#/components/responses/BadRequest" }, "401": { "$ref": "#/components/responses/Unauthorized" } }
       }
     },
