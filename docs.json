@@ -41,7 +41,6 @@
             "icon": "tools",
             "pages": [
               "ui-tour",
-              "scrape-vs-agent",
               "action-blocks",
               "selectors",
               "highlight-tool",
@@ -67,6 +66,7 @@
             "group": "Running Tasks",
             "icon": "player-play",
             "pages": [
+              "agent-vs-scrape",
               "headful-browser",
               "stateless-execution",
               "task-scheduling",
