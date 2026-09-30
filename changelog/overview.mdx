@@ -13,18 +13,12 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
 <Update label="2026-09-30" description="This week">
   ## Updates
 
-  - **API key access to execution details**: `GET /api/executions/:id` now accepts an [API key](/api-key) as well as a signed-in session. Scripts, SDKs, and integrations can fetch the full logs and result of a run without a browser login. See [REST API](/rest-api#executions).
-</Update>
-
-<Update label="2026-09-29" description="This week">
-  ## Updates
-
-  - **API key access to captures and Cabinets**: `GET /api/data/captures` and `GET /api/cabinets` now accept an [API key](/api-key) as well as a signed-in session. Scripts, SDKs, and integrations can list captures and Cabinets without a browser login. See [REST API](/rest-api#data) and [Cabinets](/sdk/js/resources/cabinets).
+  - **API key access to executions, captures, and Cabinets**: `GET /api/executions/:id`, `GET /api/data/captures`, and `GET /api/cabinets` now accept an [API key](/api-key) as well as a signed-in session. Scripts, SDKs, and integrations can fetch run logs and results, list captures, and list Cabinets without a browser login. See [REST API](/rest-api#executions) and [Cabinets](/sdk/js/resources/cabinets).
   - **Settings buttons**: the **Regenerate** API key button and the **Add Proxy** button now use a blue primary style, so the main action on each settings panel is easier to spot. See [API key](/api-key) and [Proxy rotation](/proxy-rotation).
 
   ## Fixes
 
-  - **Extraction script logging**: [extraction scripts](/data-extraction) now support `console.info()` and `console.debug()`. Scripts that call these methods no longer fail, and their messages appear in the extraction logs with `log`, `warn`, and `error` output.
+  - **Extraction script logging**: [extraction scripts](/data-extraction) now support `console.info()` and `console.debug()`. Scripts that call these methods no longer fail. Their messages appear in the extraction logs with `log`, `warn`, and `error` output.
 </Update>
 
 <Update label="2026-09-27" description="Earlier this week">
