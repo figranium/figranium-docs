@@ -35,6 +35,26 @@ To enable PostgreSQL, set the following environment variables in your deployment
 | **`DB_POSTGRESDB_DATABASE`** | Name of the database to use. |
 | **`DB_POSTGRESDB_SSL`** | Set to `true` to connect over SSL/TLS. Defaults to `false`. |
 
+<Note>
+  Database settings are managed with environment variables only. The **Settings** page no longer stores PostgreSQL connection details, so set these variables in your `.env` file, Docker Compose file, or hosting provider and restart Figranium.
+</Note>
+
+### Alternative variable names
+
+Figranium also accepts shorter variable names, in both uppercase and lowercase. The lowercase forms match the names used by platforms such as DigitalOcean. When more than one name is set for the same field, Figranium uses the first match in this order: uppercase short name, lowercase short name, then the `DB_POSTGRESDB_*` name.
+
+| **Field** | **Accepted variables** |
+| :-- | :-- |
+| Protocol | `DB_PROTOCOL`, `db_protocol`, `DB_TYPE` (defaults to `postgres`) |
+| Host | `DB_HOST`, `db_host`, `DB_POSTGRESDB_HOST` |
+| Port | `DB_PORT`, `db_port`, `DB_POSTGRESDB_PORT` |
+| Username | `DB_USERNAME`, `db_username`, `DB_POSTGRESDB_USER` |
+| Password | `DB_PASSWORD`, `db_password`, `DB_POSTGRESDB_PASSWORD` |
+| Database | `DB_DATABASE`, `db_database`, `DB_POSTGRESDB_DATABASE` (defaults to `postgres`) |
+| SSL | `DB_SSL`, `db_ssl`, `DB_POSTGRESDB_SSL` (`true` or `1` enables SSL) |
+
+Setting any of these connection variables turns on PostgreSQL storage.
+
 ### SSL connections
 
 Set `DB_POSTGRESDB_SSL=true` when your PostgreSQL server requires encrypted connections. This is required for managed Postgres services such as Neon, AWS RDS, Google Cloud SQL, Azure Database, or Supabase. Figranium connects with SSL enabled and `rejectUnauthorized: false`, which allows self-signed certificates commonly used by managed providers.

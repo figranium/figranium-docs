@@ -140,6 +140,23 @@ https://your-domain.example.com
   Do not expose Figranium publicly without completing the initial administrator setup and reviewing your instance's security configuration.
 </Warning>
 
+## Connect a PostgreSQL database
+
+By default, Figranium stores data in files on the Droplet. To use a PostgreSQL database instead, such as a DigitalOcean Managed Database, set the connection details as environment variables on the Figranium service and restart it. Figranium accepts lowercase names such as `db_host`, `db_port`, `db_username`, `db_password`, `db_database`, and `db_ssl`, alongside the standard uppercase variables.
+
+```bash
+db_host=your-cluster.db.ondigitalocean.com
+db_port=25060
+db_username=doadmin
+db_password=your_database_password
+db_database=defaultdb
+db_ssl=true
+```
+
+<Note>
+  PostgreSQL connection details are configured with environment variables only, not from the Settings page. See [PostgreSQL Support](/database-support#alternative-variable-names) for every accepted variable name.
+</Note>
+
 ## What the 1-Click App includes
 
 - Figranium running from the latest stable container image

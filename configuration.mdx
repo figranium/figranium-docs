@@ -129,6 +129,8 @@ This is useful when running on resource-constrained hosts or when you want to pr
 | `DB_POSTGRESDB_DATABASE` | — | Database name. |
 | `DB_POSTGRESDB_SSL` | `false` | Set to `true` to enable SSL/TLS database connections. |
 
+Figranium also accepts the shorter `DB_PROTOCOL`, `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_DATABASE`, and `DB_SSL` names, plus their lowercase forms (for example, `db_host`). PostgreSQL connection details can only be set with environment variables, not from the Settings page. See [Alternative variable names](/database-support#alternative-variable-names).
+
 <Tip>
   For production deployments, [Neon](https://neon.tech) is the recommended backend database provider due to its serverless autoscaling and zero-maintenance PostgreSQL infrastructure. See [PostgreSQL Support](/database-support) for full details.
 </Tip>
