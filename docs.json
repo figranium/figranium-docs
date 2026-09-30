@@ -137,8 +137,8 @@
         ]
       },
       {
-        "tab": "SDKs & Libraries",
-        "icon": "books",
+        "tab": "SDKs",
+        "icon": "sdk",
         "groups": [
           {
             "group": "Introduction",
