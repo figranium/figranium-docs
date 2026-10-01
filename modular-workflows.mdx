@@ -4,8 +4,6 @@ sidebarTitle: "Modular Workflows"
 description: "Break complex Figranium automations into reusable sub-tasks and chain them together with the start action for maintainable, scalable workflows."
 ---
 
-import { FigraniumTask } from '/snippets/figranium-embed.jsx';
-
 Figranium supports **Modular Workflows**, allowing you to break complex automations into smaller, reusable tasks and chain them together using the **Start Task** block.
 
 ## Why Modular Workflows?
@@ -34,7 +32,7 @@ As automations grow, a single monolithic task becomes hard to maintain. Modular 
 
 The Start Task action triggers another task by its ID, running it as a sub-task within the current execution context.
 
-<FigraniumTask task={{"id":"docs-modular-workflows-1","name":"The Start Task Action","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"start","value":"task-id-of-child-task"}]}} title="Figranium task preview: The Start Task Action" height={320} />
+<img src="/images/tasks/modular-workflows-task-1.png" alt="Figranium task preview: The Start Task Action" />
 
 **Key behaviors:**
 
@@ -51,19 +49,19 @@ The Start Task action triggers another task by its ID, running it as a sub-task 
   <Step title="Create the Child Task">
     Build a standalone task that handles a specific sub-flow. For example, a "Handle Cookie Banner" task:
 
-    <FigraniumTask task={{"id":"docs-modular-workflows-2","name":"How to Chain Tasks","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"if","value":"exists('#cookie-accept')"},{"id":"block-2","type":"click","selector":"#cookie-accept"},{"id":"block-3","type":"wait","value":"500"},{"id":"block-4","type":"end"}]}} title="Figranium task preview: How to Chain Tasks" height={562} />
+    <img src="/images/tasks/modular-workflows-task-2.png" alt="Figranium task preview: How to Chain Tasks" />
 
     Note its task ID from the dashboard URL.
   </Step>
   <Step title="Add `start` to Your Main Task">
     In your main task, add a **Start Task** block where you want the child task to run:
 
-    <FigraniumTask task={{"id":"docs-modular-workflows-3","name":"How to Chain Tasks","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"navigate","value":"https://example.com"},{"id":"block-2","type":"start","value":"cookie-handler-task-id"},{"id":"block-3","type":"click","selector":".main-content"}]}} title="Figranium task preview: How to Chain Tasks" height={474} />
+    <img src="/images/tasks/modular-workflows-task-3.png" alt="Figranium task preview: How to Chain Tasks" />
   </Step>
   <Step title="Pass Variables to Child Tasks">
     Variables defined in the parent task are automatically available in the child task using the same `{$varName}` syntax. There is no special configuration needed.
 
-    <FigraniumTask task={{"id":"docs-modular-workflows-4","name":"How to Chain Tasks","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"type","selector":"#email","value":"{$username}"}]}} title="Figranium task preview: How to Chain Tasks" height={320} />
+    <img src="/images/tasks/modular-workflows-task-4.png" alt="Figranium task preview: How to Chain Tasks" />
   </Step>
 </Steps>
 
@@ -75,19 +73,19 @@ The Start Task action triggers another task by its ID, running it as a sub-task 
 
 Create a single "Login" task and call it at the start of all tasks that require authentication:
 
-<FigraniumTask task={{"id":"docs-modular-workflows-5","name":"Common Modular Patterns","url":"https://app.example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"navigate","value":"https://app.example.com"},{"id":"block-2","type":"start","value":"login-task-id"},{"id":"block-3","type":"navigate","value":"https://app.example.com/dashboard"}]}} title="Figranium task preview: Common Modular Patterns" height={474} />
+<img src="/images/tasks/modular-workflows-task-5.png" alt="Figranium task preview: Common Modular Patterns" />
 
 ### Pattern 2: Paginated Scraping
 
 Break pagination into a loop calling a "Scrape One Page" sub-task:
 
-<FigraniumTask task={{"id":"docs-modular-workflows-6","name":"Common Modular Patterns","url":"https://shop.example.com/products","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"navigate","value":"https://shop.example.com/products"},{"id":"block-2","type":"while","value":"exists('.next-page')"},{"id":"block-3","type":"start","value":"scrape-page-task-id"},{"id":"block-4","type":"click","selector":".next-page"},{"id":"block-5","type":"wait","value":"1000"},{"id":"block-6","type":"end"}]}} title="Figranium task preview: Common Modular Patterns" height={738} />
+<img src="/images/tasks/modular-workflows-task-6.png" alt="Figranium task preview: Common Modular Patterns" />
 
 ### Pattern 3: Error Recovery
 
 Use an **On Error** block to trigger a recovery sub-task when something goes wrong:
 
-<FigraniumTask task={{"id":"docs-modular-workflows-7","name":"Common Modular Patterns","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"on_error"},{"id":"block-2","type":"start","value":"handle-captcha-task-id"},{"id":"block-3","type":"end"}]}} title="Figranium task preview: Common Modular Patterns" height={474} />
+<img src="/images/tasks/modular-workflows-task-7.png" alt="Figranium task preview: Common Modular Patterns" />
 
 ---
 
@@ -95,7 +93,7 @@ Use an **On Error** block to trigger a recovery sub-task when something goes wro
 
 After a Start Task block, the child task's extraction result is available in `block.output`:
 
-<FigraniumTask task={{"id":"docs-modular-workflows-8","name":"Accessing Child Task Output","url":"https://api.example.com/data?token={$block.output}","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"start","value":"get-auth-token-task-id"},{"id":"block-2","type":"navigate","value":"https://api.example.com/data?token={$block.output}"}]}} title="Figranium task preview: Accessing Child Task Output" height={386} />
+<img src="/images/tasks/modular-workflows-task-8.png" alt="Figranium task preview: Accessing Child Task Output" />
 
 ---
 
@@ -105,7 +103,7 @@ It is technically possible to create recursive chains (Task A starts Task B, whi
 
 **Always include a termination condition to prevent infinite loops:**
 
-<FigraniumTask task={{"id":"docs-modular-workflows-9","name":"Recursive Flows","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"if","value":"{$retries} > 5"},{"id":"block-2","type":"stop","value":"error"},{"id":"block-3","type":"end"},{"id":"block-4","type":"start","value":"this-tasks-own-id"}]}} title="Figranium task preview: Recursive Flows" height={562} />
+<img src="/images/tasks/modular-workflows-task-9.png" alt="Figranium task preview: Recursive Flows" />
 
 ---
 
@@ -124,7 +122,7 @@ The Start Task block sanitizes the task ID before issuing the internal API call.
 
 If sanitization removes every character (for example, when a template variable resolves to `../../api/clear-cookies?` or any other non-conforming string), the action fails fast with `Invalid task id.` and no request is made. This prevents a crafted variable value from being used to probe other internal endpoints through the Start Task block.
 
-<FigraniumTask task={{"id":"docs-modular-workflows-10","name":"Task ID validation","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"start","value":"{{ user_input }}"}]}} title="Figranium task preview: Task ID validation" height={320} />
+<img src="/images/tasks/modular-workflows-task-10.png" alt="Figranium task preview: Task ID validation" />
 
 When `user_input` resolves to `task_abc123`, the action runs normally. When it resolves to `../../api/clear-cookies?`, the action errors with `Invalid task id.` and the parent task continues with that step marked failed.
 

@@ -4,8 +4,6 @@ description: "Solve reCAPTCHA v2/v3, hCaptcha, and Cloudflare Turnstile challeng
 sidebarTitle: "CAPTCHAs"
 ---
 
-import { FigraniumTask } from '/snippets/figranium-embed.jsx';
-
 Agent mode can detect and solve CAPTCHA challenges without leaving the task flow. Figranium ships a **resource-adaptive local solver** that runs an OWL-ViT or Florence-2 model against the task's own headless browser and injects the resulting token. If you configure a YesCaptcha/AntiCaptcha-compatible remote endpoint, the block tries it first and falls back to the local solver on failure.
 
 Supported challenges: reCAPTCHA v2, reCAPTCHA v3, hCaptcha, Cloudflare Turnstile.
@@ -50,7 +48,7 @@ Local image solving requires at least **2 GiB effective cgroup memory**. Hosts b
 
 Drop the **Solve Captcha** block into a task at the step where you expect a challenge. See [Action Blocks — Solve Captcha](/action-blocks#solve-captcha) for the full field reference; the shape is:
 
-<FigraniumTask task={{"id":"docs-captcha-solving-1","name":"Solve Captcha","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"solve_captcha","captchaType":"recaptcha_v2","selector":"#recaptcha-container","varName":"captchaResult","timeout":120000}]}} title="Figranium task preview: Solve Captcha" height={320} />
+<img src="/images/tasks/captcha-solving-task-1.png" alt="Figranium task preview: Solve Captcha" />
 
 - `captchaType` is optional — omit it to auto-detect from the page. Supported values: `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, `turnstile`.
 - `selector` is optional — omit it to scan the whole page.
@@ -59,7 +57,7 @@ Drop the **Solve Captcha** block into a task at the step where you expect a chal
 
 **Example — submit a form, then solve the reCAPTCHA it renders:**
 
-<FigraniumTask task={{"id":"docs-captcha-solving-2","name":"Solve Captcha","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"click","value":"button[type='submit']"},{"id":"block-2","type":"wait_selector","value":"iframe[src*='recaptcha']"},{"id":"block-3","type":"solve_captcha","captchaType":"recaptcha_v2","varName":"captchaResult"},{"id":"block-4","type":"click","value":"button.continue"}]}} title="Figranium task preview: Solve Captcha" height={562} />
+<img src="/images/tasks/captcha-solving-task-2.png" alt="Figranium task preview: Solve Captcha" />
 
 ---
 
@@ -73,7 +71,7 @@ Use it when:
 - You want to confirm a challenge appeared before branching with an [If](/control-flow) block.
 - A widget loads asynchronously and later steps race against it.
 
-<FigraniumTask task={{"id":"docs-captcha-solving-3","name":"Wait for Captcha","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"wait_captcha","captchaType":"turnstile","selector":"#turnstile-container","varName":"captchaReady","timeout":30000}]}} title="Figranium task preview: Wait for Captcha" height={320} />
+<img src="/images/tasks/captcha-solving-task-3.png" alt="Figranium task preview: Wait for Captcha" />
 
 - `captchaType` is optional — omit it to wait for the first ready challenge of any supported type. Supported values: `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, `turnstile`.
 - `selector` is optional — omit it to scan the whole page.

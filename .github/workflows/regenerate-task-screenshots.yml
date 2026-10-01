@@ -1,0 +1,48 @@
+name: Regenerate task screenshots
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - replace-embeds-with-editor-screenshots
+
+permissions:
+  contents: write
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: figranium/figranium
+          path: .figranium
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: .figranium/package-lock.json
+      - run: npm ci
+        working-directory: .figranium
+      - run: npm run build
+        working-directory: .figranium
+      - run: npx playwright install --with-deps chromium
+        working-directory: .figranium
+      - run: node server.js > /tmp/figranium.log 2>&1 &
+        working-directory: .figranium
+      - run: npx wait-on http://127.0.0.1:11345/api/auth/check-setup
+      - run: npm run dev -- --host 127.0.0.1 > /tmp/figranium-vite.log 2>&1 &
+        working-directory: .figranium
+      - run: npx wait-on http://127.0.0.1:5173
+      - run: node scripts/generate-task-screenshots.mjs
+        env:
+          FIGRANIUM_DIR: .figranium
+          FIGRANIUM_URL: http://127.0.0.1:5173
+          FIGRANIUM_API_URL: http://127.0.0.1:11345
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "Regenerate Figranium task screenshots"
+          git push

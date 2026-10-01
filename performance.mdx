@@ -4,8 +4,6 @@ sidebarTitle: "Performance"
 description: "Make Figranium tasks faster and more reliable at scale. Optimize waits, selectors, loops, storage, and Docker resources for production deployments."
 ---
 
-import { FigraniumTask } from '/snippets/figranium-embed.jsx';
-
 This guide covers strategies for making Figranium tasks faster, more efficient, and more reliable at scale.
 
 ## Understanding Execution Time
@@ -27,11 +25,11 @@ The biggest time sinks are usually **navigation** (waiting for pages to load) an
 
 Instead of waiting a fixed time:
 
-<FigraniumTask task={{"id":"docs-performance-1","name":"Reduce Unnecessary Waits","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"click","selector":"#submit"},{"id":"block-2","type":"wait","value":"3000"}]}} title="Figranium task preview: Reduce Unnecessary Waits" height={386} />
+<img src="/images/tasks/performance-task-1.png" alt="Figranium task preview: Reduce Unnecessary Waits" />
 
 Wait for the result element to appear:
 
-<FigraniumTask task={{"id":"docs-performance-2","name":"Reduce Unnecessary Waits","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"click","selector":"#submit"},{"id":"block-2","type":"wait_selector","selector":".success-message"}]}} title="Figranium task preview: Reduce Unnecessary Waits" height={386} />
+<img src="/images/tasks/performance-task-2.png" alt="Figranium task preview: Reduce Unnecessary Waits" />
 
 This completes as soon as the element appears — often much faster than the fixed wait.
 
@@ -84,7 +82,7 @@ Figranium automatically optimizes Foreach loops based on which loop variables yo
 
 This means simple text-based loops are fast by default:
 
-<FigraniumTask task={{"id":"docs-performance-3","name":"Foreach loop optimization","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"foreach","selector":".product"},{"id":"block-2","type":"javascript","value":"return loop.text"},{"id":"block-3","type":"end"}]}} title="Figranium task preview: Foreach loop optimization" height={474} />
+<img src="/images/tasks/performance-task-3.png" alt="Figranium task preview: Foreach loop optimization" />
 
 If your loop body uses `{$loop.html}`, the full HTML is still available as expected — no changes are needed.
 
@@ -106,7 +104,7 @@ If you are working with very large extractions and notice slow rendering, switch
 
 For maximum performance when extracting structured data, collect all data in one JavaScript block rather than iterating with a Foreach loop plus individual JavaScript blocks:
 
-<FigraniumTask task={{"id":"docs-performance-4","name":"Batch extraction","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"foreach","selector":".product"},{"id":"block-2","type":"javascript","value":"return loop.text"},{"id":"block-3","type":"end"},{"id":"block-4","type":"javascript","value":"return Array.from(document.querySelectorAll('.product')).map(el => ({ name: el.querySelector('.name')?.innerText, price: el.querySelector('.price')?.innerText }))"}]}} title="Figranium task preview: Batch extraction" height={562} />
+<img src="/images/tasks/performance-task-4.png" alt="Figranium task preview: Batch extraction" />
 
 ---
 
