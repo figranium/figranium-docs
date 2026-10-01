@@ -20,9 +20,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: .embed-build/package-lock.json
-      - run: npm ci
+      - run: npm install
         working-directory: .embed-build
       - run: npm run build
         working-directory: .embed-build
