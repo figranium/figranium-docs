@@ -27,6 +27,7 @@
             "group": "Get Started",
             "icon": "brand-docker",
             "pages": [
+              "quickstart",
               "host-specs",
               "docker-compose",
               "digitalocean-one-click",
