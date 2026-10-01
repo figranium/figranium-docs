@@ -125,8 +125,9 @@ for (let index = 0; index < manifest.screenshots.length; index++) {
     const body = await page.locator('body').innerText().catch(() => '');
     throw new Error(`Figranium editor did not load at ${page.url()}: ${body.slice(0, 800)}`, { cause: error });
   }
-  // Keep the workflow centered, matching the editor's natural composition.
-  await canvas.screenshot({ path: join(outputRoot, item.filename) });
+  // Capture the complete editor viewport so the workflow column stays centered
+  // exactly as it appears in the product, including the left navigation rail.
+  await page.screenshot({ path: join(outputRoot, item.filename), fullPage: false });
 }
 
 const uiTourPath = join(docsRoot, 'ui-tour.mdx');
