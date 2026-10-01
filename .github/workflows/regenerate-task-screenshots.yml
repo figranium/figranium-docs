@@ -38,6 +38,6 @@ jobs:
       - run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add '*.mdx' images/tasks scripts/generate-task-screenshots.mjs
+          git add -A
           git diff --cached --quiet || git commit -m "Regenerate Figranium task screenshots"
           git push
