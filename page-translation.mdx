@@ -4,20 +4,15 @@ sidebarTitle: "Page Translation"
 description: "Translate browser-rendered task pages before actions and extraction using Figranium's per-task translate.js integration."
 ---
 
+import { FigraniumTask } from '/snippets/figranium-embed.jsx';
+
 Figranium can translate the rendered target page for a task before its actions and extraction logic run. Translation is configured per task and is **disabled by default**.
 
 ## Enable translation
 
 In Task Settings, enable **Page Translation** and choose a target language. The equivalent task JSON is:
 
-```json
-{
-  "translation": {
-    "enabled": true,
-    "targetLanguage": "spanish"
-  }
-}
-```
+<FigraniumTask task={{"id":"docs-page-translation-1","name":"Enable translation","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[],"translation":{"enabled":true,"targetLanguage":"spanish"}}} title="Figranium task preview: Enable translation" height={320} />
 
 `targetLanguage` uses translate.js language names. Common values include `english`, `spanish`, `french`, `german`, `italian`, `portuguese`, `japanese`, `korean`, `chinese_simplified`, and `arabic`.
 
@@ -37,17 +32,6 @@ This is useful when your selectors, extraction logic, or downstream data process
 
 ## Example task fragment
 
-```json
-{
-  "name": "Translated product scraper",
-  "mode": "agent",
-  "url": "https://example.com",
-  "translation": {
-    "enabled": true,
-    "targetLanguage": "english"
-  },
-  "actions": []
-}
-```
+<FigraniumTask task={{"id":"docs-page-translation-2","name":"Translated product scraper","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[],"translation":{"enabled":true,"targetLanguage":"english"}}} title="Figranium task preview: Translated product scraper" height={320} />
 
 Translation changes the rendered page text available to browser-backed actions; it does not turn Agent mode into an autonomous AI agent or alter Scrape mode's HTTP-only execution model.

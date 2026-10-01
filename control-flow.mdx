@@ -4,6 +4,8 @@ sidebarTitle: "Control Flow"
 description: "Handle dynamic web pages, conditional logic, pagination, and multi-step processes with if/else, loops, and error handling in Figranium tasks."
 ---
 
+import { FigraniumTask } from '/snippets/figranium-embed.jsx';
+
 Figranium provides robust control flow mechanisms to handle dynamic web pages, conditional logic, pagination, and multi-step processes.
 
 ## Conditional Execution (If / Else / End)
@@ -14,13 +16,7 @@ The **If** block executes a sequence of actions only when a condition is met.
 
 Every `if` block must be closed with an `end` block. An optional `else` block can be placed between them.
 
-```json
-{ "type": "if",   "value": "<condition>" },
-  // actions if condition is true
-{ "type": "else" },
-  // actions if condition is false (optional)
-{ "type": "end" }
-```
+<FigraniumTask task={{"id":"docs-control-flow-1","name":"Conditional Execution (If / Else / End)","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"if","value":"<condition>"},{"id":"block-2","type":"else"},{"id":"block-3","type":"end"}]}} title="Figranium task preview: Conditional Execution (If / Else / End)" height={474} />
 
 ### Condition Types
 
@@ -79,29 +75,11 @@ Every `if` block must be closed with an `end` block. An optional `else` block ca
 
     **Example: Skip a modal only when it's showing**
 
-    ```json
-    { "type": "navigate", "value": "https://example.com" },
-    { "type": "if",
-      "conditionVarType": "selector",
-      "selector": ".cookie-banner",
-      "conditionOp": "exists"
-    },
-      { "type": "click", "selector": ".cookie-banner .accept" },
-    { "type": "end" }
-    ```
+    <FigraniumTask task={{"id":"docs-control-flow-2","name":"Conditional Execution (If / Else / End)","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"navigate","value":"https://example.com"},{"id":"block-2","type":"if","conditionVarType":"selector","selector":".cookie-banner","conditionOp":"exists"},{"id":"block-3","type":"click","selector":".cookie-banner .accept"},{"id":"block-4","type":"end"}]}} title="Figranium task preview: Conditional Execution (If / Else / End)" height={562} />
 
     **Example: Paginate while a "next" button remains**
 
-    ```json
-    { "type": "while",
-      "conditionVarType": "selector",
-      "selector": ".pagination .next:not(.disabled)",
-      "conditionOp": "exists"
-    },
-      { "type": "click", "selector": ".pagination .next" },
-      { "type": "wait", "value": "1500" },
-    { "type": "end" }
-    ```
+    <FigraniumTask task={{"id":"docs-control-flow-3","name":"Conditional Execution (If / Else / End)","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"while","conditionVarType":"selector","selector":".pagination .next:not(.disabled)","conditionOp":"exists"},{"id":"block-2","type":"click","selector":".pagination .next"},{"id":"block-3","type":"wait","value":"1500"},{"id":"block-4","type":"end"}]}} title="Figranium task preview: Conditional Execution (If / Else / End)" height={562} />
   </Tab>
 </Tabs>
 
@@ -109,31 +87,13 @@ Every `if` block must be closed with an `end` block. An optional `else` block ca
 
 Check whether the user is already logged in, and skip the login form if so:
 
-```json
-{ "type": "navigate", "value": "https://app.example.com" },
-{ "type": "if", "value": "exists('.user-avatar')" },
-  { "type": "stop", "value": "success" },
-{ "type": "else" },
-  { "type": "click", "selector": "#login-button" },
-  { "type": "type", "selector": "#email", "value": "{$email}" },
-  { "type": "type", "selector": "#password", "value": "{$password}" },
-  { "type": "click", "selector": "[type='submit']" },
-{ "type": "end" }
-```
+<FigraniumTask task={{"id":"docs-control-flow-4","name":"Conditional Execution (If / Else / End)","url":"https://app.example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"navigate","value":"https://app.example.com"},{"id":"block-2","type":"if","value":"exists('.user-avatar')"},{"id":"block-3","type":"stop","value":"success"},{"id":"block-4","type":"else"},{"id":"block-5","type":"click","selector":"#login-button"},{"id":"block-6","type":"type","selector":"#email","value":"{$email}"},{"id":"block-7","type":"type","selector":"#password","value":"{$password}"},{"id":"block-8","type":"click","selector":"[type='submit']"},{"id":"block-9","type":"end"}]}} title="Figranium task preview: Conditional Execution (If / Else / End)" height={900} />
 
 ### Nested Conditions
 
 You can nest `if` blocks inside each other. Each nested block requires its own `end`:
 
-```json
-{ "type": "if", "value": "exists('.product')" },
-  { "type": "if", "value": "text('.stock-status') === 'In Stock'" },
-    { "type": "click", "selector": ".add-to-cart" },
-  { "type": "else" },
-    { "type": "set", "varName": "outOfStock", "value": "true" },
-  { "type": "end" },
-{ "type": "end" }
-```
+<FigraniumTask task={{"id":"docs-control-flow-5","name":"Conditional Execution (If / Else / End)","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"if","value":"exists('.product')"},{"id":"block-2","type":"if","value":"text('.stock-status') === 'In Stock'"},{"id":"block-3","type":"click","selector":".add-to-cart"},{"id":"block-4","type":"else"},{"id":"block-5","type":"set","varName":"outOfStock","value":"true"},{"id":"block-6","type":"end"},{"id":"block-7","type":"end"}]}} title="Figranium task preview: Conditional Execution (If / Else / End)" height={826} />
 
 ---
 
@@ -143,11 +103,7 @@ You can nest `if` blocks inside each other. Each nested block requires its own `
   <Accordion title="While Loop" icon="rotate">
     Executes a block of actions repeatedly as long as the condition remains `true`.
 
-    ```json
-    { "type": "while", "value": "exists('.next-page')" },
-      // actions to repeat
-    { "type": "end" }
-    ```
+    <FigraniumTask task={{"id":"docs-control-flow-6","name":"Loop Types","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"while","value":"exists('.next-page')"},{"id":"block-2","type":"end"}]}} title="Figranium task preview: Loop Types" height={386} />
 
     **Common use cases:**
 
@@ -157,37 +113,19 @@ You can nest `if` blocks inside each other. Each nested block requires its own `
 
     **Example: Scraping paginated results**
 
-    ```json
-    { "type": "navigate", "value": "https://example.com/listings" },
-    { "type": "while", "value": "exists('.pagination .next:not(.disabled)')" },
-      { "type": "javascript", "value": "/* collect items on this page */" },
-      { "type": "click", "selector": ".pagination .next" },
-      { "type": "wait", "value": "1500" },
-    { "type": "end" }
-    ```
+    <FigraniumTask task={{"id":"docs-control-flow-7","name":"Loop Types","url":"https://example.com/listings","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"navigate","value":"https://example.com/listings"},{"id":"block-2","type":"while","value":"exists('.pagination .next:not(.disabled)')"},{"id":"block-3","type":"javascript","value":"/* collect items on this page */"},{"id":"block-4","type":"click","selector":".pagination .next"},{"id":"block-5","type":"wait","value":"1500"},{"id":"block-6","type":"end"}]}} title="Figranium task preview: Loop Types" height={738} />
 
     <Warning>
       Prevent infinite loops by tracking a counter variable:
 
-      ```json
-      { "type": "set", "varName": "pageNum", "value": "1" },
-      { "type": "while", "value": "exists('.next') && {$pageNum} <= 10" },
-        { "type": "start", "value": "scrape-page-task-id" },
-        { "type": "click", "selector": ".next" },
-        { "type": "set", "varName": "pageNum", "value": "{$pageNum} + 1" },
-      { "type": "end" }
-      ```
+      <FigraniumTask task={{"id":"docs-control-flow-8","name":"Loop Types","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"set","varName":"pageNum","value":"1"},{"id":"block-2","type":"while","value":"exists('.next') && {$pageNum} <= 10"},{"id":"block-3","type":"start","value":"scrape-page-task-id"},{"id":"block-4","type":"click","selector":".next"},{"id":"block-5","type":"set","varName":"pageNum","value":"{$pageNum} + 1"},{"id":"block-6","type":"end"}]}} title="Figranium task preview: Loop Types" height={738} />
     </Warning>
   </Accordion>
 
   <Accordion title="Foreach Loop" icon="list">
     Iterates over all elements matching a CSS selector, executing the block once per element.
 
-    ```json
-    { "type": "foreach", "selector": ".product-card" },
-      // actions scoped to each element
-    { "type": "end" }
-    ```
+    <FigraniumTask task={{"id":"docs-control-flow-9","name":"Loop Types","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"foreach","selector":".product-card"},{"id":"block-2","type":"end"}]}} title="Figranium task preview: Loop Types" height={386} />
 
     **Loop variables available inside the block:**
 
@@ -200,40 +138,23 @@ You can nest `if` blocks inside each other. Each nested block requires its own `
 
     **Example: Clicking each item in a list**
 
-    ```json
-    { "type": "foreach", "selector": ".todo-item input[type='checkbox']:not(:checked)" },
-      { "type": "click" },
-    { "type": "end" }
-    ```
+    <FigraniumTask task={{"id":"docs-control-flow-10","name":"Loop Types","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"foreach","selector":".todo-item input[type='checkbox']:not(:checked)"},{"id":"block-2","type":"click"},{"id":"block-3","type":"end"}]}} title="Figranium task preview: Loop Types" height={474} />
 
     **Example: Extracting data from a table**
 
-    ```json
-    { "type": "foreach", "selector": "table tbody tr" },
-      { "type": "javascript", "value": "return { row: loop.index, text: loop.text }" },
-    { "type": "end" }
-    ```
+    <FigraniumTask task={{"id":"docs-control-flow-11","name":"Loop Types","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"foreach","selector":"table tbody tr"},{"id":"block-2","type":"javascript","value":"return { row: loop.index, text: loop.text }"},{"id":"block-3","type":"end"}]}} title="Figranium task preview: Loop Types" height={474} />
   </Accordion>
 
   <Accordion title="Repeat N Times" icon="repeat">
     Executes a block a fixed number of times regardless of any condition.
 
-    ```json
-    { "type": "repeat", "value": "5" },
-      // actions to repeat
-    { "type": "end" }
-    ```
+    <FigraniumTask task={{"id":"docs-control-flow-12","name":"Loop Types","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"repeat","value":"5"},{"id":"block-2","type":"end"}]}} title="Figranium task preview: Loop Types" height={386} />
 
     The `loop.index` variable is available inside `repeat` blocks (zero-based).
 
     **Example: Submit a form 3 times**
 
-    ```json
-    { "type": "repeat", "value": "3" },
-      { "type": "click", "selector": "#submit-btn" },
-      { "type": "wait", "value": "2000" },
-    { "type": "end" }
-    ```
+    <FigraniumTask task={{"id":"docs-control-flow-13","name":"Loop Types","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"repeat","value":"3"},{"id":"block-2","type":"click","selector":"#submit-btn"},{"id":"block-3","type":"wait","value":"2000"},{"id":"block-4","type":"end"}]}} title="Figranium task preview: Loop Types" height={562} />
   </Accordion>
 </AccordionGroup>
 
@@ -243,31 +164,15 @@ You can nest `if` blocks inside each other. Each nested block requires its own `
 
 The **On Error** block acts like a `try/catch`. If any action in the main flow throws an error (timeout, element not found, network failure), execution jumps to the error handler block.
 
-```json
-{ "type": "on_error" },
-  // recovery actions
-{ "type": "end" }
-```
+<FigraniumTask task={{"id":"docs-control-flow-14","name":"Error Handling (On Error)","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"on_error"},{"id":"block-2","type":"end"}]}} title="Figranium task preview: Error Handling (On Error)" height={386} />
 
 **Example: Handle a CAPTCHA popup**
 
-```json
-{ "type": "navigate", "value": "https://example.com" },
-{ "type": "click", "selector": ".login-button" },
-{ "type": "on_error" },
-  { "type": "if", "value": "exists('.captcha-frame')" },
-    { "type": "stop", "value": "error" },
-  { "type": "end" },
-{ "type": "end" }
-```
+<FigraniumTask task={{"id":"docs-control-flow-15","name":"Error Handling (On Error)","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"navigate","value":"https://example.com"},{"id":"block-2","type":"click","selector":".login-button"},{"id":"block-3","type":"on_error"},{"id":"block-4","type":"if","value":"exists('.captcha-frame')"},{"id":"block-5","type":"stop","value":"error"},{"id":"block-6","type":"end"},{"id":"block-7","type":"end"}]}} title="Figranium task preview: Error Handling (On Error)" height={826} />
 
 **Example: Dismiss a cookie banner that may or may not appear**
 
-```json
-{ "type": "on_error" },
-{ "type": "end" },
-{ "type": "click", "selector": "#cookie-accept", "timeout": 3000 }
-```
+<FigraniumTask task={{"id":"docs-control-flow-16","name":"Error Handling (On Error)","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"on_error"},{"id":"block-2","type":"end"},{"id":"block-3","type":"click","selector":"#cookie-accept","timeout":3000}]}} title="Figranium task preview: Error Handling (On Error)" height={474} />
 
 Placing an empty `on_error`/`end` block before an optional action effectively makes that action non-fatal.
 
@@ -279,10 +184,7 @@ See [Error Handling](/error-handling) for a deeper guide on retry patterns and r
 
 Immediately terminates the current task execution with a given status.
 
-```json
-{ "type": "stop", "value": "success" }
-{ "type": "stop", "value": "error" }
-```
+<FigraniumTask task={{"id":"docs-control-flow-17","name":"Stop Task","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"stop","value":"success"},{"id":"block-2","type":"stop","value":"error"}]}} title="Figranium task preview: Stop Task" height={386} />
 
 Use `stop` inside conditionals to short-circuit execution when a goal is already met or when an unrecoverable state is detected.
 

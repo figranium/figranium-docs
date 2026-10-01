@@ -4,6 +4,8 @@ sidebarTitle: "Error Handling"
 description: "Make your Figranium automation tasks resilient with On Error blocks, retry loops, timeout strategies, and fallback sub-tasks."
 ---
 
+import { FigraniumTask } from '/snippets/figranium-embed.jsx';
+
 Figranium provides several mechanisms to make your automation tasks resilient to failures, from optional actions to retry loops and fallback sub-tasks.
 
 ## Why Tasks Fail
@@ -44,11 +46,7 @@ A well-designed task anticipates these failures and handles them gracefully.
 
 The On Error block is Figranium's primary error handling mechanism. It works like a `try/catch`: if any action in the main flow raises an error, execution jumps to the On Error block.
 
-```json
-{ "type": "on_error" },
-  // recovery actions
-{ "type": "end" }
-```
+<FigraniumTask task={{"id":"docs-error-handling-1","name":"The On Error Block","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"on_error"},{"id":"block-2","type":"end"}]}} title="Figranium task preview: The On Error Block" height={386} />
 
 The On Error / End pair should be placed in the task to catch errors from preceding actions. Any error thrown by an action before the On Error block is caught.
 
@@ -56,35 +54,19 @@ The On Error / End pair should be placed in the task to catch errors from preced
   <Accordion title="Making an Action Optional" icon="circle-check">
     The simplest use: place an empty On Error / End block to absorb errors from an action that may or may not exist:
 
-    ```json
-    // Dismiss a cookie banner only if it appears — ignore if it doesn't
-    { "type": "on_error" },
-    { "type": "end" },
-    { "type": "click", "selector": "#cookie-dismiss", "timeout": 3000 }
-    ```
+    <FigraniumTask task={{"id":"docs-error-handling-2","name":"The On Error Block","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"on_error"},{"id":"block-2","type":"end"},{"id":"block-3","type":"click","selector":"#cookie-dismiss","timeout":3000}]}} title="Figranium task preview: The On Error Block" height={474} />
   </Accordion>
 
   <Accordion title="Fallback Action" icon="rotate">
     Perform a fallback action when the primary approach fails:
 
-    ```json
-    // Try clicking the button; if it fails, use JavaScript as a fallback
-    { "type": "on_error" },
-      { "type": "javascript", "value": "document.querySelector('#submit').click(); return true;" },
-    { "type": "end" },
-    { "type": "click", "selector": "#submit" }
-    ```
+    <FigraniumTask task={{"id":"docs-error-handling-3","name":"The On Error Block","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"on_error"},{"id":"block-2","type":"javascript","value":"document.querySelector('#submit').click(); return true;"},{"id":"block-3","type":"end"},{"id":"block-4","type":"click","selector":"#submit"}]}} title="Figranium task preview: The On Error Block" height={562} />
   </Accordion>
 
   <Accordion title="Stop on Error with a Reason" icon="player-stop">
     Log the failure and stop the task cleanly:
 
-    ```json
-    { "type": "on_error" },
-      { "type": "stop", "value": "error" },
-    { "type": "end" },
-    { "type": "click", "selector": ".required-element" }
-    ```
+    <FigraniumTask task={{"id":"docs-error-handling-4","name":"The On Error Block","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"on_error"},{"id":"block-2","type":"stop","value":"error"},{"id":"block-3","type":"end"},{"id":"block-4","type":"click","selector":".required-element"}]}} title="Figranium task preview: The On Error Block" height={562} />
   </Accordion>
 </AccordionGroup>
 
@@ -96,34 +78,13 @@ The On Error / End pair should be placed in the task to catch errors from preced
 
 Use a While loop combined with a counter to retry a failing action up to N times:
 
-```json
-{ "type": "set", "varName": "retries", "value": "0" },
-{ "type": "set", "varName": "success", "value": "false" },
-{ "type": "while", "value": "{$retries} < 3 && {$success} === 'false'" },
-  { "type": "on_error" },
-    { "type": "set", "varName": "retries", "value": "{$retries} + 1" },
-    { "type": "wait", "value": "2000" },
-  { "type": "end" },
-  { "type": "click", "selector": ".load-more-button" },
-  { "type": "set", "varName": "success", "value": "true" },
-{ "type": "end" }
-```
+<FigraniumTask task={{"id":"docs-error-handling-5","name":"Retry Patterns","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"set","varName":"retries","value":"0"},{"id":"block-2","type":"set","varName":"success","value":"false"},{"id":"block-3","type":"while","value":"{$retries} < 3 && {$success} === 'false'"},{"id":"block-4","type":"on_error"},{"id":"block-5","type":"set","varName":"retries","value":"{$retries} + 1"},{"id":"block-6","type":"wait","value":"2000"},{"id":"block-7","type":"end"},{"id":"block-8","type":"click","selector":".load-more-button"},{"id":"block-9","type":"set","varName":"success","value":"true"},{"id":"block-10","type":"end"}]}} title="Figranium task preview: Retry Patterns" height={900} />
 
 This retries up to 3 times with a 2-second pause between attempts, then continues if any attempt succeeds.
 
 ### Retry a Login
 
-```json
-{ "type": "set", "varName": "attempts", "value": "0" },
-{ "type": "while", "value": "!exists('.dashboard') && {$attempts} < 5" },
-  { "type": "click", "selector": "#login-btn" },
-  { "type": "type", "selector": "#email", "value": "{$email}" },
-  { "type": "type", "selector": "#password", "value": "{$password}" },
-  { "type": "click", "selector": "[type='submit']" },
-  { "type": "wait", "value": "3000" },
-  { "type": "set", "varName": "attempts", "value": "{$attempts} + 1" },
-{ "type": "end" }
-```
+<FigraniumTask task={{"id":"docs-error-handling-6","name":"Retry Patterns","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"set","varName":"attempts","value":"0"},{"id":"block-2","type":"while","value":"!exists('.dashboard') && {$attempts} < 5"},{"id":"block-3","type":"click","selector":"#login-btn"},{"id":"block-4","type":"type","selector":"#email","value":"{$email}"},{"id":"block-5","type":"type","selector":"#password","value":"{$password}"},{"id":"block-6","type":"click","selector":"[type='submit']"},{"id":"block-7","type":"wait","value":"3000"},{"id":"block-8","type":"set","varName":"attempts","value":"{$attempts} + 1"},{"id":"block-9","type":"end"}]}} title="Figranium task preview: Retry Patterns" height={900} />
 
 ---
 
@@ -133,38 +94,13 @@ Popups that appear unpredictably are a common cause of task failures. Handle the
 
 ### Check and Dismiss Before Proceeding
 
-```json
-{ "type": "navigate", "value": "https://example.com" },
-{ "type": "wait", "value": "2000" },
-{ "type": "if", "value": "exists('.modal-overlay')" },
-  { "type": "click", "selector": ".modal-close" },
-  { "type": "wait", "value": "500" },
-{ "type": "end" },
-{ "type": "click", "selector": ".main-content" }
-```
+<FigraniumTask task={{"id":"docs-error-handling-7","name":"Handling Popups and Modals","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"navigate","value":"https://example.com"},{"id":"block-2","type":"wait","value":"2000"},{"id":"block-3","type":"if","value":"exists('.modal-overlay')"},{"id":"block-4","type":"click","selector":".modal-close"},{"id":"block-5","type":"wait","value":"500"},{"id":"block-6","type":"end"},{"id":"block-7","type":"click","selector":".main-content"}]}} title="Figranium task preview: Handling Popups and Modals" height={826} />
 
 ### Dismiss Any Popup on Every Page
 
 Use a sub-task triggered via a Start Task block to handle common popups at the beginning of every task:
 
-```json
-// popup-handler task
-[
-  { "type": "if", "value": "exists('[role=\"dialog\"] button:has-text(\"Close\")')" },
-    { "type": "click", "selector": "[role=\"dialog\"] button:has-text(\"Close\")" },
-  { "type": "end" },
-  { "type": "if", "value": "exists('#cookie-banner')" },
-    { "type": "click", "selector": "#cookie-banner .accept" },
-  { "type": "end" }
-]
-
-// Main task
-[
-  { "type": "navigate", "value": "https://example.com" },
-  { "type": "start", "value": "popup-handler-task-id" },
-  // ... rest of task
-]
-```
+<FigraniumTask task={{"id":"docs-error-handling-8","name":"Handling Popups and Modals","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"if","value":"exists('[role=\"dialog\"] button:has-text(\"Close\")')"},{"id":"block-2","type":"click","selector":"[role=\"dialog\"] button:has-text(\"Close\")"},{"id":"block-3","type":"end"},{"id":"block-4","type":"if","value":"exists('#cookie-banner')"},{"id":"block-5","type":"click","selector":"#cookie-banner .accept"},{"id":"block-6","type":"end"},{"id":"block-7","type":"navigate","value":"https://example.com"},{"id":"block-8","type":"start","value":"popup-handler-task-id"}]}} title="Figranium task preview: Handling Popups and Modals" height={900} />
 
 <Tip>
   See [Modular Workflows](/modular-workflows) for more on reusing sub-tasks across multiple parent tasks.
@@ -176,13 +112,7 @@ Use a sub-task triggered via a Start Task block to handle common popups at the b
 
 Each action block can have its own `timeout` (in milliseconds). Use shorter timeouts for elements that should appear quickly, and longer ones for slow-loading content.
 
-```json
-// Short timeout for something that should already be on the page
-{ "type": "click", "selector": "#accept", "timeout": 2000 }
-
-// Longer timeout for a result that loads after an API call
-{ "type": "wait_selector", "selector": ".results", "timeout": 15000 }
-```
+<FigraniumTask task={{"id":"docs-error-handling-9","name":"Timeout Strategies","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"click","selector":"#accept","timeout":2000},{"id":"block-2","type":"wait_selector","selector":".results","timeout":15000}]}} title="Figranium task preview: Timeout Strategies" height={386} />
 
 Use an On Error block around short-timeout actions to make them non-fatal when the element doesn't appear.
 
@@ -192,16 +122,7 @@ Use an On Error block around short-timeout actions to make them non-fatal when t
 
 Use a JavaScript block inside an On Error branch to log diagnostic information to the execution output:
 
-```json
-{ "type": "on_error" },
-  {
-    "type": "javascript",
-    "value": "return { error: 'Click failed', url: window.location.href, title: document.title }"
-  },
-  { "type": "stop", "value": "error" },
-{ "type": "end" },
-{ "type": "click", "selector": ".target" }
-```
+<FigraniumTask task={{"id":"docs-error-handling-10","name":"Logging Errors for Inspection","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"on_error"},{"id":"block-2","type":"javascript","value":"return { error: 'Click failed', url: window.location.href, title: document.title }"},{"id":"block-3","type":"stop","value":"error"},{"id":"block-4","type":"end"},{"id":"block-5","type":"click","selector":".target"}]}} title="Figranium task preview: Logging Errors for Inspection" height={650} />
 
 The returned object appears in the execution detail view, giving you context about what the page looked like when the failure occurred.
 
