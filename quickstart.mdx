@@ -1,3 +1,152 @@
 ---
 title: "Quickstart"
+description: "Install Figranium, build your first browser task in the visual editor, run it, and trigger it through the API in a few minutes."
 ---
+
+This quickstart takes you from a fresh machine to a working Figranium task. You will install Figranium with Docker Compose, create a task in the visual editor, run it once, and then trigger the same task through the REST API.
+
+## 1. Install Figranium
+
+<Steps>
+  <Step title="Create a project directory">
+    Create a folder for your Figranium installation:
+
+    ```bash
+    mkdir figranium-server
+    cd figranium-server
+    ```
+  </Step>
+
+  <Step title="Download the Docker Compose file">
+    Download the official deployment configuration:
+
+    ```bash
+    wget https://raw.githubusercontent.com/figranium/figranium/main/docker-compose.deploy.yml -O docker-compose.yml
+    ```
+
+    The deployment file pulls the pre-built Figranium image, so you do not need to clone the repository or build it locally.
+  </Step>
+
+  <Step title="Start Figranium">
+    Launch the container:
+
+    ```bash
+    docker compose up -d
+    ```
+
+    Docker will pull the latest Figranium image and start the application.
+  </Step>
+
+  <Step title="Open the UI">
+    Open [http://localhost:11345](http://localhost:11345) in your browser and complete the initial setup screen.
+  </Step>
+</Steps>
+
+<Note>
+  For persistent sessions across container restarts, add a `SESSION_SECRET` to your Compose configuration. See [Docker Compose](/docker-compose) for the complete deployment file, volume mounts, update instructions, and production notes.
+</Note>
+
+## 2. Create your first task
+
+From the Figranium dashboard:
+
+<Steps>
+  <Step title="Create a task">
+    Click **New Task**. Give the task a name such as **Example Page** and set the target URL to:
+
+    ```text
+    https://example.com
+    ```
+  </Step>
+
+  <Step title="Add an action">
+    In the editor, press **Cmd/Ctrl + K** or use the add-action control to open the Action Palette.
+
+    Add a **Get Content** action and configure it to extract the page content you want returned by the task.
+  </Step>
+
+  <Step title="Save the task">
+    Save the task. Figranium stores the task definition on your own instance and gives it a stable task ID.
+  </Step>
+</Steps>
+
+<Tip>
+  Figranium tasks are built from deterministic action blocks. You can add clicks, typing, waits, JavaScript, extraction, control flow, uploads, downloads, and more. See [Action Blocks](/action-blocks) for the full block reference.
+</Tip>
+
+## 3. Run it in the editor
+
+Click **Run Task**, or press **Cmd/Ctrl + Enter**.
+
+The results drawer opens automatically and shows the run as it progresses. When the task finishes, you can inspect:
+
+- the execution status
+- the activity log
+- extracted data
+- screenshots or recordings, when enabled
+
+Every run is also recorded under **Executions** so you can inspect it later.
+
+## 4. Trigger the same task through the API
+
+Figranium exposes every saved task through a stable endpoint:
+
+```text
+POST /api/tasks/:id/api
+```
+
+You can copy the complete endpoint directly from the task editor's **API** view.
+
+First, generate or copy an API key from **Settings > API Keys**. Then call the task:
+
+```bash
+curl -X POST http://localhost:11345/api/tasks/YOUR_TASK_ID/api \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+A request body is optional. If your task uses variables, pass them as JSON:
+
+```bash
+curl -X POST http://localhost:11345/api/tasks/YOUR_TASK_ID/api \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "variables": {
+      "query": "Figranium"
+    }
+  }'
+```
+
+<Warning>
+  Treat your API key like a password. Do not commit it to source control or expose it in public screenshots.
+</Warning>
+
+## 5. Build from here
+
+You now have one task that can run from both the visual editor and the API. The same task can also be scheduled, called from an SDK, exposed through MCP, or connected to workflow platforms.
+
+<CardGroup cols={2}>
+  <Card title="UI Tour" icon="layout-dashboard" href="/ui-tour">
+    Learn the Dashboard, Editor, Executions, Captures, Cabinets, and Settings.
+  </Card>
+
+  <Card title="Action Blocks" icon="cube" href="/action-blocks">
+    Browse every block available for building browser workflows.
+  </Card>
+
+  <Card title="Variables" icon="variable" href="/variables">
+    Make tasks reusable with runtime values such as `{$query}`.
+  </Card>
+
+  <Card title="REST API" icon="api" href="/rest-api">
+    Explore task execution, schedules, executions, browser control, and more.
+  </Card>
+
+  <Card title="SDKs" icon="sdk" href="/sdk/overview">
+    Use Figranium from JavaScript, Python, Swift, or Kotlin.
+  </Card>
+
+  <Card title="MCP" icon="brain" href="/mcp-integration">
+    Connect Figranium tasks to MCP-compatible AI clients.
+  </Card>
+</CardGroup>
