@@ -83,15 +83,15 @@ await writeFile(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
 const baseUrl = process.env.FIGRANIUM_URL ?? 'http://127.0.0.1:11345';
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
-await page.goto('${baseUrl}/signup');
-await page.request.post('${baseUrl}/api/auth/setup', {
+await page.goto(`${baseUrl}/signup`);
+await page.request.post(`${baseUrl}/api/auth/setup`, {
   data: { name: 'Docs screenshots', email: 'docs@figranium.dev', password: 'screenshots-only' },
 });
 
 for (let index = 0; index < manifest.screenshots.length; index++) {
   const item = manifest.screenshots[index];
   const task = { ...item.task, id: `docs_screenshot_${index + 1}`, name: item.title };
-  await page.request.post('${baseUrl}/api/tasks', { data: task });
+  await page.request.post(`${baseUrl}/api/tasks`, { data: task });
   await page.goto(`${baseUrl}/tasks/${task.id}`);
   await page.locator('.canvas-workflow').waitFor({ state: 'visible', timeout: 30000 });
   await page.locator('.canvas-workflow').screenshot({ path: join(outputRoot, item.filename) });
