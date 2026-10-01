@@ -1,0 +1,2496 @@
+{
+  "version": 1,
+  "screenshots": [
+    {
+      "file": "action-blocks.mdx",
+      "filename": "action-blocks-task-1.png",
+      "start": 7844,
+      "end": 8392,
+      "title": "Figranium task preview: Data & Variables",
+      "height": 320,
+      "task": {
+        "id": "docs-action-blocks-1",
+        "name": "Data & Variables",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "get_content",
+            "selector": ".article-body",
+            "varName": "articleText"
+          }
+        ]
+      }
+    },
+    {
+      "file": "action-blocks.mdx",
+      "filename": "action-blocks-task-2.png",
+      "start": 12283,
+      "end": 12929,
+      "title": "Figranium task preview: Advanced Actions",
+      "height": 320,
+      "task": {
+        "id": "docs-action-blocks-2",
+        "name": "Advanced Actions",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "http_request",
+            "method": "GET",
+            "value": "https://api.example.com/products?page={$page}",
+            "headers": "{\"Authorization\": \"Bearer {$token}\"}",
+            "varName": "apiResponse"
+          }
+        ]
+      }
+    },
+    {
+      "file": "action-blocks.mdx",
+      "filename": "action-blocks-task-3.png",
+      "start": 14897,
+      "end": 15502,
+      "title": "Figranium task preview: Advanced Actions",
+      "height": 320,
+      "task": {
+        "id": "docs-action-blocks-3",
+        "name": "Advanced Actions",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "solve_captcha",
+            "captchaType": "recaptcha_v2",
+            "selector": "#recaptcha-container",
+            "varName": "captchaResult",
+            "timeout": 120000
+          }
+        ]
+      }
+    },
+    {
+      "file": "action-blocks.mdx",
+      "filename": "action-blocks-task-4.png",
+      "start": 17256,
+      "end": 17855,
+      "title": "Figranium task preview: Advanced Actions",
+      "height": 320,
+      "task": {
+        "id": "docs-action-blocks-4",
+        "name": "Advanced Actions",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "wait_captcha",
+            "captchaType": "turnstile",
+            "selector": "#turnstile-container",
+            "varName": "captchaReady",
+            "timeout": 30000
+          }
+        ]
+      }
+    },
+    {
+      "file": "action-blocks.mdx",
+      "filename": "action-blocks-task-5.png",
+      "start": 18467,
+      "end": 18963,
+      "title": "Figranium task preview: Advanced Actions",
+      "height": 320,
+      "task": {
+        "id": "docs-action-blocks-5",
+        "name": "Advanced Actions",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "do_nothing"
+          }
+        ]
+      }
+    },
+    {
+      "file": "captcha-solving.mdx",
+      "filename": "captcha-solving-task-1.png",
+      "start": 3208,
+      "end": 3809,
+      "title": "Figranium task preview: Solve Captcha",
+      "height": 320,
+      "task": {
+        "id": "docs-captcha-solving-1",
+        "name": "Solve Captcha",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "solve_captcha",
+            "captchaType": "recaptcha_v2",
+            "selector": "#recaptcha-container",
+            "varName": "captchaResult",
+            "timeout": 120000
+          }
+        ]
+      }
+    },
+    {
+      "file": "captcha-solving.mdx",
+      "filename": "captcha-solving-task-2.png",
+      "start": 4367,
+      "end": 5114,
+      "title": "Figranium task preview: Solve Captcha",
+      "height": 562,
+      "task": {
+        "id": "docs-captcha-solving-2",
+        "name": "Solve Captcha",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "click",
+            "value": "button[type='submit']"
+          },
+          {
+            "id": "block-2",
+            "type": "wait_selector",
+            "value": "iframe[src*='recaptcha']"
+          },
+          {
+            "id": "block-3",
+            "type": "solve_captcha",
+            "captchaType": "recaptcha_v2",
+            "varName": "captchaResult"
+          },
+          {
+            "id": "block-4",
+            "type": "click",
+            "value": "button.continue"
+          }
+        ]
+      }
+    },
+    {
+      "file": "captcha-solving.mdx",
+      "filename": "captcha-solving-task-3.png",
+      "start": 5770,
+      "end": 6371,
+      "title": "Figranium task preview: Wait for Captcha",
+      "height": 320,
+      "task": {
+        "id": "docs-captcha-solving-3",
+        "name": "Wait for Captcha",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "wait_captcha",
+            "captchaType": "turnstile",
+            "selector": "#turnstile-container",
+            "varName": "captchaReady",
+            "timeout": 30000
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-flow.mdx",
+      "filename": "control-flow-task-1.png",
+      "start": 663,
+      "end": 1279,
+      "title": "Figranium task preview: Conditional Execution (If / Else / End)",
+      "height": 474,
+      "task": {
+        "id": "docs-control-flow-1",
+        "name": "Conditional Execution (If / Else / End)",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "if",
+            "value": "<condition>"
+          },
+          {
+            "id": "block-2",
+            "type": "else"
+          },
+          {
+            "id": "block-3",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-flow.mdx",
+      "filename": "control-flow-task-2.png",
+      "start": 3789,
+      "end": 4566,
+      "title": "Figranium task preview: Conditional Execution (If / Else / End)",
+      "height": 562,
+      "task": {
+        "id": "docs-control-flow-2",
+        "name": "Conditional Execution (If / Else / End)",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "navigate",
+            "value": "https://example.com"
+          },
+          {
+            "id": "block-2",
+            "type": "if",
+            "conditionVarType": "selector",
+            "selector": ".cookie-banner",
+            "conditionOp": "exists"
+          },
+          {
+            "id": "block-3",
+            "type": "click",
+            "selector": ".cookie-banner .accept"
+          },
+          {
+            "id": "block-4",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-flow.mdx",
+      "filename": "control-flow-task-3.png",
+      "start": 4629,
+      "end": 5403,
+      "title": "Figranium task preview: Conditional Execution (If / Else / End)",
+      "height": 562,
+      "task": {
+        "id": "docs-control-flow-3",
+        "name": "Conditional Execution (If / Else / End)",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "while",
+            "conditionVarType": "selector",
+            "selector": ".pagination .next:not(.disabled)",
+            "conditionOp": "exists"
+          },
+          {
+            "id": "block-2",
+            "type": "click",
+            "selector": ".pagination .next"
+          },
+          {
+            "id": "block-3",
+            "type": "wait",
+            "value": "1500"
+          },
+          {
+            "id": "block-4",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-flow.mdx",
+      "filename": "control-flow-task-4.png",
+      "start": 5525,
+      "end": 6540,
+      "title": "Figranium task preview: Conditional Execution (If / Else / End)",
+      "height": 900,
+      "task": {
+        "id": "docs-control-flow-4",
+        "name": "Conditional Execution (If / Else / End)",
+        "url": "https://app.example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "navigate",
+            "value": "https://app.example.com"
+          },
+          {
+            "id": "block-2",
+            "type": "if",
+            "value": "exists('.user-avatar')"
+          },
+          {
+            "id": "block-3",
+            "type": "stop",
+            "value": "success"
+          },
+          {
+            "id": "block-4",
+            "type": "else"
+          },
+          {
+            "id": "block-5",
+            "type": "click",
+            "selector": "#login-button"
+          },
+          {
+            "id": "block-6",
+            "type": "type",
+            "selector": "#email",
+            "value": "{$email}"
+          },
+          {
+            "id": "block-7",
+            "type": "type",
+            "selector": "#password",
+            "value": "{$password}"
+          },
+          {
+            "id": "block-8",
+            "type": "click",
+            "selector": "[type='submit']"
+          },
+          {
+            "id": "block-9",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-flow.mdx",
+      "filename": "control-flow-task-5.png",
+      "start": 6652,
+      "end": 7507,
+      "title": "Figranium task preview: Conditional Execution (If / Else / End)",
+      "height": 826,
+      "task": {
+        "id": "docs-control-flow-5",
+        "name": "Conditional Execution (If / Else / End)",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "if",
+            "value": "exists('.product')"
+          },
+          {
+            "id": "block-2",
+            "type": "if",
+            "value": "text('.stock-status') === 'In Stock'"
+          },
+          {
+            "id": "block-3",
+            "type": "click",
+            "selector": ".add-to-cart"
+          },
+          {
+            "id": "block-4",
+            "type": "else"
+          },
+          {
+            "id": "block-5",
+            "type": "set",
+            "varName": "outOfStock",
+            "value": "true"
+          },
+          {
+            "id": "block-6",
+            "type": "end"
+          },
+          {
+            "id": "block-7",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-flow.mdx",
+      "filename": "control-flow-task-6.png",
+      "start": 7682,
+      "end": 8221,
+      "title": "Figranium task preview: Loop Types",
+      "height": 386,
+      "task": {
+        "id": "docs-control-flow-6",
+        "name": "Loop Types",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "while",
+            "value": "exists('.next-page')"
+          },
+          {
+            "id": "block-2",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-flow.mdx",
+      "filename": "control-flow-task-7.png",
+      "start": 8501,
+      "end": 9334,
+      "title": "Figranium task preview: Loop Types",
+      "height": 738,
+      "task": {
+        "id": "docs-control-flow-7",
+        "name": "Loop Types",
+        "url": "https://example.com/listings",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "navigate",
+            "value": "https://example.com/listings"
+          },
+          {
+            "id": "block-2",
+            "type": "while",
+            "value": "exists('.pagination .next:not(.disabled)')"
+          },
+          {
+            "id": "block-3",
+            "type": "javascript",
+            "value": "/* collect items on this page */"
+          },
+          {
+            "id": "block-4",
+            "type": "click",
+            "selector": ".pagination .next"
+          },
+          {
+            "id": "block-5",
+            "type": "wait",
+            "value": "1500"
+          },
+          {
+            "id": "block-6",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-flow.mdx",
+      "filename": "control-flow-task-8.png",
+      "start": 9418,
+      "end": 10222,
+      "title": "Figranium task preview: Loop Types",
+      "height": 738,
+      "task": {
+        "id": "docs-control-flow-8",
+        "name": "Loop Types",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "set",
+            "varName": "pageNum",
+            "value": "1"
+          },
+          {
+            "id": "block-2",
+            "type": "while",
+            "value": "exists('.next') && {$pageNum} <= 10"
+          },
+          {
+            "id": "block-3",
+            "type": "start",
+            "value": "scrape-page-task-id"
+          },
+          {
+            "id": "block-4",
+            "type": "click",
+            "selector": ".next"
+          },
+          {
+            "id": "block-5",
+            "type": "set",
+            "varName": "pageNum",
+            "value": "{$pageNum} + 1"
+          },
+          {
+            "id": "block-6",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-flow.mdx",
+      "filename": "control-flow-task-9.png",
+      "start": 10400,
+      "end": 10937,
+      "title": "Figranium task preview: Loop Types",
+      "height": 386,
+      "task": {
+        "id": "docs-control-flow-9",
+        "name": "Loop Types",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "foreach",
+            "selector": ".product-card"
+          },
+          {
+            "id": "block-2",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-flow.mdx",
+      "filename": "control-flow-task-10.png",
+      "start": 11378,
+      "end": 11982,
+      "title": "Figranium task preview: Loop Types",
+      "height": 474,
+      "task": {
+        "id": "docs-control-flow-10",
+        "name": "Loop Types",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "foreach",
+            "selector": ".todo-item input[type='checkbox']:not(:checked)"
+          },
+          {
+            "id": "block-2",
+            "type": "click"
+          },
+          {
+            "id": "block-3",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-flow.mdx",
+      "filename": "control-flow-task-11.png",
+      "start": 12035,
+      "end": 12665,
+      "title": "Figranium task preview: Loop Types",
+      "height": 474,
+      "task": {
+        "id": "docs-control-flow-11",
+        "name": "Loop Types",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "foreach",
+            "selector": "table tbody tr"
+          },
+          {
+            "id": "block-2",
+            "type": "javascript",
+            "value": "return { row: loop.index, text: loop.text }"
+          },
+          {
+            "id": "block-3",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-flow.mdx",
+      "filename": "control-flow-task-12.png",
+      "start": 12812,
+      "end": 13334,
+      "title": "Figranium task preview: Loop Types",
+      "height": 386,
+      "task": {
+        "id": "docs-control-flow-12",
+        "name": "Loop Types",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "repeat",
+            "value": "5"
+          },
+          {
+            "id": "block-2",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-flow.mdx",
+      "filename": "control-flow-task-13.png",
+      "start": 13461,
+      "end": 14086,
+      "title": "Figranium task preview: Loop Types",
+      "height": 562,
+      "task": {
+        "id": "docs-control-flow-13",
+        "name": "Loop Types",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "repeat",
+            "value": "3"
+          },
+          {
+            "id": "block-2",
+            "type": "click",
+            "selector": "#submit-btn"
+          },
+          {
+            "id": "block-3",
+            "type": "wait",
+            "value": "2000"
+          },
+          {
+            "id": "block-4",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-flow.mdx",
+      "filename": "control-flow-task-14.png",
+      "start": 14343,
+      "end": 14885,
+      "title": "Figranium task preview: Error Handling (On Error)",
+      "height": 386,
+      "task": {
+        "id": "docs-control-flow-14",
+        "name": "Error Handling (On Error)",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "on_error"
+          },
+          {
+            "id": "block-2",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-flow.mdx",
+      "filename": "control-flow-task-15.png",
+      "start": 14924,
+      "end": 15731,
+      "title": "Figranium task preview: Error Handling (On Error)",
+      "height": 826,
+      "task": {
+        "id": "docs-control-flow-15",
+        "name": "Error Handling (On Error)",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "navigate",
+            "value": "https://example.com"
+          },
+          {
+            "id": "block-2",
+            "type": "click",
+            "selector": ".login-button"
+          },
+          {
+            "id": "block-3",
+            "type": "on_error"
+          },
+          {
+            "id": "block-4",
+            "type": "if",
+            "value": "exists('.captcha-frame')"
+          },
+          {
+            "id": "block-5",
+            "type": "stop",
+            "value": "error"
+          },
+          {
+            "id": "block-6",
+            "type": "end"
+          },
+          {
+            "id": "block-7",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-flow.mdx",
+      "filename": "control-flow-task-16.png",
+      "start": 15798,
+      "end": 16415,
+      "title": "Figranium task preview: Error Handling (On Error)",
+      "height": 474,
+      "task": {
+        "id": "docs-control-flow-16",
+        "name": "Error Handling (On Error)",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "on_error"
+          },
+          {
+            "id": "block-2",
+            "type": "end"
+          },
+          {
+            "id": "block-3",
+            "type": "click",
+            "selector": "#cookie-accept",
+            "timeout": 3000
+          }
+        ]
+      }
+    },
+    {
+      "file": "control-flow.mdx",
+      "filename": "control-flow-task-17.png",
+      "start": 16719,
+      "end": 17260,
+      "title": "Figranium task preview: Stop Task",
+      "height": 386,
+      "task": {
+        "id": "docs-control-flow-17",
+        "name": "Stop Task",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "stop",
+            "value": "success"
+          },
+          {
+            "id": "block-2",
+            "type": "stop",
+            "value": "error"
+          }
+        ]
+      }
+    },
+    {
+      "file": "error-handling.mdx",
+      "filename": "error-handling-task-1.png",
+      "start": 1442,
+      "end": 1971,
+      "title": "Figranium task preview: The On Error Block",
+      "height": 386,
+      "task": {
+        "id": "docs-error-handling-1",
+        "name": "The On Error Block",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "on_error"
+          },
+          {
+            "id": "block-2",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "error-handling.mdx",
+      "filename": "error-handling-task-2.png",
+      "start": 2341,
+      "end": 2946,
+      "title": "Figranium task preview: The On Error Block",
+      "height": 474,
+      "task": {
+        "id": "docs-error-handling-2",
+        "name": "The On Error Block",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "on_error"
+          },
+          {
+            "id": "block-2",
+            "type": "end"
+          },
+          {
+            "id": "block-3",
+            "type": "click",
+            "selector": "#cookie-dismiss",
+            "timeout": 3000
+          }
+        ]
+      }
+    },
+    {
+      "file": "error-handling.mdx",
+      "filename": "error-handling-task-3.png",
+      "start": 3083,
+      "end": 3768,
+      "title": "Figranium task preview: The On Error Block",
+      "height": 562,
+      "task": {
+        "id": "docs-error-handling-3",
+        "name": "The On Error Block",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "on_error"
+          },
+          {
+            "id": "block-2",
+            "type": "javascript",
+            "value": "document.querySelector('#submit').click(); return true;"
+          },
+          {
+            "id": "block-3",
+            "type": "end"
+          },
+          {
+            "id": "block-4",
+            "type": "click",
+            "selector": "#submit"
+          }
+        ]
+      }
+    },
+    {
+      "file": "error-handling.mdx",
+      "filename": "error-handling-task-4.png",
+      "start": 3906,
+      "end": 4545,
+      "title": "Figranium task preview: The On Error Block",
+      "height": 562,
+      "task": {
+        "id": "docs-error-handling-4",
+        "name": "The On Error Block",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "on_error"
+          },
+          {
+            "id": "block-2",
+            "type": "stop",
+            "value": "error"
+          },
+          {
+            "id": "block-3",
+            "type": "end"
+          },
+          {
+            "id": "block-4",
+            "type": "click",
+            "selector": ".required-element"
+          }
+        ]
+      }
+    },
+    {
+      "file": "error-handling.mdx",
+      "filename": "error-handling-task-5.png",
+      "start": 4722,
+      "end": 5734,
+      "title": "Figranium task preview: Retry Patterns",
+      "height": 900,
+      "task": {
+        "id": "docs-error-handling-5",
+        "name": "Retry Patterns",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "set",
+            "varName": "retries",
+            "value": "0"
+          },
+          {
+            "id": "block-2",
+            "type": "set",
+            "varName": "success",
+            "value": "false"
+          },
+          {
+            "id": "block-3",
+            "type": "while",
+            "value": "{$retries} < 3 && {$success} === 'false'"
+          },
+          {
+            "id": "block-4",
+            "type": "on_error"
+          },
+          {
+            "id": "block-5",
+            "type": "set",
+            "varName": "retries",
+            "value": "{$retries} + 1"
+          },
+          {
+            "id": "block-6",
+            "type": "wait",
+            "value": "2000"
+          },
+          {
+            "id": "block-7",
+            "type": "end"
+          },
+          {
+            "id": "block-8",
+            "type": "click",
+            "selector": ".load-more-button"
+          },
+          {
+            "id": "block-9",
+            "type": "set",
+            "varName": "success",
+            "value": "true"
+          },
+          {
+            "id": "block-10",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "error-handling.mdx",
+      "filename": "error-handling-task-6.png",
+      "start": 5863,
+      "end": 6881,
+      "title": "Figranium task preview: Retry Patterns",
+      "height": 900,
+      "task": {
+        "id": "docs-error-handling-6",
+        "name": "Retry Patterns",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "set",
+            "varName": "attempts",
+            "value": "0"
+          },
+          {
+            "id": "block-2",
+            "type": "while",
+            "value": "!exists('.dashboard') && {$attempts} < 5"
+          },
+          {
+            "id": "block-3",
+            "type": "click",
+            "selector": "#login-btn"
+          },
+          {
+            "id": "block-4",
+            "type": "type",
+            "selector": "#email",
+            "value": "{$email}"
+          },
+          {
+            "id": "block-5",
+            "type": "type",
+            "selector": "#password",
+            "value": "{$password}"
+          },
+          {
+            "id": "block-6",
+            "type": "click",
+            "selector": "[type='submit']"
+          },
+          {
+            "id": "block-7",
+            "type": "wait",
+            "value": "3000"
+          },
+          {
+            "id": "block-8",
+            "type": "set",
+            "varName": "attempts",
+            "value": "{$attempts} + 1"
+          },
+          {
+            "id": "block-9",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "error-handling.mdx",
+      "filename": "error-handling-task-7.png",
+      "start": 7056,
+      "end": 7903,
+      "title": "Figranium task preview: Handling Popups and Modals",
+      "height": 826,
+      "task": {
+        "id": "docs-error-handling-7",
+        "name": "Handling Popups and Modals",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "navigate",
+            "value": "https://example.com"
+          },
+          {
+            "id": "block-2",
+            "type": "wait",
+            "value": "2000"
+          },
+          {
+            "id": "block-3",
+            "type": "if",
+            "value": "exists('.modal-overlay')"
+          },
+          {
+            "id": "block-4",
+            "type": "click",
+            "selector": ".modal-close"
+          },
+          {
+            "id": "block-5",
+            "type": "wait",
+            "value": "500"
+          },
+          {
+            "id": "block-6",
+            "type": "end"
+          },
+          {
+            "id": "block-7",
+            "type": "click",
+            "selector": ".main-content"
+          }
+        ]
+      }
+    },
+    {
+      "file": "error-handling.mdx",
+      "filename": "error-handling-task-8.png",
+      "start": 8047,
+      "end": 9032,
+      "title": "Figranium task preview: Handling Popups and Modals",
+      "height": 900,
+      "task": {
+        "id": "docs-error-handling-8",
+        "name": "Handling Popups and Modals",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "if",
+            "value": "exists('[role=\"dialog\"] button:has-text(\"Close\")')"
+          },
+          {
+            "id": "block-2",
+            "type": "click",
+            "selector": "[role=\"dialog\"] button:has-text(\"Close\")"
+          },
+          {
+            "id": "block-3",
+            "type": "end"
+          },
+          {
+            "id": "block-4",
+            "type": "if",
+            "value": "exists('#cookie-banner')"
+          },
+          {
+            "id": "block-5",
+            "type": "click",
+            "selector": "#cookie-banner .accept"
+          },
+          {
+            "id": "block-6",
+            "type": "end"
+          },
+          {
+            "id": "block-7",
+            "type": "navigate",
+            "value": "https://example.com"
+          },
+          {
+            "id": "block-8",
+            "type": "start",
+            "value": "popup-handler-task-id"
+          }
+        ]
+      }
+    },
+    {
+      "file": "error-handling.mdx",
+      "filename": "error-handling-task-9.png",
+      "start": 9351,
+      "end": 9961,
+      "title": "Figranium task preview: Timeout Strategies",
+      "height": 386,
+      "task": {
+        "id": "docs-error-handling-9",
+        "name": "Timeout Strategies",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "click",
+            "selector": "#accept",
+            "timeout": 2000
+          },
+          {
+            "id": "block-2",
+            "type": "wait_selector",
+            "selector": ".results",
+            "timeout": 15000
+          }
+        ]
+      }
+    },
+    {
+      "file": "error-handling.mdx",
+      "filename": "error-handling-task-10.png",
+      "start": 10215,
+      "end": 10997,
+      "title": "Figranium task preview: Logging Errors for Inspection",
+      "height": 650,
+      "task": {
+        "id": "docs-error-handling-10",
+        "name": "Logging Errors for Inspection",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "on_error"
+          },
+          {
+            "id": "block-2",
+            "type": "javascript",
+            "value": "return { error: 'Click failed', url: window.location.href, title: document.title }"
+          },
+          {
+            "id": "block-3",
+            "type": "stop",
+            "value": "error"
+          },
+          {
+            "id": "block-4",
+            "type": "end"
+          },
+          {
+            "id": "block-5",
+            "type": "click",
+            "selector": ".target"
+          }
+        ]
+      }
+    },
+    {
+      "file": "javascript-execution.mdx",
+      "filename": "javascript-execution-task-1.png",
+      "start": 3827,
+      "end": 4647,
+      "title": "Figranium task preview: Chaining JavaScript Blocks",
+      "height": 562,
+      "task": {
+        "id": "docs-javascript-execution-1",
+        "name": "Chaining JavaScript Blocks",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "javascript",
+            "value": "return document.querySelectorAll('.product').length"
+          },
+          {
+            "id": "block-2",
+            "type": "if",
+            "value": "block.output > 0"
+          },
+          {
+            "id": "block-3",
+            "type": "javascript",
+            "value": "/* process products */ return Array.from(document.querySelectorAll('.product')).map(p => p.innerText)"
+          },
+          {
+            "id": "block-4",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "modular-workflows.mdx",
+      "filename": "modular-workflows-task-1.png",
+      "start": 1269,
+      "end": 1806,
+      "title": "Figranium task preview: The Start Task Action",
+      "height": 320,
+      "task": {
+        "id": "docs-modular-workflows-1",
+        "name": "The Start Task Action",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "start",
+            "value": "task-id-of-child-task"
+          }
+        ]
+      }
+    },
+    {
+      "file": "modular-workflows.mdx",
+      "filename": "modular-workflows-task-2.png",
+      "start": 2363,
+      "end": 3029,
+      "title": "Figranium task preview: How to Chain Tasks",
+      "height": 562,
+      "task": {
+        "id": "docs-modular-workflows-2",
+        "name": "How to Chain Tasks",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "if",
+            "value": "exists('#cookie-accept')"
+          },
+          {
+            "id": "block-2",
+            "type": "click",
+            "selector": "#cookie-accept"
+          },
+          {
+            "id": "block-3",
+            "type": "wait",
+            "value": "500"
+          },
+          {
+            "id": "block-4",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "modular-workflows.mdx",
+      "filename": "modular-workflows-task-3.png",
+      "start": 3226,
+      "end": 3882,
+      "title": "Figranium task preview: How to Chain Tasks",
+      "height": 474,
+      "task": {
+        "id": "docs-modular-workflows-3",
+        "name": "How to Chain Tasks",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "navigate",
+            "value": "https://example.com"
+          },
+          {
+            "id": "block-2",
+            "type": "start",
+            "value": "cookie-handler-task-id"
+          },
+          {
+            "id": "block-3",
+            "type": "click",
+            "selector": ".main-content"
+          }
+        ]
+      }
+    },
+    {
+      "file": "modular-workflows.mdx",
+      "filename": "modular-workflows-task-4.png",
+      "start": 4110,
+      "end": 4650,
+      "title": "Figranium task preview: How to Chain Tasks",
+      "height": 320,
+      "task": {
+        "id": "docs-modular-workflows-4",
+        "name": "How to Chain Tasks",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "type",
+            "selector": "#email",
+            "value": "{$username}"
+          }
+        ]
+      }
+    },
+    {
+      "file": "modular-workflows.mdx",
+      "filename": "modular-workflows-task-5.png",
+      "start": 4835,
+      "end": 5520,
+      "title": "Figranium task preview: Common Modular Patterns",
+      "height": 474,
+      "task": {
+        "id": "docs-modular-workflows-5",
+        "name": "Common Modular Patterns",
+        "url": "https://app.example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "navigate",
+            "value": "https://app.example.com"
+          },
+          {
+            "id": "block-2",
+            "type": "start",
+            "value": "login-task-id"
+          },
+          {
+            "id": "block-3",
+            "type": "navigate",
+            "value": "https://app.example.com/dashboard"
+          }
+        ]
+      }
+    },
+    {
+      "file": "modular-workflows.mdx",
+      "filename": "modular-workflows-task-6.png",
+      "start": 5625,
+      "end": 6452,
+      "title": "Figranium task preview: Common Modular Patterns",
+      "height": 738,
+      "task": {
+        "id": "docs-modular-workflows-6",
+        "name": "Common Modular Patterns",
+        "url": "https://shop.example.com/products",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "navigate",
+            "value": "https://shop.example.com/products"
+          },
+          {
+            "id": "block-2",
+            "type": "while",
+            "value": "exists('.next-page')"
+          },
+          {
+            "id": "block-3",
+            "type": "start",
+            "value": "scrape-page-task-id"
+          },
+          {
+            "id": "block-4",
+            "type": "click",
+            "selector": ".next-page"
+          },
+          {
+            "id": "block-5",
+            "type": "wait",
+            "value": "1000"
+          },
+          {
+            "id": "block-6",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "modular-workflows.mdx",
+      "filename": "modular-workflows-task-7.png",
+      "start": 6570,
+      "end": 7177,
+      "title": "Figranium task preview: Common Modular Patterns",
+      "height": 474,
+      "task": {
+        "id": "docs-modular-workflows-7",
+        "name": "Common Modular Patterns",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "on_error"
+          },
+          {
+            "id": "block-2",
+            "type": "start",
+            "value": "handle-captcha-task-id"
+          },
+          {
+            "id": "block-3",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "modular-workflows.mdx",
+      "filename": "modular-workflows-task-8.png",
+      "start": 7310,
+      "end": 7987,
+      "title": "Figranium task preview: Accessing Child Task Output",
+      "height": 386,
+      "task": {
+        "id": "docs-modular-workflows-8",
+        "name": "Accessing Child Task Output",
+        "url": "https://api.example.com/data?token={$block.output}",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "start",
+            "value": "get-auth-token-task-id"
+          },
+          {
+            "id": "block-2",
+            "type": "navigate",
+            "value": "https://api.example.com/data?token={$block.output}"
+          }
+        ]
+      }
+    },
+    {
+      "file": "modular-workflows.mdx",
+      "filename": "modular-workflows-task-9.png",
+      "start": 8252,
+      "end": 8904,
+      "title": "Figranium task preview: Recursive Flows",
+      "height": 562,
+      "task": {
+        "id": "docs-modular-workflows-9",
+        "name": "Recursive Flows",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "if",
+            "value": "{$retries} > 5"
+          },
+          {
+            "id": "block-2",
+            "type": "stop",
+            "value": "error"
+          },
+          {
+            "id": "block-3",
+            "type": "end"
+          },
+          {
+            "id": "block-4",
+            "type": "start",
+            "value": "this-tasks-own-id"
+          }
+        ]
+      }
+    },
+    {
+      "file": "modular-workflows.mdx",
+      "filename": "modular-workflows-task-10.png",
+      "start": 9790,
+      "end": 10317,
+      "title": "Figranium task preview: Task ID validation",
+      "height": 320,
+      "task": {
+        "id": "docs-modular-workflows-10",
+        "name": "Task ID validation",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "start",
+            "value": "{{ user_input }}"
+          }
+        ]
+      }
+    },
+    {
+      "file": "page-translation.mdx",
+      "filename": "page-translation-task-1.png",
+      "start": 570,
+      "end": 1095,
+      "title": "Figranium task preview: Enable translation",
+      "height": 320,
+      "task": {
+        "id": "docs-page-translation-1",
+        "name": "Enable translation",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [],
+        "translation": {
+          "enabled": true,
+          "targetLanguage": "spanish"
+        }
+      }
+    },
+    {
+      "file": "page-translation.mdx",
+      "filename": "page-translation-task-2.png",
+      "start": 2109,
+      "end": 2650,
+      "title": "Figranium task preview: Translated product scraper",
+      "height": 320,
+      "task": {
+        "id": "docs-page-translation-2",
+        "name": "Translated product scraper",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [],
+        "translation": {
+          "enabled": true,
+          "targetLanguage": "english"
+        }
+      }
+    },
+    {
+      "file": "performance.mdx",
+      "filename": "performance-task-1.png",
+      "start": 955,
+      "end": 1527,
+      "title": "Figranium task preview: Reduce Unnecessary Waits",
+      "height": 386,
+      "task": {
+        "id": "docs-performance-1",
+        "name": "Reduce Unnecessary Waits",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "click",
+            "selector": "#submit"
+          },
+          {
+            "id": "block-2",
+            "type": "wait",
+            "value": "3000"
+          }
+        ]
+      }
+    },
+    {
+      "file": "performance.mdx",
+      "filename": "performance-task-2.png",
+      "start": 1569,
+      "end": 2165,
+      "title": "Figranium task preview: Reduce Unnecessary Waits",
+      "height": 386,
+      "task": {
+        "id": "docs-performance-2",
+        "name": "Reduce Unnecessary Waits",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "click",
+            "selector": "#submit"
+          },
+          {
+            "id": "block-2",
+            "type": "wait_selector",
+            "selector": ".success-message"
+          }
+        ]
+      }
+    },
+    {
+      "file": "performance.mdx",
+      "filename": "performance-task-3.png",
+      "start": 3805,
+      "end": 4430,
+      "title": "Figranium task preview: Foreach loop optimization",
+      "height": 474,
+      "task": {
+        "id": "docs-performance-3",
+        "name": "Foreach loop optimization",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "foreach",
+            "selector": ".product"
+          },
+          {
+            "id": "block-2",
+            "type": "javascript",
+            "value": "return loop.text"
+          },
+          {
+            "id": "block-3",
+            "type": "end"
+          }
+        ]
+      }
+    },
+    {
+      "file": "performance.mdx",
+      "filename": "performance-task-4.png",
+      "start": 5377,
+      "end": 6194,
+      "title": "Figranium task preview: Batch extraction",
+      "height": 562,
+      "task": {
+        "id": "docs-performance-4",
+        "name": "Batch extraction",
+        "url": "https://example.com",
+        "mode": "agent",
+        "wait": 0,
+        "rotateUserAgents": false,
+        "rotateProxies": false,
+        "rotateViewport": false,
+        "humanTyping": true,
+        "stealth": {
+          "allowTypos": false,
+          "idleMovements": false,
+          "overscroll": false,
+          "deadClicks": false,
+          "fatigue": false,
+          "naturalTyping": false,
+          "cursorGlide": false
+        },
+        "variables": {},
+        "actions": [
+          {
+            "id": "block-1",
+            "type": "foreach",
+            "selector": ".product"
+          },
+          {
+            "id": "block-2",
+            "type": "javascript",
+            "value": "return loop.text"
+          },
+          {
+            "id": "block-3",
+            "type": "end"
+          },
+          {
+            "id": "block-4",
+            "type": "javascript",
+            "value": "return Array.from(document.querySelectorAll('.product')).map(el => ({ name: el.querySelector('.name')?.innerText, price: el.querySelector('.price')?.innerText }))"
+          }
+        ]
+      }
+    }
+  ]
+}

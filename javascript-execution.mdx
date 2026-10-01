@@ -4,8 +4,6 @@ sidebarTitle: "JavaScript"
 description: "Execute custom JavaScript in the browser context for complex logic, data transformation, unsupported interactions, and dynamic content handling."
 ---
 
-import { FigraniumTask } from '/snippets/figranium-embed.jsx';
-
 Figranium allows you to execute custom JavaScript in the browser context at any point in a task. This is the most powerful feature for handling complex logic, data transformation, unsupported interactions, and dynamic content.
 
 ## The Run JavaScript Block
@@ -127,7 +125,7 @@ return false;
 
 Use `block.output` to pass data between JavaScript blocks:
 
-<FigraniumTask task={{"id":"docs-javascript-execution-1","name":"Chaining JavaScript Blocks","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"javascript","value":"return document.querySelectorAll('.product').length"},{"id":"block-2","type":"if","value":"block.output > 0"},{"id":"block-3","type":"javascript","value":"/* process products */ return Array.from(document.querySelectorAll('.product')).map(p => p.innerText)"},{"id":"block-4","type":"end"}]}} title="Figranium task preview: Chaining JavaScript Blocks" height={562} />
+<img src="/images/tasks/javascript-execution-task-1.png" alt="Figranium task preview: Chaining JavaScript Blocks" />
 
 ---
 
