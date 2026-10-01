@@ -113,7 +113,11 @@ for (let index = 0; index < manifest.screenshots.length; index++) {
     body: JSON.stringify(task),
   });
   if (!saved.ok) throw new Error(`Figranium task save failed: ${saved.status}`);
-  await page.goto(`${baseUrl}/tasks/${task.id}`, { waitUntil: 'domcontentloaded' });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await page.evaluate((id) => {
+    window.history.pushState({}, '', `/tasks/${id}`);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  }, task.id);
   const canvas = page.locator('.canvas-workflow');
   try {
     await canvas.waitFor({ state: 'visible', timeout: 30000 });
