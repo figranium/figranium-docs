@@ -125,6 +125,14 @@ for (let index = 0; index < manifest.screenshots.length; index++) {
     const body = await page.locator('body').innerText().catch(() => '');
     throw new Error(`Figranium editor did not load at ${page.url()}: ${body.slice(0, 800)}`, { cause: error });
   }
+  // Shift the workflow left so the trigger is intentionally bisected at the
+  // viewport edge, giving every task capture the same compact composition.
+  const bounds = await canvas.boundingBox();
+  if (bounds) {
+    await page.mouse.move(bounds.x + bounds.width - 96, bounds.y + bounds.height / 2);
+    await page.mouse.wheel(720, 0);
+    await page.waitForTimeout(100);
+  }
   await canvas.screenshot({ path: join(outputRoot, item.filename) });
 }
 
