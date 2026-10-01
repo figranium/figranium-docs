@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - replace-embeds-with-editor-screenshots
+      - main
 
 permissions:
   contents: write
