@@ -14,13 +14,12 @@ The **If** block executes a sequence of actions only when a condition is met.
 
 Every `if` block must be closed with an `end` block. An optional `else` block can be placed between them.
 
-```json
-{ "type": "if",   "value": "<condition>" },
-  // actions if condition is true
-{ "type": "else" },
-  // actions if condition is false (optional)
-{ "type": "end" }
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTEiLCJuYW1lIjoiQ29uZGl0aW9uYWwgRXhlY3V0aW9uIChJZiAvIEVsc2UgLyBFbmQpIiwidXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSIsIm1vZGUiOiJhZ2VudCIsIndhaXQiOjAsInJvdGF0ZVVzZXJBZ2VudHMiOmZhbHNlLCJyb3RhdGVQcm94aWVzIjpmYWxzZSwicm90YXRlVmlld3BvcnQiOmZhbHNlLCJodW1hblR5cGluZyI6dHJ1ZSwic3RlYWx0aCI6eyJhbGxvd1R5cG9zIjpmYWxzZSwiaWRsZU1vdmVtZW50cyI6ZmFsc2UsIm92ZXJzY3JvbGwiOmZhbHNlLCJkZWFkQ2xpY2tzIjpmYWxzZSwiZmF0aWd1ZSI6ZmFsc2UsIm5hdHVyYWxUeXBpbmciOmZhbHNlLCJjdXJzb3JHbGlkZSI6ZmFsc2V9LCJ2YXJpYWJsZXMiOnt9LCJhY3Rpb25zIjpbeyJpZCI6ImJsb2NrLTEiLCJ0eXBlIjoiaWYiLCJ2YWx1ZSI6Ijxjb25kaXRpb24%2BIn0seyJpZCI6ImJsb2NrLTIiLCJ0eXBlIjoiZWxzZSJ9LHsiaWQiOiJibG9jay0zIiwidHlwZSI6ImVuZCJ9XX0%3D" title="Figranium task preview: Conditional Execution (If / Else / End)" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '474px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTEiLCJuYW1lIjoiQ29uZGl0aW9uYWwgRXhlY3V0aW9uIChJZiAvIEVsc2UgLyBFbmQpIiwidXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSIsIm1vZGUiOiJhZ2VudCIsIndhaXQiOjAsInJvdGF0ZVVzZXJBZ2VudHMiOmZhbHNlLCJyb3RhdGVQcm94aWVzIjpmYWxzZSwicm90YXRlVmlld3BvcnQiOmZhbHNlLCJodW1hblR5cGluZyI6dHJ1ZSwic3RlYWx0aCI6eyJhbGxvd1R5cG9zIjpmYWxzZSwiaWRsZU1vdmVtZW50cyI6ZmFsc2UsIm92ZXJzY3JvbGwiOmZhbHNlLCJkZWFkQ2xpY2tzIjpmYWxzZSwiZmF0aWd1ZSI6ZmFsc2UsIm5hdHVyYWxUeXBpbmciOmZhbHNlLCJjdXJzb3JHbGlkZSI6ZmFsc2V9LCJ2YXJpYWJsZXMiOnt9LCJhY3Rpb25zIjpbeyJpZCI6ImJsb2NrLTEiLCJ0eXBlIjoiaWYiLCJ2YWx1ZSI6Ijxjb25kaXRpb24%2BIn0seyJpZCI6ImJsb2NrLTIiLCJ0eXBlIjoiZWxzZSJ9LHsiaWQiOiJibG9jay0zIiwidHlwZSI6ImVuZCJ9XX0%3D" title="Figranium task preview: Conditional Execution (If / Else / End)" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '474px' }} />
+</div>
 
 ### Condition Types
 
@@ -79,29 +78,21 @@ Every `if` block must be closed with an `end` block. An optional `else` block ca
 
     **Example: Skip a modal only when it's showing**
 
-    ```json
-    { "type": "navigate", "value": "https://example.com" },
-    { "type": "if",
-      "conditionVarType": "selector",
-      "selector": ".cookie-banner",
-      "conditionOp": "exists"
-    },
-      { "type": "click", "selector": ".cookie-banner .accept" },
-    { "type": "end" }
-    ```
+    <div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTIiLCJuYW1lIjoiQ29uZGl0aW9uYWwgRXhlY3V0aW9uIChJZiAvIEVsc2UgLyBFbmQpIiwidXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSIsIm1vZGUiOiJhZ2VudCIsIndhaXQiOjAsInJvdGF0ZVVzZXJBZ2VudHMiOmZhbHNlLCJyb3RhdGVQcm94aWVzIjpmYWxzZSwicm90YXRlVmlld3BvcnQiOmZhbHNlLCJodW1hblR5cGluZyI6dHJ1ZSwic3RlYWx0aCI6eyJhbGxvd1R5cG9zIjpmYWxzZSwiaWRsZU1vdmVtZW50cyI6ZmFsc2UsIm92ZXJzY3JvbGwiOmZhbHNlLCJkZWFkQ2xpY2tzIjpmYWxzZSwiZmF0aWd1ZSI6ZmFsc2UsIm5hdHVyYWxUeXBpbmciOmZhbHNlLCJjdXJzb3JHbGlkZSI6ZmFsc2V9LCJ2YXJpYWJsZXMiOnt9LCJhY3Rpb25zIjpbeyJpZCI6ImJsb2NrLTEiLCJ0eXBlIjoibmF2aWdhdGUiLCJ2YWx1ZSI6Imh0dHBzOi8vZXhhbXBsZS5jb20ifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJpZiIsImNvbmRpdGlvblZhclR5cGUiOiJzZWxlY3RvciIsInNlbGVjdG9yIjoiLmNvb2tpZS1iYW5uZXIiLCJjb25kaXRpb25PcCI6ImV4aXN0cyJ9LHsiaWQiOiJibG9jay0zIiwidHlwZSI6ImNsaWNrIiwic2VsZWN0b3IiOiIuY29va2llLWJhbm5lciAuYWNjZXB0In0seyJpZCI6ImJsb2NrLTQiLCJ0eXBlIjoiZW5kIn1dfQ%3D%3D" title="Figranium task preview: Conditional Execution (If / Else / End)" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '562px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTIiLCJuYW1lIjoiQ29uZGl0aW9uYWwgRXhlY3V0aW9uIChJZiAvIEVsc2UgLyBFbmQpIiwidXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSIsIm1vZGUiOiJhZ2VudCIsIndhaXQiOjAsInJvdGF0ZVVzZXJBZ2VudHMiOmZhbHNlLCJyb3RhdGVQcm94aWVzIjpmYWxzZSwicm90YXRlVmlld3BvcnQiOmZhbHNlLCJodW1hblR5cGluZyI6dHJ1ZSwic3RlYWx0aCI6eyJhbGxvd1R5cG9zIjpmYWxzZSwiaWRsZU1vdmVtZW50cyI6ZmFsc2UsIm92ZXJzY3JvbGwiOmZhbHNlLCJkZWFkQ2xpY2tzIjpmYWxzZSwiZmF0aWd1ZSI6ZmFsc2UsIm5hdHVyYWxUeXBpbmciOmZhbHNlLCJjdXJzb3JHbGlkZSI6ZmFsc2V9LCJ2YXJpYWJsZXMiOnt9LCJhY3Rpb25zIjpbeyJpZCI6ImJsb2NrLTEiLCJ0eXBlIjoibmF2aWdhdGUiLCJ2YWx1ZSI6Imh0dHBzOi8vZXhhbXBsZS5jb20ifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJpZiIsImNvbmRpdGlvblZhclR5cGUiOiJzZWxlY3RvciIsInNlbGVjdG9yIjoiLmNvb2tpZS1iYW5uZXIiLCJjb25kaXRpb25PcCI6ImV4aXN0cyJ9LHsiaWQiOiJibG9jay0zIiwidHlwZSI6ImNsaWNrIiwic2VsZWN0b3IiOiIuY29va2llLWJhbm5lciAuYWNjZXB0In0seyJpZCI6ImJsb2NrLTQiLCJ0eXBlIjoiZW5kIn1dfQ%3D%3D" title="Figranium task preview: Conditional Execution (If / Else / End)" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '562px' }} />
+</div>
 
     **Example: Paginate while a "next" button remains**
 
-    ```json
-    { "type": "while",
-      "conditionVarType": "selector",
-      "selector": ".pagination .next:not(.disabled)",
-      "conditionOp": "exists"
-    },
-      { "type": "click", "selector": ".pagination .next" },
-      { "type": "wait", "value": "1500" },
-    { "type": "end" }
-    ```
+    <div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTMiLCJuYW1lIjoiQ29uZGl0aW9uYWwgRXhlY3V0aW9uIChJZiAvIEVsc2UgLyBFbmQpIiwidXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSIsIm1vZGUiOiJhZ2VudCIsIndhaXQiOjAsInJvdGF0ZVVzZXJBZ2VudHMiOmZhbHNlLCJyb3RhdGVQcm94aWVzIjpmYWxzZSwicm90YXRlVmlld3BvcnQiOmZhbHNlLCJodW1hblR5cGluZyI6dHJ1ZSwic3RlYWx0aCI6eyJhbGxvd1R5cG9zIjpmYWxzZSwiaWRsZU1vdmVtZW50cyI6ZmFsc2UsIm92ZXJzY3JvbGwiOmZhbHNlLCJkZWFkQ2xpY2tzIjpmYWxzZSwiZmF0aWd1ZSI6ZmFsc2UsIm5hdHVyYWxUeXBpbmciOmZhbHNlLCJjdXJzb3JHbGlkZSI6ZmFsc2V9LCJ2YXJpYWJsZXMiOnt9LCJhY3Rpb25zIjpbeyJpZCI6ImJsb2NrLTEiLCJ0eXBlIjoid2hpbGUiLCJjb25kaXRpb25WYXJUeXBlIjoic2VsZWN0b3IiLCJzZWxlY3RvciI6Ii5wYWdpbmF0aW9uIC5uZXh0Om5vdCguZGlzYWJsZWQpIiwiY29uZGl0aW9uT3AiOiJleGlzdHMifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiLnBhZ2luYXRpb24gLm5leHQifSx7ImlkIjoiYmxvY2stMyIsInR5cGUiOiJ3YWl0IiwidmFsdWUiOiIxNTAwIn0seyJpZCI6ImJsb2NrLTQiLCJ0eXBlIjoiZW5kIn1dfQ%3D%3D" title="Figranium task preview: Conditional Execution (If / Else / End)" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '562px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTMiLCJuYW1lIjoiQ29uZGl0aW9uYWwgRXhlY3V0aW9uIChJZiAvIEVsc2UgLyBFbmQpIiwidXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSIsIm1vZGUiOiJhZ2VudCIsIndhaXQiOjAsInJvdGF0ZVVzZXJBZ2VudHMiOmZhbHNlLCJyb3RhdGVQcm94aWVzIjpmYWxzZSwicm90YXRlVmlld3BvcnQiOmZhbHNlLCJodW1hblR5cGluZyI6dHJ1ZSwic3RlYWx0aCI6eyJhbGxvd1R5cG9zIjpmYWxzZSwiaWRsZU1vdmVtZW50cyI6ZmFsc2UsIm92ZXJzY3JvbGwiOmZhbHNlLCJkZWFkQ2xpY2tzIjpmYWxzZSwiZmF0aWd1ZSI6ZmFsc2UsIm5hdHVyYWxUeXBpbmciOmZhbHNlLCJjdXJzb3JHbGlkZSI6ZmFsc2V9LCJ2YXJpYWJsZXMiOnt9LCJhY3Rpb25zIjpbeyJpZCI6ImJsb2NrLTEiLCJ0eXBlIjoid2hpbGUiLCJjb25kaXRpb25WYXJUeXBlIjoic2VsZWN0b3IiLCJzZWxlY3RvciI6Ii5wYWdpbmF0aW9uIC5uZXh0Om5vdCguZGlzYWJsZWQpIiwiY29uZGl0aW9uT3AiOiJleGlzdHMifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiLnBhZ2luYXRpb24gLm5leHQifSx7ImlkIjoiYmxvY2stMyIsInR5cGUiOiJ3YWl0IiwidmFsdWUiOiIxNTAwIn0seyJpZCI6ImJsb2NrLTQiLCJ0eXBlIjoiZW5kIn1dfQ%3D%3D" title="Figranium task preview: Conditional Execution (If / Else / End)" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '562px' }} />
+</div>
   </Tab>
 </Tabs>
 
@@ -109,31 +100,23 @@ Every `if` block must be closed with an `end` block. An optional `else` block ca
 
 Check whether the user is already logged in, and skip the login form if so:
 
-```json
-{ "type": "navigate", "value": "https://app.example.com" },
-{ "type": "if", "value": "exists('.user-avatar')" },
-  { "type": "stop", "value": "success" },
-{ "type": "else" },
-  { "type": "click", "selector": "#login-button" },
-  { "type": "type", "selector": "#email", "value": "{$email}" },
-  { "type": "type", "selector": "#password", "value": "{$password}" },
-  { "type": "click", "selector": "[type='submit']" },
-{ "type": "end" }
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTQiLCJuYW1lIjoiQ29uZGl0aW9uYWwgRXhlY3V0aW9uIChJZiAvIEVsc2UgLyBFbmQpIiwidXJsIjoiaHR0cHM6Ly9hcHAuZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6Im5hdmlnYXRlIiwidmFsdWUiOiJodHRwczovL2FwcC5leGFtcGxlLmNvbSJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImlmIiwidmFsdWUiOiJleGlzdHMoJy51c2VyLWF2YXRhcicpIn0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoic3RvcCIsInZhbHVlIjoic3VjY2VzcyJ9LHsiaWQiOiJibG9jay00IiwidHlwZSI6ImVsc2UifSx7ImlkIjoiYmxvY2stNSIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiI2xvZ2luLWJ1dHRvbiJ9LHsiaWQiOiJibG9jay02IiwidHlwZSI6InR5cGUiLCJzZWxlY3RvciI6IiNlbWFpbCIsInZhbHVlIjoieyRlbWFpbH0ifSx7ImlkIjoiYmxvY2stNyIsInR5cGUiOiJ0eXBlIiwic2VsZWN0b3IiOiIjcGFzc3dvcmQiLCJ2YWx1ZSI6InskcGFzc3dvcmR9In0seyJpZCI6ImJsb2NrLTgiLCJ0eXBlIjoiY2xpY2siLCJzZWxlY3RvciI6Ilt0eXBlPSdzdWJtaXQnXSJ9LHsiaWQiOiJibG9jay05IiwidHlwZSI6ImVuZCJ9XX0%3D" title="Figranium task preview: Conditional Execution (If / Else / End)" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '900px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTQiLCJuYW1lIjoiQ29uZGl0aW9uYWwgRXhlY3V0aW9uIChJZiAvIEVsc2UgLyBFbmQpIiwidXJsIjoiaHR0cHM6Ly9hcHAuZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6Im5hdmlnYXRlIiwidmFsdWUiOiJodHRwczovL2FwcC5leGFtcGxlLmNvbSJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImlmIiwidmFsdWUiOiJleGlzdHMoJy51c2VyLWF2YXRhcicpIn0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoic3RvcCIsInZhbHVlIjoic3VjY2VzcyJ9LHsiaWQiOiJibG9jay00IiwidHlwZSI6ImVsc2UifSx7ImlkIjoiYmxvY2stNSIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiI2xvZ2luLWJ1dHRvbiJ9LHsiaWQiOiJibG9jay02IiwidHlwZSI6InR5cGUiLCJzZWxlY3RvciI6IiNlbWFpbCIsInZhbHVlIjoieyRlbWFpbH0ifSx7ImlkIjoiYmxvY2stNyIsInR5cGUiOiJ0eXBlIiwic2VsZWN0b3IiOiIjcGFzc3dvcmQiLCJ2YWx1ZSI6InskcGFzc3dvcmR9In0seyJpZCI6ImJsb2NrLTgiLCJ0eXBlIjoiY2xpY2siLCJzZWxlY3RvciI6Ilt0eXBlPSdzdWJtaXQnXSJ9LHsiaWQiOiJibG9jay05IiwidHlwZSI6ImVuZCJ9XX0%3D" title="Figranium task preview: Conditional Execution (If / Else / End)" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '900px' }} />
+</div>
 
 ### Nested Conditions
 
 You can nest `if` blocks inside each other. Each nested block requires its own `end`:
 
-```json
-{ "type": "if", "value": "exists('.product')" },
-  { "type": "if", "value": "text('.stock-status') === 'In Stock'" },
-    { "type": "click", "selector": ".add-to-cart" },
-  { "type": "else" },
-    { "type": "set", "varName": "outOfStock", "value": "true" },
-  { "type": "end" },
-{ "type": "end" }
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTUiLCJuYW1lIjoiQ29uZGl0aW9uYWwgRXhlY3V0aW9uIChJZiAvIEVsc2UgLyBFbmQpIiwidXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSIsIm1vZGUiOiJhZ2VudCIsIndhaXQiOjAsInJvdGF0ZVVzZXJBZ2VudHMiOmZhbHNlLCJyb3RhdGVQcm94aWVzIjpmYWxzZSwicm90YXRlVmlld3BvcnQiOmZhbHNlLCJodW1hblR5cGluZyI6dHJ1ZSwic3RlYWx0aCI6eyJhbGxvd1R5cG9zIjpmYWxzZSwiaWRsZU1vdmVtZW50cyI6ZmFsc2UsIm92ZXJzY3JvbGwiOmZhbHNlLCJkZWFkQ2xpY2tzIjpmYWxzZSwiZmF0aWd1ZSI6ZmFsc2UsIm5hdHVyYWxUeXBpbmciOmZhbHNlLCJjdXJzb3JHbGlkZSI6ZmFsc2V9LCJ2YXJpYWJsZXMiOnt9LCJhY3Rpb25zIjpbeyJpZCI6ImJsb2NrLTEiLCJ0eXBlIjoiaWYiLCJ2YWx1ZSI6ImV4aXN0cygnLnByb2R1Y3QnKSJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImlmIiwidmFsdWUiOiJ0ZXh0KCcuc3RvY2stc3RhdHVzJykgPT09ICdJbiBTdG9jaycifSx7ImlkIjoiYmxvY2stMyIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiLmFkZC10by1jYXJ0In0seyJpZCI6ImJsb2NrLTQiLCJ0eXBlIjoiZWxzZSJ9LHsiaWQiOiJibG9jay01IiwidHlwZSI6InNldCIsInZhck5hbWUiOiJvdXRPZlN0b2NrIiwidmFsdWUiOiJ0cnVlIn0seyJpZCI6ImJsb2NrLTYiLCJ0eXBlIjoiZW5kIn0seyJpZCI6ImJsb2NrLTciLCJ0eXBlIjoiZW5kIn1dfQ%3D%3D" title="Figranium task preview: Conditional Execution (If / Else / End)" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '826px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTUiLCJuYW1lIjoiQ29uZGl0aW9uYWwgRXhlY3V0aW9uIChJZiAvIEVsc2UgLyBFbmQpIiwidXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSIsIm1vZGUiOiJhZ2VudCIsIndhaXQiOjAsInJvdGF0ZVVzZXJBZ2VudHMiOmZhbHNlLCJyb3RhdGVQcm94aWVzIjpmYWxzZSwicm90YXRlVmlld3BvcnQiOmZhbHNlLCJodW1hblR5cGluZyI6dHJ1ZSwic3RlYWx0aCI6eyJhbGxvd1R5cG9zIjpmYWxzZSwiaWRsZU1vdmVtZW50cyI6ZmFsc2UsIm92ZXJzY3JvbGwiOmZhbHNlLCJkZWFkQ2xpY2tzIjpmYWxzZSwiZmF0aWd1ZSI6ZmFsc2UsIm5hdHVyYWxUeXBpbmciOmZhbHNlLCJjdXJzb3JHbGlkZSI6ZmFsc2V9LCJ2YXJpYWJsZXMiOnt9LCJhY3Rpb25zIjpbeyJpZCI6ImJsb2NrLTEiLCJ0eXBlIjoiaWYiLCJ2YWx1ZSI6ImV4aXN0cygnLnByb2R1Y3QnKSJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImlmIiwidmFsdWUiOiJ0ZXh0KCcuc3RvY2stc3RhdHVzJykgPT09ICdJbiBTdG9jaycifSx7ImlkIjoiYmxvY2stMyIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiLmFkZC10by1jYXJ0In0seyJpZCI6ImJsb2NrLTQiLCJ0eXBlIjoiZWxzZSJ9LHsiaWQiOiJibG9jay01IiwidHlwZSI6InNldCIsInZhck5hbWUiOiJvdXRPZlN0b2NrIiwidmFsdWUiOiJ0cnVlIn0seyJpZCI6ImJsb2NrLTYiLCJ0eXBlIjoiZW5kIn0seyJpZCI6ImJsb2NrLTciLCJ0eXBlIjoiZW5kIn1dfQ%3D%3D" title="Figranium task preview: Conditional Execution (If / Else / End)" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '826px' }} />
+</div>
 
 ---
 
@@ -143,11 +126,12 @@ You can nest `if` blocks inside each other. Each nested block requires its own `
   <Accordion title="While Loop" icon="rotate">
     Executes a block of actions repeatedly as long as the condition remains `true`.
 
-    ```json
-    { "type": "while", "value": "exists('.next-page')" },
-      // actions to repeat
-    { "type": "end" }
-    ```
+    <div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTYiLCJuYW1lIjoiTG9vcCBUeXBlcyIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6IndoaWxlIiwidmFsdWUiOiJleGlzdHMoJy5uZXh0LXBhZ2UnKSJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImVuZCJ9XX0%3D" title="Figranium task preview: Loop Types" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '386px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTYiLCJuYW1lIjoiTG9vcCBUeXBlcyIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6IndoaWxlIiwidmFsdWUiOiJleGlzdHMoJy5uZXh0LXBhZ2UnKSJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImVuZCJ9XX0%3D" title="Figranium task preview: Loop Types" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '386px' }} />
+</div>
 
     **Common use cases:**
 
@@ -157,37 +141,34 @@ You can nest `if` blocks inside each other. Each nested block requires its own `
 
     **Example: Scraping paginated results**
 
-    ```json
-    { "type": "navigate", "value": "https://example.com/listings" },
-    { "type": "while", "value": "exists('.pagination .next:not(.disabled)')" },
-      { "type": "javascript", "value": "/* collect items on this page */" },
-      { "type": "click", "selector": ".pagination .next" },
-      { "type": "wait", "value": "1500" },
-    { "type": "end" }
-    ```
+    <div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTciLCJuYW1lIjoiTG9vcCBUeXBlcyIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20vbGlzdGluZ3MiLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6Im5hdmlnYXRlIiwidmFsdWUiOiJodHRwczovL2V4YW1wbGUuY29tL2xpc3RpbmdzIn0seyJpZCI6ImJsb2NrLTIiLCJ0eXBlIjoid2hpbGUiLCJ2YWx1ZSI6ImV4aXN0cygnLnBhZ2luYXRpb24gLm5leHQ6bm90KC5kaXNhYmxlZCknKSJ9LHsiaWQiOiJibG9jay0zIiwidHlwZSI6ImphdmFzY3JpcHQiLCJ2YWx1ZSI6Ii8qIGNvbGxlY3QgaXRlbXMgb24gdGhpcyBwYWdlICovIn0seyJpZCI6ImJsb2NrLTQiLCJ0eXBlIjoiY2xpY2siLCJzZWxlY3RvciI6Ii5wYWdpbmF0aW9uIC5uZXh0In0seyJpZCI6ImJsb2NrLTUiLCJ0eXBlIjoid2FpdCIsInZhbHVlIjoiMTUwMCJ9LHsiaWQiOiJibG9jay02IiwidHlwZSI6ImVuZCJ9XX0%3D" title="Figranium task preview: Loop Types" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '738px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTciLCJuYW1lIjoiTG9vcCBUeXBlcyIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20vbGlzdGluZ3MiLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6Im5hdmlnYXRlIiwidmFsdWUiOiJodHRwczovL2V4YW1wbGUuY29tL2xpc3RpbmdzIn0seyJpZCI6ImJsb2NrLTIiLCJ0eXBlIjoid2hpbGUiLCJ2YWx1ZSI6ImV4aXN0cygnLnBhZ2luYXRpb24gLm5leHQ6bm90KC5kaXNhYmxlZCknKSJ9LHsiaWQiOiJibG9jay0zIiwidHlwZSI6ImphdmFzY3JpcHQiLCJ2YWx1ZSI6Ii8qIGNvbGxlY3QgaXRlbXMgb24gdGhpcyBwYWdlICovIn0seyJpZCI6ImJsb2NrLTQiLCJ0eXBlIjoiY2xpY2siLCJzZWxlY3RvciI6Ii5wYWdpbmF0aW9uIC5uZXh0In0seyJpZCI6ImJsb2NrLTUiLCJ0eXBlIjoid2FpdCIsInZhbHVlIjoiMTUwMCJ9LHsiaWQiOiJibG9jay02IiwidHlwZSI6ImVuZCJ9XX0%3D" title="Figranium task preview: Loop Types" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '738px' }} />
+</div>
 
     <Warning>
       Prevent infinite loops by tracking a counter variable:
 
-      ```json
-      { "type": "set", "varName": "pageNum", "value": "1" },
-      { "type": "while", "value": "exists('.next') && {$pageNum} <= 10" },
-        { "type": "start", "value": "scrape-page-task-id" },
-        { "type": "click", "selector": ".next" },
-        { "type": "set", "varName": "pageNum", "value": "{$pageNum} + 1" },
-      { "type": "end" }
-      ```
+      <div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTgiLCJuYW1lIjoiTG9vcCBUeXBlcyIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6InNldCIsInZhck5hbWUiOiJwYWdlTnVtIiwidmFsdWUiOiIxIn0seyJpZCI6ImJsb2NrLTIiLCJ0eXBlIjoid2hpbGUiLCJ2YWx1ZSI6ImV4aXN0cygnLm5leHQnKSAmJiB7JHBhZ2VOdW19IDw9IDEwIn0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoic3RhcnQiLCJ2YWx1ZSI6InNjcmFwZS1wYWdlLXRhc2staWQifSx7ImlkIjoiYmxvY2stNCIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiLm5leHQifSx7ImlkIjoiYmxvY2stNSIsInR5cGUiOiJzZXQiLCJ2YXJOYW1lIjoicGFnZU51bSIsInZhbHVlIjoieyRwYWdlTnVtfSArIDEifSx7ImlkIjoiYmxvY2stNiIsInR5cGUiOiJlbmQifV19" title="Figranium task preview: Loop Types" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '738px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTgiLCJuYW1lIjoiTG9vcCBUeXBlcyIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6InNldCIsInZhck5hbWUiOiJwYWdlTnVtIiwidmFsdWUiOiIxIn0seyJpZCI6ImJsb2NrLTIiLCJ0eXBlIjoid2hpbGUiLCJ2YWx1ZSI6ImV4aXN0cygnLm5leHQnKSAmJiB7JHBhZ2VOdW19IDw9IDEwIn0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoic3RhcnQiLCJ2YWx1ZSI6InNjcmFwZS1wYWdlLXRhc2staWQifSx7ImlkIjoiYmxvY2stNCIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiLm5leHQifSx7ImlkIjoiYmxvY2stNSIsInR5cGUiOiJzZXQiLCJ2YXJOYW1lIjoicGFnZU51bSIsInZhbHVlIjoieyRwYWdlTnVtfSArIDEifSx7ImlkIjoiYmxvY2stNiIsInR5cGUiOiJlbmQifV19" title="Figranium task preview: Loop Types" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '738px' }} />
+</div>
     </Warning>
   </Accordion>
 
   <Accordion title="Foreach Loop" icon="list">
     Iterates over all elements matching a CSS selector, executing the block once per element.
 
-    ```json
-    { "type": "foreach", "selector": ".product-card" },
-      // actions scoped to each element
-    { "type": "end" }
-    ```
+    <div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTkiLCJuYW1lIjoiTG9vcCBUeXBlcyIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6ImZvcmVhY2giLCJzZWxlY3RvciI6Ii5wcm9kdWN0LWNhcmQifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJlbmQifV19" title="Figranium task preview: Loop Types" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '386px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTkiLCJuYW1lIjoiTG9vcCBUeXBlcyIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6ImZvcmVhY2giLCJzZWxlY3RvciI6Ii5wcm9kdWN0LWNhcmQifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJlbmQifV19" title="Figranium task preview: Loop Types" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '386px' }} />
+</div>
 
     **Loop variables available inside the block:**
 
@@ -200,40 +181,43 @@ You can nest `if` blocks inside each other. Each nested block requires its own `
 
     **Example: Clicking each item in a list**
 
-    ```json
-    { "type": "foreach", "selector": ".todo-item input[type='checkbox']:not(:checked)" },
-      { "type": "click" },
-    { "type": "end" }
-    ```
+    <div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTEwIiwibmFtZSI6Ikxvb3AgVHlwZXMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJmb3JlYWNoIiwic2VsZWN0b3IiOiIudG9kby1pdGVtIGlucHV0W3R5cGU9J2NoZWNrYm94J106bm90KDpjaGVja2VkKSJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImNsaWNrIn0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoiZW5kIn1dfQ%3D%3D" title="Figranium task preview: Loop Types" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '474px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTEwIiwibmFtZSI6Ikxvb3AgVHlwZXMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJmb3JlYWNoIiwic2VsZWN0b3IiOiIudG9kby1pdGVtIGlucHV0W3R5cGU9J2NoZWNrYm94J106bm90KDpjaGVja2VkKSJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImNsaWNrIn0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoiZW5kIn1dfQ%3D%3D" title="Figranium task preview: Loop Types" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '474px' }} />
+</div>
 
     **Example: Extracting data from a table**
 
-    ```json
-    { "type": "foreach", "selector": "table tbody tr" },
-      { "type": "javascript", "value": "return { row: loop.index, text: loop.text }" },
-    { "type": "end" }
-    ```
+    <div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTExIiwibmFtZSI6Ikxvb3AgVHlwZXMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJmb3JlYWNoIiwic2VsZWN0b3IiOiJ0YWJsZSB0Ym9keSB0ciJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImphdmFzY3JpcHQiLCJ2YWx1ZSI6InJldHVybiB7IHJvdzogbG9vcC5pbmRleCwgdGV4dDogbG9vcC50ZXh0IH0ifSx7ImlkIjoiYmxvY2stMyIsInR5cGUiOiJlbmQifV19" title="Figranium task preview: Loop Types" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '474px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTExIiwibmFtZSI6Ikxvb3AgVHlwZXMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJmb3JlYWNoIiwic2VsZWN0b3IiOiJ0YWJsZSB0Ym9keSB0ciJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImphdmFzY3JpcHQiLCJ2YWx1ZSI6InJldHVybiB7IHJvdzogbG9vcC5pbmRleCwgdGV4dDogbG9vcC50ZXh0IH0ifSx7ImlkIjoiYmxvY2stMyIsInR5cGUiOiJlbmQifV19" title="Figranium task preview: Loop Types" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '474px' }} />
+</div>
   </Accordion>
 
   <Accordion title="Repeat N Times" icon="repeat">
     Executes a block a fixed number of times regardless of any condition.
 
-    ```json
-    { "type": "repeat", "value": "5" },
-      // actions to repeat
-    { "type": "end" }
-    ```
+    <div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTEyIiwibmFtZSI6Ikxvb3AgVHlwZXMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJyZXBlYXQiLCJ2YWx1ZSI6IjUifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJlbmQifV19" title="Figranium task preview: Loop Types" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '386px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTEyIiwibmFtZSI6Ikxvb3AgVHlwZXMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJyZXBlYXQiLCJ2YWx1ZSI6IjUifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJlbmQifV19" title="Figranium task preview: Loop Types" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '386px' }} />
+</div>
 
     The `loop.index` variable is available inside `repeat` blocks (zero-based).
 
     **Example: Submit a form 3 times**
 
-    ```json
-    { "type": "repeat", "value": "3" },
-      { "type": "click", "selector": "#submit-btn" },
-      { "type": "wait", "value": "2000" },
-    { "type": "end" }
-    ```
+    <div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTEzIiwibmFtZSI6Ikxvb3AgVHlwZXMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJyZXBlYXQiLCJ2YWx1ZSI6IjMifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiI3N1Ym1pdC1idG4ifSx7ImlkIjoiYmxvY2stMyIsInR5cGUiOiJ3YWl0IiwidmFsdWUiOiIyMDAwIn0seyJpZCI6ImJsb2NrLTQiLCJ0eXBlIjoiZW5kIn1dfQ%3D%3D" title="Figranium task preview: Loop Types" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '562px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTEzIiwibmFtZSI6Ikxvb3AgVHlwZXMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJyZXBlYXQiLCJ2YWx1ZSI6IjMifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiI3N1Ym1pdC1idG4ifSx7ImlkIjoiYmxvY2stMyIsInR5cGUiOiJ3YWl0IiwidmFsdWUiOiIyMDAwIn0seyJpZCI6ImJsb2NrLTQiLCJ0eXBlIjoiZW5kIn1dfQ%3D%3D" title="Figranium task preview: Loop Types" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '562px' }} />
+</div>
   </Accordion>
 </AccordionGroup>
 
@@ -243,31 +227,30 @@ You can nest `if` blocks inside each other. Each nested block requires its own `
 
 The **On Error** block acts like a `try/catch`. If any action in the main flow throws an error (timeout, element not found, network failure), execution jumps to the error handler block.
 
-```json
-{ "type": "on_error" },
-  // recovery actions
-{ "type": "end" }
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTE0IiwibmFtZSI6IkVycm9yIEhhbmRsaW5nIChPbiBFcnJvcikiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJvbl9lcnJvciJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImVuZCJ9XX0%3D" title="Figranium task preview: Error Handling (On Error)" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '386px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTE0IiwibmFtZSI6IkVycm9yIEhhbmRsaW5nIChPbiBFcnJvcikiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJvbl9lcnJvciJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImVuZCJ9XX0%3D" title="Figranium task preview: Error Handling (On Error)" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '386px' }} />
+</div>
 
 **Example: Handle a CAPTCHA popup**
 
-```json
-{ "type": "navigate", "value": "https://example.com" },
-{ "type": "click", "selector": ".login-button" },
-{ "type": "on_error" },
-  { "type": "if", "value": "exists('.captcha-frame')" },
-    { "type": "stop", "value": "error" },
-  { "type": "end" },
-{ "type": "end" }
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTE1IiwibmFtZSI6IkVycm9yIEhhbmRsaW5nIChPbiBFcnJvcikiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJuYXZpZ2F0ZSIsInZhbHVlIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImNsaWNrIiwic2VsZWN0b3IiOiIubG9naW4tYnV0dG9uIn0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoib25fZXJyb3IifSx7ImlkIjoiYmxvY2stNCIsInR5cGUiOiJpZiIsInZhbHVlIjoiZXhpc3RzKCcuY2FwdGNoYS1mcmFtZScpIn0seyJpZCI6ImJsb2NrLTUiLCJ0eXBlIjoic3RvcCIsInZhbHVlIjoiZXJyb3IifSx7ImlkIjoiYmxvY2stNiIsInR5cGUiOiJlbmQifSx7ImlkIjoiYmxvY2stNyIsInR5cGUiOiJlbmQifV19" title="Figranium task preview: Error Handling (On Error)" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '826px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTE1IiwibmFtZSI6IkVycm9yIEhhbmRsaW5nIChPbiBFcnJvcikiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJuYXZpZ2F0ZSIsInZhbHVlIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImNsaWNrIiwic2VsZWN0b3IiOiIubG9naW4tYnV0dG9uIn0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoib25fZXJyb3IifSx7ImlkIjoiYmxvY2stNCIsInR5cGUiOiJpZiIsInZhbHVlIjoiZXhpc3RzKCcuY2FwdGNoYS1mcmFtZScpIn0seyJpZCI6ImJsb2NrLTUiLCJ0eXBlIjoic3RvcCIsInZhbHVlIjoiZXJyb3IifSx7ImlkIjoiYmxvY2stNiIsInR5cGUiOiJlbmQifSx7ImlkIjoiYmxvY2stNyIsInR5cGUiOiJlbmQifV19" title="Figranium task preview: Error Handling (On Error)" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '826px' }} />
+</div>
 
 **Example: Dismiss a cookie banner that may or may not appear**
 
-```json
-{ "type": "on_error" },
-{ "type": "end" },
-{ "type": "click", "selector": "#cookie-accept", "timeout": 3000 }
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTE2IiwibmFtZSI6IkVycm9yIEhhbmRsaW5nIChPbiBFcnJvcikiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJvbl9lcnJvciJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImVuZCJ9LHsiaWQiOiJibG9jay0zIiwidHlwZSI6ImNsaWNrIiwic2VsZWN0b3IiOiIjY29va2llLWFjY2VwdCIsInRpbWVvdXQiOjMwMDB9XX0%3D" title="Figranium task preview: Error Handling (On Error)" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '474px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTE2IiwibmFtZSI6IkVycm9yIEhhbmRsaW5nIChPbiBFcnJvcikiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJvbl9lcnJvciJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImVuZCJ9LHsiaWQiOiJibG9jay0zIiwidHlwZSI6ImNsaWNrIiwic2VsZWN0b3IiOiIjY29va2llLWFjY2VwdCIsInRpbWVvdXQiOjMwMDB9XX0%3D" title="Figranium task preview: Error Handling (On Error)" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '474px' }} />
+</div>
 
 Placing an empty `on_error`/`end` block before an optional action effectively makes that action non-fatal.
 
@@ -279,10 +262,12 @@ See [Error Handling](/error-handling) for a deeper guide on retry patterns and r
 
 Immediately terminates the current task execution with a given status.
 
-```json
-{ "type": "stop", "value": "success" }
-{ "type": "stop", "value": "error" }
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTE3IiwibmFtZSI6IlN0b3AgVGFzayIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6InN0b3AiLCJ2YWx1ZSI6InN1Y2Nlc3MifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJzdG9wIiwidmFsdWUiOiJlcnJvciJ9XX0%3D" title="Figranium task preview: Stop Task" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '386px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY29udHJvbC1mbG93LTE3IiwibmFtZSI6IlN0b3AgVGFzayIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6InN0b3AiLCJ2YWx1ZSI6InN1Y2Nlc3MifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJzdG9wIiwidmFsdWUiOiJlcnJvciJ9XX0%3D" title="Figranium task preview: Stop Task" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '386px' }} />
+</div>
 
 Use `stop` inside conditionals to short-circuit execution when a goal is already met or when an unrecoverable state is detected.
 
