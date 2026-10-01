@@ -125,8 +125,21 @@ for (let index = 0; index < manifest.screenshots.length; index++) {
     const body = await page.locator('body').innerText().catch(() => '');
     throw new Error(`Figranium editor did not load at ${page.url()}: ${body.slice(0, 800)}`, { cause: error });
   }
-  // Capture the complete editor viewport so the workflow column stays centered
-  // exactly as it appears in the product, including the left navigation rail.
+  // Center the workflow itself in the final docs capture. The editor's left
+  // navigation rail makes the natural editor composition sit slightly right.
+  const trigger = page.getByText('On Execution', { exact: true }).first();
+  const triggerBox = await trigger.boundingBox();
+  const viewport = page.viewportSize();
+  if (triggerBox && viewport) {
+    const workflowCenter = triggerBox.x + triggerBox.width / 2;
+    const viewportCenter = viewport.width / 2;
+    const deltaX = workflowCenter - viewportCenter;
+    if (Math.abs(deltaX) > 1) {
+      await page.mouse.move(viewportCenter, viewport.height / 2);
+      await page.mouse.wheel(deltaX, 0);
+      await page.waitForTimeout(100);
+    }
+  }
   await page.screenshot({ path: join(outputRoot, item.filename), fullPage: false });
 }
 
