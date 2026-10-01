@@ -8,11 +8,7 @@ Figranium can translate the rendered target page for a task before its actions a
 
 ## Enable translation
 
-In Task Settings, enable **Page Translation** and choose a target language. The equivalent task JSON is:
-
-<img src="/images/tasks/page-translation-task-1.png" alt="Figranium task preview: Enable translation" />
-
-`targetLanguage` uses translate.js language names. Common values include `english`, `spanish`, `french`, `german`, `italian`, `portuguese`, `japanese`, `korean`, `chinese_simplified`, and `arabic`.
+In Task Settings, enable **Page Translation** and choose a target language. `targetLanguage` uses translate.js language names. Common values include `english`, `spanish`, `french`, `german`, `italian`, `portuguese`, `japanese`, `korean`, `chinese_simplified`, and `arabic`.
 
 ## Execution behavior
 
@@ -27,9 +23,5 @@ This is useful when your selectors, extraction logic, or downstream data process
 <Warning>
   Enabling translation loads translate.js and sends rendered page text to its configured external translation service. Only enable it for pages whose content may be shared with that service.
 </Warning>
-
-## Example task fragment
-
-<img src="/images/tasks/page-translation-task-2.png" alt="Figranium task preview: Translated product scraper" />
 
 Translation changes the rendered page text available to browser-backed actions; it does not turn Agent mode into an autonomous AI agent or alter Scrape mode's HTTP-only execution model.
