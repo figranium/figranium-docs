@@ -1,5 +1,7 @@
 name: Regenerate task screenshots
 
+# Keep generated editor captures in sync with the current UI.
+
 on:
   workflow_dispatch:
   push:
