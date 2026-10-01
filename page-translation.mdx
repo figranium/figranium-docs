@@ -10,14 +10,12 @@ Figranium can translate the rendered target page for a task before its actions a
 
 In Task Settings, enable **Page Translation** and choose a target language. The equivalent task JSON is:
 
-```json
-{
-  "translation": {
-    "enabled": true,
-    "targetLanguage": "spanish"
-  }
-}
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtcGFnZS10cmFuc2xhdGlvbi0xIiwibmFtZSI6IkVuYWJsZSB0cmFuc2xhdGlvbiIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W10sInRyYW5zbGF0aW9uIjp7ImVuYWJsZWQiOnRydWUsInRhcmdldExhbmd1YWdlIjoic3BhbmlzaCJ9fQ%3D%3D" title="Figranium task preview: Enable translation" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '320px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtcGFnZS10cmFuc2xhdGlvbi0xIiwibmFtZSI6IkVuYWJsZSB0cmFuc2xhdGlvbiIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W10sInRyYW5zbGF0aW9uIjp7ImVuYWJsZWQiOnRydWUsInRhcmdldExhbmd1YWdlIjoic3BhbmlzaCJ9fQ%3D%3D" title="Figranium task preview: Enable translation" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '320px' }} />
+</div>
 
 `targetLanguage` uses translate.js language names. Common values include `english`, `spanish`, `french`, `german`, `italian`, `portuguese`, `japanese`, `korean`, `chinese_simplified`, and `arabic`.
 
@@ -37,17 +35,11 @@ This is useful when your selectors, extraction logic, or downstream data process
 
 ## Example task fragment
 
-```json
-{
-  "name": "Translated product scraper",
-  "mode": "agent",
-  "url": "https://example.com",
-  "translation": {
-    "enabled": true,
-    "targetLanguage": "english"
-  },
-  "actions": []
-}
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtcGFnZS10cmFuc2xhdGlvbi0yIiwibmFtZSI6IlRyYW5zbGF0ZWQgcHJvZHVjdCBzY3JhcGVyIiwidXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSIsIm1vZGUiOiJhZ2VudCIsIndhaXQiOjAsInJvdGF0ZVVzZXJBZ2VudHMiOmZhbHNlLCJyb3RhdGVQcm94aWVzIjpmYWxzZSwicm90YXRlVmlld3BvcnQiOmZhbHNlLCJodW1hblR5cGluZyI6dHJ1ZSwic3RlYWx0aCI6eyJhbGxvd1R5cG9zIjpmYWxzZSwiaWRsZU1vdmVtZW50cyI6ZmFsc2UsIm92ZXJzY3JvbGwiOmZhbHNlLCJkZWFkQ2xpY2tzIjpmYWxzZSwiZmF0aWd1ZSI6ZmFsc2UsIm5hdHVyYWxUeXBpbmciOmZhbHNlLCJjdXJzb3JHbGlkZSI6ZmFsc2V9LCJ2YXJpYWJsZXMiOnt9LCJhY3Rpb25zIjpbXSwidHJhbnNsYXRpb24iOnsiZW5hYmxlZCI6dHJ1ZSwidGFyZ2V0TGFuZ3VhZ2UiOiJlbmdsaXNoIn19" title="Figranium task preview: Translated product scraper" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '320px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtcGFnZS10cmFuc2xhdGlvbi0yIiwibmFtZSI6IlRyYW5zbGF0ZWQgcHJvZHVjdCBzY3JhcGVyIiwidXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSIsIm1vZGUiOiJhZ2VudCIsIndhaXQiOjAsInJvdGF0ZVVzZXJBZ2VudHMiOmZhbHNlLCJyb3RhdGVQcm94aWVzIjpmYWxzZSwicm90YXRlVmlld3BvcnQiOmZhbHNlLCJodW1hblR5cGluZyI6dHJ1ZSwic3RlYWx0aCI6eyJhbGxvd1R5cG9zIjpmYWxzZSwiaWRsZU1vdmVtZW50cyI6ZmFsc2UsIm92ZXJzY3JvbGwiOmZhbHNlLCJkZWFkQ2xpY2tzIjpmYWxzZSwiZmF0aWd1ZSI6ZmFsc2UsIm5hdHVyYWxUeXBpbmciOmZhbHNlLCJjdXJzb3JHbGlkZSI6ZmFsc2V9LCJ2YXJpYWJsZXMiOnt9LCJhY3Rpb25zIjpbXSwidHJhbnNsYXRpb24iOnsiZW5hYmxlZCI6dHJ1ZSwidGFyZ2V0TGFuZ3VhZ2UiOiJlbmdsaXNoIn19" title="Figranium task preview: Translated product scraper" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '320px' }} />
+</div>
 
 Translation changes the rendered page text available to browser-backed actions; it does not turn Agent mode into an autonomous AI agent or alter Scrape mode's HTTP-only execution model.
