@@ -81,30 +81,36 @@ await mkdir(outputRoot, { recursive: true });
 await writeFile(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
 
 const baseUrl = process.env.FIGRANIUM_URL ?? 'http://127.0.0.1:11345';
-const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
-await page.goto(`${baseUrl}/signup`);
-const setup = await page.evaluate(async () => {
-  const response = await fetch('/api/auth/setup', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ name: 'Docs screenshots', email: 'docs@figranium.dev', password: 'screenshots-only' }),
-  });
-  return { ok: response.ok, status: response.status };
+const setup = await fetch(`${baseUrl}/api/auth/setup`, {
+  method: 'POST',
+  headers: { 'content-type': 'application/json', origin: baseUrl },
+  body: JSON.stringify({ name: 'Docs screenshots', email: 'docs@figranium.dev', password: 'screenshots-only' }),
 });
 if (!setup.ok) throw new Error(`Figranium setup failed: ${setup.status}`);
+const [sessionCookie] = setup.headers.getSetCookie();
+if (!sessionCookie) throw new Error('Figranium setup did not create a browser session');
+const [nameValue] = sessionCookie.split(';');
+const separator = nameValue.indexOf('=');
+const sessionName = nameValue.slice(0, separator);
+const sessionValue = nameValue.slice(separator + 1);
+
+const browser = await chromium.launch({ headless: true });
+const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+await context.addCookies([{ name: sessionName, value: sessionValue, url: baseUrl }]);
+const page = await context.newPage();
 
 for (let index = 0; index < manifest.screenshots.length; index++) {
   const item = manifest.screenshots[index];
   const task = { ...item.task, id: `docs_screenshot_${index + 1}`, name: item.title };
-  const saved = await page.evaluate(async (nextTask) => {
-    const response = await fetch('/api/tasks', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(nextTask),
-    });
-    return { ok: response.ok, status: response.status };
-  }, task);
+  const saved = await fetch(`${baseUrl}/api/tasks`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      origin: baseUrl,
+      cookie: `${sessionName}=${sessionValue}`,
+    },
+    body: JSON.stringify(task),
+  });
   if (!saved.ok) throw new Error(`Figranium task save failed: ${saved.status}`);
   await page.goto(`${baseUrl}/tasks/${task.id}`);
   await page.locator('.canvas-workflow').waitFor({ state: 'visible', timeout: 30000 });
