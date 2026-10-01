@@ -4,6 +4,8 @@ sidebarTitle: "Action Blocks"
 description: "Complete reference for Figranium action blocks. Browse navigation, interaction, logic, data, and advanced blocks to build deterministic browser automation flows."
 ---
 
+import { FigraniumTask } from '/snippets/figranium-embed.jsx';
+
 In Agent mode, tasks are built from a sequence of actions. These actions are executed sequentially by the browser.
 
 <CardGroup cols={2}>
@@ -178,12 +180,7 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
 
     **Example — store the main article text in a variable:**
 
-    <div className="not-prose my-6 dark:hidden">
-  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtYWN0aW9uLWJsb2Nrcy0xIiwibmFtZSI6IkRhdGEgJiBWYXJpYWJsZXMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJnZXRfY29udGVudCIsInNlbGVjdG9yIjoiLmFydGljbGUtYm9keSIsInZhck5hbWUiOiJhcnRpY2xlVGV4dCJ9XX0%3D" title="Figranium task preview: Data & Variables" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '320px' }} />
-</div>
-<div className="not-prose my-6 hidden dark:block">
-  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtYWN0aW9uLWJsb2Nrcy0xIiwibmFtZSI6IkRhdGEgJiBWYXJpYWJsZXMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJnZXRfY29udGVudCIsInNlbGVjdG9yIjoiLmFydGljbGUtYm9keSIsInZhck5hbWUiOiJhcnRpY2xlVGV4dCJ9XX0%3D" title="Figranium task preview: Data & Variables" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '320px' }} />
-</div>
+    <FigraniumTask task={{"id":"docs-action-blocks-1","name":"Data & Variables","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"get_content","selector":".article-body","varName":"articleText"}]}} title="Figranium task preview: Data & Variables" height={320} />
 
     After this block runs, `{$articleText}` contains the visible text of the `.article-body` element.
   </Accordion>
@@ -257,12 +254,7 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
 
     **Example — fetch an API and store the result:**
 
-    <div className="not-prose my-6 dark:hidden">
-  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtYWN0aW9uLWJsb2Nrcy0yIiwibmFtZSI6IkFkdmFuY2VkIEFjdGlvbnMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJodHRwX3JlcXVlc3QiLCJtZXRob2QiOiJHRVQiLCJ2YWx1ZSI6Imh0dHBzOi8vYXBpLmV4YW1wbGUuY29tL3Byb2R1Y3RzP3BhZ2U9eyRwYWdlfSIsImhlYWRlcnMiOiJ7XCJBdXRob3JpemF0aW9uXCI6IFwiQmVhcmVyIHskdG9rZW59XCJ9IiwidmFyTmFtZSI6ImFwaVJlc3BvbnNlIn1dfQ%3D%3D" title="Figranium task preview: Advanced Actions" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '320px' }} />
-</div>
-<div className="not-prose my-6 hidden dark:block">
-  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtYWN0aW9uLWJsb2Nrcy0yIiwibmFtZSI6IkFkdmFuY2VkIEFjdGlvbnMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJodHRwX3JlcXVlc3QiLCJtZXRob2QiOiJHRVQiLCJ2YWx1ZSI6Imh0dHBzOi8vYXBpLmV4YW1wbGUuY29tL3Byb2R1Y3RzP3BhZ2U9eyRwYWdlfSIsImhlYWRlcnMiOiJ7XCJBdXRob3JpemF0aW9uXCI6IFwiQmVhcmVyIHskdG9rZW59XCJ9IiwidmFyTmFtZSI6ImFwaVJlc3BvbnNlIn1dfQ%3D%3D" title="Figranium task preview: Advanced Actions" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '320px' }} />
-</div>
+    <FigraniumTask task={{"id":"docs-action-blocks-2","name":"Advanced Actions","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"http_request","method":"GET","value":"https://api.example.com/products?page={$page}","headers":"{\"Authorization\": \"Bearer {$token}\"}","varName":"apiResponse"}]}} title="Figranium task preview: Advanced Actions" height={320} />
 
     After this block runs, `{$apiResponse}` contains the parsed JSON response.
   </Accordion>
@@ -287,12 +279,7 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
 
     **Example — solve a reCAPTCHA v2 widget and store the result:**
 
-    <div className="not-prose my-6 dark:hidden">
-  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtYWN0aW9uLWJsb2Nrcy0zIiwibmFtZSI6IkFkdmFuY2VkIEFjdGlvbnMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJzb2x2ZV9jYXB0Y2hhIiwiY2FwdGNoYVR5cGUiOiJyZWNhcHRjaGFfdjIiLCJzZWxlY3RvciI6IiNyZWNhcHRjaGEtY29udGFpbmVyIiwidmFyTmFtZSI6ImNhcHRjaGFSZXN1bHQiLCJ0aW1lb3V0IjoxMjAwMDB9XX0%3D" title="Figranium task preview: Advanced Actions" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '320px' }} />
-</div>
-<div className="not-prose my-6 hidden dark:block">
-  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtYWN0aW9uLWJsb2Nrcy0zIiwibmFtZSI6IkFkdmFuY2VkIEFjdGlvbnMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJzb2x2ZV9jYXB0Y2hhIiwiY2FwdGNoYVR5cGUiOiJyZWNhcHRjaGFfdjIiLCJzZWxlY3RvciI6IiNyZWNhcHRjaGEtY29udGFpbmVyIiwidmFyTmFtZSI6ImNhcHRjaGFSZXN1bHQiLCJ0aW1lb3V0IjoxMjAwMDB9XX0%3D" title="Figranium task preview: Advanced Actions" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '320px' }} />
-</div>
+    <FigraniumTask task={{"id":"docs-action-blocks-3","name":"Advanced Actions","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"solve_captcha","captchaType":"recaptcha_v2","selector":"#recaptcha-container","varName":"captchaResult","timeout":120000}]}} title="Figranium task preview: Advanced Actions" height={320} />
 
     For tasks that hit CAPTCHAs at unpredictable points, you can turn on the task-level **Auto-Solve Captchas** setting instead of scattering Solve Captcha blocks through the flow. It runs the same detection pass after the initial task navigation and after every Navigate, Click, and Type, and no-ops when no challenge is present. See [CAPTCHA Solving](/captcha-solving) for the full setup, environment variables, and the auto-solve toggle.
   </Accordion>
@@ -309,12 +296,7 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
 
     **Example — wait for a Turnstile widget scoped to its container:**
 
-    <div className="not-prose my-6 dark:hidden">
-  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtYWN0aW9uLWJsb2Nrcy00IiwibmFtZSI6IkFkdmFuY2VkIEFjdGlvbnMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJ3YWl0X2NhcHRjaGEiLCJjYXB0Y2hhVHlwZSI6InR1cm5zdGlsZSIsInNlbGVjdG9yIjoiI3R1cm5zdGlsZS1jb250YWluZXIiLCJ2YXJOYW1lIjoiY2FwdGNoYVJlYWR5IiwidGltZW91dCI6MzAwMDB9XX0%3D" title="Figranium task preview: Advanced Actions" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '320px' }} />
-</div>
-<div className="not-prose my-6 hidden dark:block">
-  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtYWN0aW9uLWJsb2Nrcy00IiwibmFtZSI6IkFkdmFuY2VkIEFjdGlvbnMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJ3YWl0X2NhcHRjaGEiLCJjYXB0Y2hhVHlwZSI6InR1cm5zdGlsZSIsInNlbGVjdG9yIjoiI3R1cm5zdGlsZS1jb250YWluZXIiLCJ2YXJOYW1lIjoiY2FwdGNoYVJlYWR5IiwidGltZW91dCI6MzAwMDB9XX0%3D" title="Figranium task preview: Advanced Actions" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '320px' }} />
-</div>
+    <FigraniumTask task={{"id":"docs-action-blocks-4","name":"Advanced Actions","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"wait_captcha","captchaType":"turnstile","selector":"#turnstile-container","varName":"captchaReady","timeout":30000}]}} title="Figranium task preview: Advanced Actions" height={320} />
 
     See [CAPTCHA Solving](/captcha-solving#the-wait-captcha-block) for the readiness checks and return value details.
   </Accordion>
@@ -326,12 +308,7 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
 
     **Example — placeholder inside an `if` branch:**
 
-    <div className="not-prose my-6 dark:hidden">
-  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtYWN0aW9uLWJsb2Nrcy01IiwibmFtZSI6IkFkdmFuY2VkIEFjdGlvbnMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJkb19ub3RoaW5nIn1dfQ%3D%3D" title="Figranium task preview: Advanced Actions" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '320px' }} />
-</div>
-<div className="not-prose my-6 hidden dark:block">
-  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtYWN0aW9uLWJsb2Nrcy01IiwibmFtZSI6IkFkdmFuY2VkIEFjdGlvbnMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJkb19ub3RoaW5nIn1dfQ%3D%3D" title="Figranium task preview: Advanced Actions" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '320px' }} />
-</div>
+    <FigraniumTask task={{"id":"docs-action-blocks-5","name":"Advanced Actions","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"do_nothing"}]}} title="Figranium task preview: Advanced Actions" height={320} />
   </Accordion>
 </AccordionGroup>
 
