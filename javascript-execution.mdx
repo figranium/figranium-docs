@@ -4,6 +4,8 @@ sidebarTitle: "JavaScript"
 description: "Execute custom JavaScript in the browser context for complex logic, data transformation, unsupported interactions, and dynamic content handling."
 ---
 
+import { FigraniumTask } from '/snippets/figranium-embed.jsx';
+
 Figranium allows you to execute custom JavaScript in the browser context at any point in a task. This is the most powerful feature for handling complex logic, data transformation, unsupported interactions, and dynamic content.
 
 ## The Run JavaScript Block
@@ -125,12 +127,7 @@ return false;
 
 Use `block.output` to pass data between JavaScript blocks:
 
-<div className="not-prose my-6 dark:hidden">
-  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtamF2YXNjcmlwdC1leGVjdXRpb24tMSIsIm5hbWUiOiJDaGFpbmluZyBKYXZhU2NyaXB0IEJsb2NrcyIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6ImphdmFzY3JpcHQiLCJ2YWx1ZSI6InJldHVybiBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCcucHJvZHVjdCcpLmxlbmd0aCJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImlmIiwidmFsdWUiOiJibG9jay5vdXRwdXQgPiAwIn0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoiamF2YXNjcmlwdCIsInZhbHVlIjoiLyogcHJvY2VzcyBwcm9kdWN0cyAqLyByZXR1cm4gQXJyYXkuZnJvbShkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCcucHJvZHVjdCcpKS5tYXAocCA9PiBwLmlubmVyVGV4dCkifSx7ImlkIjoiYmxvY2stNCIsInR5cGUiOiJlbmQifV19" title="Figranium task preview: Chaining JavaScript Blocks" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '562px' }} />
-</div>
-<div className="not-prose my-6 hidden dark:block">
-  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtamF2YXNjcmlwdC1leGVjdXRpb24tMSIsIm5hbWUiOiJDaGFpbmluZyBKYXZhU2NyaXB0IEJsb2NrcyIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6ImphdmFzY3JpcHQiLCJ2YWx1ZSI6InJldHVybiBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCcucHJvZHVjdCcpLmxlbmd0aCJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImlmIiwidmFsdWUiOiJibG9jay5vdXRwdXQgPiAwIn0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoiamF2YXNjcmlwdCIsInZhbHVlIjoiLyogcHJvY2VzcyBwcm9kdWN0cyAqLyByZXR1cm4gQXJyYXkuZnJvbShkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCcucHJvZHVjdCcpKS5tYXAocCA9PiBwLmlubmVyVGV4dCkifSx7ImlkIjoiYmxvY2stNCIsInR5cGUiOiJlbmQifV19" title="Figranium task preview: Chaining JavaScript Blocks" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '562px' }} />
-</div>
+<FigraniumTask task={{"id":"docs-javascript-execution-1","name":"Chaining JavaScript Blocks","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"javascript","value":"return document.querySelectorAll('.product').length"},{"id":"block-2","type":"if","value":"block.output > 0"},{"id":"block-3","type":"javascript","value":"/* process products */ return Array.from(document.querySelectorAll('.product')).map(p => p.innerText)"},{"id":"block-4","type":"end"}]}} title="Figranium task preview: Chaining JavaScript Blocks" height={562} />
 
 ---
 
