@@ -125,6 +125,7 @@ for (let index = 0; index < manifest.screenshots.length; index++) {
     const body = await page.locator('body').innerText().catch(() => '');
     throw new Error(`Figranium editor did not load at ${page.url()}: ${body.slice(0, 800)}`, { cause: error });
   }
+  // Keep the workflow centered, matching the editor's natural composition.
   await canvas.screenshot({ path: join(outputRoot, item.filename) });
 }
 
