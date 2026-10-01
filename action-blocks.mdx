@@ -4,6 +4,8 @@ sidebarTitle: "Action Blocks"
 description: "Complete reference for Figranium action blocks. Browse navigation, interaction, logic, data, and advanced blocks to build deterministic browser automation flows."
 ---
 
+import { FigraniumTask } from '/snippets/figranium-embed.jsx';
+
 In Agent mode, tasks are built from a sequence of actions. These actions are executed sequentially by the browser.
 
 <CardGroup cols={2}>
@@ -35,33 +37,33 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
     - **Wait**: Optional delay (in seconds) after clicking.
   </Accordion>
 
-  <Accordion title="Check (check)" icon="square-check">
+  <Accordion title="Check " icon="square-check">
     Ensures a checkbox or radio control is selected. This is idempotent: an already-selected control is left unchanged.
 
     - **Selector**: The checkbox or radio control to select.
   </Accordion>
 
-  <Accordion title="Uncheck (uncheck)" icon="square">
+  <Accordion title="Uncheck " icon="square">
     Ensures a checkbox is cleared. The selector must target a compatible checkbox control.
 
     - **Selector**: The checkbox to clear.
   </Accordion>
 
-  <Accordion title="Drag and Drop (drag_and_drop)" icon="arrows-left-right">
+  <Accordion title="Drag and Drop " icon="arrows-left-right">
     Drags the element matched by **Selector** onto the element matched by **Target Selector**. Choose each selector independently, including in headful selector picking.
 
     - **Selector**: The draggable source element.
     - **Target Selector**: The required drop target element.
   </Accordion>
 
-  <Accordion title="Select (select)" icon="list">
+  <Accordion title="Select" icon="list">
     Selects an option in a native HTML `<select>` control.
 
     - **Selector**: The native select element.
     - **Value**: The option value to choose.
   </Accordion>
 
-  <Accordion title="Reload (reload)" icon="rotate">
+  <Accordion title="Reload " icon="rotate">
     Reloads the current page and waits for the refreshed document to load.
   </Accordion>
 
@@ -79,14 +81,14 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
     - **Value**: Duration in seconds (e.g., `2.5`).
   </Accordion>
 
-  <Accordion title="Wait for Selector (wait_selector)" icon="eye">
+  <Accordion title="Wait for Selector" icon="eye">
     Waits until a specific element appears in the DOM. Use this to ensure the page has loaded the content you need before proceeding.
 
     - **Selector**: The element to wait for.
     - **Value**: Timeout in seconds (default: 30).
   </Accordion>
 
-  <Accordion title="Press (press)" icon="arrow-right">
+  <Accordion title="Press " icon="arrow-right">
     Simulates a keyboard key press. Use this for navigation keys like `Enter`, `Tab`, or `Escape`.
 
     - **Key**: The key name (e.g., `Enter`, `Tab`, `Escape`, `ArrowDown`).
@@ -148,27 +150,27 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
 ## Data & Variables
 
 <AccordionGroup>
-  <Accordion title="Set Variable (set)" icon="edit">
+  <Accordion title="Set Variable " icon="edit">
     Updates a runtime variable. Use this to store calculations or flags for later use.
 
     - **Var Name**: The variable to update (e.g., `counter`).
     - **Value**: The new value (can be a JS expression).
   </Accordion>
 
-  <Accordion title="CSV (csv)" icon="file-type-csv">
+  <Accordion title="CSV " icon="file-type-csv">
     Parses CSV formatted text into rows (an array of objects). Use this to extract data out of comma separated text for further processing.
 
     - **Value**: The CSV text to parse. If left blank, it will attempt to use the output of the previous block (`block.output`).
   </Accordion>
 
-  <Accordion title="Merge (merge)" icon="arrow-merge">
+  <Accordion title="Merge" icon="arrow-merge">
     Merges multiple arrays, objects, or primitive values into a single output. Use this when you have collected data from different steps and need to combine them into one payload.
 
     - **Value**: Comma-separated list of values or variables to merge (e.g., `items, extraItems, {$block.output}`).
     - **Target Variable**: (Optional) The name of a new or existing variable to store the merged result (e.g., `allItems`).
   </Accordion>
 
-  <Accordion title="Get Content (get_content)" icon="align-box-center-stretch">
+  <Accordion title="Get Content" icon="align-box-center-stretch">
     Extracts the text content of the current page or a specific element. Use this to capture visible text without writing a custom JavaScript block — for example, grabbing an article body, a table's contents, or the entire page text for downstream processing.
 
     - **Selector**: (Optional) A CSS selector targeting the element to read. If empty, the full page text is returned.
@@ -178,7 +180,7 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
 
     **Example — store the main article text in a variable:**
 
-    <img src="/images/tasks/action-blocks-task-1.png" alt="Figranium task preview: Data & Variables" />
+    <FigraniumTask task={{"id":"docs-action-blocks-1","name":"Data & Variables","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"get_content","selector":".article-body","varName":"articleText"}]}} title="Figranium task preview: Data & Variables" height={320} />
 
     After this block runs, `{$articleText}` contains the visible text of the `.article-body` element.
   </Accordion>
@@ -187,7 +189,7 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
 ## Advanced Actions
 
 <AccordionGroup>
-  <Accordion title="JavaScript (javascript)" icon="brand-javascript">
+  <Accordion title="JavaScript" icon="brand-javascript">
     Executes custom JavaScript in the browser context. Use this for complex logic, data extraction, or interactions not supported by other blocks.
 
     - **Value**: The JS code (e.g., `return document.title;`).
@@ -207,7 +209,7 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
     - **Value**: Exit status (e.g., `success`, `failure`).
   </Accordion>
 
-  <Accordion title="Wait for Downloads (wait_downloads)" icon="download">
+  <Accordion title="Wait for Downloads" icon="download">
     Waits for file downloads to complete. Use this after clicking a download button to ensure the transfer finishes before the task continues.
 
     - **Value**: Timeout in seconds.
@@ -215,7 +217,7 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
     Completed downloads are persisted in the task's selected [Cabinet](/file-downloads), introduced in v0.17.
   </Accordion>
 
-  <Accordion title="Upload (upload)" icon="upload">
+  <Accordion title="Upload " icon="upload">
     Attaches the newest unuploaded item from a Cabinet to the current page. Use it for download-then-upload workflows without moving files outside Figranium.
 
     - **Selector**: Target file input, file chooser trigger, or compatible drop target.
@@ -225,17 +227,17 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
     Upload supports ordinary files, ZIP archives, compatible folders, native file inputs, file choosers, and drop targets.
   </Accordion>
 
-  <Accordion title="Finalize Uploads (finalize_uploads)" icon="check">
+  <Accordion title="Finalize Uploads" icon="check">
     Marks all Cabinet items attached during the current execution as uploaded.
 
     Use this after the surrounding form submission or upload flow succeeds when you want consumption to happen later than the attachment itself.
   </Accordion>
 
-  <Accordion title="On Error (on_error)" icon="alert-triangle">
+  <Accordion title="On Error" icon="alert-triangle">
     Defines a block of actions to run if an error occurs in the main flow. Use this to implement retry logic or graceful failures (try/catch).
   </Accordion>
 
-  <Accordion title="HTTP Request (http_request)" icon="http-get">
+  <Accordion title="HTTP Request " icon="http-get">
     Makes a server-side HTTP request to any URL. Use this to call external APIs, send webhook notifications, or fetch data from REST endpoints — without leaving the task flow.
 
     - **Method**: `GET`, `POST`, `PUT`, `PATCH`, or `DELETE`.
@@ -252,18 +254,18 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
 
     **Example — fetch an API and store the result:**
 
-    <img src="/images/tasks/action-blocks-task-2.png" alt="Figranium task preview: Advanced Actions" />
+    <FigraniumTask task={{"id":"docs-action-blocks-2","name":"Advanced Actions","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"http_request","method":"GET","value":"https://api.example.com/products?page={$page}","headers":"{\"Authorization\": \"Bearer {$token}\"}","varName":"apiResponse"}]}} title="Figranium task preview: Advanced Actions" height={320} />
 
     After this block runs, `{$apiResponse}` contains the parsed JSON response.
   </Accordion>
 
-  <Accordion title="Start Task (start)" icon="player-play">
+  <Accordion title="Start Task " icon="player-play">
     Triggers another task to run from within the current task. Use this to create modular workflows by chaining tasks together.
 
     - **Task**: The ID of the task to run.
   </Accordion>
 
-  <Accordion title="Solve Captcha (solve_captcha)" icon="shield" id="solve-captcha">
+  <Accordion title="Solve Captcha " icon="shield" id="solve-captcha">
     Detects a CAPTCHA challenge on the current page and solves it through a configured YesCaptcha/AntiCaptcha-compatible endpoint (tried first when set) or the built-in active-browser local solver, then injects the token back into the page so the site's own callback fires. Use this when a specific step reaches a challenge you already know about — for example, right after submitting a login form.
 
     Supported challenge types: reCAPTCHA v2, reCAPTCHA v3, hCaptcha, and Cloudflare Turnstile.
@@ -277,12 +279,12 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
 
     **Example — solve a reCAPTCHA v2 widget and store the result:**
 
-    <img src="/images/tasks/action-blocks-task-3.png" alt="Figranium task preview: Advanced Actions" />
+    <FigraniumTask task={{"id":"docs-action-blocks-3","name":"Advanced Actions","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"solve_captcha","captchaType":"recaptcha_v2","selector":"#recaptcha-container","varName":"captchaResult","timeout":120000}]}} title="Figranium task preview: Advanced Actions" height={320} />
 
     For tasks that hit CAPTCHAs at unpredictable points, you can turn on the task-level **Auto-Solve Captchas** setting instead of scattering Solve Captcha blocks through the flow. It runs the same detection pass after the initial task navigation and after every Navigate, Click, and Type, and no-ops when no challenge is present. See [CAPTCHA Solving](/captcha-solving) for the full setup, environment variables, and the auto-solve toggle.
   </Accordion>
 
-  <Accordion title="Wait for Captcha (wait_captcha)" icon="clock" id="wait-captcha">
+  <Accordion title="Wait for Captcha" icon="clock" id="wait-captcha">
     Pauses the task until a CAPTCHA control on the page is initialized, visible, enabled, pointer-receivable, and stable. The block does not click or solve the challenge. Use it to gate later steps on the widget being ready — for example, before handing the page to your own solving logic, or to confirm that a challenge rendered at all.
 
     Supported challenge types: reCAPTCHA v2, reCAPTCHA v3, hCaptcha, and Cloudflare Turnstile.
@@ -294,19 +296,19 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
 
     **Example — wait for a Turnstile widget scoped to its container:**
 
-    <img src="/images/tasks/action-blocks-task-4.png" alt="Figranium task preview: Advanced Actions" />
+    <FigraniumTask task={{"id":"docs-action-blocks-4","name":"Advanced Actions","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"wait_captcha","captchaType":"turnstile","selector":"#turnstile-container","varName":"captchaReady","timeout":30000}]}} title="Figranium task preview: Advanced Actions" height={320} />
 
     See [CAPTCHA Solving](/captcha-solving#the-wait-captcha-block) for the readiness checks and return value details.
   </Accordion>
 
-  <Accordion title="Do Nothing (do_nothing)" icon="ban">
+  <Accordion title="Do Nothing " icon="ban">
     Performs no operation and moves to the next block. Use this as a placeholder while drafting a task, or as the body of an If or On Error branch when you explicitly want the branch to fall through without side effects.
 
     The block takes no configuration. It logs `Do nothing` and completes successfully. The aliases `noop` and `pass` behave the same way.
 
     **Example — placeholder inside an `if` branch:**
 
-    <img src="/images/tasks/action-blocks-task-5.png" alt="Figranium task preview: Advanced Actions" />
+    <FigraniumTask task={{"id":"docs-action-blocks-5","name":"Advanced Actions","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"do_nothing"}]}} title="Figranium task preview: Advanced Actions" height={320} />
   </Accordion>
 </AccordionGroup>
 
