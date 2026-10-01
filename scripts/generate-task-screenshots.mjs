@@ -130,7 +130,7 @@ for (let index = 0; index < manifest.screenshots.length; index++) {
   const bounds = await canvas.boundingBox();
   if (bounds) {
     await page.mouse.move(bounds.x + bounds.width - 96, bounds.y + bounds.height / 2);
-    await page.mouse.wheel(720, 0);
+    await page.mouse.wheel(660, 0);
     await page.waitForTimeout(100);
   }
   await canvas.screenshot({ path: join(outputRoot, item.filename) });
