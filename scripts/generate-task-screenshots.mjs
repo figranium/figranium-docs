@@ -96,4 +96,14 @@ for (let index = 0; index < manifest.screenshots.length; index++) {
   await page.locator('.canvas-workflow').waitFor({ state: 'visible', timeout: 30000 });
   await page.locator('.canvas-workflow').screenshot({ path: join(outputRoot, item.filename) });
 }
+
+const uiTourPath = join(docsRoot, 'ui-tour.mdx');
+const uiTour = await readFile(uiTourPath, 'utf8');
+if (manifest.screenshots.length) {
+  await page.screenshot({ path: join(outputRoot, 'editor-ui.png'), fullPage: false });
+  if (!uiTour.includes('/images/tasks/editor-ui.png')) {
+    await writeFile(uiTourPath, uiTour.replace(/^(---[\s\S]*?---\n)/, '$1\n<img src="/images/tasks/editor-ui.png" alt="Figranium editor interface" />\n'));
+  }
+}
+
 await browser.close();
