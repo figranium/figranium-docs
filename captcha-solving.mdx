@@ -48,15 +48,12 @@ Local image solving requires at least **2 GiB effective cgroup memory**. Hosts b
 
 Drop the **Solve Captcha** block into a task at the step where you expect a challenge. See [Action Blocks — Solve Captcha](/action-blocks#solve-captcha) for the full field reference; the shape is:
 
-```json
-{
-  "type": "solve_captcha",
-  "captchaType": "recaptcha_v2",
-  "selector": "#recaptcha-container",
-  "varName": "captchaResult",
-  "timeout": 120000
-}
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY2FwdGNoYS1zb2x2aW5nLTEiLCJuYW1lIjoiU29sdmUgQ2FwdGNoYSIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6InNvbHZlX2NhcHRjaGEiLCJjYXB0Y2hhVHlwZSI6InJlY2FwdGNoYV92MiIsInNlbGVjdG9yIjoiI3JlY2FwdGNoYS1jb250YWluZXIiLCJ2YXJOYW1lIjoiY2FwdGNoYVJlc3VsdCIsInRpbWVvdXQiOjEyMDAwMH1dfQ%3D%3D" title="Figranium task preview: Solve Captcha" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '320px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY2FwdGNoYS1zb2x2aW5nLTEiLCJuYW1lIjoiU29sdmUgQ2FwdGNoYSIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6InNvbHZlX2NhcHRjaGEiLCJjYXB0Y2hhVHlwZSI6InJlY2FwdGNoYV92MiIsInNlbGVjdG9yIjoiI3JlY2FwdGNoYS1jb250YWluZXIiLCJ2YXJOYW1lIjoiY2FwdGNoYVJlc3VsdCIsInRpbWVvdXQiOjEyMDAwMH1dfQ%3D%3D" title="Figranium task preview: Solve Captcha" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '320px' }} />
+</div>
 
 - `captchaType` is optional — omit it to auto-detect from the page. Supported values: `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, `turnstile`.
 - `selector` is optional — omit it to scan the whole page.
@@ -65,18 +62,12 @@ Drop the **Solve Captcha** block into a task at the step where you expect a chal
 
 **Example — submit a form, then solve the reCAPTCHA it renders:**
 
-```json
-[
-  { "type": "click", "value": "button[type='submit']" },
-  { "type": "wait_selector", "value": "iframe[src*='recaptcha']" },
-  {
-    "type": "solve_captcha",
-    "captchaType": "recaptcha_v2",
-    "varName": "captchaResult"
-  },
-  { "type": "click", "value": "button.continue" }
-]
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY2FwdGNoYS1zb2x2aW5nLTIiLCJuYW1lIjoiU29sdmUgQ2FwdGNoYSIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6ImNsaWNrIiwidmFsdWUiOiJidXR0b25bdHlwZT0nc3VibWl0J10ifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJ3YWl0X3NlbGVjdG9yIiwidmFsdWUiOiJpZnJhbWVbc3JjKj0ncmVjYXB0Y2hhJ10ifSx7ImlkIjoiYmxvY2stMyIsInR5cGUiOiJzb2x2ZV9jYXB0Y2hhIiwiY2FwdGNoYVR5cGUiOiJyZWNhcHRjaGFfdjIiLCJ2YXJOYW1lIjoiY2FwdGNoYVJlc3VsdCJ9LHsiaWQiOiJibG9jay00IiwidHlwZSI6ImNsaWNrIiwidmFsdWUiOiJidXR0b24uY29udGludWUifV19" title="Figranium task preview: Solve Captcha" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '562px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY2FwdGNoYS1zb2x2aW5nLTIiLCJuYW1lIjoiU29sdmUgQ2FwdGNoYSIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6ImNsaWNrIiwidmFsdWUiOiJidXR0b25bdHlwZT0nc3VibWl0J10ifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJ3YWl0X3NlbGVjdG9yIiwidmFsdWUiOiJpZnJhbWVbc3JjKj0ncmVjYXB0Y2hhJ10ifSx7ImlkIjoiYmxvY2stMyIsInR5cGUiOiJzb2x2ZV9jYXB0Y2hhIiwiY2FwdGNoYVR5cGUiOiJyZWNhcHRjaGFfdjIiLCJ2YXJOYW1lIjoiY2FwdGNoYVJlc3VsdCJ9LHsiaWQiOiJibG9jay00IiwidHlwZSI6ImNsaWNrIiwidmFsdWUiOiJidXR0b24uY29udGludWUifV19" title="Figranium task preview: Solve Captcha" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '562px' }} />
+</div>
 
 ---
 
@@ -90,15 +81,12 @@ Use it when:
 - You want to confirm a challenge appeared before branching with an [If](/control-flow) block.
 - A widget loads asynchronously and later steps race against it.
 
-```json
-{
-  "type": "wait_captcha",
-  "captchaType": "turnstile",
-  "selector": "#turnstile-container",
-  "varName": "captchaReady",
-  "timeout": 30000
-}
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtY2FwdGNoYS1zb2x2aW5nLTMiLCJuYW1lIjoiV2FpdCBmb3IgQ2FwdGNoYSIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6IndhaXRfY2FwdGNoYSIsImNhcHRjaGFUeXBlIjoidHVybnN0aWxlIiwic2VsZWN0b3IiOiIjdHVybnN0aWxlLWNvbnRhaW5lciIsInZhck5hbWUiOiJjYXB0Y2hhUmVhZHkiLCJ0aW1lb3V0IjozMDAwMH1dfQ%3D%3D" title="Figranium task preview: Wait for Captcha" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '320px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtY2FwdGNoYS1zb2x2aW5nLTMiLCJuYW1lIjoiV2FpdCBmb3IgQ2FwdGNoYSIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6IndhaXRfY2FwdGNoYSIsImNhcHRjaGFUeXBlIjoidHVybnN0aWxlIiwic2VsZWN0b3IiOiIjdHVybnN0aWxlLWNvbnRhaW5lciIsInZhck5hbWUiOiJjYXB0Y2hhUmVhZHkiLCJ0aW1lb3V0IjozMDAwMH1dfQ%3D%3D" title="Figranium task preview: Wait for Captcha" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '320px' }} />
+</div>
 
 - `captchaType` is optional — omit it to wait for the first ready challenge of any supported type. Supported values: `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, `turnstile`.
 - `selector` is optional — omit it to scan the whole page.
