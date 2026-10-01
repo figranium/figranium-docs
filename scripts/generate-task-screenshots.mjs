@@ -81,9 +81,10 @@ await mkdir(outputRoot, { recursive: true });
 await writeFile(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
 
 const baseUrl = process.env.FIGRANIUM_URL ?? 'http://127.0.0.1:11345';
-const setup = await fetch(`${baseUrl}/api/auth/setup`, {
+const apiBaseUrl = process.env.FIGRANIUM_API_URL ?? baseUrl;
+const setup = await fetch(`${apiBaseUrl}/api/auth/setup`, {
   method: 'POST',
-  headers: { 'content-type': 'application/json', origin: baseUrl },
+  headers: { 'content-type': 'application/json', origin: apiBaseUrl },
   body: JSON.stringify({ name: 'Docs screenshots', email: 'docs@figranium.dev', password: 'screenshots-only' }),
 });
 if (!setup.ok) throw new Error(`Figranium setup failed: ${setup.status}`);
@@ -102,11 +103,11 @@ const page = await context.newPage();
 for (let index = 0; index < manifest.screenshots.length; index++) {
   const item = manifest.screenshots[index];
   const task = { ...item.task, id: `docs_screenshot_${index + 1}`, name: item.title };
-  const saved = await fetch(`${baseUrl}/api/tasks`, {
+  const saved = await fetch(`${apiBaseUrl}/api/tasks`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
-      origin: baseUrl,
+      origin: apiBaseUrl,
       cookie: `${sessionName}=${sessionValue}`,
     },
     body: JSON.stringify(task),
