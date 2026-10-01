@@ -39,6 +39,7 @@ jobs:
         env:
           FIGRANIUM_DIR: .figranium
           FIGRANIUM_URL: http://127.0.0.1:5173
+          FIGRANIUM_API_URL: http://127.0.0.1:11345
       - run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
