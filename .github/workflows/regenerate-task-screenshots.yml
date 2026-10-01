@@ -31,10 +31,11 @@ jobs:
         working-directory: .figranium
       - run: node server.js > /tmp/figranium.log 2>&1 &
         working-directory: .figranium
-      - run: npx wait-on http://127.0.0.1:3000/api/auth/check-setup
+      - run: npx wait-on http://127.0.0.1:11345/api/auth/check-setup
       - run: node scripts/generate-task-screenshots.mjs
         env:
           FIGRANIUM_DIR: .figranium
+          FIGRANIUM_URL: http://127.0.0.1:11345
       - run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
