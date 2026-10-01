@@ -25,17 +25,21 @@ The biggest time sinks are usually **navigation** (waiting for pages to load) an
 
 Instead of waiting a fixed time:
 
-```json
-{ "type": "click", "selector": "#submit" },
-{ "type": "wait", "value": "3000" }
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtcGVyZm9ybWFuY2UtMSIsIm5hbWUiOiJSZWR1Y2UgVW5uZWNlc3NhcnkgV2FpdHMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiI3N1Ym1pdCJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6IndhaXQiLCJ2YWx1ZSI6IjMwMDAifV19" title="Figranium task preview: Reduce Unnecessary Waits" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '386px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtcGVyZm9ybWFuY2UtMSIsIm5hbWUiOiJSZWR1Y2UgVW5uZWNlc3NhcnkgV2FpdHMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiI3N1Ym1pdCJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6IndhaXQiLCJ2YWx1ZSI6IjMwMDAifV19" title="Figranium task preview: Reduce Unnecessary Waits" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '386px' }} />
+</div>
 
 Wait for the result element to appear:
 
-```json
-{ "type": "click", "selector": "#submit" },
-{ "type": "wait_selector", "selector": ".success-message" }
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtcGVyZm9ybWFuY2UtMiIsIm5hbWUiOiJSZWR1Y2UgVW5uZWNlc3NhcnkgV2FpdHMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiI3N1Ym1pdCJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6IndhaXRfc2VsZWN0b3IiLCJzZWxlY3RvciI6Ii5zdWNjZXNzLW1lc3NhZ2UifV19" title="Figranium task preview: Reduce Unnecessary Waits" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '386px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtcGVyZm9ybWFuY2UtMiIsIm5hbWUiOiJSZWR1Y2UgVW5uZWNlc3NhcnkgV2FpdHMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiI3N1Ym1pdCJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6IndhaXRfc2VsZWN0b3IiLCJzZWxlY3RvciI6Ii5zdWNjZXNzLW1lc3NhZ2UifV19" title="Figranium task preview: Reduce Unnecessary Waits" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '386px' }} />
+</div>
 
 This completes as soon as the element appears — often much faster than the fixed wait.
 
@@ -88,12 +92,12 @@ Figranium automatically optimizes Foreach loops based on which loop variables yo
 
 This means simple text-based loops are fast by default:
 
-```json
-// Optimized automatically — loop.html is not referenced, so HTML is not fetched
-{ "type": "foreach", "selector": ".product" },
-  { "type": "javascript", "value": "return loop.text" },
-{ "type": "end" }
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtcGVyZm9ybWFuY2UtMyIsIm5hbWUiOiJGb3JlYWNoIGxvb3Agb3B0aW1pemF0aW9uIiwidXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSIsIm1vZGUiOiJhZ2VudCIsIndhaXQiOjAsInJvdGF0ZVVzZXJBZ2VudHMiOmZhbHNlLCJyb3RhdGVQcm94aWVzIjpmYWxzZSwicm90YXRlVmlld3BvcnQiOmZhbHNlLCJodW1hblR5cGluZyI6dHJ1ZSwic3RlYWx0aCI6eyJhbGxvd1R5cG9zIjpmYWxzZSwiaWRsZU1vdmVtZW50cyI6ZmFsc2UsIm92ZXJzY3JvbGwiOmZhbHNlLCJkZWFkQ2xpY2tzIjpmYWxzZSwiZmF0aWd1ZSI6ZmFsc2UsIm5hdHVyYWxUeXBpbmciOmZhbHNlLCJjdXJzb3JHbGlkZSI6ZmFsc2V9LCJ2YXJpYWJsZXMiOnt9LCJhY3Rpb25zIjpbeyJpZCI6ImJsb2NrLTEiLCJ0eXBlIjoiZm9yZWFjaCIsInNlbGVjdG9yIjoiLnByb2R1Y3QifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJqYXZhc2NyaXB0IiwidmFsdWUiOiJyZXR1cm4gbG9vcC50ZXh0In0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoiZW5kIn1dfQ%3D%3D" title="Figranium task preview: Foreach loop optimization" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '474px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtcGVyZm9ybWFuY2UtMyIsIm5hbWUiOiJGb3JlYWNoIGxvb3Agb3B0aW1pemF0aW9uIiwidXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSIsIm1vZGUiOiJhZ2VudCIsIndhaXQiOjAsInJvdGF0ZVVzZXJBZ2VudHMiOmZhbHNlLCJyb3RhdGVQcm94aWVzIjpmYWxzZSwicm90YXRlVmlld3BvcnQiOmZhbHNlLCJodW1hblR5cGluZyI6dHJ1ZSwic3RlYWx0aCI6eyJhbGxvd1R5cG9zIjpmYWxzZSwiaWRsZU1vdmVtZW50cyI6ZmFsc2UsIm92ZXJzY3JvbGwiOmZhbHNlLCJkZWFkQ2xpY2tzIjpmYWxzZSwiZmF0aWd1ZSI6ZmFsc2UsIm5hdHVyYWxUeXBpbmciOmZhbHNlLCJjdXJzb3JHbGlkZSI6ZmFsc2V9LCJ2YXJpYWJsZXMiOnt9LCJhY3Rpb25zIjpbeyJpZCI6ImJsb2NrLTEiLCJ0eXBlIjoiZm9yZWFjaCIsInNlbGVjdG9yIjoiLnByb2R1Y3QifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJqYXZhc2NyaXB0IiwidmFsdWUiOiJyZXR1cm4gbG9vcC50ZXh0In0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoiZW5kIn1dfQ%3D%3D" title="Figranium task preview: Foreach loop optimization" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '474px' }} />
+</div>
 
 If your loop body uses `{$loop.html}`, the full HTML is still available as expected — no changes are needed.
 
@@ -115,18 +119,12 @@ If you are working with very large extractions and notice slow rendering, switch
 
 For maximum performance when extracting structured data, collect all data in one JavaScript block rather than iterating with a Foreach loop plus individual JavaScript blocks:
 
-```json
-// Slower: foreach + javascript per item
-{ "type": "foreach", "selector": ".product" },
-  { "type": "javascript", "value": "return loop.text" },
-{ "type": "end" }
-
-// Faster: single JavaScript block extracting everything
-{
-  "type": "javascript",
-  "value": "return Array.from(document.querySelectorAll('.product')).map(el => ({ name: el.querySelector('.name')?.innerText, price: el.querySelector('.price')?.innerText }))"
-}
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtcGVyZm9ybWFuY2UtNCIsIm5hbWUiOiJCYXRjaCBleHRyYWN0aW9uIiwidXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSIsIm1vZGUiOiJhZ2VudCIsIndhaXQiOjAsInJvdGF0ZVVzZXJBZ2VudHMiOmZhbHNlLCJyb3RhdGVQcm94aWVzIjpmYWxzZSwicm90YXRlVmlld3BvcnQiOmZhbHNlLCJodW1hblR5cGluZyI6dHJ1ZSwic3RlYWx0aCI6eyJhbGxvd1R5cG9zIjpmYWxzZSwiaWRsZU1vdmVtZW50cyI6ZmFsc2UsIm92ZXJzY3JvbGwiOmZhbHNlLCJkZWFkQ2xpY2tzIjpmYWxzZSwiZmF0aWd1ZSI6ZmFsc2UsIm5hdHVyYWxUeXBpbmciOmZhbHNlLCJjdXJzb3JHbGlkZSI6ZmFsc2V9LCJ2YXJpYWJsZXMiOnt9LCJhY3Rpb25zIjpbeyJpZCI6ImJsb2NrLTEiLCJ0eXBlIjoiZm9yZWFjaCIsInNlbGVjdG9yIjoiLnByb2R1Y3QifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJqYXZhc2NyaXB0IiwidmFsdWUiOiJyZXR1cm4gbG9vcC50ZXh0In0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoiZW5kIn0seyJpZCI6ImJsb2NrLTQiLCJ0eXBlIjoiamF2YXNjcmlwdCIsInZhbHVlIjoicmV0dXJuIEFycmF5LmZyb20oZG9jdW1lbnQucXVlcnlTZWxlY3RvckFsbCgnLnByb2R1Y3QnKSkubWFwKGVsID0%2BICh7IG5hbWU6IGVsLnF1ZXJ5U2VsZWN0b3IoJy5uYW1lJyk%2FLmlubmVyVGV4dCwgcHJpY2U6IGVsLnF1ZXJ5U2VsZWN0b3IoJy5wcmljZScpPy5pbm5lclRleHQgfSkpIn1dfQ%3D%3D" title="Figranium task preview: Batch extraction" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '562px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtcGVyZm9ybWFuY2UtNCIsIm5hbWUiOiJCYXRjaCBleHRyYWN0aW9uIiwidXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSIsIm1vZGUiOiJhZ2VudCIsIndhaXQiOjAsInJvdGF0ZVVzZXJBZ2VudHMiOmZhbHNlLCJyb3RhdGVQcm94aWVzIjpmYWxzZSwicm90YXRlVmlld3BvcnQiOmZhbHNlLCJodW1hblR5cGluZyI6dHJ1ZSwic3RlYWx0aCI6eyJhbGxvd1R5cG9zIjpmYWxzZSwiaWRsZU1vdmVtZW50cyI6ZmFsc2UsIm92ZXJzY3JvbGwiOmZhbHNlLCJkZWFkQ2xpY2tzIjpmYWxzZSwiZmF0aWd1ZSI6ZmFsc2UsIm5hdHVyYWxUeXBpbmciOmZhbHNlLCJjdXJzb3JHbGlkZSI6ZmFsc2V9LCJ2YXJpYWJsZXMiOnt9LCJhY3Rpb25zIjpbeyJpZCI6ImJsb2NrLTEiLCJ0eXBlIjoiZm9yZWFjaCIsInNlbGVjdG9yIjoiLnByb2R1Y3QifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJqYXZhc2NyaXB0IiwidmFsdWUiOiJyZXR1cm4gbG9vcC50ZXh0In0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoiZW5kIn0seyJpZCI6ImJsb2NrLTQiLCJ0eXBlIjoiamF2YXNjcmlwdCIsInZhbHVlIjoicmV0dXJuIEFycmF5LmZyb20oZG9jdW1lbnQucXVlcnlTZWxlY3RvckFsbCgnLnByb2R1Y3QnKSkubWFwKGVsID0%2BICh7IG5hbWU6IGVsLnF1ZXJ5U2VsZWN0b3IoJy5uYW1lJyk%2FLmlubmVyVGV4dCwgcHJpY2U6IGVsLnF1ZXJ5U2VsZWN0b3IoJy5wcmljZScpPy5pbm5lclRleHQgfSkpIn1dfQ%3D%3D" title="Figranium task preview: Batch extraction" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '562px' }} />
+</div>
 
 ---
 
