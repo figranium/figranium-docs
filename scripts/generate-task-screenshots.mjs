@@ -112,9 +112,15 @@ for (let index = 0; index < manifest.screenshots.length; index++) {
     body: JSON.stringify(task),
   });
   if (!saved.ok) throw new Error(`Figranium task save failed: ${saved.status}`);
-  await page.goto(`${baseUrl}/tasks/${task.id}`);
-  await page.locator('.canvas-workflow').waitFor({ state: 'visible', timeout: 30000 });
-  await page.locator('.canvas-workflow').screenshot({ path: join(outputRoot, item.filename) });
+  await page.goto(`${baseUrl}/tasks/${task.id}`, { waitUntil: 'domcontentloaded' });
+  const canvas = page.locator('.canvas-workflow');
+  try {
+    await canvas.waitFor({ state: 'visible', timeout: 30000 });
+  } catch (error) {
+    const body = await page.locator('body').innerText().catch(() => '');
+    throw new Error(`Figranium editor did not load at ${page.url()}: ${body.slice(0, 800)}`, { cause: error });
+  }
+  await canvas.screenshot({ path: join(outputRoot, item.filename) });
 }
 
 const uiTourPath = join(docsRoot, 'ui-tour.mdx');
