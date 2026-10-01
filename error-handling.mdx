@@ -44,11 +44,12 @@ A well-designed task anticipates these failures and handles them gracefully.
 
 The On Error block is Figranium's primary error handling mechanism. It works like a `try/catch`: if any action in the main flow raises an error, execution jumps to the On Error block.
 
-```json
-{ "type": "on_error" },
-  // recovery actions
-{ "type": "end" }
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctMSIsIm5hbWUiOiJUaGUgT24gRXJyb3IgQmxvY2siLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJvbl9lcnJvciJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImVuZCJ9XX0%3D" title="Figranium task preview: The On Error Block" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '386px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctMSIsIm5hbWUiOiJUaGUgT24gRXJyb3IgQmxvY2siLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJvbl9lcnJvciJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImVuZCJ9XX0%3D" title="Figranium task preview: The On Error Block" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '386px' }} />
+</div>
 
 The On Error / End pair should be placed in the task to catch errors from preceding actions. Any error thrown by an action before the On Error block is caught.
 
@@ -56,35 +57,34 @@ The On Error / End pair should be placed in the task to catch errors from preced
   <Accordion title="Making an Action Optional" icon="circle-check">
     The simplest use: place an empty On Error / End block to absorb errors from an action that may or may not exist:
 
-    ```json
-    // Dismiss a cookie banner only if it appears — ignore if it doesn't
-    { "type": "on_error" },
-    { "type": "end" },
-    { "type": "click", "selector": "#cookie-dismiss", "timeout": 3000 }
-    ```
+    <div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctMiIsIm5hbWUiOiJUaGUgT24gRXJyb3IgQmxvY2siLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJvbl9lcnJvciJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImVuZCJ9LHsiaWQiOiJibG9jay0zIiwidHlwZSI6ImNsaWNrIiwic2VsZWN0b3IiOiIjY29va2llLWRpc21pc3MiLCJ0aW1lb3V0IjozMDAwfV19" title="Figranium task preview: The On Error Block" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '474px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctMiIsIm5hbWUiOiJUaGUgT24gRXJyb3IgQmxvY2siLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJvbl9lcnJvciJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImVuZCJ9LHsiaWQiOiJibG9jay0zIiwidHlwZSI6ImNsaWNrIiwic2VsZWN0b3IiOiIjY29va2llLWRpc21pc3MiLCJ0aW1lb3V0IjozMDAwfV19" title="Figranium task preview: The On Error Block" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '474px' }} />
+</div>
   </Accordion>
 
   <Accordion title="Fallback Action" icon="rotate">
     Perform a fallback action when the primary approach fails:
 
-    ```json
-    // Try clicking the button; if it fails, use JavaScript as a fallback
-    { "type": "on_error" },
-      { "type": "javascript", "value": "document.querySelector('#submit').click(); return true;" },
-    { "type": "end" },
-    { "type": "click", "selector": "#submit" }
-    ```
+    <div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctMyIsIm5hbWUiOiJUaGUgT24gRXJyb3IgQmxvY2siLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJvbl9lcnJvciJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImphdmFzY3JpcHQiLCJ2YWx1ZSI6ImRvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoJyNzdWJtaXQnKS5jbGljaygpOyByZXR1cm4gdHJ1ZTsifSx7ImlkIjoiYmxvY2stMyIsInR5cGUiOiJlbmQifSx7ImlkIjoiYmxvY2stNCIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiI3N1Ym1pdCJ9XX0%3D" title="Figranium task preview: The On Error Block" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '562px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctMyIsIm5hbWUiOiJUaGUgT24gRXJyb3IgQmxvY2siLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJvbl9lcnJvciJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImphdmFzY3JpcHQiLCJ2YWx1ZSI6ImRvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoJyNzdWJtaXQnKS5jbGljaygpOyByZXR1cm4gdHJ1ZTsifSx7ImlkIjoiYmxvY2stMyIsInR5cGUiOiJlbmQifSx7ImlkIjoiYmxvY2stNCIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiI3N1Ym1pdCJ9XX0%3D" title="Figranium task preview: The On Error Block" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '562px' }} />
+</div>
   </Accordion>
 
   <Accordion title="Stop on Error with a Reason" icon="player-stop">
     Log the failure and stop the task cleanly:
 
-    ```json
-    { "type": "on_error" },
-      { "type": "stop", "value": "error" },
-    { "type": "end" },
-    { "type": "click", "selector": ".required-element" }
-    ```
+    <div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctNCIsIm5hbWUiOiJUaGUgT24gRXJyb3IgQmxvY2siLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJvbl9lcnJvciJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6InN0b3AiLCJ2YWx1ZSI6ImVycm9yIn0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoiZW5kIn0seyJpZCI6ImJsb2NrLTQiLCJ0eXBlIjoiY2xpY2siLCJzZWxlY3RvciI6Ii5yZXF1aXJlZC1lbGVtZW50In1dfQ%3D%3D" title="Figranium task preview: The On Error Block" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '562px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctNCIsIm5hbWUiOiJUaGUgT24gRXJyb3IgQmxvY2siLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJvbl9lcnJvciJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6InN0b3AiLCJ2YWx1ZSI6ImVycm9yIn0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoiZW5kIn0seyJpZCI6ImJsb2NrLTQiLCJ0eXBlIjoiY2xpY2siLCJzZWxlY3RvciI6Ii5yZXF1aXJlZC1lbGVtZW50In1dfQ%3D%3D" title="Figranium task preview: The On Error Block" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '562px' }} />
+</div>
   </Accordion>
 </AccordionGroup>
 
@@ -96,34 +96,23 @@ The On Error / End pair should be placed in the task to catch errors from preced
 
 Use a While loop combined with a counter to retry a failing action up to N times:
 
-```json
-{ "type": "set", "varName": "retries", "value": "0" },
-{ "type": "set", "varName": "success", "value": "false" },
-{ "type": "while", "value": "{$retries} < 3 && {$success} === 'false'" },
-  { "type": "on_error" },
-    { "type": "set", "varName": "retries", "value": "{$retries} + 1" },
-    { "type": "wait", "value": "2000" },
-  { "type": "end" },
-  { "type": "click", "selector": ".load-more-button" },
-  { "type": "set", "varName": "success", "value": "true" },
-{ "type": "end" }
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctNSIsIm5hbWUiOiJSZXRyeSBQYXR0ZXJucyIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6InNldCIsInZhck5hbWUiOiJyZXRyaWVzIiwidmFsdWUiOiIwIn0seyJpZCI6ImJsb2NrLTIiLCJ0eXBlIjoic2V0IiwidmFyTmFtZSI6InN1Y2Nlc3MiLCJ2YWx1ZSI6ImZhbHNlIn0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoid2hpbGUiLCJ2YWx1ZSI6InskcmV0cmllc30gPCAzICYmIHskc3VjY2Vzc30gPT09ICdmYWxzZScifSx7ImlkIjoiYmxvY2stNCIsInR5cGUiOiJvbl9lcnJvciJ9LHsiaWQiOiJibG9jay01IiwidHlwZSI6InNldCIsInZhck5hbWUiOiJyZXRyaWVzIiwidmFsdWUiOiJ7JHJldHJpZXN9ICsgMSJ9LHsiaWQiOiJibG9jay02IiwidHlwZSI6IndhaXQiLCJ2YWx1ZSI6IjIwMDAifSx7ImlkIjoiYmxvY2stNyIsInR5cGUiOiJlbmQifSx7ImlkIjoiYmxvY2stOCIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiLmxvYWQtbW9yZS1idXR0b24ifSx7ImlkIjoiYmxvY2stOSIsInR5cGUiOiJzZXQiLCJ2YXJOYW1lIjoic3VjY2VzcyIsInZhbHVlIjoidHJ1ZSJ9LHsiaWQiOiJibG9jay0xMCIsInR5cGUiOiJlbmQifV19" title="Figranium task preview: Retry Patterns" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '900px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctNSIsIm5hbWUiOiJSZXRyeSBQYXR0ZXJucyIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6InNldCIsInZhck5hbWUiOiJyZXRyaWVzIiwidmFsdWUiOiIwIn0seyJpZCI6ImJsb2NrLTIiLCJ0eXBlIjoic2V0IiwidmFyTmFtZSI6InN1Y2Nlc3MiLCJ2YWx1ZSI6ImZhbHNlIn0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoid2hpbGUiLCJ2YWx1ZSI6InskcmV0cmllc30gPCAzICYmIHskc3VjY2Vzc30gPT09ICdmYWxzZScifSx7ImlkIjoiYmxvY2stNCIsInR5cGUiOiJvbl9lcnJvciJ9LHsiaWQiOiJibG9jay01IiwidHlwZSI6InNldCIsInZhck5hbWUiOiJyZXRyaWVzIiwidmFsdWUiOiJ7JHJldHJpZXN9ICsgMSJ9LHsiaWQiOiJibG9jay02IiwidHlwZSI6IndhaXQiLCJ2YWx1ZSI6IjIwMDAifSx7ImlkIjoiYmxvY2stNyIsInR5cGUiOiJlbmQifSx7ImlkIjoiYmxvY2stOCIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiLmxvYWQtbW9yZS1idXR0b24ifSx7ImlkIjoiYmxvY2stOSIsInR5cGUiOiJzZXQiLCJ2YXJOYW1lIjoic3VjY2VzcyIsInZhbHVlIjoidHJ1ZSJ9LHsiaWQiOiJibG9jay0xMCIsInR5cGUiOiJlbmQifV19" title="Figranium task preview: Retry Patterns" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '900px' }} />
+</div>
 
 This retries up to 3 times with a 2-second pause between attempts, then continues if any attempt succeeds.
 
 ### Retry a Login
 
-```json
-{ "type": "set", "varName": "attempts", "value": "0" },
-{ "type": "while", "value": "!exists('.dashboard') && {$attempts} < 5" },
-  { "type": "click", "selector": "#login-btn" },
-  { "type": "type", "selector": "#email", "value": "{$email}" },
-  { "type": "type", "selector": "#password", "value": "{$password}" },
-  { "type": "click", "selector": "[type='submit']" },
-  { "type": "wait", "value": "3000" },
-  { "type": "set", "varName": "attempts", "value": "{$attempts} + 1" },
-{ "type": "end" }
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctNiIsIm5hbWUiOiJSZXRyeSBQYXR0ZXJucyIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6InNldCIsInZhck5hbWUiOiJhdHRlbXB0cyIsInZhbHVlIjoiMCJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6IndoaWxlIiwidmFsdWUiOiIhZXhpc3RzKCcuZGFzaGJvYXJkJykgJiYgeyRhdHRlbXB0c30gPCA1In0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoiY2xpY2siLCJzZWxlY3RvciI6IiNsb2dpbi1idG4ifSx7ImlkIjoiYmxvY2stNCIsInR5cGUiOiJ0eXBlIiwic2VsZWN0b3IiOiIjZW1haWwiLCJ2YWx1ZSI6InskZW1haWx9In0seyJpZCI6ImJsb2NrLTUiLCJ0eXBlIjoidHlwZSIsInNlbGVjdG9yIjoiI3Bhc3N3b3JkIiwidmFsdWUiOiJ7JHBhc3N3b3JkfSJ9LHsiaWQiOiJibG9jay02IiwidHlwZSI6ImNsaWNrIiwic2VsZWN0b3IiOiJbdHlwZT0nc3VibWl0J10ifSx7ImlkIjoiYmxvY2stNyIsInR5cGUiOiJ3YWl0IiwidmFsdWUiOiIzMDAwIn0seyJpZCI6ImJsb2NrLTgiLCJ0eXBlIjoic2V0IiwidmFyTmFtZSI6ImF0dGVtcHRzIiwidmFsdWUiOiJ7JGF0dGVtcHRzfSArIDEifSx7ImlkIjoiYmxvY2stOSIsInR5cGUiOiJlbmQifV19" title="Figranium task preview: Retry Patterns" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '900px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctNiIsIm5hbWUiOiJSZXRyeSBQYXR0ZXJucyIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6InNldCIsInZhck5hbWUiOiJhdHRlbXB0cyIsInZhbHVlIjoiMCJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6IndoaWxlIiwidmFsdWUiOiIhZXhpc3RzKCcuZGFzaGJvYXJkJykgJiYgeyRhdHRlbXB0c30gPCA1In0seyJpZCI6ImJsb2NrLTMiLCJ0eXBlIjoiY2xpY2siLCJzZWxlY3RvciI6IiNsb2dpbi1idG4ifSx7ImlkIjoiYmxvY2stNCIsInR5cGUiOiJ0eXBlIiwic2VsZWN0b3IiOiIjZW1haWwiLCJ2YWx1ZSI6InskZW1haWx9In0seyJpZCI6ImJsb2NrLTUiLCJ0eXBlIjoidHlwZSIsInNlbGVjdG9yIjoiI3Bhc3N3b3JkIiwidmFsdWUiOiJ7JHBhc3N3b3JkfSJ9LHsiaWQiOiJibG9jay02IiwidHlwZSI6ImNsaWNrIiwic2VsZWN0b3IiOiJbdHlwZT0nc3VibWl0J10ifSx7ImlkIjoiYmxvY2stNyIsInR5cGUiOiJ3YWl0IiwidmFsdWUiOiIzMDAwIn0seyJpZCI6ImJsb2NrLTgiLCJ0eXBlIjoic2V0IiwidmFyTmFtZSI6ImF0dGVtcHRzIiwidmFsdWUiOiJ7JGF0dGVtcHRzfSArIDEifSx7ImlkIjoiYmxvY2stOSIsInR5cGUiOiJlbmQifV19" title="Figranium task preview: Retry Patterns" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '900px' }} />
+</div>
 
 ---
 
@@ -133,38 +122,23 @@ Popups that appear unpredictably are a common cause of task failures. Handle the
 
 ### Check and Dismiss Before Proceeding
 
-```json
-{ "type": "navigate", "value": "https://example.com" },
-{ "type": "wait", "value": "2000" },
-{ "type": "if", "value": "exists('.modal-overlay')" },
-  { "type": "click", "selector": ".modal-close" },
-  { "type": "wait", "value": "500" },
-{ "type": "end" },
-{ "type": "click", "selector": ".main-content" }
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctNyIsIm5hbWUiOiJIYW5kbGluZyBQb3B1cHMgYW5kIE1vZGFscyIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6Im5hdmlnYXRlIiwidmFsdWUiOiJodHRwczovL2V4YW1wbGUuY29tIn0seyJpZCI6ImJsb2NrLTIiLCJ0eXBlIjoid2FpdCIsInZhbHVlIjoiMjAwMCJ9LHsiaWQiOiJibG9jay0zIiwidHlwZSI6ImlmIiwidmFsdWUiOiJleGlzdHMoJy5tb2RhbC1vdmVybGF5JykifSx7ImlkIjoiYmxvY2stNCIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiLm1vZGFsLWNsb3NlIn0seyJpZCI6ImJsb2NrLTUiLCJ0eXBlIjoid2FpdCIsInZhbHVlIjoiNTAwIn0seyJpZCI6ImJsb2NrLTYiLCJ0eXBlIjoiZW5kIn0seyJpZCI6ImJsb2NrLTciLCJ0eXBlIjoiY2xpY2siLCJzZWxlY3RvciI6Ii5tYWluLWNvbnRlbnQifV19" title="Figranium task preview: Handling Popups and Modals" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '826px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctNyIsIm5hbWUiOiJIYW5kbGluZyBQb3B1cHMgYW5kIE1vZGFscyIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6Im5hdmlnYXRlIiwidmFsdWUiOiJodHRwczovL2V4YW1wbGUuY29tIn0seyJpZCI6ImJsb2NrLTIiLCJ0eXBlIjoid2FpdCIsInZhbHVlIjoiMjAwMCJ9LHsiaWQiOiJibG9jay0zIiwidHlwZSI6ImlmIiwidmFsdWUiOiJleGlzdHMoJy5tb2RhbC1vdmVybGF5JykifSx7ImlkIjoiYmxvY2stNCIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiLm1vZGFsLWNsb3NlIn0seyJpZCI6ImJsb2NrLTUiLCJ0eXBlIjoid2FpdCIsInZhbHVlIjoiNTAwIn0seyJpZCI6ImJsb2NrLTYiLCJ0eXBlIjoiZW5kIn0seyJpZCI6ImJsb2NrLTciLCJ0eXBlIjoiY2xpY2siLCJzZWxlY3RvciI6Ii5tYWluLWNvbnRlbnQifV19" title="Figranium task preview: Handling Popups and Modals" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '826px' }} />
+</div>
 
 ### Dismiss Any Popup on Every Page
 
 Use a sub-task triggered via a Start Task block to handle common popups at the beginning of every task:
 
-```json
-// popup-handler task
-[
-  { "type": "if", "value": "exists('[role=\"dialog\"] button:has-text(\"Close\")')" },
-    { "type": "click", "selector": "[role=\"dialog\"] button:has-text(\"Close\")" },
-  { "type": "end" },
-  { "type": "if", "value": "exists('#cookie-banner')" },
-    { "type": "click", "selector": "#cookie-banner .accept" },
-  { "type": "end" }
-]
-
-// Main task
-[
-  { "type": "navigate", "value": "https://example.com" },
-  { "type": "start", "value": "popup-handler-task-id" },
-  // ... rest of task
-]
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctOCIsIm5hbWUiOiJIYW5kbGluZyBQb3B1cHMgYW5kIE1vZGFscyIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6ImlmIiwidmFsdWUiOiJleGlzdHMoJ1tyb2xlPVwiZGlhbG9nXCJdIGJ1dHRvbjpoYXMtdGV4dChcIkNsb3NlXCIpJykifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiW3JvbGU9XCJkaWFsb2dcIl0gYnV0dG9uOmhhcy10ZXh0KFwiQ2xvc2VcIikifSx7ImlkIjoiYmxvY2stMyIsInR5cGUiOiJlbmQifSx7ImlkIjoiYmxvY2stNCIsInR5cGUiOiJpZiIsInZhbHVlIjoiZXhpc3RzKCcjY29va2llLWJhbm5lcicpIn0seyJpZCI6ImJsb2NrLTUiLCJ0eXBlIjoiY2xpY2siLCJzZWxlY3RvciI6IiNjb29raWUtYmFubmVyIC5hY2NlcHQifSx7ImlkIjoiYmxvY2stNiIsInR5cGUiOiJlbmQifSx7ImlkIjoiYmxvY2stNyIsInR5cGUiOiJuYXZpZ2F0ZSIsInZhbHVlIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSJ9LHsiaWQiOiJibG9jay04IiwidHlwZSI6InN0YXJ0IiwidmFsdWUiOiJwb3B1cC1oYW5kbGVyLXRhc2staWQifV19" title="Figranium task preview: Handling Popups and Modals" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '900px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctOCIsIm5hbWUiOiJIYW5kbGluZyBQb3B1cHMgYW5kIE1vZGFscyIsInVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJtb2RlIjoiYWdlbnQiLCJ3YWl0IjowLCJyb3RhdGVVc2VyQWdlbnRzIjpmYWxzZSwicm90YXRlUHJveGllcyI6ZmFsc2UsInJvdGF0ZVZpZXdwb3J0IjpmYWxzZSwiaHVtYW5UeXBpbmciOnRydWUsInN0ZWFsdGgiOnsiYWxsb3dUeXBvcyI6ZmFsc2UsImlkbGVNb3ZlbWVudHMiOmZhbHNlLCJvdmVyc2Nyb2xsIjpmYWxzZSwiZGVhZENsaWNrcyI6ZmFsc2UsImZhdGlndWUiOmZhbHNlLCJuYXR1cmFsVHlwaW5nIjpmYWxzZSwiY3Vyc29yR2xpZGUiOmZhbHNlfSwidmFyaWFibGVzIjp7fSwiYWN0aW9ucyI6W3siaWQiOiJibG9jay0xIiwidHlwZSI6ImlmIiwidmFsdWUiOiJleGlzdHMoJ1tyb2xlPVwiZGlhbG9nXCJdIGJ1dHRvbjpoYXMtdGV4dChcIkNsb3NlXCIpJykifSx7ImlkIjoiYmxvY2stMiIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiW3JvbGU9XCJkaWFsb2dcIl0gYnV0dG9uOmhhcy10ZXh0KFwiQ2xvc2VcIikifSx7ImlkIjoiYmxvY2stMyIsInR5cGUiOiJlbmQifSx7ImlkIjoiYmxvY2stNCIsInR5cGUiOiJpZiIsInZhbHVlIjoiZXhpc3RzKCcjY29va2llLWJhbm5lcicpIn0seyJpZCI6ImJsb2NrLTUiLCJ0eXBlIjoiY2xpY2siLCJzZWxlY3RvciI6IiNjb29raWUtYmFubmVyIC5hY2NlcHQifSx7ImlkIjoiYmxvY2stNiIsInR5cGUiOiJlbmQifSx7ImlkIjoiYmxvY2stNyIsInR5cGUiOiJuYXZpZ2F0ZSIsInZhbHVlIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSJ9LHsiaWQiOiJibG9jay04IiwidHlwZSI6InN0YXJ0IiwidmFsdWUiOiJwb3B1cC1oYW5kbGVyLXRhc2staWQifV19" title="Figranium task preview: Handling Popups and Modals" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '900px' }} />
+</div>
 
 <Tip>
   See [Modular Workflows](/modular-workflows) for more on reusing sub-tasks across multiple parent tasks.
@@ -176,13 +150,12 @@ Use a sub-task triggered via a Start Task block to handle common popups at the b
 
 Each action block can have its own `timeout` (in milliseconds). Use shorter timeouts for elements that should appear quickly, and longer ones for slow-loading content.
 
-```json
-// Short timeout for something that should already be on the page
-{ "type": "click", "selector": "#accept", "timeout": 2000 }
-
-// Longer timeout for a result that loads after an API call
-{ "type": "wait_selector", "selector": ".results", "timeout": 15000 }
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctOSIsIm5hbWUiOiJUaW1lb3V0IFN0cmF0ZWdpZXMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiI2FjY2VwdCIsInRpbWVvdXQiOjIwMDB9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6IndhaXRfc2VsZWN0b3IiLCJzZWxlY3RvciI6Ii5yZXN1bHRzIiwidGltZW91dCI6MTUwMDB9XX0%3D" title="Figranium task preview: Timeout Strategies" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '386px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctOSIsIm5hbWUiOiJUaW1lb3V0IFN0cmF0ZWdpZXMiLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJjbGljayIsInNlbGVjdG9yIjoiI2FjY2VwdCIsInRpbWVvdXQiOjIwMDB9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6IndhaXRfc2VsZWN0b3IiLCJzZWxlY3RvciI6Ii5yZXN1bHRzIiwidGltZW91dCI6MTUwMDB9XX0%3D" title="Figranium task preview: Timeout Strategies" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '386px' }} />
+</div>
 
 Use an On Error block around short-timeout actions to make them non-fatal when the element doesn't appear.
 
@@ -192,16 +165,12 @@ Use an On Error block around short-timeout actions to make them non-fatal when t
 
 Use a JavaScript block inside an On Error branch to log diagnostic information to the execution output:
 
-```json
-{ "type": "on_error" },
-  {
-    "type": "javascript",
-    "value": "return { error: 'Click failed', url: window.location.href, title: document.title }"
-  },
-  { "type": "stop", "value": "error" },
-{ "type": "end" },
-{ "type": "click", "selector": ".target" }
-```
+<div className="not-prose my-6 dark:hidden">
+  <iframe src="https://figranium-embed.vercel.app/?theme=light&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctMTAiLCJuYW1lIjoiTG9nZ2luZyBFcnJvcnMgZm9yIEluc3BlY3Rpb24iLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJvbl9lcnJvciJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImphdmFzY3JpcHQiLCJ2YWx1ZSI6InJldHVybiB7IGVycm9yOiAnQ2xpY2sgZmFpbGVkJywgdXJsOiB3aW5kb3cubG9jYXRpb24uaHJlZiwgdGl0bGU6IGRvY3VtZW50LnRpdGxlIH0ifSx7ImlkIjoiYmxvY2stMyIsInR5cGUiOiJzdG9wIiwidmFsdWUiOiJlcnJvciJ9LHsiaWQiOiJibG9jay00IiwidHlwZSI6ImVuZCJ9LHsiaWQiOiJibG9jay01IiwidHlwZSI6ImNsaWNrIiwic2VsZWN0b3IiOiIudGFyZ2V0In1dfQ%3D%3D" title="Figranium task preview: Logging Errors for Inspection" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '650px' }} />
+</div>
+<div className="not-prose my-6 hidden dark:block">
+  <iframe src="https://figranium-embed.vercel.app/?theme=dark&task=eyJpZCI6ImRvY3MtZXJyb3ItaGFuZGxpbmctMTAiLCJuYW1lIjoiTG9nZ2luZyBFcnJvcnMgZm9yIEluc3BlY3Rpb24iLCJ1cmwiOiJodHRwczovL2V4YW1wbGUuY29tIiwibW9kZSI6ImFnZW50Iiwid2FpdCI6MCwicm90YXRlVXNlckFnZW50cyI6ZmFsc2UsInJvdGF0ZVByb3hpZXMiOmZhbHNlLCJyb3RhdGVWaWV3cG9ydCI6ZmFsc2UsImh1bWFuVHlwaW5nIjp0cnVlLCJzdGVhbHRoIjp7ImFsbG93VHlwb3MiOmZhbHNlLCJpZGxlTW92ZW1lbnRzIjpmYWxzZSwib3ZlcnNjcm9sbCI6ZmFsc2UsImRlYWRDbGlja3MiOmZhbHNlLCJmYXRpZ3VlIjpmYWxzZSwibmF0dXJhbFR5cGluZyI6ZmFsc2UsImN1cnNvckdsaWRlIjpmYWxzZX0sInZhcmlhYmxlcyI6e30sImFjdGlvbnMiOlt7ImlkIjoiYmxvY2stMSIsInR5cGUiOiJvbl9lcnJvciJ9LHsiaWQiOiJibG9jay0yIiwidHlwZSI6ImphdmFzY3JpcHQiLCJ2YWx1ZSI6InJldHVybiB7IGVycm9yOiAnQ2xpY2sgZmFpbGVkJywgdXJsOiB3aW5kb3cubG9jYXRpb24uaHJlZiwgdGl0bGU6IGRvY3VtZW50LnRpdGxlIH0ifSx7ImlkIjoiYmxvY2stMyIsInR5cGUiOiJzdG9wIiwidmFsdWUiOiJlcnJvciJ9LHsiaWQiOiJibG9jay00IiwidHlwZSI6ImVuZCJ9LHsiaWQiOiJibG9jay01IiwidHlwZSI6ImNsaWNrIiwic2VsZWN0b3IiOiIudGFyZ2V0In1dfQ%3D%3D" title="Figranium task preview: Logging Errors for Inspection" loading="lazy" sandbox="allow-scripts" className="w-full rounded-xl border border-gray-200 dark:border-gray-800" style={{ height: '650px' }} />
+</div>
 
 The returned object appears in the execution detail view, giving you context about what the page looked like when the failure occurred.
 
