@@ -217,7 +217,7 @@ await page.route('**/api/cabinets', async (route) => {
   if (route.request().method() !== 'GET') return route.continue();
   await route.fulfill({ json: demoCabinets });
 });
-await page.route(/\\/api\\/cabinets\\/[^/]+\\/items(?:\\?.*)?$/, async (route) => {
+await page.route((url) => url.pathname.startsWith('/api/cabinets/') && url.pathname.endsWith('/items'), async (route) => {
   const id = new URL(route.request().url()).pathname.split('/')[3];
   await route.fulfill({ json: itemResponse(id) });
 });
