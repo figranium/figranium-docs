@@ -4,8 +4,6 @@ sidebarTitle: "UI Tour"
 description: "Explore Figranium's five main sections: Dashboard, Editor, Executions, Cabinets, and Settings. Learn how to navigate, create tasks, and configure your instance."
 ---
 
-<img src="/images/tasks/editor-ui.png" alt="Figranium editor interface" />
-
 Figranium's user interface is designed for simplicity and power. It consists of six main sections: Dashboard, Editor, Executions, Cabinets, and Settings.
 
 <CardGroup cols={2}>
@@ -26,7 +24,7 @@ Figranium's user interface is designed for simplicity and power. It consists of 
   </Card>
 </CardGroup>
 
-## Dashboard (`/dashboard`)
+## Dashboard (`/dashboard`)\n\n<img src="/images/tasks/ui-dashboard.png" alt="Figranium Dashboard with a clean set of example automation tasks" />
 
 - **Overview**: View all your saved automation tasks in a grid layout.
 - **Actions**:
@@ -39,7 +37,7 @@ Figranium's user interface is designed for simplicity and power. It consists of 
 - **Status Indicators**: Shows the task mode (Agent, Scraper) and target URL. Each card displays the target site's favicon in full color, so you can identify tasks at a glance. Hover over a task name to see the full title in a tooltip — useful when names are truncated on smaller screens.
 - **Keyboard navigation**: All dashboard buttons support keyboard navigation with visible focus indicators. Hover over any button to see a tooltip describing its action and keyboard shortcut (e.g., "Create new task (Alt \+ N)"). Press `/` from anywhere on the dashboard to focus the search bar instantly.
 
-## Editor (`/tasks/:id`)
+## Editor (`/tasks/:id`)\n\n<img src="/images/tasks/editor-ui.png" alt="Figranium editor showing a realistic automation workflow" />
 
 The core of Figranium. This screen features an infinite canvas spatial editor for building your automation flows:
 
@@ -94,7 +92,7 @@ The core of Figranium. This screen features an infinite canvas spatial editor fo
   Press `Cmd/Ctrl + K` anywhere in the editor to open the Action Palette and start adding blocks without touching the mouse.
 </Tip>
 
-## Executions (`/executions`)
+## Executions (`/executions`)\n\n<img src="/images/tasks/ui-executions.png" alt="Figranium Executions page with representative successful and failed runs" />
 
 A chronological log of task executions triggered from the editor or via the API. Interactive Headful browser sessions are intentionally excluded from this list.
 
@@ -105,7 +103,7 @@ A chronological log of task executions triggered from the editor or via the API.
 - **Empty state**: When no executions exist, the screen displays a prompt with a shortcut to the dashboard so you can start a task right away.
 - **Keyboard navigation**: All action buttons support keyboard navigation with visible focus indicators.
 
-## Cabinets (`/cabinets`)
+## Cabinets (`/cabinets`)\n\n<img src="/images/tasks/ui-cabinets.png" alt="Figranium Cabinets page with organized example output files" />
 
 Cabinets are durable, installation-wide download queues used by browser downloads and Upload actions.
 
@@ -117,7 +115,7 @@ Cabinets are durable, installation-wide download queues used by browser download
 
 See [Downloads and Cabinets](/file-downloads) for the full workflow.
 
-## Settings (`/settings`)
+## Settings (`/settings`)\n\n<img src="/images/tasks/ui-settings.png" alt="Figranium Settings page" />
 
 Global configuration for the Figranium instance. Each settings tab (**System**, **Data**, **Advanced**, **Proxies**) displays a semantic icon alongside its label so you can identify sections at a glance.
 
