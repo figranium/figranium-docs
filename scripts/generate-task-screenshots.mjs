@@ -95,6 +95,129 @@ const separator = nameValue.indexOf('=');
 const sessionName = nameValue.slice(0, separator);
 const sessionValue = nameValue.slice(separator + 1);
 
+
+const demoPresetUrl = 'https://templates.figranium.dev/api/presets/41da9f7c-0a49-490f-aca8-f287519cca87';
+
+function normalizePreset(raw) {
+  let value = raw;
+  if (value && typeof value === 'object' && 'configuration' in value) value = value.configuration;
+  if (typeof value === 'string') value = JSON.parse(value);
+  if (Array.isArray(value)) return value[0];
+  if (value && Array.isArray(value.tasks)) return value.tasks[0];
+  if (value?.task && typeof value.task === 'object') return value.task;
+  return value;
+}
+
+async function seedTourWorkspace() {
+  const headers = {
+    'content-type': 'application/json',
+    origin: apiBaseUrl,
+    cookie: `${sessionName}=${sessionValue}`,
+  };
+
+  let mapsTask = null;
+  try {
+    const presetResponse = await fetch(demoPresetUrl);
+    if (presetResponse.ok) mapsTask = normalizePreset(await presetResponse.json());
+  } catch {}
+
+  const demoTasks = [
+    mapsTask ? {
+      ...mapsTask,
+      id: 'tour_maps_leads',
+      name: 'Google Maps Lead Scraper',
+      description: 'Collect local business names, ratings, addresses, phones, and websites.',
+      last_opened: Date.now() - 1000 * 60 * 7,
+    } : {
+      id: 'tour_maps_leads', name: 'Google Maps Lead Scraper',
+      description: 'Collect local business names, ratings, addresses, phones, and websites.',
+      mode: 'agent', url: 'https://www.google.com/maps', actions: [], wait: 0,
+      last_opened: Date.now() - 1000 * 60 * 7,
+    },
+    {
+      id: 'tour_competitor_watch', name: 'Competitor Price Monitor',
+      description: 'Track product pricing and availability across a competitor catalog.',
+      mode: 'agent', url: 'https://example.com/products', actions: [], wait: 0,
+      last_opened: Date.now() - 1000 * 60 * 38,
+    },
+    {
+      id: 'tour_directory_export', name: 'Directory Export',
+      description: 'Extract a structured company directory and save the result as CSV.',
+      mode: 'scraper', url: 'https://example.com/directory', actions: [], wait: 0,
+      last_opened: Date.now() - 1000 * 60 * 92,
+    },
+    {
+      id: 'tour_weekly_report', name: 'Weekly Market Report',
+      description: 'Gather weekly market data and prepare a clean report for downstream workflows.',
+      mode: 'agent', url: 'https://example.com/markets', actions: [], wait: 0,
+      last_opened: Date.now() - 1000 * 60 * 60 * 5,
+    },
+    {
+      id: 'tour_job_board', name: 'Job Board Monitor',
+      description: 'Watch selected job listings and extract new matches.',
+      mode: 'scraper', url: 'https://example.com/jobs', actions: [], wait: 0,
+      last_opened: Date.now() - 1000 * 60 * 60 * 24,
+    },
+  ];
+
+  for (const task of demoTasks) {
+    const response = await fetch(`${apiBaseUrl}/api/tasks`, {
+      method: 'POST', headers, body: JSON.stringify(task),
+    });
+    if (!response.ok) throw new Error(`Tour task seed failed: ${response.status}`);
+  }
+
+  const now = Date.now();
+  const executions = [
+    ['exec_tour_1', 'Google Maps Lead Scraper', 'tour_maps_leads', 'agent', 'editor', 200, 'success', 8421, 8],
+    ['exec_tour_2', 'Competitor Price Monitor', 'tour_competitor_watch', 'agent', 'api', 200, 'success', 5240, 24],
+    ['exec_tour_3', 'Directory Export', 'tour_directory_export', 'scraper', 'api', 200, 'success', 2218, 47],
+    ['exec_tour_4', 'Weekly Market Report', 'tour_weekly_report', 'agent', 'editor', 200, 'success', 6914, 83],
+    ['exec_tour_5', 'Job Board Monitor', 'tour_job_board', 'scraper', 'api', 500, 'error', 3170, 118],
+    ['exec_tour_6', 'Google Maps Lead Scraper', 'tour_maps_leads', 'agent', 'api', 200, 'success', 7742, 164],
+  ].map(([id, taskName, taskId, mode, source, status, outcome, durationMs, minutesAgo]) => ({
+    id, taskName, taskId, mode, source, status, outcome, durationMs,
+    timestamp: now - Number(minutesAgo) * 60 * 1000,
+    method: 'POST', path: `/api/tasks/${taskId}/api`,
+    url: demoTasks.find((task) => task.id === taskId)?.url,
+    result: { outcome, data: [] },
+  }));
+  await writeFile(join(figraniumRoot, 'data', 'executions.json'), JSON.stringify(executions, null, 2) + '\n');
+
+  const cabinetsRoot = join(figraniumRoot, 'data', 'cabinets');
+  const cabinetDefs = [
+    { id: 'cab_basic', name: 'Basic Cabinet', files: [
+      ['item_leads', 'google-maps-leads.csv', 'unuploaded', 'name,rating,address\\nAcme Coffee,4.8,Main Street\\n'],
+      ['item_report', 'weekly-market-report.pdf', 'uploaded', 'Figranium tour placeholder report\\n'],
+    ]},
+    { id: 'cab_exports', name: 'Client Exports', files: [
+      ['item_directory', 'company-directory.csv', 'unuploaded', 'company,website\\nNorthstar Labs,https://example.com\\n'],
+      ['item_prices', 'competitor-prices.json', 'uploaded', '{"items":[{"name":"Example product","price":49}]}\\n'],
+    ]},
+    { id: 'cab_archive', name: 'Archive', files: [
+      ['item_jobs', 'job-board-results.csv', 'uploaded', 'title,company\\nProduct Designer,Example Studio\\n'],
+    ]},
+  ];
+  const catalog = { version: 1, defaultCabinetId: 'cab_basic', migratedLegacy: true, legacyPaths: {}, cabinets: [] };
+  for (const cabinet of cabinetDefs) {
+    const items = [];
+    for (let i = 0; i < cabinet.files.length; i++) {
+      const [itemId, name, status, contents] = cabinet.files[i];
+      const dir = join(cabinetsRoot, cabinet.id, itemId);
+      await mkdir(dir, { recursive: true });
+      await writeFile(join(dir, name), contents);
+      items.push({ id: itemId, name, kind: 'file', status, size: Buffer.byteLength(contents),
+        createdAt: now - (i + 1) * 1000 * 60 * 12, storageName: name });
+    }
+    catalog.cabinets.push({ id: cabinet.id, name: cabinet.name,
+      createdAt: now - 1000 * 60 * 60 * 24 * 14, items });
+  }
+  await mkdir(cabinetsRoot, { recursive: true });
+  await writeFile(join(cabinetsRoot, 'catalog.json'), JSON.stringify(catalog, null, 2) + '\n');
+}
+
+await seedTourWorkspace();
+
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
 await context.addCookies([{ name: sessionName, value: sessionValue, url: baseUrl }]);
@@ -150,6 +273,21 @@ if (manifest.screenshots.length) {
   if (!uiTour.includes('/images/tasks/editor-ui.png')) {
     await writeFile(uiTourPath, uiTour.replace(/^(---[\s\S]*?---\n)/, '$1\n<img src="/images/tasks/editor-ui.png" alt="Figranium editor interface" />\n'));
   }
+}
+
+
+const tourScreens = [
+  { path: '/dashboard', filename: 'ui-dashboard.png', waitFor: 'Overview' },
+  { path: '/executions', filename: 'ui-executions.png', waitFor: 'Executions' },
+  { path: '/cabinets/cab_basic', filename: 'ui-cabinets.png', waitFor: 'Cabinets' },
+  { path: '/settings', filename: 'ui-settings.png', waitFor: 'Settings' },
+];
+
+for (const screen of tourScreens) {
+  await page.goto(`${baseUrl}${screen.path}`, { waitUntil: 'domcontentloaded' });
+  await page.getByText(screen.waitFor, { exact: true }).first().waitFor({ state: 'visible', timeout: 30000 }).catch(() => {});
+  await page.waitForTimeout(700);
+  await page.screenshot({ path: join(outputRoot, screen.filename), fullPage: false });
 }
 
 await browser.close();
