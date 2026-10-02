@@ -96,132 +96,132 @@ const sessionName = nameValue.slice(0, separator);
 const sessionValue = nameValue.slice(separator + 1);
 
 
-const demoPresetUrl = 'https://templates.figranium.dev/api/presets/41da9f7c-0a49-490f-aca8-f287519cca87';
 
-function normalizePreset(raw) {
-  let value = raw;
-  if (value && typeof value === 'object' && 'configuration' in value) value = value.configuration;
-  if (typeof value === 'string') value = JSON.parse(value);
-  if (Array.isArray(value)) return value[0];
-  if (value && Array.isArray(value.tasks)) return value.tasks[0];
-  if (value?.task && typeof value.task === 'object') return value.task;
-  return value;
+const headers = {
+  'content-type': 'application/json',
+  origin: apiBaseUrl,
+  cookie: `${sessionName}=${sessionValue}`,
+};
+const hubBase = 'https://templates.figranium.dev';
+const hubItems = [];
+let next = `${hubBase}/api/presets`;
+const visited = new Set();
+while (next && !visited.has(next)) {
+  visited.add(next);
+  const response = await fetch(next);
+  if (!response.ok) throw new Error(`Templates Hub request failed: ${response.status} ${next}`);
+  const body = await response.json();
+  const items = Array.isArray(body) ? body
+    : body.presets ?? body.templates ?? body.data?.presets ?? body.data?.templates
+      ?? body.data?.items ?? body.data ?? body.items ?? body.results;
+  if (!Array.isArray(items)) throw new Error('Unexpected Templates Hub listing format');
+  hubItems.push(...items);
+  const nextPage = body.next ?? body.nextPage ?? body.pagination?.next ?? null;
+  next = typeof nextPage === 'string' ? new URL(nextPage, hubBase).href : null;
 }
-
-async function seedTourWorkspace() {
-  const headers = {
-    'content-type': 'application/json',
-    origin: apiBaseUrl,
-    cookie: `${sessionName}=${sessionValue}`,
+if (!hubItems.length) throw new Error('Templates Hub returned no templates; refusing to generate an empty tour');
+const tasks = [];
+for (const [index, item] of hubItems.entries()) {
+  const detail = item.configuration != null ? item
+    : await (async () => {
+        const id = item.id ?? item.uuid ?? item.slug;
+        if (!id) throw new Error('Templates Hub entry missing an identifier');
+        const response = await fetch(`${hubBase}/api/presets/${encodeURIComponent(id)}`);
+        if (!response.ok) throw new Error(`Template fetch failed: ${response.status} ${id}`);
+        return response.json();
+      })();
+  let config = detail.configuration ?? detail.task ?? detail;
+  if (typeof config === 'string') config = JSON.parse(config);
+  if (Array.isArray(config?.tasks)) config = config.tasks[0];
+  if (!config || !Array.isArray(config.actions)) throw new Error(`Template has no valid task actions: ${item.title ?? item.id}`);
+  const task = {
+    ...config,
+    id: `tour_hub_${index + 1}`,
+    name: detail.title ?? detail.name ?? config.name ?? `Template ${index + 1}`,
+    description: detail.description ?? config.description ?? '',
+    last_opened: Date.now() - index * 600000,
   };
-
-  let mapsTask = null;
-  try {
-    const presetResponse = await fetch(demoPresetUrl);
-    if (presetResponse.ok) mapsTask = normalizePreset(await presetResponse.json());
-  } catch {}
-
-  const demoTasks = [
-    mapsTask ? {
-      ...mapsTask,
-      id: 'tour_maps_leads',
-      name: 'Google Maps Lead Scraper',
-      description: 'Collect local business names, ratings, addresses, phones, and websites.',
-      last_opened: Date.now() - 1000 * 60 * 7,
-    } : {
-      id: 'tour_maps_leads', name: 'Google Maps Lead Scraper',
-      description: 'Collect local business names, ratings, addresses, phones, and websites.',
-      mode: 'agent', url: 'https://www.google.com/maps', actions: [], wait: 0,
-      last_opened: Date.now() - 1000 * 60 * 7,
-    },
-    {
-      id: 'tour_competitor_watch', name: 'Competitor Price Monitor',
-      description: 'Track product pricing and availability across a competitor catalog.',
-      mode: 'agent', url: 'https://example.com/products', actions: [], wait: 0,
-      last_opened: Date.now() - 1000 * 60 * 38,
-    },
-    {
-      id: 'tour_directory_export', name: 'Directory Export',
-      description: 'Extract a structured company directory and save the result as CSV.',
-      mode: 'scraper', url: 'https://example.com/directory', actions: [], wait: 0,
-      last_opened: Date.now() - 1000 * 60 * 92,
-    },
-    {
-      id: 'tour_weekly_report', name: 'Weekly Market Report',
-      description: 'Gather weekly market data and prepare a clean report for downstream workflows.',
-      mode: 'agent', url: 'https://example.com/markets', actions: [], wait: 0,
-      last_opened: Date.now() - 1000 * 60 * 60 * 5,
-    },
-    {
-      id: 'tour_job_board', name: 'Job Board Monitor',
-      description: 'Watch selected job listings and extract new matches.',
-      mode: 'scraper', url: 'https://example.com/jobs', actions: [], wait: 0,
-      last_opened: Date.now() - 1000 * 60 * 60 * 24,
-    },
-  ];
-
-  for (const task of demoTasks) {
-    const response = await fetch(`${apiBaseUrl}/api/tasks`, {
-      method: 'POST', headers, body: JSON.stringify(task),
-    });
-    if (!response.ok) throw new Error(`Tour task seed failed: ${response.status}`);
-  }
-
-  const now = Date.now();
-  const executions = [
-    ['exec_tour_1', 'Google Maps Lead Scraper', 'tour_maps_leads', 'agent', 'editor', 200, 'success', 8421, 8],
-    ['exec_tour_2', 'Competitor Price Monitor', 'tour_competitor_watch', 'agent', 'api', 200, 'success', 5240, 24],
-    ['exec_tour_3', 'Directory Export', 'tour_directory_export', 'scraper', 'api', 200, 'success', 2218, 47],
-    ['exec_tour_4', 'Weekly Market Report', 'tour_weekly_report', 'agent', 'editor', 200, 'success', 6914, 83],
-    ['exec_tour_5', 'Job Board Monitor', 'tour_job_board', 'scraper', 'api', 500, 'error', 3170, 118],
-    ['exec_tour_6', 'Google Maps Lead Scraper', 'tour_maps_leads', 'agent', 'api', 200, 'success', 7742, 164],
-  ].map(([id, taskName, taskId, mode, source, status, outcome, durationMs, minutesAgo]) => ({
-    id, taskName, taskId, mode, source, status, outcome, durationMs,
-    timestamp: now - Number(minutesAgo) * 60 * 1000,
-    method: 'POST', path: `/api/tasks/${taskId}/api`,
-    url: demoTasks.find((task) => task.id === taskId)?.url,
-    result: { outcome, data: [] },
-  }));
-  await writeFile(join(figraniumRoot, 'data', 'executions.json'), JSON.stringify(executions, null, 2) + '\n');
-
-  const cabinetsRoot = join(figraniumRoot, 'data', 'cabinets');
-  const cabinetDefs = [
-    { id: 'cab_basic', name: 'Basic Cabinet', files: [
-      ['item_leads', 'google-maps-leads.csv', 'unuploaded', 'name,rating,address\\nAcme Coffee,4.8,Main Street\\n'],
-      ['item_report', 'weekly-market-report.pdf', 'uploaded', 'Figranium tour placeholder report\\n'],
-    ]},
-    { id: 'cab_exports', name: 'Client Exports', files: [
-      ['item_directory', 'company-directory.csv', 'unuploaded', 'company,website\\nNorthstar Labs,https://example.com\\n'],
-      ['item_prices', 'competitor-prices.json', 'uploaded', '{"items":[{"name":"Example product","price":49}]}\\n'],
-    ]},
-    { id: 'cab_archive', name: 'Archive', files: [
-      ['item_jobs', 'job-board-results.csv', 'uploaded', 'title,company\\nProduct Designer,Example Studio\\n'],
-    ]},
-  ];
-  const catalog = { version: 1, defaultCabinetId: 'cab_basic', migratedLegacy: true, legacyPaths: {}, cabinets: [] };
-  for (const cabinet of cabinetDefs) {
-    const items = [];
-    for (let i = 0; i < cabinet.files.length; i++) {
-      const [itemId, name, status, contents] = cabinet.files[i];
-      const dir = join(cabinetsRoot, cabinet.id, itemId);
-      await mkdir(dir, { recursive: true });
-      await writeFile(join(dir, name), contents);
-      items.push({ id: itemId, name, kind: 'file', status, size: Buffer.byteLength(contents),
-        createdAt: now - (i + 1) * 1000 * 60 * 12, storageName: name });
-    }
-    catalog.cabinets.push({ id: cabinet.id, name: cabinet.name,
-      createdAt: now - 1000 * 60 * 60 * 24 * 14, items });
-  }
-  await mkdir(cabinetsRoot, { recursive: true });
-  await writeFile(join(cabinetsRoot, 'catalog.json'), JSON.stringify(catalog, null, 2) + '\n');
+  const saved = await fetch(`${apiBaseUrl}/api/tasks`, {
+    method: 'POST', headers, body: JSON.stringify(task),
+  });
+  if (!saved.ok) throw new Error(`Could not import template ${task.name}: ${saved.status} ${await saved.text()}`);
+  tasks.push(task);
 }
+console.log(`Imported ${tasks.length} genuine Templates Hub tasks`);
 
-await seedTourWorkspace();
+// Generate a real instance API key; never put the key's plaintext in documentation.
+const keyResponse = await fetch(`${apiBaseUrl}/api/settings/api-key`, {
+  method: 'POST', headers, body: JSON.stringify({}),
+});
+if (!keyResponse.ok) throw new Error(`Could not generate demo API key: ${keyResponse.status}`);
+
+// These are illustrative historical entries, not claims that external websites were run.
+// Intercept only the demo tour's history endpoint, leaving Figranium's real UI untouched.
+const now = Date.now();
+const demoExecutions = tasks.slice(0, 12).map((task, i) => ({
+  id: `tour_history_${i + 1}`, taskId: task.id, taskName: task.name,
+  mode: task.mode ?? 'agent', source: i % 3 === 0 ? 'editor' : 'api',
+  method: 'POST', path: `/api/tasks/${task.id}/api`, url: task.url,
+  timestamp: now - (i + 1) * 600000,
+  status: i === 7 ? 500 : 200,
+  outcome: i === 7 ? 'error' : 'success',
+  durationMs: 2800 + i * 713,
+}));
+if (!demoExecutions.length) throw new Error('No Hub tasks to populate execution history');
+
+// Use the actual Cabinets API so the server cache and UI stay in sync.
+const cabinetResponse = await fetch(`${apiBaseUrl}/api/cabinets`, { headers });
+if (!cabinetResponse.ok) throw new Error('Could not load demo Cabinets');
+const existing = await cabinetResponse.json();
+const basicId = existing.defaultCabinetId;
+const cabinetIds = [basicId];
+for (const name of ['Lead Exports', 'Reports']) {
+  const response = await fetch(`${apiBaseUrl}/api/cabinets`, {
+    method: 'POST', headers, body: JSON.stringify({ name }),
+  });
+  if (!response.ok) throw new Error(`Could not create Cabinet ${name}`);
+  cabinetIds.push((await response.json()).id);
+}
+// The Cabinets API does not expose direct file import. For screenshot-only demo
+// data, intercept its GET responses instead of writing behind the server's cache.
+const demoCabinets = {
+  defaultCabinetId: basicId,
+  cabinets: [
+    { id: basicId, name: 'Basic Cabinet', isDefault: true, itemCount: 3, unuploadedCount: 2 },
+    { id: cabinetIds[1], name: 'Lead Exports', isDefault: false, itemCount: 4, unuploadedCount: 1 },
+    { id: cabinetIds[2], name: 'Reports', isDefault: false, itemCount: 2, unuploadedCount: 0 },
+  ],
+};
+const demoItems = {
+  [basicId]: ['business-leads.csv', 'company-directory.json', 'scrape-log.txt'],
+  [cabinetIds[1]]: ['maps-leads.csv', 'directory-export.csv', 'contacts.json', 'verified-leads.csv'],
+  [cabinetIds[2]]: ['weekly-report.csv', 'summary.json'],
+};
+function itemResponse(id) {
+  return { items: (demoItems[id] ?? []).map((name, index) => ({
+    id: `tour_item_${id}_${index}`, name, kind: 'file',
+    status: index === 0 ? 'unuploaded' : 'uploaded', size: 2048 + index * 1354,
+    createdAt: now - index * 3600000,
+  })) };
+}
 
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
 await context.addCookies([{ name: sessionName, value: sessionValue, url: baseUrl }]);
 const page = await context.newPage();
+await page.route('**/api/executions', async (route) => {
+  if (route.request().method() !== 'GET') return route.continue();
+  await route.fulfill({ json: { executions: demoExecutions } });
+});
+await page.route('**/api/cabinets', async (route) => {
+  if (route.request().method() !== 'GET') return route.continue();
+  await route.fulfill({ json: demoCabinets });
+});
+await page.route((url) => url.pathname.startsWith('/api/cabinets/') && url.pathname.endsWith('/items'), async (route) => {
+  const id = new URL(route.request().url()).pathname.split('/')[3];
+  await route.fulfill({ json: itemResponse(id) });
+});
+
 
 for (let index = 0; index < manifest.screenshots.length; index++) {
   const item = manifest.screenshots[index];
@@ -286,7 +286,7 @@ const tourScreens = [
 for (const screen of tourScreens) {
   await page.goto(`${baseUrl}${screen.path}`, { waitUntil: 'domcontentloaded' });
   await page.getByText(screen.waitFor, { exact: true }).first().waitFor({ state: 'visible', timeout: 30000 }).catch(() => {});
-  await page.waitForTimeout(700);
+  await page.waitForTimeout(1100);
   await page.screenshot({ path: join(outputRoot, screen.filename), fullPage: false });
 }
 
