@@ -8,7 +8,7 @@ on:
     branches:
       - main
       - docs/populate-tour-from-templates-hub
-      - docs/templates-ui-tour-clean
+      - fix/templates-tour-capture-direct
 
 permissions:
   contents: write
@@ -39,7 +39,6 @@ jobs:
       - run: npm run dev -- --host 127.0.0.1 > /tmp/figranium-vite.log 2>&1 &
         working-directory: .figranium
       - run: npx wait-on http://127.0.0.1:5173
-      - run: node scripts/include-templates-tour.mjs
       - run: node scripts/generate-task-screenshots.mjs
         env:
           FIGRANIUM_DIR: .figranium
