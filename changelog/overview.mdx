@@ -11,6 +11,16 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
 </Note>
 
 <Update label="2026-10-03" description="This week">
+  ## Features
+
+  ### Templates in the JavaScript SDK
+
+  `@figranium/sdk` 0.4.0 adds a `templates` resource. You can list, search, filter, and paginate the template catalog, fetch a single template by ID, and report a successful import. See the [JavaScript SDK](/sdk/js/overview) and the [Templates API](/rest-api#templates).
+
+  ### Template tools in the MCP server
+
+  [MCP server](/mcp-integration#available-tools) v1.4.0 adds two read-only tools. `template_search` searches the template catalog by keyword and category, with sorting and pagination. `template_get` returns a template's full workflow and README by ID. Your LLM client can now find a community template before building a task from scratch.
+
   ## Updates
 
   - **Template popularity from real imports**: when you [import a template](/community-presets#browse-and-import-a-template), Figranium reports the import to the Templates Hub, so **Most popular** sorting and featured templates reflect actual usage. Each installation counts at most once per template, using a random installation ID that is unrelated to telemetry. Reporting is best-effort and never causes an import to fail.
