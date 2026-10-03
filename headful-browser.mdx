@@ -137,6 +137,29 @@ The noVNC page mirrors this on the client side: on an RFB disconnect it retries 
 
 On Apple Silicon Macs, make sure Docker Desktop is pulling the native `linux/arm64` image. Running the AMD64 image under QEMU emulation is the most common cause of the fast-crash pattern above. See [Troubleshooting — Headful viewer shows "Connecting..." then "Disconnected" on Apple Silicon Macs](/troubleshooting#12-headful-viewer-shows-connecting-then-disconnected-on-apple-silicon-macs).
 
+## Adaptive viewer quality
+
+Starting in v0.20, the viewer adjusts its image quality to your connection. It samples throughput and latency every 30 seconds and also reads your browser's network hints, then picks one of three profiles:
+
+| Profile | When it applies | What changes |
+| --- | --- | --- |
+| **Full** | Normal connections | Full resolution, quality 7, compression 3. |
+| **Constrained** | Downlink under 5 Mbps, latency over 180 ms, or a 3G connection | Quality 4, compression 6. |
+| **Severe** | Downlink under 1.5 Mbps, latency over 450 ms, or a 2G connection | Switches to a second, lower-bandwidth VNC stream scaled to 2/3 resolution. If that stream is unavailable, the viewer uses the constrained profile instead. |
+
+The viewer only lowers quality after two consecutive poor samples, and only restores it after the connection stays healthy for at least two minutes. While it switches streams, the status label shows **Optimizing for connection...** or **Restoring full resolution...**. Under the severe profile, the headful browser also shortens page animations and transitions and pauses video and audio to reduce repaints.
+
+The low-bandwidth stream runs on its own ports, configurable with environment variables:
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `VNC_FULL_PORT` | `5900` | Full-resolution x11vnc server |
+| `VNC_LOW_PORT` | `5901` | Low-bandwidth x11vnc server |
+| `NOVNC_PORT` | `54311` | websockify for the full-resolution stream |
+| `NOVNC_LOW_PORT` | `54312` | websockify for the low-bandwidth stream |
+
+The embedded viewer reaches the low-bandwidth stream through `/websockify-low` on the main Figranium port, so you don't need to publish these ports.
+
 ## Access control
 
 Figranium's VNC stack is hardened against unauthenticated access. If you connect to it through the embedded viewer in the UI, everything works automatically — this section is only relevant if you build a custom client or open a raw VNC connection.

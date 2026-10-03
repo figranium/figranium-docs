@@ -49,7 +49,7 @@ After setup, you should also:
 
 ### Settings endpoints always require authentication
 
-Every route under `/api/settings/*` — including API key management, proxy configuration, AI model selection, and the Gemini, OpenAI, Claude, and Ollama key endpoints — requires a logged-in session regardless of `NODE_ENV`. There is no development mode that bypasses this check, so unauthenticated requests to settings routes always return `401 UNAUTHORIZED`, even on a local `npm run dev` instance. This prevents accidental exposure of credentials if a development instance is reachable from the network.
+Every route under `/api/settings/*` — including API key management and proxy configuration — requires a logged-in session regardless of `NODE_ENV`. There is no development mode that bypasses this check, so unauthenticated requests to settings routes always return `401 UNAUTHORIZED`, even on a local `npm run dev` instance. This prevents accidental exposure of credentials if a development instance is reachable from the network.
 
 ## IP Allowlist (`ALLOWED_IPS`)
 
@@ -82,7 +82,7 @@ When `ALLOW_PRIVATE_NETWORKS` is `false`, the following addresses are blocked:
 | **Hostnames** | `localhost`, `*.localhost`, `host.docker.internal` |
 
 <Note>
-  `host.docker.internal` is blocked because it resolves to the Docker host machine, which could expose internal services. This includes Ollama connections — both Ollama configuration URLs and API calls are validated against the SSRF blocklist. If you need to reach Ollama on the Docker host, set `ALLOW_PRIVATE_NETWORKS=true`.
+  `host.docker.internal` is blocked because it resolves to the Docker host machine, which could expose internal services. If you need to reach a service on the Docker host, set `ALLOW_PRIVATE_NETWORKS=true`.
 </Note>
 
 **Protocol validation** is always enforced regardless of the `ALLOW_PRIVATE_NETWORKS` setting. Only `http:` and `https:` URLs are allowed. Schemes such as `file://`, `ftp://`, and `javascript:` are blocked even when private network access is enabled.
@@ -102,37 +102,6 @@ This prevents an attacker (or a misconfiguration) from routing scrape traffic th
 When bulk importing, each proxy entry is validated individually. If any entry points to a restricted address, the entire import is rejected and the error message identifies which server failed validation.
 
 If you need to use a proxy on your local network (for example, a SOCKS5 proxy running on the same machine), set `ALLOW_PRIVATE_NETWORKS=true`.
-
-### Ollama URL validation
-
-Ollama base URLs are validated against the same SSRF blocklist when you save them in **Settings \> System \> API Keys**. If an Ollama URL points to a private or internal address (such as `localhost` or `host.docker.internal`), the save is rejected with an `INVALID_URL` error.
-
-Figranium also validates Ollama URLs at request time, not just when they are saved. Every outbound call to an Ollama instance — including AI-powered selector generation and extraction script generation — goes through redirect-safe fetching. This means:
-
-- The Ollama URL is re-validated against the SSRF blocklist before each request.
-- If the URL returns a redirect, every hop is validated before following it.
-- Sensitive headers are stripped on cross-origin redirects.
-
-This defense-in-depth approach protects against cases where an Ollama URL was saved before stricter validation was introduced, or where DNS resolution changes between save time and request time.
-
-<Note>
-  Other AI providers (Gemini, OpenAI, Claude) connect to fixed public API endpoints and do not require this additional validation. Only Ollama uses user-supplied URLs, so only Ollama calls go through request-time SSRF checks.
-</Note>
-
-### Gemini API key transport
-
-Gemini API keys are sent to Google's API using the `x-goog-api-key` HTTP header rather than a URL query parameter. This prevents keys from appearing in server access logs, reverse-proxy logs, or `Referer` headers — all common sources of credential leakage. No configuration is required; this is the default behavior for all Gemini-powered endpoints (selector generation and script generation).
-
-```http
-POST /v1beta/models/gemini-2.0-flash:generateContent HTTP/1.1
-Host: generativelanguage.googleapis.com
-Content-Type: application/json
-x-goog-api-key: <your key>
-```
-
-<Note>
-  If you previously relied on the `?key=` query-parameter form for log inspection or proxy filtering, update your tooling — the key only appears in the `x-goog-api-key` header now.
-</Note>
 
 ### Redirect protection
 
@@ -207,10 +176,10 @@ Figranium does not currently mask variable values, typed input, or `javascript` 
 Because Figranium is self-hosted, this data never leaves your machine, but anyone with filesystem or database access to the host can read it. To limit exposure:
 
 - Pass secrets as **runtime variables** via `POST /api/tasks/:id/api` instead of saving them as task defaults — see [Variables & Templating](/variables#handling-sensitive-values).
-- Clear runs that contain sensitive values from **Settings \> Data \> Clear Execution History**.
+- Clear runs that contain sensitive values from **Settings \> Advanced \> Clear execution history**.
 - Restrict who can reach the host with the [`ALLOWED_IPS`](#ip-allowlist-allowed_ips) allowlist and require API key auth on all endpoints.
 
-Saved output provider credentials (Baserow tokens, Gemini/OpenAI/Claude keys) are a separate store and are redacted in the `GET /api/credentials` response — see [REST API](/rest-api).
+Saved output provider credentials (such as Baserow tokens) are a separate store and are redacted in the `GET /api/credentials` response — see [REST API](/rest-api).
 
 ## Content Security Policy
 
@@ -225,12 +194,12 @@ The policy is applied automatically with no configuration required. The default 
 | `style-src` | `'self'`, inline styles, Google Fonts |
 | `font-src` | `'self'`, Google Fonts static assets |
 | `img-src` | `'self'`, `data:`, `blob:`, Google, jsDelivr CDN, GitHub raw content |
-| `connect-src` | `'self'`, GitHub API, Google Generative Language API, OpenAI API, Anthropic API, Baserow API, Ollama (local) |
+| `connect-src` | `'self'`, GitHub API, Google Generative Language API, OpenAI API, Anthropic API, Baserow API |
 | `media-src` | `'self'`, `blob:` |
 | `frame-src` | `'self'` |
 
 <Note>
-  If you integrate a third-party service whose domain is not in the allow-list above, the browser will block those requests. Check the browser console for CSP violation reports to diagnose connectivity issues with external services. Ollama requests are made server-side, so CSP does not affect connectivity to your Ollama instance.
+  If you integrate a third-party service whose domain is not in the allow-list above, the browser will block those requests. Check the browser console for CSP violation reports to diagnose connectivity issues with external services.
 </Note>
 
 Figranium also sets the following security headers on every response:
@@ -320,7 +289,6 @@ Each error response includes a structured error code you can match on programmat
 | `INVALID` | `POST /api/auth/login` | Generic credential-rejection response. The same code is returned for unknown emails and wrong passwords to prevent user enumeration |
 | `INVALID_WEBHOOK_URL` | `POST /api/execute/:id` | Webhook URL failed SSRF validation |
 | `INVALID_BASE_URL` | `POST /api/credentials`, `PUT /api/credentials/:id` | Credential base URL is malformed or points to a restricted address |
-| `INVALID_URL` | `POST /api/settings/ollama-api-key` | Ollama base URL failed SSRF validation |
 | `INVALID_URL` | `POST /api/settings/proxies`, `POST /api/settings/proxies/import`, `PUT /api/settings/proxies/:id` | Proxy server address failed SSRF validation |
 | `INVALID_DATABASE_ID` | `GET /api/credentials/:id/proxy/baserow/databases/:dbId/tables` | Database ID is not a valid numeric identifier |
 | `Invalid task id.` | `start` action (in-task) | A task ID supplied to the `start` action contained characters outside `[A-Za-z0-9_-]` and was rejected before the internal request was issued. See [Modular workflows](/modular-workflows#task-id-validation). |

@@ -286,7 +286,7 @@ If enabled, authentication must be provided via one of the following methods:
 
 <AccordionGroup>
   <Accordion title="GET /api/executions/list">
-    Returns a lightweight list of execution records with summary metadata (ID, task ID, status, timestamps, duration) without full logs or result payloads. Use this for dashboard views and history listings when you don't need the per-execution detail returned by `GET /api/executions/:id`. Requires API-key authentication.
+    Returns a lightweight list of execution records with summary metadata (ID, task ID, status, phase, outcome, timestamps, duration) without full logs or result payloads. Use this for dashboard views and history listings when you don't need the per-execution detail returned by `GET /api/executions/:id`. Requires API-key authentication.
 
     **Response**:
 
@@ -296,14 +296,24 @@ If enabled, authentication must be provided via one of the following methods:
         {
           "id": "exec_abc123",
           "taskId": "task_1",
-          "status": "success",
-          "startedAt": "2026-08-05T18:04:12.335Z",
-          "finishedAt": "2026-08-05T18:04:16.535Z",
+          "status": 200,
+          "phase": "finished",
+          "outcome": "success",
+          "startedAt": 1785953052335,
+          "finishedAt": 1785953056535,
           "durationMs": 4200
         }
       ]
     }
     ```
+
+    | Field | Description |
+    | :-- | :-- |
+    | `phase` | `queued`, `running`, or `finished`. Queued and running runs appear in the list before they complete. |
+    | `outcome` | The final outcome of the run. Present only when `phase` is `finished`. |
+    | `startedAt` | When the run left the queue and started, in milliseconds since the Unix epoch. |
+    | `finishedAt` | When the run finished, in milliseconds since the Unix epoch. |
+    | `durationMs` | Run duration in milliseconds. |
   </Accordion>
 
   <Accordion title="GET /api/executions">
@@ -317,6 +327,56 @@ If enabled, authentication must be provided via one of the following methods:
 
   <Accordion title="GET /api/executions/:id">
     Gets detailed logs and result for a specific execution. Accepts an API key or a signed-in session.
+
+    If the stored record exceeded `MAX_PERSISTED_EXECUTION_BYTES` (default 256 KB), the result in the history record is trimmed and marked with `"truncated": true` and `"hasFullResult": true`. Use `GET /api/executions/:id/result` to load the complete result.
+  </Accordion>
+
+  <Accordion title="GET /api/executions/:id/result">
+    Returns the complete stored result for an execution whose history record was trimmed. Accepts an API key or a signed-in session. Full results are deleted together with execution history when the [retention period](/captures-and-storage#automatic-retention) expires.
+
+    **Response**:
+
+    ```json
+    {
+      "result": {
+        "data": [],
+        "logs": []
+      }
+    }
+    ```
+
+    **Error responses**:
+
+    | Status | Error code | Cause |
+    | :-- | :-- | :-- |
+    | `404` | `EXECUTION_NOT_FOUND` | No execution exists with the given `id` |
+    | `404` | `FULL_RESULT_NOT_AVAILABLE` | The execution was not trimmed, or its full result is no longer stored |
+  </Accordion>
+
+  <Accordion title="POST /api/executions/stop">
+    Stops a running execution, or cancels a run that is still waiting in the execution queue. Requires a signed-in session.
+
+    **Body**:
+
+    ```json
+    { "runId": "run_abc123" }
+    ```
+
+    **Response**:
+
+    ```json
+    { "success": true }
+    ```
+
+    When you cancel a queued run, it never starts, and the original run request responds with `200`:
+
+    ```json
+    { "outcome": "stopped", "logs": ["Execution stopped while queued."] }
+    ```
+
+    If the client that started a queued run disconnects before the run starts, Figranium cancels the queued run.
+
+    Returns `400 MISSING_RUN_ID` if `runId` is missing.
   </Accordion>
 
   <Accordion title="DELETE /api/executions/:id">
@@ -343,6 +403,107 @@ If enabled, authentication must be provided via one of the following methods:
     Deletes a specific capture file.
   </Accordion>
 </AccordionGroup>
+
+---
+
+## Templates
+
+Use these endpoints to list and fetch community templates from the official [Templates Hub](/community-presets). Both endpoints require a signed-in workspace session (the session cookie set when you sign in). API keys are not accepted. Requests are rate limited.
+
+Figranium caches the Hub catalog for 5 minutes and waits up to 12 seconds for the Hub to respond.
+
+<AccordionGroup>
+  <Accordion title="GET /api/templates">
+    Lists, searches, and sorts community templates.
+
+    - **Without query parameters**: returns the full catalog as an array of templates, including `configuration`, `readme`, and `expected_output`.
+    - **With any query parameter**: returns a page of template summaries as `{ "items": [...], "total": n }`. Summaries omit `configuration`, `readme`, and `expected_output`, and add `action_count`.
+
+    **Query parameters**:
+
+    | Parameter | Type | Default | Description |
+    | :-- | :-- | :-- | :-- |
+    | `limit` | integer | `12` | Number of summaries to return, from `1` to `24`. |
+    | `offset` | integer | `0` | Number of matching templates to skip. |
+    | `sort` | string | `popular` | `popular`, `newest`, or `name`. |
+    | `category` | string | `all` | Exact category to filter by, up to 60 characters. Use `all` for every category. |
+    | `search` | string | | Case-insensitive search across title, description, author name, category, and target URL, up to 100 characters. |
+
+    **Request**:
+
+    ```bash
+    curl "http://localhost:11345/api/templates?search=price&sort=popular&limit=12" \
+      -H "Cookie: connect.sid=YOUR_SESSION_COOKIE"
+    ```
+
+    **Response**:
+
+    ```json
+    {
+      "items": [
+        {
+          "id": "3f1c2b9e-6a4d-4c1e-9b7a-2d5e8f0a1b2c",
+          "title": "Price tracker",
+          "description": "Monitors a product page for price changes",
+          "author_name": "Jane Doe",
+          "category": "Monitoring",
+          "target_url": "https://example.com/product",
+          "downloads": 128,
+          "action_count": 6
+        }
+      ],
+      "total": 1
+    }
+    ```
+
+    **Error responses**:
+
+    | Status | Error code | Cause |
+    | :-- | :-- | :-- |
+    | `400` | `INVALID_TEMPLATE_QUERY` | A query parameter is out of range or not allowed |
+    | `502` | `TEMPLATE_CATALOG_UNAVAILABLE` | The Templates Hub returned an error |
+    | `502` | `TEMPLATE_CATALOG_TIMEOUT` | The Templates Hub did not respond in time |
+    | `502` | `TEMPLATE_CATALOG_INVALID` | The Templates Hub returned invalid data |
+  </Accordion>
+
+  <Accordion title="GET /api/templates/:id">
+    Returns a single template, including its workflow `configuration`, `readme`, and `expected_output`. The `id` must be a UUID.
+
+    **Request**:
+
+    ```bash
+    curl "http://localhost:11345/api/templates/3f1c2b9e-6a4d-4c1e-9b7a-2d5e8f0a1b2c" \
+      -H "Cookie: connect.sid=YOUR_SESSION_COOKIE"
+    ```
+
+    **Response**:
+
+    ```json
+    {
+      "id": "3f1c2b9e-6a4d-4c1e-9b7a-2d5e8f0a1b2c",
+      "title": "Price tracker",
+      "description": "Monitors a product page for price changes",
+      "author_name": "Jane Doe",
+      "category": "Monitoring",
+      "target_url": "https://example.com/product",
+      "downloads": 128,
+      "configuration": { "actions": [] },
+      "readme": "# Price tracker\n\nTracks the price of a product page.",
+      "expected_output": "{ \"price\": \"$19.99\" }"
+    }
+    ```
+
+    **Error responses**:
+
+    | Status | Error code | Cause |
+    | :-- | :-- | :-- |
+    | `400` | `INVALID_TEMPLATE_ID` | The `id` is not a UUID |
+    | `404` | `TEMPLATE_NOT_FOUND` | No template exists with the given `id` |
+    | `502` | `TEMPLATE_CATALOG_UNAVAILABLE`, `TEMPLATE_CATALOG_TIMEOUT`, or `TEMPLATE_CATALOG_INVALID` | The Templates Hub could not be reached or returned invalid data |
+  </Accordion>
+</AccordionGroup>
+
+Paginated list responses and single-template responses include `Cache-Control: private, max-age=60`.
 
 ---
 

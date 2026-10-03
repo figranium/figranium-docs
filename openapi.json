@@ -18,7 +18,8 @@
     { "name": "Credentials", "description": "Third-party integration credentials (e.g. Baserow)" },
     { "name": "Data", "description": "Captures, screenshots, cookies" },
     { "name": "Browser", "description": "Managed browser sessions and inspector" },
-    { "name": "Health", "description": "Health check" }
+    { "name": "Health", "description": "Health check" },
+    { "name": "Templates", "description": "Community templates from the Figranium Templates Hub" }
   ],
   "components": {
     "securitySchemes": {
@@ -84,12 +85,56 @@
           "method": { "type": "string" },
           "path": { "type": "string" },
           "status": { "type": "string" },
+          "phase": { "type": "string", "enum": ["queued", "running", "finished"], "description": "Lifecycle phase of the run." },
+          "outcome": { "type": "string", "description": "Final outcome. Present only when `phase` is `finished`." },
+          "startedAt": { "type": "integer" },
+          "finishedAt": { "type": "integer" },
           "durationMs": { "type": "integer" },
           "source": { "type": "string" },
           "mode": { "type": "string" },
           "taskId": { "type": "string" },
           "taskName": { "type": "string" },
           "url": { "type": "string" }
+        }
+      },
+      "TemplatePreset": {
+        "type": "object",
+        "required": ["id", "title", "configuration"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "author_name": { "type": "string" },
+          "category": { "type": "string" },
+          "target_url": { "type": "string" },
+          "downloads": { "type": "integer" },
+          "configuration": { "type": "object", "additionalProperties": true },
+          "readme": { "type": "string" },
+          "expected_output": { "type": "string" }
+        },
+        "additionalProperties": true
+      },
+      "TemplateSummary": {
+        "type": "object",
+        "required": ["id", "title"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "author_name": { "type": "string" },
+          "category": { "type": "string" },
+          "target_url": { "type": "string" },
+          "downloads": { "type": "integer" },
+          "action_count": { "type": "integer" }
+        },
+        "additionalProperties": true
+      },
+      "TemplatePage": {
+        "type": "object",
+        "required": ["items", "total"],
+        "properties": {
+          "items": { "type": "array", "items": { "$ref": "#/components/schemas/TemplateSummary" } },
+          "total": { "type": "integer" }
         }
       },
       "Proxy": {
@@ -465,52 +510,6 @@
           "200": { "description": "Restored task", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Task" } } } },
           "400": { "$ref": "#/components/responses/BadRequest" },
           "404": { "$ref": "#/components/responses/NotFound" }
-        }
-      }
-    },
-    "/api/tasks/generate-selector": {
-      "post": {
-        "tags": ["Tasks"],
-        "summary": "Use AI to generate a CSS selector for an action step",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["task", "actionIndex", "prompt"],
-                "properties": {
-                  "task": { "type": "object" },
-                  "actionIndex": { "type": "integer" },
-                  "prompt": { "type": "string" }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Generated selector", "content": { "application/json": { "schema": { "type": "object", "properties": { "selector": { "type": "string" } } } } } },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "500": { "$ref": "#/components/responses/ServerError" }
-        }
-      }
-    },
-    "/api/tasks/generate-script": {
-      "post": {
-        "tags": ["Tasks"],
-        "summary": "Use AI to generate a page.evaluate extraction script",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "type": "object", "required": ["description"], "properties": { "description": { "type": "string" } } }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Generated script", "content": { "application/json": { "schema": { "type": "object", "properties": { "script": { "type": "string" } } } } } },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "502": { "description": "All AI providers failed", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
         }
       }
     },
@@ -905,6 +904,20 @@
         }
       }
     },
+    "/api/executions/{id}/result": {
+      "get": {
+        "tags": ["Executions"],
+        "summary": "Load the full result of a trimmed execution",
+        "description": "Returns the complete stored result for an execution whose history record was trimmed because it exceeded `MAX_PERSISTED_EXECUTION_BYTES` (default 256 KB). Trimmed records have `result.hasFullResult` set to `true`. Accepts a session or an API key.",
+        "security": [{ "sessionAuth": [] }, { "apiKeyAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "200": { "description": "Full execution result", "content": { "application/json": { "schema": { "type": "object", "properties": { "result": { "type": "object", "additionalProperties": true } } } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "description": "`EXECUTION_NOT_FOUND` when the execution does not exist, or `FULL_RESULT_NOT_AVAILABLE` when no full result is stored for it", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
     "/api/executions/clear": {
       "post": {
         "tags": ["Executions"],
@@ -918,7 +931,8 @@
     "/api/executions/stop": {
       "post": {
         "tags": ["Executions"],
-        "summary": "Stop a running execution",
+        "summary": "Stop a running or queued execution",
+        "description": "Requests a stop for a running execution. If the run is still waiting in the execution queue, it is cancelled before it starts, and the original run request responds with `{ \"outcome\": \"stopped\", \"logs\": [\"Execution stopped while queued.\"] }`.",
         "requestBody": {
           "content": { "application/json": { "schema": { "type": "object", "required": ["runId"], "properties": { "runId": { "type": "string" } } } } }
         },
@@ -926,6 +940,43 @@
           "200": { "description": "Stopped", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SuccessFlag" } } } },
           "400": { "$ref": "#/components/responses/BadRequest" },
           "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/api/templates": {
+      "get": {
+        "tags": ["Templates"],
+        "summary": "List and search community templates",
+        "description": "Without query parameters, returns the complete catalog as an array. Supplying any query parameter returns a paginated `{ items, total }` object of template summaries. Summaries omit `configuration`, `readme`, and `expected_output`, and include `action_count`. Requires a signed-in workspace session.",
+        "security": [{ "sessionAuth": [] }],
+        "parameters": [
+          { "name": "limit", "in": "query", "description": "Maximum number of summaries to return.", "schema": { "type": "integer", "minimum": 1, "maximum": 24, "default": 12 } },
+          { "name": "offset", "in": "query", "description": "Number of matching templates to skip.", "schema": { "type": "integer", "minimum": 0, "default": 0 } },
+          { "name": "sort", "in": "query", "description": "Sort order.", "schema": { "type": "string", "enum": ["popular", "newest", "name"], "default": "popular" } },
+          { "name": "category", "in": "query", "description": "Exact category to filter by, or `all`.", "schema": { "type": "string", "maxLength": 60, "default": "all" } },
+          { "name": "search", "in": "query", "description": "Case-insensitive search across title, description, author name, category, and target URL.", "schema": { "type": "string", "maxLength": 100 } }
+        ],
+        "responses": {
+          "200": { "description": "Full catalog (no query parameters) or a page of template summaries", "content": { "application/json": { "schema": { "oneOf": [{ "type": "array", "items": { "$ref": "#/components/schemas/TemplatePreset" } }, { "$ref": "#/components/schemas/TemplatePage" }] } } } },
+          "400": { "description": "`INVALID_TEMPLATE_QUERY`", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "502": { "description": "`TEMPLATE_CATALOG_UNAVAILABLE`, `TEMPLATE_CATALOG_TIMEOUT`, or `TEMPLATE_CATALOG_INVALID`", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/api/templates/{id}": {
+      "get": {
+        "tags": ["Templates"],
+        "summary": "Get a template",
+        "description": "Returns a template with its workflow `configuration`, `readme`, and `expected_output`. Requires a signed-in workspace session.",
+        "security": [{ "sessionAuth": [] }],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "description": "Template UUID.", "schema": { "type": "string", "format": "uuid" } }],
+        "responses": {
+          "200": { "description": "Template", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TemplatePreset" } } } },
+          "400": { "description": "`INVALID_TEMPLATE_ID`: the ID is not a UUID", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "description": "`TEMPLATE_NOT_FOUND`", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "502": { "description": "`TEMPLATE_CATALOG_UNAVAILABLE`, `TEMPLATE_CATALOG_TIMEOUT`, or `TEMPLATE_CATALOG_INVALID`", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
         }
       }
     },
@@ -1154,94 +1205,6 @@
         }
       }
     },
-    "/api/settings/gemini-api-key": {
-      "get": {
-        "tags": ["Settings"],
-        "summary": "Get Gemini API keys",
-        "responses": {
-          "200": { "description": "Keys", "content": { "application/json": { "schema": { "type": "object", "properties": { "geminiApiKeys": { "type": "array", "items": { "type": "string" } } } } } } },
-          "500": { "$ref": "#/components/responses/ServerError" }
-        }
-      },
-      "post": {
-        "tags": ["Settings"],
-        "summary": "Set Gemini API keys",
-        "requestBody": {
-          "content": { "application/json": { "schema": { "type": "object", "properties": { "geminiApiKeys": { "type": "array", "items": { "type": "string" } }, "geminiApiKey": { "type": "string" } } } } }
-        },
-        "responses": {
-          "200": { "description": "Saved", "content": { "application/json": { "schema": { "type": "object", "properties": { "geminiApiKeys": { "type": "array", "items": { "type": "string" } } } } } } },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "500": { "$ref": "#/components/responses/ServerError" }
-        }
-      }
-    },
-    "/api/settings/openai-api-key": {
-      "get": {
-        "tags": ["Settings"],
-        "summary": "Get OpenAI API keys",
-        "responses": {
-          "200": { "description": "Keys", "content": { "application/json": { "schema": { "type": "object", "properties": { "openAiApiKeys": { "type": "array", "items": { "type": "string" } } } } } } },
-          "500": { "$ref": "#/components/responses/ServerError" }
-        }
-      },
-      "post": {
-        "tags": ["Settings"],
-        "summary": "Set OpenAI API keys",
-        "requestBody": {
-          "content": { "application/json": { "schema": { "type": "object", "properties": { "openAiApiKeys": { "type": "array", "items": { "type": "string" } }, "openAiApiKey": { "type": "string" } } } } }
-        },
-        "responses": {
-          "200": { "description": "Saved", "content": { "application/json": { "schema": { "type": "object", "properties": { "openAiApiKeys": { "type": "array", "items": { "type": "string" } } } } } } },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "500": { "$ref": "#/components/responses/ServerError" }
-        }
-      }
-    },
-    "/api/settings/claude-api-key": {
-      "get": {
-        "tags": ["Settings"],
-        "summary": "Get Claude API keys",
-        "responses": {
-          "200": { "description": "Keys", "content": { "application/json": { "schema": { "type": "object", "properties": { "claudeApiKeys": { "type": "array", "items": { "type": "string" } } } } } } },
-          "500": { "$ref": "#/components/responses/ServerError" }
-        }
-      },
-      "post": {
-        "tags": ["Settings"],
-        "summary": "Set Claude API keys",
-        "requestBody": {
-          "content": { "application/json": { "schema": { "type": "object", "properties": { "claudeApiKeys": { "type": "array", "items": { "type": "string" } }, "claudeApiKey": { "type": "string" } } } } }
-        },
-        "responses": {
-          "200": { "description": "Saved", "content": { "application/json": { "schema": { "type": "object", "properties": { "claudeApiKeys": { "type": "array", "items": { "type": "string" } } } } } } },
-          "400": { "$ref": "#/components/responses/BadRequest" },
-          "500": { "$ref": "#/components/responses/ServerError" }
-        }
-      }
-    },
-    "/api/settings/ollama-api-key": {
-      "get": {
-        "tags": ["Settings"],
-        "summary": "Get Ollama endpoints",
-        "responses": {
-          "200": { "description": "Endpoints", "content": { "application/json": { "schema": { "type": "object", "properties": { "ollamaApiKeys": { "type": "array", "items": { "type": "string" } } } } } } },
-          "500": { "$ref": "#/components/responses/ServerError" }
-        }
-      },
-      "post": {
-        "tags": ["Settings"],
-        "summary": "Set Ollama endpoints",
-        "requestBody": {
-          "content": { "application/json": { "schema": { "type": "object", "properties": { "ollamaApiKeys": { "type": "array", "items": { "type": "string" } }, "ollamaApiKey": { "type": "string" } } } } }
-        },
-        "responses": {
-          "200": { "description": "Saved", "content": { "application/json": { "schema": { "type": "object", "properties": { "ollamaApiKeys": { "type": "array", "items": { "type": "string" } } } } } } },
-          "400": { "description": "Invalid URL", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
-          "500": { "$ref": "#/components/responses/ServerError" }
-        }
-      }
-    },
     "/api/settings/proxies": {
       "get": {
         "tags": ["Settings"],
@@ -1382,33 +1345,6 @@
         },
         "responses": {
           "200": { "description": "Updated proxy list", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProxyList" } } } },
-          "500": { "$ref": "#/components/responses/ServerError" }
-        }
-      }
-    },
-    "/api/settings/ai-models": {
-      "get": {
-        "tags": ["Settings"],
-        "summary": "Get selected AI model per provider",
-        "responses": {
-          "200": {
-            "description": "AI model selection",
-            "content": { "application/json": { "schema": { "type": "object", "properties": { "gemini": { "type": "string" }, "openai": { "type": "string" }, "claude": { "type": "string" }, "ollama": { "type": "string" } } } } }
-          },
-          "500": { "$ref": "#/components/responses/ServerError" }
-        }
-      },
-      "post": {
-        "tags": ["Settings"],
-        "summary": "Set selected AI model per provider",
-        "requestBody": {
-          "content": { "application/json": { "schema": { "type": "object", "properties": { "gemini": { "type": "string" }, "openai": { "type": "string" }, "claude": { "type": "string" }, "ollama": { "type": "string" } } } } }
-        },
-        "responses": {
-          "200": {
-            "description": "Saved",
-            "content": { "application/json": { "schema": { "type": "object", "properties": { "gemini": { "type": "string" }, "openai": { "type": "string" }, "claude": { "type": "string" }, "ollama": { "type": "string" } } } } }
-          },
           "500": { "$ref": "#/components/responses/ServerError" }
         }
       }

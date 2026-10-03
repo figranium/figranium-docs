@@ -80,9 +80,8 @@ DB_POSTGRESDB_SSL=true
     When PostgreSQL is enabled, the following data is stored in the database instead of on disk:
 
     - **Tasks and execution logs** — task definitions, run history, and metadata.
-    - **API keys** — Figranium API key, plus provider keys for Gemini, OpenAI, Claude, and Ollama.
+    - **API keys** — Figranium API key.
     - **Credentials** — saved credentials used by output providers and action blocks.
-    - **AI model configuration** — selected models for each provider.
     - **Proxy configuration** — proxy list, default proxy, rotation mode, and rotation settings.
 
     API key columns use the `TEXT` type, so longer keys (such as service-account tokens) are stored without truncation.
@@ -97,7 +96,7 @@ DB_POSTGRESDB_SSL=true
 When you switch to PostgreSQL:
 
 1. **Automatic setup**: Figranium creates the necessary tables on first run, and migrates existing API key columns to `TEXT` if you are upgrading from an earlier version.
-2. **Data persistence**: Task metadata, execution logs, settings, credentials, API keys, AI model selections, and proxy configuration are stored in the database.
+2. **Data persistence**: Task metadata, execution logs, settings, credentials, API keys, and proxy configuration are stored in the database.
 3. **Captures**: Visual assets (screenshots and recordings) remain on the local file system or mounted volumes; only their metadata is stored in Postgres.
 4. **Fallback**: If the database is unreachable at startup, Figranium falls back to file-based storage and logs the failure.
 
