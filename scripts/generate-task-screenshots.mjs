@@ -279,6 +279,7 @@ if (manifest.screenshots.length) {
 const tourScreens = [
   { path: '/dashboard', filename: 'ui-dashboard.png', waitFor: 'Overview' },
   { path: '/templates', filename: 'ui-templates.png', waitFor: 'Templates' },
+  { path: '/templates', filename: 'ui-templates.png', waitFor: 'Templates' },
   { path: '/executions', filename: 'ui-executions.png', waitFor: 'Executions' },
   { path: '/cabinets/cab_basic', filename: 'ui-cabinets.png', waitFor: 'Cabinets' },
   { path: '/settings', filename: 'ui-settings.png', waitFor: 'Settings' },
