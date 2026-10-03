@@ -58,7 +58,6 @@
             "icon": "database-export",
             "pages": [
               "data-extraction",
-              "extraction-script-generation",
               "csv-processing",
               "output-providers"
             ]
@@ -357,6 +356,10 @@
       "source": "/sdk/kotlin",
       "destination": "/sdk/kotlin/overview",
       "permanent": false
+    },
+    {
+      "source": "/extraction-script-generation",
+      "destination": "/data-extraction"
     }
   ]
 }

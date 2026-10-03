@@ -125,7 +125,7 @@ For passwords, API tokens, and other secrets used in a login flow, we recommend:
     Use `{$password}` directly in the `Type` action's **Value** field rather than copying it into intermediate `set` variables or `javascript` blocks, which increases the surface area where the value can be logged.
   </Step>
   <Step title="Rotate execution history">
-    Delete runs that contain secrets from **Executions**, or purge everything via **Settings \> Data \> Clear Execution History**. Figranium also auto-rotates the log at `MAX_EXECUTIONS` entries (default 500). See [Captures & Storage](/captures-and-storage).
+    Delete runs that contain secrets from **Executions**, or purge everything via **Settings \> Advanced \> Clear execution history**. Figranium also auto-rotates the log at `MAX_EXECUTIONS` entries (default 500). See [Captures & Storage](/captures-and-storage).
   </Step>
   <Step title="Restrict access to the host">
     All execution data stays on your own machine or server. Because there is no in-app redaction, anyone with filesystem or database access to `data/executions.json` can read historical values. Follow [Security best practices](/security) to keep that data private.
@@ -133,7 +133,7 @@ For passwords, API tokens, and other secrets used in a login flow, we recommend:
 </Steps>
 
 <Tip>
-  Output provider credentials saved under **Settings \> API Keys** (Baserow tokens, Gemini/OpenAI/Claude keys, and similar) are stored separately and are redacted in the `GET /api/credentials` API response. This section applies to values typed into pages during a scrape, not to those saved credentials.
+  Output provider credentials saved under **Settings \> API Keys** (such as Baserow tokens) are stored separately and are redacted in the `GET /api/credentials` API response. This section applies to values typed into pages during a scrape, not to those saved credentials.
 </Tip>
 
 <Tip>

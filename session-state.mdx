@@ -94,8 +94,8 @@ Browser session state refers to the cookies, local storage, and other browser da
     Cookies in these profiles have **no platform-imposed TTL** — they persist indefinitely unless:
 
     - The cookie's own `Expires` / `Max-Age` attribute causes it to expire.
-    - You manually clear cookies in **Settings \> Data**.
-    - You click **Clear Storage** to wipe all session data.
+    - You clear cookies with `POST /api/data/clear-cookies`.
+    - You click **Clear all** under **Settings \> Advanced \> Maintenance** to wipe all workspace data, including browser profiles.
   </Tab>
   <Tab title="Stateless Mode">
     When `statelessExecution: true` is set on a task, Figranium launches an ephemeral in-memory browser context. No profile directory is read from or written to. All cookies and storage generated during the run are **discarded immediately** when the task completes.
@@ -239,11 +239,11 @@ No manual action is required. If migration fails partway through, the file is re
 
 | Action | How |
 | :-- | :-- |
-| Clear all browser cookies | **Settings \> Data \> Clear Storage** |
-| Copy a cookie value | **Settings \> Data \> Cookies** — click **Copy** next to any cookie |
-| Delete an individual cookie | **Settings \> Data \> Cookies** — click **Delete** next to any cookie |
+| Clear all browser cookies | `POST /api/data/clear-cookies` |
+| List stored cookies | `GET /api/data/cookies` |
+| Delete an individual cookie | `POST /api/data/cookies/delete` |
 | Invalidate dashboard sessions | Restart server with a new `SESSION_SECRET` |
-| Clear execution logs | **Settings \> Data** (up to `MAX_EXECUTIONS` entries retained) |
+| Clear execution logs | **Settings \> Advanced \> Clear execution history** (up to `MAX_EXECUTIONS` entries retained) |
 
 <CardGroup cols={2}>
   <Card title="Stateless Execution" icon="bolt" href="/stateless-execution">

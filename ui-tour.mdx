@@ -1,18 +1,22 @@
 ---
-title: "Figranium UI Tour: Dashboard, Editor, Executions, Cabinets, Settings"
+title: "Figranium UI Tour: Dashboard, Templates, Editor, Executions, Cabinets, Settings"
 sidebarTitle: "UI Tour"
-description: "Explore Figranium's five main sections: Dashboard, Editor, Executions, Cabinets, and Settings. Learn how to navigate, create tasks, and configure your instance."
+description: "Explore Figranium's six main sections: Dashboard, Templates, Editor, Executions, Cabinets, and Settings. Learn how to navigate, create tasks, and configure your instance."
 ---
 
-Figranium's user interface is designed for simplicity and power. It consists of five main sections: Dashboard, Editor, Executions, Cabinets, and Settings.
+Figranium's user interface is designed for simplicity and power. It consists of six main sections: Dashboard, Templates, Editor, Executions, Cabinets, and Settings.
 
 <CardGroup cols={2}>
   <Card title="Dashboard" icon="layout-dashboard" href="/dashboard">
     View, create, import, and manage all your automation tasks in a searchable grid.
   </Card>
 
+  <Card title="Templates" icon="template" href="/community-presets">
+    Browse community automations and import them into your workspace as new tasks.
+  </Card>
+
   <Card title="Executions" icon="list-check" href="/executions">
-    Review a chronological log of every task run with status, source, and duration.
+    Review a chronological log of every task run with status, source, duration, screenshots, and recordings.
   </Card>
 
   <Card title="Cabinets" icon="folder" href="/cabinets">
@@ -20,7 +24,7 @@ Figranium's user interface is designed for simplicity and power. It consists of 
   </Card>
 
   <Card title="Settings" icon="settings" href="/settings">
-    Configure API keys, AI models, themes, cookies, proxies, and storage.
+    Configure API keys, user agents, proxies, appearance, retention, and maintenance.
   </Card>
 </CardGroup>
 
@@ -30,14 +34,25 @@ Figranium's user interface is designed for simplicity and power. It consists of 
 
 - **Overview**: View all your saved automation tasks in a grid layout.
 - **Actions**:
-  - **Create Task**: Click the **New Task** button to start a blank automation flow.
+  - **Create Task**: Click **Create Task** to start a blank automation flow. Open the arrow menu next to it to choose **Start from scratch** (a blank task) or **Create from a template** (opens [Templates](#templates)).
   - **Import/Export**: Use the `Import` and `Export` buttons to move tasks between environments (JSON format).
   - **Edit**: Click any task card to open the editor, or use the **Edit Task** button at the bottom of the card.
   - **Delete**: Remove tasks permanently.
 - **Filter tasks**: When you have one or more tasks, a search bar appears in the dashboard header. Type to filter tasks by name or URL in real time. A clear button appears inside the field when text is entered, letting you reset the filter with one click. If no tasks match, a "No matching tasks" message is displayed along with a **Clear Filter** action.
 - **Copy URL**: Hover over any task card (or tab into it) to reveal a **Copy** button that copies the target URL to your clipboard — handy for sharing or pasting into other tools without opening the editor.
 - **Status Indicators**: Shows the task mode (Agent, Scraper) and target URL. Each card displays the target site's favicon in full color, so you can identify tasks at a glance. Hover over a task name to see the full title in a tooltip — useful when names are truncated on smaller screens.
+- **Featured templates**: When you have no tasks yet, the dashboard shows **Start with a popular template** with the three most popular templates and an option to start from scratch.
 - **Keyboard navigation**: All dashboard buttons support keyboard navigation with visible focus indicators. Hover over any button to see a tooltip describing its action and keyboard shortcut (e.g., "Create new task (Alt \+ N)"). Press `/` from anywhere on the dashboard to focus the search bar instantly.
+
+## Templates
+
+The **Templates** screen (`/templates`) lists ready-to-use community automations from the official Figranium Templates Hub.
+
+- **Find templates**: Search by template, site, or use case, filter by category, and sort by **Most popular**, **Newest**, or **Name**. Click **Load more templates** to see more results.
+- **Preview**: Click a card to open a preview with the template's README and expected output. Each card shows its creator and whether the creator is verified.
+- **Import**: Click **Import** on a card or in the preview to add the template as a new task and open it in the editor.
+
+See [Templates](/community-presets) for details.
 
 ## Editor
 
@@ -103,10 +118,13 @@ The core of Figranium. This screen features an infinite canvas spatial editor fo
   alt="Figranium Executions page with representative successful and failed runs"
 />
 
-A chronological log of task executions triggered from the editor or via the API. Interactive Headful browser sessions are intentionally excluded from this list.
+A chronological log of task executions triggered from the editor, the API, or a schedule. Interactive Headful browser sessions are intentionally excluded from this list.
 
 - **Source filter**: Use the **All**, **Editor**, and **API** tabs at the top to narrow the list by how each run was triggered.
 - **Execution rows**: Each entry shows the task name, mode, timestamp, source, status, and duration. The HTTP status code is displayed as a color-coded badge — green for success (2xx), red for client/server errors (4xx/5xx), and blue for other codes — so you can scan results at a glance. Click a row to open the full execution detail, including the screenshot, activity log, and extracted data. The detail view uses the same color-coded status badges. Click the **Back** button to return to the executions list — it displays a shortcut hint (Alt \+ 3) in its tooltip.
+- **Queued and running runs**: Runs that are waiting in the queue or still running appear in the list with a **Queued** or **Running** indicator and update live until they finish. Stopping a run that is still queued cancels it before it starts.
+- **Captures**: Open a run's detail view to see its screenshot. Click **View All Captures** to browse that run's screenshots and recordings.
+- **Full results**: When a large result was trimmed in history, the detail view shows a **Load full data** button that loads the complete stored result.
 - **Delete**: Remove a single execution by clicking the trash icon on its row.
 - **Clear all**: Click the trash icon in the page header to delete every execution record at once. A confirmation prompt appears before anything is removed.
 - **Empty state**: When no executions exist, the screen displays a prompt with a shortcut to the dashboard so you can start a task right away.
@@ -130,36 +148,27 @@ See [Downloads and Cabinets](/file-downloads) for the full workflow.
 
 <img src="/images/tasks/ui-settings.png" alt="Figranium Settings page" />
 
-Global configuration for the Figranium instance. Each settings tab (**System**, **Data**, **Advanced**, **Proxies**) displays a semantic icon alongside its label so you can identify sections at a glance.
+Global configuration for the Figranium instance. Settings is split into sections, each shown with an icon next to its label: **API Keys**, **User Agent**, **Proxies**, **Appearance**, **About**, and **Advanced**.
 
-- **System**:
-  - **API Keys**: A unified panel for managing all keys and provider connections:
-    - **Tasks API Key**: Your key for remote execution via the REST API. Copy or regenerate it here.
-    - **AI Providers**: Add keys for Gemini, OpenAI, Claude, or connect a local Ollama instance. Each provider supports multiple keys — the first is marked **Primary** and the rest serve as **Backup** for automatic failover. For Ollama, you enter a base URL instead of an API key.
-    - **Database / Output Providers**: Add credentials for output destinations like Baserow.
-    - Click **Add API Key** to open the provider selection modal and configure a new entry.
-  - **AI Models**: Set the preferred model for each AI provider. This panel lists Gemini, OpenAI, Anthropic (Claude), and Ollama. Click **Edit** next to a provider to change its model — you can pick from the suggestions or type a custom model identifier. The selected model is used whenever that provider handles AI-powered actions such as selector generation. Default models are `gemini-3-flash-preview`, `gpt-5-nano`, `claude-haiku-4-6`, and `llama3.2`.
-  - **User Agent**: Set a global User-Agent string or let Figranium rotate them.
-  - **Selector Finder**: Choose your default selector tool. Select between the **Highlight Tool** (standard browser inspector) or the **AI Selector Finder** (uses AI to generate selectors). The Highlight Tool is the default.
-  - **Theme**: Pick the color scheme for the Figranium UI. Choose **Auto** (default) to follow your device's light or dark setting, or pick one of four manual themes: **Dark**, **Light**, **Solarized Light**, and **Solarized Dark**. Auto updates automatically when your device preference changes and is the default for both new and existing installations. Each manual option shows a preview image with a swatch of its surface and accent colors so you can see what you're switching to before you commit. The selected theme is applied instantly and persisted three ways: to the backend data store (via `POST /api/settings/theme`), to a `figranium_theme` cookie with a 1-year TTL, and to browser local storage under `figranium.theme`. Server-side persistence means the same theme follows you across browsers and devices on the same Figranium instance. On page load, Figranium reads the cookie first for an instant paint, then reconciles with the server value from `GET /api/settings/theme`.
-  - **Storage**: Clear all captures or cookies.
-- **Data**: Manage persistent cookies and specific capture files.
-  - **Cookies panel**: View all stored cookies grouped by origin. Click any cookie value to expand or collapse it. Each cookie row includes:
-    - **Copy**: Copy the cookie value to your clipboard with a single click.
-    - **Decode**: If the value is URL-encoded or Base64, decode it inline.
-    - **Delete**: Remove an individual cookie.
-  - **Keyboard navigation**: All cookies panel buttons support keyboard navigation with visible focus indicators. Hover over any button to see a tooltip describing its action.
-- **Advanced** (`/settings/advanced`, added in v0.19):
-
-  - **Account**: Change your sign-in email or password. Enter your current password, then click **Save account**. New passwords must be 8 to 128 characters.
-  - **Data retention**: Choose how long captures and execution history are kept (default 7 days). See [Automatic Retention](/captures-and-storage#automatic-retention).
-  - **Maintenance**: **Clear captures**, **Clear execution history**, or **Clear all workspace data**. Clearing all data requires your current password and removes tasks, executions, credentials, API keys, AI provider keys and models, captures, Cabinets, browser profiles, saved proxies, and settings. Your account and current sign-in are kept.
-  - **CAPTCHA assistance**: Shows the local CAPTCHA solver tier, backend, and device detected at startup, or **Unavailable** when the host cannot run it.
+- **API Keys**: A unified panel for managing keys and provider connections:
+  - **Tasks API Key**: Your key for remote execution via the REST API. Copy or regenerate it here.
+  - **Database / Output Providers**: Add credentials for output destinations like Baserow.
+  - Click **Add API Key** to open the provider selection modal and configure a new entry.
+- **User Agent**: Set a global User-Agent string or let Figranium rotate them.
 - **Proxies**:
   - **Add Proxy**: Input HTTP/SOCKS proxies. The button disables until a server address is provided and shows a loading spinner during submission.
   - **Import**: Bulk add proxies from a list.
   - **Rotation**: Configure rotation strategy (Round-Robin vs Random) and whether to include your local IP.
   - **Keyboard navigation**: All proxy panel buttons support keyboard navigation with visible focus indicators. Hover over any button to see a tooltip describing its action.
+- **Appearance**:
+  - **Theme**: Pick the color scheme for the Figranium UI. Choose **Auto** (default) to follow your device's light or dark setting, or pick one of four manual themes: **Dark**, **Light**, **Solarized Light**, and **Solarized Dark**. Auto updates automatically when your device preference changes and is the default for both new and existing installations. Each manual option shows a preview image with a swatch of its surface and accent colors so you can see what you're switching to before you commit. The selected theme is applied instantly and persisted three ways: to the backend data store (via `POST /api/settings/theme`), to a `figranium_theme` cookie with a 1-year TTL, and to browser local storage under `figranium.theme`. Server-side persistence means the same theme follows you across browsers and devices on the same Figranium instance. On page load, Figranium reads the cookie first for an instant paint, then reconciles with the server value from `GET /api/settings/theme`.
+- **About**: Shows the installed Figranium version.
+- **Advanced** (`/settings/advanced`, added in v0.19):
+
+  - **Account**: Change your sign-in email or password. Enter your current password, then click **Save account**. New passwords must be 8 to 128 characters.
+  - **Data retention**: Choose how long captures and execution history are kept (default 7 days). See [Automatic Retention](/captures-and-storage#automatic-retention).
+  - **Maintenance**: **Clear captures**, **Clear execution history**, or **Clear all workspace data**. Clearing all data requires your current password and removes tasks, executions, credentials, API keys, captures, Cabinets, browser profiles, saved proxies, and settings. Your account and current sign-in are kept.
+  - **CAPTCHA assistance**: Shows the local CAPTCHA solver tier, backend, and device detected at startup, or **Unavailable** when the host cannot run it.
 
 ## Global keyboard shortcuts
 
@@ -168,9 +177,10 @@ Figranium provides global keyboard shortcuts that let you navigate between scree
 | Shortcut | Action |
 | --- | --- |
 | **Alt \+ 1** | Go to Dashboard |
-| **Alt \+ 2** | Go to Settings |
+| **Alt \+ 2** | Go to Templates |
 | **Alt \+ 3** | Go to Executions |
-| **Alt \+ 4** | Go to Captures |
+| **Alt \+ 4** | Go to Cabinets |
+| **Alt \+ 5** | Go to Settings |
 | **Alt \+ N** | Create a new task |
 | **Alt \+ L** | Log out |
 

@@ -10,6 +10,31 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   Figranium releases continuously. Major features are announced here as they ship. Check back weekly for new capabilities.
 </Note>
 
+<Update label="2026-10-03" description="v0.20.0">
+  ## Features
+
+  ### Templates in the app
+
+  A new **Templates** screen (Alt/Option + 2) lets you search, filter by category, sort, and preview community automations, including each template's README and expected output. Click **Import** to add a template as a new task and open it in the editor. Empty workspaces show popular templates on the dashboard, and the **Create Task** menu includes **Create from a template**. See [Templates](/community-presets) and the [Templates API](/rest-api#templates).
+
+  ### Queued execution status and cancellation
+
+  Executions now report a `phase` of `queued`, `running`, or `finished`, including scheduled runs. Stopping a run with `POST /api/executions/stop` also cancels it while it is still waiting in the queue. See [REST API](/rest-api).
+
+  ### Full results for large executions
+
+  When a result exceeds the execution-history size limit, Figranium stores the complete result separately. Load it from the execution detail view or with `GET /api/executions/{id}/result`. See [Captures and storage](/captures-and-storage).
+
+  ### Adaptive headful viewer
+
+  The headful viewer lowers image quality, and switches to a lower-bandwidth stream on very slow connections, then restores full resolution when your connection recovers. See [Adaptive viewer quality](/headful-browser#adaptive-viewer-quality).
+
+  ## Removed
+
+  - **Captures page**: view a run's screenshots and recordings from its detail view in **Executions**.
+  - **AI features**: AI provider keys, AI model settings, AI extraction script generation, and AI selector generation are no longer available. Visual extraction still generates extraction scripts from your field definitions.
+</Update>
+
 <Update label="2026-10-01" description="This week">
   ## Updates
 

@@ -1,35 +1,54 @@
 ---
-title: "Templates Hub"
+title: "Templates: browse and import community automations"
 sidebarTitle: "Templates"
-description: "Browse, import, and publish reusable Figranium automation workflows through the Templates Hub. Share battle-tested tasks with the community."
+description: "Find ready-made Figranium automations on the Templates screen, preview the README and expected output, and import any template as a new task."
 ---
 
-The **Templates Hub** is a marketplace where Figranium users can share and discover automation workflows.
+The **Templates** screen lets you browse ready-to-use community automations from the official [Figranium Templates Hub](https://templates.figranium.dev) and import them straight into your workspace. Use a template when you want a working starting point for a common job, such as monitoring a page, collecting leads, or testing a flow, instead of building every action from scratch.
 
 ## Overview
 
-The Hub allows you to:
+From the Templates screen you can:
 
-- **Browse Templates**: Discover tasks and workspace configurations created by the community.
-- **Import Workflows**: Download and import templates directly into your Figranium instance.
-- **Publish Templates**: Share your own battle-tested workflows with other users.
+- **Browse templates**: Discover automations created by the community, grouped by category.
+- **Preview before importing**: Read each template's README and see the output it is expected to produce.
+- **Import in one click**: Add a template to your workspace as a new task and open it in the editor.
+- **Publish templates**: Share your own battle-tested workflows with other users through the Hub.
 
-## How to Use
+## Browse and import a template
 
 <Steps>
-  <Step title="Access the Hub">
-    Navigate to the **Templates** section in the Figranium dashboard.
+  <Step title="Open Templates">
+    Click **Templates** in the sidebar, or press <kbd>Alt</kbd> + <kbd>2</kbd> (<kbd>Option</kbd> + <kbd>2</kbd> on macOS).
   </Step>
-  <Step title="Filter and search">
-    Find templates based on tags, popularity, or specific use cases (e.g., "E-commerce", "Social Media").
+  <Step title="Search, filter, and sort">
+    Type in the **Search templates, sites, or use cases…** field to match titles, descriptions, creator names, categories, and target URLs. Use the category filter to narrow results to **Developer Tools**, **Lead Gen**, **Monitoring**, **Other**, **QA Testing**, **Shopping**, or **Social Media**, and sort by **Most popular**, **Newest**, or **Name**. Click **Load more templates** to see more results.
   </Step>
-  <Step title="Import a template">
-    Once you find a template you like, download it and click **Import** to add it to your tasks.
+  <Step title="Preview a template">
+    Click a template card to open its preview. The preview shows the creator, the template's README, and its expected output. Cards and previews show a verified badge next to verified creators.
+  </Step>
+  <Step title="Import the template">
+    Click **Import** on the card or in the preview. Figranium adds the template to your workspace as a new task and opens it in the editor.
   </Step>
   <Step title="Customize">
-    After importing, you can modify the task to suit your specific needs (e.g., updating selectors or variables).
+    Adjust the imported task to fit your needs, for example by updating selectors, variables, or the target URL.
   </Step>
 </Steps>
+
+## Start from the dashboard
+
+You can also reach templates from the dashboard:
+
+- **Create Task menu**: Open the arrow menu next to the **Create Task** button and choose **Create from a template** to go to the Templates screen, or **Start from scratch** to open a blank task.
+- **Featured templates**: When your workspace has no tasks yet, the dashboard shows **Start with a popular template** with the three most popular templates and an option to build your own.
+
+<Note>
+  Figranium loads the catalog from the Templates Hub and caches it for 5 minutes. If the Hub can't be reached and no cached copy is available, the Templates screen shows **Templates are unavailable** with a **Retry** button.
+</Note>
+
+## Template API
+
+Signed-in workspace sessions can list, search, and fetch templates through the REST API. See [Templates](/rest-api#templates) in the REST API reference.
 
 ## Contributing to the Hub
 
@@ -40,7 +59,7 @@ If you've built a workflow that solves a common problem, consider sharing it!
     Use the **Export** feature in the Task Editor.
   </Step>
   <Step title="Submit to the Hub">
-    Upload the exported JSON file along with a description and expected output.
+    Go to the [Templates Hub](https://templates.figranium.dev) and upload the exported JSON file along with a description and expected output.
   </Step>
 </Steps>
 
@@ -49,7 +68,7 @@ If you've built a workflow that solves a common problem, consider sharing it!
 </Warning>
 
 <Tip>
-  Start with a highly-rated template that matches your use case, then customize selectors and variables for your target site rather than building from scratch.
+  Start with a popular template that matches your use case, then customize selectors and variables for your target site rather than building from scratch.
 </Tip>
 
 <CardGroup cols={2}>
