@@ -24,6 +24,10 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   ## Updates
 
   - **Template popularity from real imports**: when you [import a template](/community-presets#browse-and-import-a-template), Figranium reports the import to the Templates Hub, so **Most popular** sorting and featured templates reflect actual usage. Each installation counts at most once per template, using a random installation ID that is unrelated to telemetry. Reporting is best-effort and never causes an import to fail.
+
+  ## Fixes
+
+  - **Captures from other runs**: the screenshots and recordings modal in an execution's detail view now shows only that run's [captures](/captures-and-storage#screenshots). `GET /api/data/captures` also matches the run ID exactly, so runs with similar IDs no longer return each other's files.
 </Update>
 
 <Update label="2026-10-03" description="v0.20.0">
