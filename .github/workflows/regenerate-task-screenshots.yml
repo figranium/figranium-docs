@@ -8,6 +8,7 @@ on:
     branches:
       - main
       - docs/populate-tour-from-templates-hub
+      - docs/templates-ui-tour-clean
 
 permissions:
   contents: write
