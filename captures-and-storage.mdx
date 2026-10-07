@@ -99,6 +99,39 @@ To change it, open **Settings > Advanced**, pick a period under **Data retention
 
 You can also read and set retention through [`GET` and `POST /api/settings/system`](/rest-api#system-settings).
 
+### Exporting data
+
+Export a backup of your workspace data, or move it to another Figranium instance, as a ZIP file.
+
+1. Open **Settings > Advanced** and find **Export data**.
+2. Select the categories to include. All five are selected by default.
+3. Click **Export selected**. Your browser downloads `figranium-export-YYYY-MM-DD.zip`.
+
+| Category | Archive contents |
+| :-- | :-- |
+| **Tasks** | `tasks.json` with every saved task |
+| **Executions** | `executions.json` with stored execution history |
+| **Captures** | A `captures/` folder with screenshots and recordings |
+| **API Keys** | `api-keys.json` with your Figranium API key |
+| **Cookies** | `cookies.json` with saved browser cookies |
+
+Every archive also includes `manifest.json`, which records the export time and the selected categories:
+
+```json
+{
+  "exportedAt": "2026-10-07T12:00:00.000Z",
+  "included": ["tasks", "executions", "captures"]
+}
+```
+
+Tasks, executions, and API keys are exported from the active storage backend, so export works with both JSON files and [PostgreSQL](/database-support).
+
+<Warning>
+  API keys and cookies are exported in readable form. Anyone with the archive can use them to call your API or reuse your logged-in sessions. Leave them unselected unless you need them, and store the file securely.
+</Warning>
+
+You can also export through [`POST /api/settings/export`](/rest-api#system-settings).
+
 ### File Cleanup
 
 Screenshots, videos, and downloaded files accumulate in `public/captures`. Video recordings are stored separately in `data/recordings`. You can delete or download them:

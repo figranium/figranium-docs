@@ -540,6 +540,29 @@ Paginated list responses and single-template responses include `Cache-Control: p
 
     Returns `400 INVALID_SYSTEM_SETTINGS` for values outside the range.
   </Accordion>
+
+  <Accordion title="POST /api/settings/export">
+    Downloads a ZIP archive with the selected workspace data. See [Exporting data](/captures-and-storage#exporting-data) for the archive contents.
+
+    **Body**:
+
+    ```json
+    { "include": ["tasks", "executions", "captures"] }
+    ```
+
+    | Field | Type | Required | Description |
+    | :-- | :-- | :-- | :-- |
+    | `include` | string[] | Yes | Categories to export: `tasks`, `executions`, `captures`, `apiKeys`, `cookies`. Unknown values are ignored. |
+
+    The response is `application/zip` with `Content-Disposition: attachment; filename="figranium-export-YYYY-MM-DD.zip"` and `Cache-Control: no-store`.
+
+    **Error responses**:
+
+    | Status | Error code | Cause |
+    | :-- | :-- | :-- |
+    | `400` | `EXPORT_SELECTION_REQUIRED` | `include` has no valid categories |
+    | `500` | `DATA_EXPORT_FAILED` | The archive could not be generated |
+  </Accordion>
 </AccordionGroup>
 
 ---
