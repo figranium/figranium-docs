@@ -133,6 +133,19 @@ Set `MAX_CONCURRENT_EXECUTIONS` to a positive integer to replace the automatic l
   See [CAPTCHA Solving](/captcha-solving) for the full feature reference, including the task-level auto-solve toggle and troubleshooting.
 </Tip>
 
+## Figranium Cloud sign-in
+
+These optional variables let users who are signed in to Figranium Cloud open your instance without entering their password again. Cloud sends the browser to your instance with a short-lived, single-use code. Your instance then exchanges that code with Cloud server-to-server and starts a normal Figranium session.
+
+The feature stays off unless you set both variables. Self-hosted instances without them work exactly as before.
+
+| **Variable** | **Default Value** | **Description** |
+| :-- | :-- | :-- |
+| `FIGRANIUM_CLOUD_AUTH_EXCHANGE_URL` | — | Figranium Cloud endpoint used to exchange handoff codes. Must use HTTPS on the `cloud.figranium.dev` host and must not contain credentials. |
+| `FIGRANIUM_CLOUD_INSTANCE_SECRET` | — | Per-instance secret that Figranium sends as a bearer token when it exchanges a handoff code. Keep it private. |
+
+Cloud sign-in only works for users who already have a local account. The email address on the Cloud identity must match an existing Figranium user. If no user matches, the instance responds with `403 CLOUD_USER_NOT_PROVISIONED`. After a successful handoff, Figranium redirects the browser to the app home page.
+
 ## Database (PostgreSQL)
 
 | **Variable** | **Default Value** | **Description** |
