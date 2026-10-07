@@ -1,27 +1,28 @@
 ---
 title: "n8n Integration"
 sidebarTitle: "n8n"
-description: "Connect Figranium to n8n workflows with the official community node. Install, authenticate, and trigger tasks or schedules from any n8n automation."
+description: "Connect Figranium to n8n workflows with the official verified community node and run browser automation tasks with dynamic inputs."
 ---
 
-The official Figranium n8n community node (`n8n-nodes-figranium`) connects n8n workflows to Figranium. You can execute saved tasks with runtime variables, manage task definitions, inspect execution history, and manage schedules.
+The official Figranium n8n community node (`n8n-nodes-figranium`) connects n8n workflows to Figranium. Use it to execute saved browser automation tasks, pass runtime variables, and work with tasks, executions, and schedules.
 
-## Installation
-
-Figranium is a verified n8n community node, so you can install it directly from the n8n node picker.
+## Install the node
 
 <Steps>
-  <Step title="Open a workflow">
-    Open an existing workflow in n8n or create a new one.
-  </Step>
   <Step title="Add Figranium">
-    Click **Add node**, search for **Figranium**, and select it.
+    In an n8n workflow, click **Add node**, search for **Figranium**, and select the verified community node.
   </Step>
   <Step title="Install the node">
-    Install the verified community node when prompted, then add it to your workflow.
+    Install it when prompted, then add it to your workflow.
   </Step>
-  <Step title="Connect your credentials">
-    Create or select a **Figranium API** credential.
+  <Step title="Configure credentials">
+    Create a **Figranium API** credential with your Figranium **Base URL** and **API key**. Use the base URL without a trailing slash. If you need an API key, see [Get Your Figranium API Key](/api-key).
+  </Step>
+  <Step title="Choose an operation">
+    Select **Execute Task** to run a saved task, or choose one of the task, execution, or schedule operations.
+  </Step>
+  <Step title="Map variables">
+    For task execution, provide runtime variables as name/value pairs. n8n expressions such as `{{ $json.product_url }}` can supply values from earlier nodes.
   </Step>
 </Steps>
 
@@ -29,143 +30,18 @@ Figranium is a verified n8n community node, so you can install it directly from 
   On self-hosted n8n instances, an instance owner may need to allow or install verified community nodes first.
 </Note>
 
-## Credentials
+## Operations
 
-The node uses a **Figranium API** credential with two fields:
+The node can execute tasks, create and manage task definitions, list execution history, and manage schedules and scheduler status.
 
-| Field | Description |
-| --- | --- |
-| **Base URL** | Your Figranium instance URL, for example `http://localhost:11345`. Do not include a trailing slash. |
-| **API Key** | Your Figranium API key. Open **Settings** in Figranium to copy it. |
+For the underlying endpoints, see the [REST API Reference](/rest-api).
 
-The API key is sent as the `x-api-key` header on requests.
+## Runtime variables
 
-## Resources and operations
+Runtime variables let the same Figranium task accept different inputs on every n8n run. Variable names are case-sensitive and must match those defined by the task.
 
-<CardGroup cols={2}>
-  <Card title="Execute" icon="player-play">
-    **Execute Task** runs a saved task and returns its result.
-  </Card>
+See [Variables & Templating](/variables) for details.
 
-  <Card title="Task Action" icon="list-check">
-    **List**, **Create**, **Update**, and **Delete** saved tasks.
-  </Card>
+## Authentication
 
-  <Card title="Execution" icon="list">
-    **List** past execution records.
-  </Card>
-
-  <Card title="Schedule" icon="calendar-clock">
-    List, inspect, create, update, delete, and describe task schedules, or inspect scheduler status.
-  </Card>
-</CardGroup>
-
-## Execute a task
-
-Choose **Execute → Execute Task**.
-
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| **Task Name or ID** | Dropdown | Yes | Loaded automatically from the connected Figranium instance. You can also supply an ID with an n8n expression. |
-| **Variables** | Key-value collection | No | Runtime variables passed to the task. Add each variable as a **Name** and **Value** pair; raw JSON is not required. |
-| The node calls `POST /api/tasks/{taskId}/api` and returns the Figranium JSON response for use by downstream nodes. |  |  |  |
-
-<Tip>
-  Variable names are case-sensitive. You can use n8n expressions in variable values, such as `{{ $json.product_url }}`.
-</Tip>
-
-## Task actions
-
-<AccordionGroup>
-  <Accordion title="List">
-    Returns the saved tasks available on the connected Figranium instance.
-
-    **API call:** `GET /api/tasks/list`
-  </Accordion>
-
-  <Accordion title="Create">
-    Creates a new task. **Name**, **URL**, and **Mode** are required. Additional fields expose supported task configuration such as description, waits, selectors, extraction options, rotation and stealth settings, actions, and variables.
-  </Accordion>
-
-  <Accordion title="Update">
-    Partially updates the selected task. Only fields you set are sent, so you can change individual properties without replacing the complete task definition.
-  </Accordion>
-
-  <Accordion title="Delete">
-    Permanently deletes the selected task.
-  </Accordion>
-</AccordionGroup>
-
-## Execution history
-
-Choose **Execution → List** to retrieve a summary of past executions.
-
-**API call:** `GET /api/executions/list`
-
-The returned records can be used directly in later n8n nodes for filtering, branching, storage, or notifications.
-
-## Schedules
-
-<AccordionGroup>
-  <Accordion title="List">
-    Returns tasks with schedules configured.
-
-    **API call:** `GET /api/schedules`
-  </Accordion>
-
-  <Accordion title="Get Status">
-    Returns the schedule configuration and next run time for a task.
-
-    **API call:** `GET /api/schedules/{taskId}/status`
-  </Accordion>
-
-  <Accordion title="Set Schedule">
-    Creates or updates a task schedule. Choose either **Frequency (Interval)** or **Cron Expression**.
-
-    Frequency mode supports every N minutes, daily, weekly, and monthly schedules. Cron mode accepts a standard 5-field expression such as `0 9 * * 1`.
-
-    **API call:** `POST /api/schedules/{taskId}`
-  </Accordion>
-
-  <Accordion title="Delete Schedule">
-    Removes the schedule without deleting the task.
-
-    **API call:** `DELETE /api/schedules/{taskId}`
-  </Accordion>
-
-  <Accordion title="Describe Schedule">
-    Validates and previews a schedule without saving it.
-
-    **API call:** `POST /api/schedules/{taskId}/describe`
-  </Accordion>
-
-  <Accordion title="Get Scheduler Status">
-    Returns the overall scheduler status.
-
-    **API call:** `GET /api/schedules/status/all`
-  </Accordion>
-</AccordionGroup>
-
-## Troubleshooting
-
-<AccordionGroup>
-  <Accordion title="Task dropdown is empty">
-    Confirm that the **Base URL** is reachable from the n8n host and that the **API Key** is valid. The dropdown is populated from `/api/tasks/list`.
-  </Accordion>
-
-  <Accordion title="Connection refused in Docker">
-    If n8n and Figranium run in separate containers, `localhost` from the n8n container does not refer to the Figranium container. Use a hostname or network address that n8n can reach.
-  </Accordion>
-
-  <Accordion title="Variables are ignored">
-    Make sure each variable has a non-empty **Name** and that it exactly matches the variable name expected by the task.
-  </Accordion>
-
-  <Accordion title="A schedule operation fails">
-    Confirm the task ID exists and that the Figranium scheduler is running. **Get Scheduler Status** can be used to inspect it.
-  </Accordion>
-</AccordionGroup>
-
-## Package
-
-The current community-node package is `n8n-nodes-figranium`. The node is also usable as an n8n AI tool where community-node tool usage is supported.
+The node authenticates directly with your Figranium instance using the API key in the **Figranium API** credential. Keep the key secret and rotate it if it is exposed. See [API Key](/api-key) for key management.
