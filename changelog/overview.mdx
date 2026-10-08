@@ -10,6 +10,29 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   Figranium releases continuously. Major features are announced here as they ship. Check back weekly for new capabilities.
 </Note>
 
+<Update label="2026-10-08" description="Vault and scoped API keys">
+  ## Features
+
+  ### Named cookie states
+
+  A new **Vault** screen in the sidebar lets you create, import, rename, and delete cookie states. Start a state empty or import a Playwright storage-state JSON file. In the editor, open **States** and pick a cookie state for each task. Runs start from that state and save changed cookies back to it. Choose **No State** to run with an empty, isolated cookie context. This replaces the **Stateless Execution** toggle, and existing stateless tasks move to **No State** automatically. See [Session state](/session-state) and [Stateless execution](/stateless-execution).
+
+  ### 1Password passwords in tasks
+
+  Connect a 1Password service account token in **Settings > Connections**. Figranium uses a dedicated "Figranium" vault, and creates it if it doesn't exist. Use `{$passwords.example^com}` in any task to insert the password from the Login item whose website is `example.com`, replacing dots with `^`. Figranium resolves passwords on the server. If no Login item matches, or more than one does, the run fails instead of using an empty value. The editor's variable list has a new **Passwords** tab, and **Vault > Passwords** lets you copy saved passwords. See [Variables](/variables).
+
+  ### Scoped API keys
+
+  **Settings > API Keys** now lets you create multiple named keys. Give each key only the permissions it needs: **Read tasks**, **Run tasks**, **Read results**, or **Manage tasks**. You can also limit a key to specific tasks. A key is shown once at creation and can be revoked at any time. Your existing key keeps working as **Legacy full access key**. See [API key](/api-key).
+
+  ## Updates
+
+  - **Baserow connections**: save Baserow API keys under **Settings > Connections** for use as task [output destinations](/output-providers).
+  - **Settings and sign out**: **Settings** now sits at the bottom of the sidebar. **Sign out** moved to **Settings > Advanced**.
+  - **Editor shortcuts**: the editor top bar has new **Behavior**, **States**, and **Output** buttons that open task settings directly.
+  - **Data export and import**: archives can now include cookie states and **Connections**. Archives contain readable API keys, cookies, and connection tokens, so store them securely. See [Exporting data](/captures-and-storage#exporting-data).
+</Update>
+
 <Update label="2026-10-08" description="This week">
   ## Features
 
