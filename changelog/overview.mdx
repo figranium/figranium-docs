@@ -10,6 +10,19 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   Figranium releases continuously. Major features are announced here as they ship. Check back weekly for new capabilities.
 </Note>
 
+<Update label="2026-10-09" description="Dedicated Baserow tables and Docker release channels">
+  ## Features
+
+  ### Dedicated Baserow tables per task
+
+  In a task's **Output** settings, choose a Baserow workspace and click **Create dedicated database and table**. Figranium creates a new database with a **Results** table just for that task. On each run, Figranium adds a text column for any new key in your data, so you no longer need to set up columns first. Nested values are saved as JSON text. This requires a Baserow token that can create databases in the workspace. See [Baserow integration](/output-providers#baserow-integration).
+
+  ## Updates
+
+  - **Baserow outputs need a dedicated table**: you can no longer pick an existing database or table, or enter a table ID. Outputs that point to an existing table stop pushing data. Create a dedicated table to start pushing again.
+  - **Docker release channels**: `latest` now updates only for stable releases. A new `edge` tag follows every change to `main`. The `beta` tag no longer gets updates. Switch to `edge` or `latest`. See [Image tags](/docker-compose#image-tags).
+</Update>
+
 <Update label="2026-10-08" description="Vault and scoped API keys">
   ## Features
 
