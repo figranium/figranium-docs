@@ -10,6 +10,31 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   Figranium releases continuously. Major features are announced here as they ship. Check back weekly for new capabilities.
 </Note>
 
+<Update label="2026-10-08" description="This week">
+  ## Features
+
+  ### Selective data import
+
+  **Settings > Advanced** now has an **Import data** section. Choose a Figranium export ZIP, pick which of the included categories to restore, and click **Import selected**. Imported categories replace their matching workspace data. Unselected categories stay unchanged. See [Exporting data](/captures-and-storage#exporting-data).
+
+  ### Run tasks from CI with the JavaScript SDK
+
+  `@figranium/sdk` 0.5.0 adds a `figranium run <task-id>` command for running saved tasks from GitHub Actions, GitLab CI, Jenkins, or your terminal. Set `FIGRANIUM_URL` and `FIGRANIUM_API_KEY`, pass runtime variables with repeatable `--var name=value`, and use `--timeout` and `--json` as needed. The command exits with `0` on success, `1` when the task completes unsuccessfully, and `2` for configuration, authentication, or network failures. See the [JavaScript SDK](/sdk/js/overview).
+
+  ## Updates
+
+  - **Playwright 1.64**: Figranium and its Docker image now use Playwright 1.64 and its matching browsers. See [Docker Compose](/docker-compose).
+  - **Refreshed MCP connection page**: the hosted [MCP server](/mcp-integration)'s OAuth connection page has a new Figranium-branded design that fits small screens.
+
+  ## Fixes
+
+  - **Safari after restart**: Figranium now loads reliably when you reopen Safari, without clearing website data first.
+  - **Headful viewer in Safari**: the [headful viewer](/headful-browser) now connects in Safari.
+  - **Headful viewer errors**: if the viewer can't load, the headful window now shows an error message instead of staying blank.
+  - **New headful sessions**: closing a previous viewer no longer stops a headful session you just started.
+  - **Cursor states**: buttons, links, and sidebar items now show a consistent pointer cursor.
+</Update>
+
 <Update label="2026-10-07" description="This week">
   ## Features
 
