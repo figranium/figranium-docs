@@ -291,6 +291,7 @@ Each error response includes a structured error code you can match on programmat
 | `INVALID_BASE_URL` | `POST /api/credentials`, `PUT /api/credentials/:id` | Credential base URL is malformed or points to a restricted address |
 | `INVALID_URL` | `POST /api/settings/proxies`, `POST /api/settings/proxies/import`, `PUT /api/settings/proxies/:id` | Proxy server address failed SSRF validation |
 | `INVALID_DATABASE_ID` | `GET /api/credentials/:id/proxy/baserow/databases/:dbId/tables` | Database ID is not a valid numeric identifier |
+| `INVALID_PROVISION_REQUEST` | `POST /api/credentials/:id/proxy/baserow/provision` | Workspace ID is not numeric, or task ID is missing or contains characters outside `[A-Za-z0-9_-]` |
 | `Invalid task id.` | `start` action (in-task) | A task ID supplied to the `start` action contained characters outside `[A-Za-z0-9_-]` and was rejected before the internal request was issued. See [Modular workflows](/modular-workflows#task-id-validation). |
 | `API_KEY_NOT_SET` | Any API-key-protected endpoint (`403`) | The server has no API key configured in **Settings \> System** |
 | `INVALID_API_KEY` | Any API-key-protected endpoint (`401`) | The provided API key was missing, malformed, or did not match the configured key |
