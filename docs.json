@@ -362,5 +362,10 @@
       "source": "/extraction-script-generation",
       "destination": "/data-extraction"
     }
-  ]
+  ],
+  "background": {
+    "color": {
+      "dark": "#101114"
+    }
+  }
 }
