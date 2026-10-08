@@ -104,7 +104,33 @@ docker compose down
 
 ### Update the Application
 
-To update to the latest version, pull the latest image and restart:
+To update to the newest image for your tag, pull it and restart. With the `latest` tag, this installs the most recent stable release. See [Image tags](#image-tags) for other release channels.
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+## Image tags
+
+Figranium publishes multi-architecture images (`linux/amd64` and `linux/arm64`) to `ghcr.io/figranium/figranium`. Choose a tag based on how much stability you need:
+
+| Tag | Updated when | Use it for |
+| --- | --- | --- |
+| `latest` | A stable version is released | Production deployments. This is the default in `docker-compose.deploy.yml`. |
+| `1.2.3` | Never. Each stable release gets its own tag. | Pinning an exact version so updates happen only when you change the tag. |
+| `v1.2.3`, `v1.3.0-rc.1` | Never. Each release tag, including prereleases, gets its own tag. | Pinning a release by its Git tag name, or testing a prerelease. |
+| `edge` | Every push to the `main` branch | Trying unreleased features. Expect occasional breaking changes. |
+
+Prereleases (version tags containing `-`, such as `v1.3.0-rc.1`) never update `latest` and don't get a plain version tag. The `beta` tag no longer receives updates. If your compose file uses `beta`, switch to `edge` for the newest builds or to `latest` for stable releases.
+
+To change the tag, edit the `image` line in `docker-compose.yml`, then pull and restart:
+
+```yaml
+services:
+  figranium:
+    image: ghcr.io/figranium/figranium:edge
+```
 
 ```bash
 docker compose pull
