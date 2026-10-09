@@ -296,6 +296,7 @@ const tourScreens = [
   { path: '/executions', filename: 'ui-executions.png', waitFor: 'Executions' },
   { path: '/cabinets/cab_basic', filename: 'ui-cabinets.png', waitFor: 'Cabinets' },
   { path: '/settings', filename: 'ui-settings.png', waitFor: 'Settings' },
+  { path: '/vault', filename: 'ui-vault.png', waitFor: 'Vault' },
 ];
 
 for (const screen of tourScreens) {
