@@ -163,7 +163,8 @@ for (const key of demoKeys) {
   });
   if (!response.ok) {
     const detail = await response.text();
-    throw new Error(`Could not create demo API key "${key.name}": ${response.status} ${detail.slice(0, 400)}`);
+    const serverLog = await readFile('/tmp/figranium.log', 'utf8').catch(() => 'Server log unavailable');
+    throw new Error(`Could not create demo API key "${key.name}": ${response.status} ${detail.slice(0, 400)}\nServer log:\n${serverLog.slice(-5000)}`);
   }
 }
 
