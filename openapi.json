@@ -852,6 +852,54 @@
         }
       }
     },
+    "/api/credentials/{id}/proxy/baserow/workspaces": {
+      "get": {
+        "tags": ["Credentials"],
+        "summary": "Proxy: list Baserow workspaces for a credential",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "Workspaces",
+            "content": { "application/json": { "schema": { "type": "array", "items": { "type": "object", "properties": { "id": { "type": "string" }, "name": { "type": "string" } } } } } }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "502": { "description": "Baserow request failed (`BASEROW_WORKSPACES_FAILED`)" }
+        }
+      }
+    },
+    "/api/credentials/{id}/proxy/baserow/provision": {
+      "post": {
+        "tags": ["Credentials"],
+        "summary": "Proxy: create a dedicated Baserow database and Results table for a task",
+        "description": "Creates a database named `Figranium - <taskName> - <taskId>` in the given workspace, then creates a table named `Results` in it. Store the returned IDs in the task's `output` with `dedicated: true`. Requires a Baserow token that can create databases in the workspace.",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["workspaceId", "taskId"],
+                "properties": {
+                  "workspaceId": { "type": "string", "description": "Numeric Baserow workspace ID." },
+                  "taskId": { "type": "string", "description": "Task ID. 1-128 characters from `[A-Za-z0-9_-]`." },
+                  "taskName": { "type": "string", "description": "Task name used in the database name. Truncated to 80 characters." }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Provisioned destination",
+            "content": { "application/json": { "schema": { "type": "object", "properties": { "databaseId": { "type": "string" }, "tableId": { "type": "string" } } } } }
+          },
+          "400": { "description": "Invalid workspace ID or task ID (`INVALID_PROVISION_REQUEST`)" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "502": { "description": "Baserow request failed. `BASEROW_PROVISION_FAILED` if the database wasn't created, or `BASEROW_TABLE_CREATION_FAILED` (with `databaseId`) if the database was created but the table wasn't." }
+        }
+      }
+    },
     "/api/executions": {
       "get": {
         "tags": ["Executions"],

@@ -1,7 +1,7 @@
 ---
 title: "Push Task Output to External Providers Automatically"
 sidebarTitle: "Output Providers"
-description: "Configure Figranium output providers to push extracted data to Baserow and other destinations automatically after each task run."
+description: "Configure Figranium output providers to create a dedicated Baserow database for each task and push extracted data to it automatically after every run."
 ---
 
 **Output Providers** allow Figranium to automatically push extracted data to external databases and services immediately after a task completes — no manual download or API polling required.
@@ -34,13 +34,13 @@ Additional providers may be added in future releases.
 
 ## Baserow Integration
 
-[Baserow](https://baserow.io) is a self-hosted, open-source alternative to Airtable. Figranium integrates with it to push extracted JSON data directly into a Baserow table.
+[Baserow](https://baserow.io) is a self-hosted, open-source alternative to Airtable. Figranium integrates with it to push extracted JSON data into a dedicated Baserow table that Figranium creates for each task.
 
 ### Prerequisites
 
 1. A running Baserow instance (self-hosted or Baserow.io cloud).
-2. A Baserow API token with write access to the target table.
-3. The **Table ID** of the destination table in Baserow.
+2. A Baserow token that can list workspaces and create databases and tables in the target workspace. Database-only tokens can't provision a destination.
+3. A saved task. Figranium uses the task ID to name the dedicated database.
 
 ### Step 1: Configure credentials
 
@@ -64,7 +64,9 @@ You can add credentials in two places:
   Figranium validates the base URL to prevent requests to private or internal network addresses. If `ALLOW_PRIVATE_NETWORKS` is set to `false`, URLs pointing to private IP ranges (such as `10.x.x.x`, `172.16.x.x`, or `192.168.x.x`) are rejected. Redirect chains are also validated — if a Baserow instance returns a redirect, each hop is checked against the same blocklist. Additionally, sensitive headers like `Authorization` are automatically stripped if a redirect crosses to a different origin. See [Security best practices](/security) for details.
 </Note>
 
-### Step 2: Configure the Task Output
+### Step 2: Create a dedicated destination
+
+Each task writes to its own dedicated Baserow database. You can't select an existing database or table, or enter a table ID manually.
 
 <Steps>
   <Step title="Open task output settings">
@@ -73,17 +75,24 @@ You can add credentials in two places:
   <Step title="Select provider and credential">
     Select **Provider**: `Baserow` and choose the credential you just created.
   </Step>
-  <Step title="Set table and error behavior">
-    Enter the **Table ID** and choose **On Error**: `ignore` (default) or `fail` (marks the execution as failed if the push fails).
+  <Step title="Create the database and table">
+    Under **Dedicated Baserow destination**, choose a workspace and click **Create dedicated database and table**. Figranium creates a database named `Figranium - <task name> - <task ID>` with a table named `Results`. The editor then shows the new table ID as **Current table**.
+  </Step>
+  <Step title="Set error behavior">
+    Choose **On Push Error**: `Ignore` (default) or `Log Error`.
   </Step>
   <Step title="Save the task">
     Save the task to activate the output provider.
   </Step>
 </Steps>
 
-### Step 3: Match Your Extraction Data to Table Columns
+<Warning>
+  Figranium only pushes to dedicated destinations created from **Settings \> Output**. Tasks configured with a manually selected database or table ID before this change no longer push data. Open each affected task and create a dedicated destination to resume pushes.
+</Warning>
 
-Figranium pushes data using Baserow's `user_field_names=true` API parameter, which means you reference columns by their **display name** (not internal ID).
+### Step 3: Return extraction data
+
+You don't need to create columns in advance. Before each push, Figranium reads the fields on the `Results` table. It then creates a long text field for every key in your data that doesn't have a matching field yet. Figranium matches field names exactly (case-sensitive).
 
 Your extraction script must return either:
 
@@ -110,22 +119,30 @@ const rows = Array.from(document.querySelectorAll(".product-card")).map(card => 
 return rows;
 ```
 
-The keys in your returned object must match the column names in your Baserow table exactly (case-sensitive).
+Any other shape, such as an empty array, a primitive, or an array that contains non-objects, fails the push.
 
-### How Data is Sent
+### How data is sent
+
+Figranium stores every value as text:
+
+| Value type | Stored as |
+| :-- | :-- |
+| String | Unchanged |
+| `null` or `undefined` | Empty string |
+| Number, boolean, object, or array | JSON string (for example, `29.99`, `true`, or `{"a":1}`) |
 
 | Extracted data shape | Baserow API call |
 | :-- | :-- |
 | JSON object `{}` | Single row via `POST /api/database/rows/table/{tableId}/` |
 | JSON array `[{}, {}]` | Batch insert via `POST /api/database/rows/table/{tableId}/batch/` |
 
-The integration uses Baserow's standard row creation API with `Authorization: Token <your-token>`.
+The integration uses Baserow's `user_field_names=true` parameter and authenticates with `Authorization: Token <your-token>`.
 
 ### Error Handling
 
 By default, push failures are **ignored** — the execution is marked as successful even if the Baserow push fails. This prevents network blips from causing false task failures.
 
-To make the task fail when the push fails, set **On Error** to `fail` in the output settings.
+To log push failures as errors instead of warnings, set **On Push Error** to `Log Error` in the output settings.
 
 Check the execution logs for output push status:
 
