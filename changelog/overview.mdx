@@ -10,6 +10,13 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   Figranium releases continuously. Major features are announced here as they ship. Check back weekly for new capabilities.
 </Note>
 
+<Update label="2026-10-09" description="This week">
+  ## Updates
+
+  - **Verifiable Docker images**: each image published to `ghcr.io/figranium/figranium` now has a signed build provenance attestation. Run `gh attestation verify oci://ghcr.io/figranium/figranium:latest --owner figranium` to confirm an image was built from the official repository. See [Docker Compose](/docker-compose#image-tags).
+  - **Image metadata**: the Docker image now includes a description, source repository, and license labels, so registries and container tools show where it came from.
+</Update>
+
 <Update label="2026-10-09" description="Dedicated Baserow tables and Docker release channels">
   ## Features
 
