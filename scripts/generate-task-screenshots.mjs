@@ -149,16 +149,7 @@ for (const [index, item] of hubItems.entries()) {
 }
 console.log(`Imported ${tasks.length} genuine Templates Hub tasks`);
 
-// Generate a real instance API key; never put the key's plaintext in documentation.
-const keyResponse = await fetch(`${apiBaseUrl}/api/api-keys`, {
-  method: 'POST',
-  headers,
-  body: JSON.stringify({
-    name: 'Docs screenshots',
-    permissions: ['tasks:read', 'tasks:run', 'results:read'],
-  }),
-});
-if (!keyResponse.ok) throw new Error(`Could not generate demo API key: ${keyResponse.status}`);
+// Screenshots use the authenticated setup session; no API key is needed.
 
 // These are illustrative historical entries, not claims that external websites were run.
 // Intercept only the demo tour's history endpoint, leaving Figranium's real UI untouched.
