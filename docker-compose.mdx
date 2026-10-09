@@ -118,9 +118,9 @@ Figranium publishes multi-architecture images (`linux/amd64` and `linux/arm64`) 
 | Tag | Updated when | Use it for |
 | --- | --- | --- |
 | `latest` | A stable version is released | Production deployments. This is the default in `docker-compose.deploy.yml`. |
+| `edge` | Every push to the `main` branch | Trying unreleased features. Expect occasional breaking changes. |
 | `1.2.3` | Never. Each stable release gets its own tag. | Pinning an exact version so updates happen only when you change the tag. |
 | `v1.2.3`, `v1.3.0-rc.1` | Never. Each release tag, including prereleases, gets its own tag. | Pinning a release by its Git tag name, or testing a prerelease. |
-| `edge` | Every push to the `main` branch | Trying unreleased features. Expect occasional breaking changes. |
 
 Prereleases (version tags containing `-`, such as `v1.3.0-rc.1`) never update `latest` and don't get a plain version tag. The `beta` tag no longer receives updates. If your compose file uses `beta`, switch to `edge` for the newest builds or to `latest` for stable releases.
 
