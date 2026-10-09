@@ -149,7 +149,24 @@ for (const [index, item] of hubItems.entries()) {
 }
 console.log(`Imported ${tasks.length} genuine Templates Hub tasks`);
 
-// Screenshots use the authenticated setup session; no API key is needed.
+// Populate the Settings API Keys view with realistic, independently scoped demo keys.
+// Secrets stay server-side and are never written to documentation or screenshots.
+const demoKeys = [
+  { name: 'Production Automation', permissions: ['tasks:read', 'tasks:run', 'results:read', 'tasks:manage'] },
+  { name: 'CI/CD Pipeline', permissions: ['tasks:read', 'tasks:run', 'results:read'] },
+  { name: 'Reporting Dashboard', permissions: ['tasks:read', 'results:read'] },
+  { name: 'Scheduled Scrapers', permissions: ['tasks:run'], taskIds: tasks.slice(0, 3).map(task => task.id) },
+];
+for (const key of demoKeys) {
+  const response = await fetch(`${apiBaseUrl}/api/api-keys`, {
+    method: 'POST', headers, body: JSON.stringify(key),
+  });
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`Could not create demo API key "${key.name}": ${response.status} ${detail.slice(0, 400)}`);
+  }
+}
+
 
 // These are illustrative historical entries, not claims that external websites were run.
 // Intercept only the demo tour's history endpoint, leaving Figranium's real UI untouched.
