@@ -25,9 +25,18 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
 
   In task **Output** settings, select an existing database and table that the saved Baserow token can access. Create the table and its fields in Baserow first; Figranium shows known output fields that are missing from the selected table. See [Output Providers](/output-providers#baserow-integration).
 
+  ## Updates
+
+  - **Site-matched password variables**: the editor's **Passwords** tab now lists `{$password}` and `{$uname}` first, followed by 1Password Login items that match the task URL's website or its subdomains. Set a concrete task URL to see matches. See [Variables](/variables).
+  - **Variables in task URLs**: the dashboard and task cards now show URL variables such as `{$query}` as highlighted placeholders instead of plain text.
+
   ## Configuration
 
   Figranium caches 1Password Login-item metadata and password lookups on the server to reduce repeated requests. Set `PASSWORD_CACHE_ENABLED=false` to bypass the cache and fetch current values directly. See [Configuration](/configuration#feature-flags).
+
+  ## Bug fixes
+
+  - **API key permissions**: creating an API key with no recognized permissions now returns `400` with `PERMISSIONS_REQUIRED` instead of creating a key that can't do anything. See [API key](/api-key).
 </Update>
 
 <Note>
