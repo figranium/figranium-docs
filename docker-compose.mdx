@@ -137,6 +137,18 @@ docker compose pull
 docker compose up -d
 ```
 
+### Verify image provenance
+
+Every image Figranium publishes to GHCR, including `edge` and stable releases, has a signed build provenance attestation. The attestation proves that the Figranium GitHub Actions workflow built the image from the `figranium/figranium` repository. Verify it before deploying if your environment requires supply-chain checks.
+
+You need the [GitHub CLI](https://cli.github.com/) (`gh`), signed in with `gh auth login`. Run:
+
+```bash
+gh attestation verify oci://ghcr.io/figranium/figranium:latest -R figranium/figranium
+```
+
+Replace `latest` with the tag you deploy, such as `edge` or `1.2.3`. The command exits with a non-zero status if the image has no valid attestation from the `figranium/figranium` repository.
+
 ## Volume Persistence
 
 Figranium uses volume mounts to ensure your data persists even if you delete the container.
