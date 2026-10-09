@@ -141,7 +141,7 @@ docker compose up -d
 
 Figranium uses volume mounts to ensure your data persists even if you delete the container.
 
-- `./data`: Stores `tasks.json`, `proxies.json`, `settings.json`, and execution logs.
+- `./data`: Stores `tasks.json`, `proxies.json`, `settings.json`, execution logs, the encrypted 1Password connection, and cache files. The master key and encrypted files are in this directory by default, so protect the directory and its backups. Set `MASTER_KEY_FILE` to a separately protected persistent path for stronger key separation.
 - `./captures`: Stores screenshots and recordings. Mount this host directory to **both** `/app/public/captures` and `/app/src/public/captures` inside the container. Agent runs write to the `src/public/captures` path, while scrape runs write to `public/captures`. Mounting both to the same host directory ensures every capture is persisted and visible in the run's detail view in **Executions**.
 
 If you need to backup your data, simply copy these folders.

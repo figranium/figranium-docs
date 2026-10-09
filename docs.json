@@ -46,6 +46,7 @@
               "selectors",
               "highlight-tool",
               "variables",
+              "passwords",
               "advanced-templating",
               "control-flow",
               "error-handling",

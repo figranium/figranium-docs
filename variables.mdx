@@ -42,7 +42,7 @@ When executed, Figranium replaces `{$query}` with "Figranium".
 
 ## 1Password Login Variables
 
-Connect a 1Password service account in **Settings > Connections** to use Login items in tasks. Figranium resolves credential variables on the server from the Login item whose website matches the task URL.
+Connect a 1Password service account in **Settings > Connections** to use Login items in tasks. Figranium resolves credential variables on the server from the Login item whose website matches the task URL. See [Passwords](/passwords) for the Vault list and connection steps.
 
 - `{$password}` and `{$uname}` use the password and username for the task URL's website.
 - `{$passwords.example^com}` and `{$unames.example^com}` select a specific hostname. Replace each dot with `^`, for example `{$passwords.login^example^com}` for `login.example.com`.

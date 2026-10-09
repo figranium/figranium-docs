@@ -66,7 +66,7 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
 
   ### 1Password passwords in tasks
 
-  Connect a 1Password service account token in **Settings > Connections**. Figranium uses a dedicated "Figranium" vault, and creates it if it doesn't exist. Use `{$passwords.example^com}` in any task to insert the password from the Login item whose website is `example.com`, replacing dots with `^`. Figranium resolves passwords on the server. If no Login item matches, or more than one does, the run fails instead of using an empty value. The editor's variable list has a new **Passwords** tab, and **Vault > Passwords** lets you copy saved passwords. See [Variables](/variables).
+  Connect a 1Password service account token in **Settings > Connections**. Figranium uses a dedicated "Figranium" vault, and creates it if it doesn't exist. Use `{$passwords.example^com}` in any task to insert the password from the Login item whose website is `example.com`, replacing dots with `^`. Figranium resolves passwords on the server. If no Login item matches, or more than one does, the run fails instead of using an empty value. The editor's variable list has a new **Passwords** tab, and **Vault > Passwords** lists Login items available to Figranium, including their website domains and usernames. It does not display password values. See [Passwords](/passwords) and [Variables](/variables).
 
   ### Scoped API keys
 
