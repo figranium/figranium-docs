@@ -96,6 +96,12 @@ Figranium generates up to five selector alternatives, ranked from most readable 
 
 See [CSS Selectors — Built-in Highlight Tool](/selectors#built-in-highlight-tool) for details on the ranking algorithm.
 
+## Save login credentials
+
+When you submit a password form in a headful browser session, Figranium can detect the website login and offer to save or update its Login item in the Figranium 1Password vault. Connect a 1Password service account under **Settings > Connections** to use this option. Choose **Save password** to confirm, or **Not now** to dismiss the prompt. Figranium does not save the credentials until you confirm.
+
+The saved Login can then provide `{$password}` and `{$uname}` variables for tasks whose URL matches that website. See [1Password Login variables](/variables#1password-login-variables).
+
 ## Variable support
 
 Headful sessions resolve [task variables](/variables) in the starting URL. For example, if your task defines a variable `site`, you can set the headful URL to:

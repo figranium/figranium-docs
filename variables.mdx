@@ -40,6 +40,20 @@ When executed, Figranium replaces `{$query}` with "Figranium".
   </Tab>
 </Tabs>
 
+## 1Password Login Variables
+
+Connect a 1Password service account in **Settings > Connections** to use Login items in tasks. Figranium resolves credential variables on the server from the Login item whose website matches the task URL.
+
+- `{$password}` and `{$uname}` use the password and username for the task URL's website.
+- `{$passwords.example^com}` and `{$unames.example^com}` select a specific hostname. Replace each dot with `^`, for example `{$passwords.login^example^com}` for `login.example.com`.
+- If no matching Login item exists, the required field is missing, or multiple items match, the task run fails instead of using an empty value.
+- `password` and `uname` are reserved names. Do not define them as ordinary task variables or pass them as runtime variables.
+- Resolved usernames and passwords are redacted from execution results and logs.
+
+<Tip>
+  Figranium can offer to save or update a Login item after you enter credentials in the [headful browser](/headful-browser#save-login-credentials). The prompt requires a connected 1Password service account.
+</Tip>
+
 ## Variable Types
 
 <CardGroup cols={2}>
@@ -110,7 +124,7 @@ This value persists for the remainder of the task execution.
 
 ## Handling Sensitive Values
 
-Figranium does not currently mask or redact variable values in execution logs. Any value you `Type` into an input, pass as a `{$variable}`, or return from a `javascript` block can appear in the execution record stored at `data/executions.json` (or the equivalent PostgreSQL table). Treat that record as sensitive.
+Ordinary variable values are not masked or redacted in execution logs. Values you `Type` into an input, pass as a `{$variable}`, or return from a `javascript` block can appear in the execution record stored at `data/executions.json` (or the equivalent PostgreSQL table). Treat that record as sensitive. Credentials resolved from 1Password variables are redacted from results and logs.
 
 For passwords, API tokens, and other secrets used in a login flow, we recommend:
 
@@ -133,7 +147,7 @@ For passwords, API tokens, and other secrets used in a login flow, we recommend:
 </Steps>
 
 <Tip>
-  Output provider credentials saved under **Settings \> API Keys** (such as Baserow tokens) are stored separately and are redacted in the `GET /api/credentials` API response. This section applies to values typed into pages during a scrape, not to those saved credentials.
+  Output provider credentials saved under **Settings > Connections** (such as Baserow tokens) are stored separately from task variables. This section applies to values typed into pages during a scrape, not to those saved credentials.
 </Tip>
 
 <Tip>

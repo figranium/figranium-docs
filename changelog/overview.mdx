@@ -7,6 +7,30 @@ sidebarTitle: "Changelog"
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
 <Note>
+  The changes listed below v0.20.0 are unreleased and currently available on the `edge` build only. They are not part of the stable release. See [Docker image tags](/docker-compose#image-tags) to run the edge build.
+</Note>
+
+<Update label="2026-10-09" description="Unreleased · Edge Build">
+  ## Features
+
+  ### Save website logins to 1Password
+
+  When you enter credentials in the headful browser, Figranium can offer to save or update the Login item in its 1Password vault. Choose **Save password** to store it, or **Not now** to dismiss the prompt. Connect a 1Password service account under **Settings > Connections** first.
+
+  ### Use 1Password credentials in task variables
+
+  Tasks can now use `{$password}` and `{$uname}` to resolve the password and username from the 1Password Login item matching the task URL's website. You can also target a specific website with `{$passwords.example^com}` or `{$unames.example^com}`, replacing dots in the hostname with `^`. Missing or ambiguous matches fail the run. Credential values are redacted from results and logs. See [Variables](/variables).
+
+  ### Choose an existing Baserow destination
+
+  In task **Output** settings, select an existing database and table that the saved Baserow token can access. Create the table and its fields in Baserow first; Figranium shows known output fields that are missing from the selected table. See [Output Providers](/output-providers#baserow-integration).
+
+  ## Configuration
+
+  Figranium caches 1Password Login-item metadata and password lookups on the server to reduce repeated requests. Set `PASSWORD_CACHE_ENABLED=false` to bypass the cache and fetch current values directly. See [Configuration](/configuration#feature-flags).
+</Update>
+
+<Note>
   Figranium releases continuously. Major features are announced here as they ship. Check back weekly for new capabilities.
 </Note>
 
@@ -17,17 +41,11 @@ Stay up to date with the latest changes to Figranium. For documentation changes,
   - **Image metadata**: the Docker image now includes a description, source repository, and license labels, so registries and container tools show where it came from.
 </Update>
 
-<Update label="2026-10-09" description="Dedicated Baserow tables and Docker release channels">
-  ## Features
-
-  ### Dedicated Baserow tables per task
-
-  In a task's **Output** settings, choose a Baserow workspace and click **Create dedicated database and table**. Figranium creates a new database with a **Results** table just for that task. On each run, Figranium adds a text column for any new key in your data, so you no longer need to set up columns first. Nested values are saved as JSON text. This requires a Baserow token that can create databases in the workspace. See [Baserow integration](/output-providers#baserow-integration).
-
+<Update label="2026-10-09" description="Baserow destinations and Docker release channels">
   ## Updates
 
-  - **Baserow outputs need a dedicated table**: you can no longer pick an existing database or table, or enter a table ID. Outputs that point to an existing table stop pushing data. Create a dedicated table to start pushing again.
-  - **Docker release channels**: `latest` now updates only for stable releases. A new `edge` tag follows every change to `main`. The `beta` tag no longer gets updates. Switch to `edge` or `latest`. See [Image tags](/docker-compose#image-tags).
+  - **Select existing Baserow destinations**: choose a database and table available to your saved token. Create the table and fields in Baserow first. Existing output configurations that pointed at a dedicated table may need their destination selected again. See [Baserow integration](/output-providers#baserow-integration).
+  - **Docker release channels**: `latest` now updates only for stable releases. The `edge` tag follows changes to `main`. The `beta` tag no longer gets updates. Switch to `edge` or `latest`. See [Image tags](/docker-compose#image-tags).
 </Update>
 
 <Update label="2026-10-08" description="Vault and scoped API keys">

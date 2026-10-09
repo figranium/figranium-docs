@@ -77,7 +77,7 @@ Starting in v0.19, Figranium protects the host from running too many Chromium pr
 
 Executions beyond the limit wait in a first-in, first-out queue. When free memory drops below the reserve or CPU load reaches `RESOURCE_CPU_THRESHOLD`, the queue pauses until pressure eases. If the queue is full or an execution waits longer than `EXECUTION_QUEUE_TIMEOUT_MS`, the request returns `503` with `RESOURCE_CAPACITY_EXCEEDED` and a `Retry-After` header. On shutdown, queued executions are released cleanly.
 
-Set `MAX_CONCURRENT_EXECUTIONS` to a positive integer to replace the automatic limit. You can check the current limit, pressure, and queue length from [`GET /api/health`](/rest-api#health). For an in-depth explanation and tuning examples, see [Resource Protection](/resource-protection).
+Set `MAX_CONCURRENT_EXECUTIONS` to a positive integer to replace the automatic limit. You can check the current limit, pressure, and queue length from `GET /api/health`. For an in-depth explanation and tuning examples, see [Resource Protection](/resource-protection).
 
 ## Rate Limiting
 
@@ -98,6 +98,13 @@ Set `MAX_CONCURRENT_EXECUTIONS` to a positive integer to replace the automatic l
 | :-- | :-- | :-- |
 | `SESSION_COOKIE_SECURE` | `false` | Set to `true` if serving over HTTPS. |
 | `FIGRANIUM_TELEMETRY_ENABLED` | `true` | Controls anonymous usage telemetry. Set to `false` to disable telemetry entirely. |
+| `PASSWORD_CACHE_ENABLED` | `true` | Controls server-side caching of 1Password Login-item metadata and password lookups. Set to `false` to bypass the cache. |
+
+<Note>
+  `PASSWORD_CACHE_ENABLED` is currently available on unreleased edge builds only. To try it, use the [`edge` Docker image tag](/docker-compose#image-tags).
+</Note>
+
+By default, Figranium caches 1Password Login-item metadata and password lookups on the server to reduce repeated requests. Set `PASSWORD_CACHE_ENABLED=false` in your environment or Docker Compose `environment` section to disable caching and retrieve values directly from 1Password.
 
 ## Browser Engine
 

@@ -1,30 +1,20 @@
 ---
-title: "Push Task Output to External Providers Automatically"
+title: "Connect Figranium Tasks to an Existing Baserow Table"
 sidebarTitle: "Output Providers"
-description: "Configure Figranium output providers to create a dedicated Baserow database for each task and push extracted data to it automatically after every run."
+description: "Connect a Baserow token, select an existing database and table, then map task results to fields so each run can append rows automatically."
 ---
 
-**Output Providers** allow Figranium to automatically push extracted data to external databases and services immediately after a task completes — no manual download or API polling required.
+Connect an existing Baserow table to a Figranium task to append extracted results after each run. Create the destination and its fields in Baserow first, then choose them in the task's output settings.
 
 ## Overview
 
-After a task finishes extracting data, Figranium can automatically forward the result to a configured output destination. This creates a fully automated pipeline:
-
-```text
-Task runs → Extracts data → Pushes to Baserow table
-```
-
-This is useful for:
-
-- Continuously populating a database with scraped data on a schedule.
-- Building live dashboards that refresh from automated tasks.
-- Feeding extracted data directly into other tools without custom ETL scripts.
+After a task finishes extracting data, Figranium can send its JSON result to a configured output destination. For Baserow, each object becomes a row and an array of objects becomes a batch of rows.
 
 ## Supported Providers
 
 <CardGroup cols={2}>
   <Card title="Baserow" icon="database" href="#baserow-integration">
-    Open-source no-code database. Appends rows to a table via the Baserow REST API.
+    Append task results to an existing Baserow table through the Baserow REST API.
   </Card>
 </CardGroup>
 
@@ -34,69 +24,55 @@ Additional providers may be added in future releases.
 
 ## Baserow Integration
 
-[Baserow](https://baserow.io) is a self-hosted, open-source alternative to Airtable. Figranium integrates with it to push extracted JSON data into a dedicated Baserow table that Figranium creates for each task.
+[Baserow](https://baserow.io) is a self-hosted, open-source alternative to Airtable. Figranium can append extracted JSON data to a table that you select from the databases and tables available to your saved token.
 
 ### Prerequisites
 
-1. A running Baserow instance (self-hosted or Baserow.io cloud).
-2. A Baserow token that can list workspaces and create databases and tables in the target workspace. Database-only tokens can't provision a destination.
-3. A saved task. Figranium uses the task ID to name the dedicated database.
+1. A running Baserow instance, either self-hosted or Baserow.io cloud.
+2. A Baserow database token with permission to list accessible databases and tables and create rows in the destination table.
+3. An existing database, table, and fields that match the task's output.
 
 ### Step 1: Configure credentials
 
-You can add credentials in two places:
-
-<Tabs>
-  <Tab title="From Settings">
-    1. Go to **Settings \> API Keys**.
-    2. Under **Database / Output**, click **Add API Key** and select **Baserow**.
-    3. Enter a **Name**, **Base URL** (e.g., `https://api.baserow.io`), and your **API Token**.
-    4. Save the credential.
-  </Tab>
-  <Tab title="From the task editor">
-    1. Open a task and go to **Settings \> Output**.
-    2. Click **\+ New** next to the Credential dropdown.
-    3. Fill in the same fields and save.
-  </Tab>
-</Tabs>
-
-<Note>
-  Figranium validates the base URL to prevent requests to private or internal network addresses. If `ALLOW_PRIVATE_NETWORKS` is set to `false`, URLs pointing to private IP ranges (such as `10.x.x.x`, `172.16.x.x`, or `192.168.x.x`) are rejected. Redirect chains are also validated — if a Baserow instance returns a redirect, each hop is checked against the same blocklist. Additionally, sensitive headers like `Authorization` are automatically stripped if a redirect crosses to a different origin. See [Security best practices](/security) for details.
-</Note>
-
-### Step 2: Create a dedicated destination
-
-Each task writes to its own dedicated Baserow database. You can't select an existing database or table, or enter a table ID manually.
+You can add a Baserow credential in **Settings > Connections** or from the task editor:
 
 <Steps>
-  <Step title="Open task output settings">
-    Open the task in the **Task Editor** and go to **Settings \> Output**.
+  <Step title="Open the credential form">
+    In **Settings > Connections**, go to **Database / Output** and add a credential. Alternatively, open task **Settings > Output** and choose **\+ New** next to the credential selector.
   </Step>
-  <Step title="Select provider and credential">
-    Select **Provider**: `Baserow` and choose the credential you just created.
+  <Step title="Enter your Baserow details">
+    Select **Baserow**, then enter a name, the Baserow base URL (for example, `https://api.baserow.io`), and your API token.
   </Step>
-  <Step title="Create the database and table">
-    Under **Dedicated Baserow destination**, choose a workspace and click **Create dedicated database and table**. Figranium creates a database named `Figranium - <task name> - <task ID>` with a table named `Results`. The editor then shows the new table ID as **Current table**.
-  </Step>
-  <Step title="Set error behavior">
-    Choose **On Push Error**: `Ignore` (default) or `Log Error`.
-  </Step>
-  <Step title="Save the task">
-    Save the task to activate the output provider.
+  <Step title="Save the credential">
+    Save the credential. Figranium stores it separately from task variables and uses it when sending rows to Baserow.
   </Step>
 </Steps>
 
-<Warning>
-  Figranium only pushes to dedicated destinations created from **Settings \> Output**. Tasks configured with a manually selected database or table ID before this change no longer push data. Open each affected task and create a dedicated destination to resume pushes.
-</Warning>
+### Step 2: Select the output destination
 
-### Step 3: Return extraction data
+<Steps>
+  <Step title="Open task output settings">
+    Open the task in the editor and go to **Settings > Output**.
+  </Step>
+  <Step title="Choose Baserow and a credential">
+    Select **Baserow**, then select the saved credential that can access your destination.
+  </Step>
+  <Step title="Choose a database and table">
+    Select an existing database, then select a table within it. Figranium lists destinations available to the token. It does not create databases, tables, or fields.
+  </Step>
+  <Step title="Create matching fields in Baserow">
+    Create a field for each key in your extraction output. The task editor shows known output fields that are missing from the selected table. If you use a JavaScript extraction script and have no sample output yet, run the task once to identify the fields.
+  </Step>
+  <Step title="Choose error behavior and save">
+    Set **On Push Error** to `ignore` (default) or `fail`, then save the task. `fail` marks the execution as failed if the Baserow push fails.
+  </Step>
+</Steps>
 
-You don't need to create columns in advance. Before each push, Figranium reads the fields on the `Results` table. It then creates a long text field for every key in your data that doesn't have a matching field yet. Figranium matches field names exactly (case-sensitive).
+### Return data that matches your table
 
-Your extraction script must return either:
+Figranium uses Baserow's `user_field_names=true` option. Object keys in your extraction result must match the field names in the selected table exactly, including capitalization.
 
-**A single object (inserts one row):**
+Return a single object to insert one row:
 
 ```js
 return {
@@ -107,7 +83,7 @@ return {
 };
 ```
 
-**An array of objects (inserts multiple rows in a batch):**
+Return an array of objects to insert multiple rows:
 
 ```js
 const rows = Array.from(document.querySelectorAll(".product-card")).map(card => ({
@@ -119,34 +95,21 @@ const rows = Array.from(document.querySelectorAll(".product-card")).map(card => 
 return rows;
 ```
 
-Any other shape, such as an empty array, a primitive, or an array that contains non-objects, fails the push.
+Each returned object becomes a row. Nested objects and arrays are serialized as JSON text. The table must already have compatible fields for every key.
 
 ### How data is sent
 
-Figranium stores every value as text:
-
-| Value type | Stored as |
+| Extracted data shape | Baserow API operation |
 | :-- | :-- |
-| String | Unchanged |
-| `null` or `undefined` | Empty string |
-| Number, boolean, object, or array | JSON string (for example, `29.99`, `true`, or `{"a":1}`) |
+| JSON object `{}` | Create one row in the selected table |
+| JSON array `[{}, {}]` | Batch-create rows in the selected table |
 
-| Extracted data shape | Baserow API call |
-| :-- | :-- |
-| JSON object `{}` | Single row via `POST /api/database/rows/table/{tableId}/` |
-| JSON array `[{}, {}]` | Batch insert via `POST /api/database/rows/table/{tableId}/batch/` |
+Figranium authenticates with `Authorization: Token <your-token>`.
 
-The integration uses Baserow's `user_field_names=true` parameter and authenticates with `Authorization: Token <your-token>`.
+### Error handling
 
-### Error Handling
+By default, output push failures are ignored so a temporary Baserow issue does not fail the task. Set **On Push Error** to `fail` if the execution should fail when the push fails. Check the execution logs for the output push status.
 
-By default, push failures are **ignored** — the execution is marked as successful even if the Baserow push fails. This prevents network blips from causing false task failures.
-
-To log push failures as errors instead of warnings, set **On Push Error** to `Log Error` in the output settings.
-
-Check the execution logs for output push status:
-
-```text
-[OUTPUT] Pushed data to baserow for execution exec_abc123
-[OUTPUT] Push to baserow FAILED for execution exec_abc123: Baserow batch insert failed (403)
-```
+<Note>
+  Figranium validates Baserow URLs and redirect destinations to help prevent requests to private or internal network addresses. See [Security best practices](/security) for details.
+</Note>
