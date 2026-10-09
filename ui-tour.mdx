@@ -1,10 +1,10 @@
 ---
-title: "Figranium UI Tour: Dashboard, Templates, Editor, Executions, Cabinets, Settings"
+title: "Figranium UI Tour: Dashboard, Templates, Vault, Editor, Executions, Cabinets, Settings"
 sidebarTitle: "UI Tour"
-description: "Explore Figranium's six main sections: Dashboard, Templates, Editor, Executions, Cabinets, and Settings. Learn how to navigate, create tasks, and configure your instance."
+description: "Explore Figranium's main sections: Dashboard, Templates, Vault, Editor, Executions, Cabinets, and Settings. Learn how to navigate, build tasks, manage cookies and logins, and configure your instance."
 ---
 
-Figranium's user interface is designed for simplicity and power. It consists of six main sections: Dashboard, Templates, Editor, Executions, Cabinets, and Settings.
+Figranium's user interface is organized around Dashboard, Templates, Vault, Editor, Executions, Cabinets, and Settings. Vault groups reusable cookie states and 1Password Login information in one place.
 
 <CardGroup cols={2}>
   <Card title="Dashboard" icon="home" href="/dashboard">
@@ -13,6 +13,10 @@ Figranium's user interface is designed for simplicity and power. It consists of 
 
   <Card title="Templates" icon="sketching" href="/community-presets">
     Browse community automations and import them into your workspace as new tasks.
+  </Card>
+
+  <Card title="Vault" icon="lock" href="/passwords">
+    Manage reusable browser cookie states and inspect Login items from your connected 1Password vault.
   </Card>
 
   <Card title="Executions" icon="history" href="/executions">
@@ -55,6 +59,21 @@ The **Templates** screen (`/templates`) lists ready-to-use community automations
 - **Import**: Click **Import** on a card or in the preview to add the template as a new task and open it in the editor.
 
 See [Templates](/community-presets) for details.
+
+## Vault
+
+<img
+  src="/images/tasks/ui-vault.png"
+  alt="Figranium Vault showing reusable cookie states and 1Password Login items"
+/>
+
+The **Vault** screen brings browser session states and passwords together in two tabs. This feature is currently available on the `edge` build.
+
+- **Cookies / States**: Create an empty cookie state or import a Playwright storage-state JSON file. Rename or delete saved states, and select one for a task using the editor's **States** control. Executions load the selected state and persist updated cookies back to it; choose **No State** to start with an isolated browser context.
+- **Passwords**: Connect a 1Password service account through **Settings > Connections** to view Login items accessible to Figranium. The list shows website domains, usernames, item names, and their vault without revealing password values.
+- **Using logins**: Reference the matching website's username or password in task variables, or choose to save a Login item after submitting a login form in a headful browser session.
+
+See [Session State](/session-state), [Passwords](/passwords), and [Variables](/variables) for details.
 
 ## Editor
 
@@ -150,7 +169,7 @@ See [Downloads and Cabinets](/file-downloads) for the full workflow.
 
 <img src="/images/tasks/ui-settings.png" alt="Figranium Settings page" />
 
-Global configuration for the Figranium instance. Settings is split into sections, each shown with an icon next to its label: **API Keys**, **User Agent**, **Proxies**, **Appearance**, **About**, and **Advanced**.
+Global configuration for the Figranium instance. Settings includes **API Keys**, **Connections**, **User Agent**, **Proxies**, **Appearance**, **About**, and **Advanced**. Connections is where you configure integrations such as 1Password.
 
 - **API Keys**: A unified panel for managing keys and provider connections:
   - **Tasks API Key**: Your key for remote execution via the REST API. Copy or regenerate it here.
