@@ -100,13 +100,14 @@ Set `MAX_CONCURRENT_EXECUTIONS` to a positive integer to replace the automatic l
 | `FIGRANIUM_TELEMETRY_ENABLED` | `true` | Controls anonymous usage telemetry. Set to `false` to disable telemetry entirely. |
 | `PASSWORD_CACHE_ENABLED` | `true` | Controls server-side caching of 1Password Login-item metadata and password lookups. Set to `false` to bypass the cache. |
 | `PASSWORD_CACHE_KEY` | Local key file | Optional secret used to derive the encryption key for the 1Password cache. If unset, Figranium creates or reuses `data/password_cache.key`. |
-| `MASTER_KEY_FILE` | `data/master.key` | Optional path for the master key that encrypts supported file-backed credentials, including the 1Password connection. Use a persistent, separately protected path for stronger separation from encrypted data. |
+| `MASTER_KEY` | — | Optional external master key that enables authenticated encryption for new file-backed secrets. Without it, new file-backed secret writes use plaintext JSON. |
+| `MASTER_KEY_FILE` | `data/master.key` | Optional path for the local master-key file used when configured. Use a persistent, separately protected path for stronger key separation. |
 
-<Note>
-  `PASSWORD_CACHE_ENABLED` is currently available on unreleased edge builds only. To try it, use the [`edge` Docker image tag](/docker-compose#image-tags).
-</Note>
+By default, Figranium caches 1Password Login-item metadata and password lookups on the server to reduce repeated requests. The persistent cache is encrypted with AES-256-GCM. If `PASSWORD_CACHE_KEY` is unset, Figranium creates or reuses a random key in `data/password_cache.key`; the cache file and key are stored together in `data/` by default. For more control, set `PASSWORD_CACHE_KEY` to a secret managed separately from that directory.
 
-By default, Figranium caches 1Password Login-item metadata and password lookups on the server to reduce repeated requests. The persistent cache is encrypted with AES-256-GCM. If `PASSWORD_CACHE_KEY` is unset, Figranium creates or reuses a random key in `data/password_cache.key`; the cache file and key are stored together in `data/` by default. For more control, set `PASSWORD_CACHE_KEY` to a secret managed separately from that directory. On current `edge` builds, supported file-backed credentials, including the saved 1Password connection, also use envelope encryption with a master key. `MASTER_KEY_FILE` defaults to `data/master.key`; point it to a separately protected persistent mount for stronger separation. Keep the same master key available for existing encrypted files, because a new or empty key cannot decrypt them. Set `PASSWORD_CACHE_ENABLED=false` in your environment or Docker Compose `environment` section to disable caching and retrieve values directly from 1Password. See [Passwords](/passwords#local-storage-and-encryption) for file protection and cache expiry details.
+Secret encryption is opt-in for new file-backed credentials. Configure `MASTER_KEY` to enable authenticated envelope encryption, and use `MASTER_KEY_FILE` when you need to control the local key-file path. Without an explicitly configured master key, new file-backed secret writes use plaintext JSON. Existing encrypted files remain accessible with their original key and migrate to plaintext only after successful decryption when encryption is disabled. Figranium refuses to overwrite encrypted data when its original key is unavailable.
+
+Set `PASSWORD_CACHE_ENABLED=false` in your environment or Docker Compose `environment` section to bypass the cache and retrieve values directly from 1Password. Password management can continue if the optional encrypted local cache cannot be written. See [Passwords](/passwords#local-storage-and-encryption) for file protection and cache expiry details.
 
 ## Browser Engine
 

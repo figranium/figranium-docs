@@ -36,20 +36,26 @@ The endpoint distinguishes two failure modes via separate error codes:
 
 | Error code | Status | When |
 | :-- | :-- | :-- |
-| `API_KEY_NOT_SET` | `403` | The server has no API key configured. Set one in **Settings \> System** before calling protected endpoints. |
+| `API_KEY_NOT_SET` | `403` | The server has no API key configured. Set one in **Settings > API Keys** before calling protected endpoints. |
 | `INVALID_API_KEY` | `401` | A key was sent (or omitted) and did not match the configured key. The same code is returned for missing, malformed, and incorrect keys to avoid leaking which case applied. |
 
 No configuration is required — this protection is always active on every endpoint that uses API key authentication, including `requireApiKey` and `requireAuthOrApiKey` routes.
 
 After setup, you should also:
 
-- **API Key**: Generate a strong API key in **Settings \> System**. All API keys are limited to 512 characters.
+- **API Key**: Generate a strong API key in **Settings \> API Keys**. All API keys are limited to 512 characters.
 - **Rotate**: Regularly regenerate the API key if you suspect it's compromised.
 - **Header**: Always use `x-api-key` or `Authorization: Bearer` for API calls.
 
 ### Settings endpoints always require authentication
 
 Every route under `/api/settings/*` — including API key management and proxy configuration — requires a logged-in session regardless of `NODE_ENV`. There is no development mode that bypasses this check, so unauthenticated requests to settings routes always return `401 UNAUTHORIZED`, even on a local `npm run dev` instance. This prevents accidental exposure of credentials if a development instance is reachable from the network.
+
+## Cloud-to-instance authentication handoff
+
+If you connect a Figranium Cloud account to a self-hosted instance, the optional authentication handoff exchanges a short-lived, single-use code between the services. The integration is disabled unless you explicitly configure it and a matching local account has already been provisioned.
+
+The handoff requires HTTPS and includes redirect, replay, and session protections. Do not treat the handoff code as a reusable API key, and do not expose it in logs or URLs that third parties can access.
 
 ## IP Allowlist (`ALLOWED_IPS`)
 

@@ -6,11 +6,33 @@ sidebarTitle: "Changelog"
 
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
-<Note>
-  The changes listed below v0.20.0 are unreleased and currently available on the `edge` build only. They are not part of the stable release. See [Docker image tags](/docker-compose#image-tags) to run the edge build.
-</Note>
+<Update label="2026-10-10" description="v0.21.1">
+  ## API reliability and credential security
 
-<Update label="2026-10-09" description="Unreleased · Edge Build">
+  v0.21.1 fixes API regressions from v0.21.0 and strengthens credential storage behavior.
+
+  - Protected API endpoints restore scoped API-key authentication and return structured JSON errors for unhandled failures.
+  - Task and filesystem read failures now propagate instead of appearing as empty Task lists, and failed filesystem loads can retry on later requests.
+  - Persistent writes update Task caches only after success, while scoped API-key database replacement is transactional.
+  - Secret encryption is now opt-in for new file-backed writes through `MASTER_KEY`. Existing encrypted files remain readable with their original key, and Figranium refuses to overwrite encrypted data when that key is unavailable.
+  - PostgreSQL-backed deployments store 1Password configuration in PostgreSQL instead of relying on a writable local secret file.
+  - Password management continues if the optional encrypted local cache cannot be written.
+
+  See [API Key](/api-key), [Passwords](/passwords), and [Configuration](/configuration#feature-flags).
+</Update>
+
+<Update label="2026-10-09" description="v0.21.0">
+  ## Scoped access, integrations, and portability
+
+  - Create named, scoped API keys with permissions for reading Tasks, running Tasks and reading results, or managing Tasks. Restrict keys to selected Tasks and revoke them individually. See [API Key](/api-key).
+  - Manage reusable browser cookie states and attach a selected state to a Task. See [Session State](/session-state).
+  - Connect 1Password and Baserow from **Settings > Connections**. Use 1Password Login items through `{$password}` and `{$uname}` variables, save credentials from headful login flows, and configure Baserow output destinations. See [Passwords](/passwords) and [Output Providers](/output-providers).
+  - Export and selectively import Tasks, Executions, Captures, API Keys, and Cookies as ZIP archives with a manifest. See [Captures and Storage](/captures-and-storage).
+  - Optionally connect a Figranium Cloud account to a self-hosted instance through a protected, short-lived authentication handoff. See [Security](/security).
+  - Stable Docker releases now use `latest`, while commits to `main` publish to `edge`. GHCR images include verifiable build provenance attestations. See [Docker Compose](/docker-compose).
+</Update>
+
+<Update label="2026-10-09" description="Unreleased">
   ## Features
 
   ### Save website logins to 1Password

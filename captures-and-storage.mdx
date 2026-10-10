@@ -132,6 +132,12 @@ Tasks, executions, and API keys are exported from the active storage backend, so
 
 You can also export through [`POST /api/settings/export`](/rest-api#system-settings).
 
+### Importing data
+
+Restore selected categories from a Figranium export ZIP in **Settings > Advanced > Import data**. Choose the archive, select the categories to restore, and click **Import selected**. Imported categories replace their matching workspace data. Categories you leave unselected are not changed.
+
+Use the import flow when moving selected Tasks, Executions, Captures, API Keys, or Cookies between instances. Treat archives as sensitive because API keys and cookies are readable inside the ZIP.
+
 ### File Cleanup
 
 Screenshots, videos, and downloaded files accumulate in `public/captures`. Video recordings are stored separately in `data/recordings`. You can delete or download them:

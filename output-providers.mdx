@@ -57,8 +57,8 @@ You can add a Baserow credential in **Settings > Connections** or from the task 
   <Step title="Choose Baserow and a credential">
     Select **Baserow**, then select the saved credential that can access your destination.
   </Step>
-  <Step title="Choose a database and table">
-    Select an existing database, then select a table within it. Figranium lists destinations available to the token. It does not create databases, tables, or fields.
+  <Step title="Choose or provision a destination">
+    Select an existing database and table available to the token, or use the provisioning flow to create a dedicated database and table for the Task output. Figranium can create compatible text fields and add missing columns for provisioned destinations.
   </Step>
   <Step title="Create matching fields in Baserow">
     Create a field for each key in your extraction output. The task editor shows known output fields that are missing from the selected table. If you use a JavaScript extraction script and have no sample output yet, run the task once to identify the fields.
@@ -67,6 +67,12 @@ You can add a Baserow credential in **Settings > Connections** or from the task 
     Set **On Push Error** to `ignore` (default) or `fail`, then save the task. `fail` marks the execution as failed if the Baserow push fails.
   </Step>
 </Steps>
+
+### Provisioned destinations
+
+The Baserow provisioning flow creates a dedicated database and table for an individual Task output. It configures typed destination settings, provisions text fields for the output, and adds columns when new output fields require them. Use an existing destination instead when you want to manage the database, table, and field schema yourself.
+
+Provisioning and database or table discovery require the saved Baserow token to have the corresponding access. These workspace and provisioning operations are rate-limited.
 
 ### Return data that matches your table
 

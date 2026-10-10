@@ -7,12 +7,16 @@ description: "Find, copy, generate, and use your Figranium API key for integrati
 Use your Figranium API key to authenticate integrations, scripts, and other external tools with your instance.
 
 <Steps>
-  <Step title="Open Settings">
-    In Figranium, open **Settings** from the main navigation.
+  <Step title="Open API Keys">
+    In Figranium, open **Settings > API Keys** from the main navigation.
   </Step>
 
-  <Step title="Copy or generate your key">
-    Copy your existing Figranium API key. If you do not have one yet, generate a new key.
+  <Step title="Create a named key">
+    Select **Add API Key**, give the key a name, and choose only the permissions it needs. You can optionally restrict it to specific Tasks.
+  </Step>
+
+  <Step title="Copy it once">
+    Copy the secret when Figranium shows it after creation. Store it securely because the full value is shown only once.
   </Step>
 
   <Step title="Paste it into your integration">
@@ -44,9 +48,27 @@ curl https://your-figranium.example.com/api/tasks \
   Your Figranium **Base URL** is the address of your own Figranium instance. For example, `https://figranium.example.com` or `http://localhost:11345` for a default local installation.
 </Note>
 
+## Permissions and Task restrictions
+
+Create each key for one integration or workflow and grant only the access it needs:
+
+| Permission | Allows |
+| :-- | :-- |
+| `tasks:read` | Read Tasks. |
+| `tasks:run` | Run Tasks and read their execution results. |
+| `tasks:manage` | Manage Tasks. |
+
+You can restrict a key to selected Tasks with a Task allowlist. A restricted key cannot access other Tasks, even when it has the corresponding permission.
+
+Figranium accepts existing `results:read` keys and normalizes them to the current `tasks:run` access model.
+
+## Revoking a key
+
+To invalidate a key, open **Settings > API Keys**, select the key, and confirm the revocation. Any integration using the revoked key must be updated with another key.
+
 ## Regenerating a key
 
-If a key is exposed or you want to replace it, generate a new one in **Settings > API Keys**. Any integration still using the previous key will need to be updated with the new value.
+If a key is exposed or you want to replace it, create a new named key in **Settings > API Keys**, update your integrations, then revoke the old key.
 
 <Card title="REST API Reference" icon="code" href="/rest-api">
   See the full API reference for authentication methods, endpoints, request bodies, and examples.
