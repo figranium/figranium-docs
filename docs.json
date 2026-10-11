@@ -296,8 +296,8 @@
     ]
   },
   "favicon": {
-    "light": "/images/favicon.svg",
-    "dark": "/images/icon_light.svg"
+    "light": "/images/figranium_icon.svg",
+    "dark": "/images/figranium_icon.svg"
   },
   "logo": {
     "light": "/images/figranium-dark.svg",
