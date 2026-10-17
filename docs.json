@@ -337,7 +337,7 @@
   "fonts": {
     "family": "Questrial"
   },
-  "description": "Figranium is an open-source browser automation platform for visually building reliable browser tasks and running them through an API.",
+  "description": "Open-source, self-hosted visual browser automation: build reliable Tasks visually, then run them through an API, SDKs, MCP, n8n, Zapier, and more.",
   "navbar": {
     "primary": {
       "type": "github",
