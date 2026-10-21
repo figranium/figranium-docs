@@ -1,0 +1,32 @@
+---
+title: "REST API Errors"
+sidebarTitle: "Errors & Retries"
+description: "Handle REST API failures, execution capacity limits, and timeouts."
+---
+
+Check the HTTP status and response body on every REST API call. Error responses can include a machine-readable `error` code.
+
+## Common conditions
+
+| HTTP status | Meaning | Recommended action |
+| :-- | :-- | :-- |
+| `400` | Invalid request data | Correct the request; do not blindly retry |
+| `401` / `403` | Missing credentials or insufficient access | Check the key, permissions, and Task allowlist |
+| `404` | Resource not found | Verify the Task or resource ID |
+| `503` | Capacity exceeded or service unavailable | Retry cautiously when transient |
+| `504` | Execution timeout | Inspect the Task and execution limits |
+
+## Capacity errors
+
+When resource protection is active, an execution can return `503` with error code `RESOURCE_CAPACITY_EXCEEDED` if the queue is full or the wait exceeds `EXECUTION_QUEUE_TIMEOUT_MS`. The response includes `retryAfterMs` and a `Retry-After` header.
+
+A `504` with `EXECUTION_TIMEOUT` means a non-headful run exceeded `EXECUTION_TIMEOUT_MS` and was stopped.
+
+## Retry carefully
+
+- Honor `Retry-After` when present and use bounded exponential backoff for transient failures.
+- Do not retry invalid requests or permission failures without changing the request or credentials.
+- A Task may have external side effects. Before retrying an ambiguous network failure, inspect execution history to avoid duplicate work.
+- If capacity errors persist, review [Resource Protection](/resource-protection).
+
+For endpoint-specific error codes, see the [REST API Reference](/rest-api).
