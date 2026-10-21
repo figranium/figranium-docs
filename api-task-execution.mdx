@@ -1,0 +1,52 @@
+---
+title: "Run Tasks via REST"
+sidebarTitle: "Run Tasks"
+description: "Trigger Figranium Tasks through the REST API with variables and optional completion webhooks."
+---
+
+Use `POST /api/tasks/:id/api` to execute a saved Task from a script or integration. The default base URL is `http://localhost:11345`.
+
+## Run a Task
+
+```bash
+curl -X POST "http://localhost:11345/api/tasks/TASK_ID/api" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+A key with `tasks:run` is appropriate. If the key has a Task allowlist, the Task must be included.
+
+## Override variables
+
+Send a JSON body and `Content-Type: application/json`:
+
+```bash
+curl -X POST "http://localhost:11345/api/tasks/TASK_ID/api" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"variables":{"query":"laptops"}}'
+```
+
+Without a body, Figranium uses the Task's default variables.
+
+## Optional execution settings
+
+| Field | Purpose |
+| :-- | :-- |
+| `variables` | Override Task variables for this run |
+| `webhookUrl` | Receive a completion callback |
+| `statelessExecution` | Use a clean browser context without saved cookies |
+| `sessionId` | Load and persist a named browser session snapshot |
+
+For example:
+
+```json
+{
+  "variables": { "query": "laptops" },
+  "statelessExecution": true,
+  "webhookUrl": "https://example.com/figranium/callback"
+}
+```
+
+A completion webhook receives the execution ID, Task ID, status, duration, and result. Webhook destinations are subject to server-side URL validation; delivery failures are logged without changing the original execution result.
+
+See [REST API Reference](/rest-api#trigger-a-task) for detailed response behavior and [Session State](/session-state) for session handling.
