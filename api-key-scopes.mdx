@@ -1,0 +1,72 @@
+---
+title: "Scoped API Keys"
+sidebarTitle: "Scoped Keys"
+description: "Restrict Figranium API keys by permission and Task allowlist."
+---
+
+Scoped API keys let you give integrations only the access they need. Configure them in **Settings > API Keys**.
+
+## Available permissions
+
+| Permission | Access |
+| :-- | :-- |
+| `tasks:read` | Read Tasks |
+| `tasks:run` | Run Tasks and read execution results |
+| `tasks:manage` | Manage Tasks |
+
+<Note>
+  Older keys using `results:read` are accepted and normalized to `tasks:run`.
+</Note>
+
+## Create a scoped key
+
+<Steps>
+  <Step title="Open API Keys">
+    Go to **Settings > API Keys** and select **Add API Key**.
+  </Step>
+  <Step title="Name the integration">
+    Use a recognizable name, such as `Daily reporting` or `n8n production`.
+  </Step>
+  <Step title="Choose permissions">
+    Select only the permissions the integration needs. A run-only integration usually needs `tasks:run`; a dashboard listing Tasks needs `tasks:read`.
+  </Step>
+  <Step title="Restrict Tasks if appropriate">
+    Choose the Task IDs this key should access. The allowlist limits access even when a permission would otherwise allow the operation.
+  </Step>
+  <Step title="Copy and store the secret">
+    The full secret is displayed only at creation. Save it in your integration's secret storage.
+  </Step>
+</Steps>
+
+## Example: run a single Task
+
+Create a key with `tasks:run` and restrict it to the desired Task. Then call its execution endpoint:
+
+```bash
+curl -X POST "http://localhost:11345/api/tasks/TASK_ID/api" \
+  -H "x-api-key: YOUR_SCOPED_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"variables":{"query":"example"}}'
+```
+
+The key cannot be used to access Tasks outside its allowlist. For reading Task definitions, separately grant `tasks:read`.
+
+## Common configurations
+
+| Integration | Suggested permission |
+| :-- | :-- |
+| Task inventory dashboard | `tasks:read` |
+| Scheduled external trigger | `tasks:run` |
+| Task administration tool | `tasks:read`, `tasks:manage` (and `tasks:run` if it executes Tasks) |
+
+These are starting points; verify the endpoints your integration actually uses.
+
+## Rotate or revoke
+
+Create a replacement key, update the integration, verify it works, and then revoke the old key under **Settings > API Keys**. Revocation immediately invalidates integrations using that secret.
+
+<Warning>
+  Never use a broad legacy key where a limited named key is sufficient. API-key administration itself uses authenticated UI-session endpoints; do not assume a scoped Task key can create or revoke other keys.
+</Warning>
+
+See [Authentication](/api-authentication) and the [REST API Reference](/rest-api).
