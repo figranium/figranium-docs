@@ -1,39 +1,158 @@
 ---
 title: "REST API Authentication"
 sidebarTitle: "Authentication"
-description: "Authenticate Figranium REST requests with a named API key."
+description: "Connect securely to the Figranium REST API with named keys, headers, and least-privilege access."
 ---
 
-Figranium accepts named API keys for programmatic access to your instance. Create one under **Settings > API Keys**. Use a separate key for each integration so it can be revoked independently.
+Every Figranium instance exposes its own REST API. Use a named API key to authenticate scripts, automation platforms, and other integrations without sharing an interactive UI session.
 
-## Send a key
+<CardGroup cols={2}>
+  <Card title="Get an API key" icon="key" href="/api-key">
+    Create and securely store a named credential.
+  </Card>
+  <Card title="Scope access" icon="shield-lock" href="/api-key-scopes">
+    Choose permissions and restrict the accessible Tasks.
+  </Card>
+</CardGroup>
 
-The recommended approach is the `x-api-key` header:
+## Before you begin
 
-```bash
-curl http://localhost:11345/api/tasks \
-  -H "x-api-key: YOUR_API_KEY"
-```
+<Steps>
+  <Step title="Find your instance URL">
+    The default local address is `http://localhost:11345`. Remote installations use their own hostname, such as `https://figranium.example.com`.
+  </Step>
+  <Step title="Create a named key">
+    Open **Settings → API Keys**, select **Add API Key**, and choose permissions for the integration. Copy the secret when it appears.
+  </Step>
+  <Step title="Store the secret securely">
+    Use your integration's credential store or a server-side environment variable. Never put the key in a frontend bundle.
+  </Step>
+  <Step title="Make a test request">
+    Call an endpoint compatible with the selected scopes, such as a Task listing with `tasks:read`.
+  </Step>
+</Steps>
 
-Bearer authentication is also supported:
+## Authentication methods
 
-```bash
-curl http://localhost:11345/api/tasks \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+<Tabs>
+  <Tab title="x-api-key (recommended)">
+    Pass the secret in an HTTP header.
 
-The default local base URL is `http://localhost:11345`. Replace it with your instance URL when deployed remotely, and use HTTPS for remote connections.
+    ```bash
+    curl "http://localhost:11345/api/tasks" \
+      -H "x-api-key: YOUR_API_KEY"
+    ```
 
-## Permissions
+    This is the clearest approach for scripts and integrations that support custom headers.
+  </Tab>
+  <Tab title="Bearer token">
+    The API also accepts an Authorization bearer header.
 
-Named keys can have `tasks:read`, `tasks:run`, and `tasks:manage` permissions. They can also be restricted to selected Task IDs. An authenticated request can still be rejected when the key lacks the permission or Task access required by the endpoint.
+    ```bash
+    curl "http://localhost:11345/api/tasks" \
+      -H "Authorization: Bearer YOUR_API_KEY"
+    ```
 
-See [Scoped API Keys](/api-key-scopes) for setup and examples.
+    Use this form for clients with built-in bearer-token authentication.
+  </Tab>
+</Tabs>
 
-## Security
+<Note>
+  Some legacy integrations may support other authentication formats. Prefer `x-api-key` or `Authorization: Bearer` for new integrations, and consult the [REST API Reference](/rest-api) for endpoint-specific details.
+</Note>
 
-<Warning>
-  Never embed API keys in browser-side JavaScript, public repositories, screenshots, or logs. Store secrets in your integration's secret manager or environment variables.
-</Warning>
+## Integrate with code
 
-Keep a key per integration, grant the minimum permissions, and revoke credentials that are no longer needed. See [API Key](/api-key) for the creation and replacement workflow.
+<Tabs>
+  <Tab title="JavaScript">
+    ```js
+    const baseUrl = process.env.FIGRANIUM_URL ?? "http://localhost:11345";
+    const response = await fetch(`${baseUrl}/api/tasks`, {
+      headers: { "x-api-key": process.env.FIGRANIUM_API_KEY }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Figranium returned HTTP ${response.status}`);
+    }
+
+    const tasks = await response.json();
+    console.log(tasks);
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    import os
+    import requests
+
+    base_url = os.getenv("FIGRANIUM_URL", "http://localhost:11345")
+    response = requests.get(
+        f"{base_url}/api/tasks",
+        headers={"x-api-key": os.environ["FIGRANIUM_API_KEY"]},
+        timeout=30,
+    )
+    response.raise_for_status()
+    print(response.json())
+    ```
+  </Tab>
+  <Tab title="cURL">
+    ```bash
+    export FIGRANIUM_URL="http://localhost:11345"
+    export FIGRANIUM_API_KEY="YOUR_API_KEY"
+
+    curl "$FIGRANIUM_URL/api/tasks" \
+      -H "x-api-key: $FIGRANIUM_API_KEY"
+    ```
+  </Tab>
+</Tabs>
+
+## Authentication versus authorization
+
+Providing a valid key proves the caller's identity. It does **not** guarantee that every endpoint or Task is accessible.
+
+| Check | Example |
+| :-- | :-- |
+| Authentication | Is the supplied API key valid and active? |
+| Permission scope | Does the key have `tasks:run` to execute a Task? |
+| Task restriction | Is the requested Task in the key's allowlist? |
+
+<Tip>
+  Create separate credentials for read-only dashboards, scheduled runners, and Task administration. That way, one compromised integration does not automatically gain every capability.
+</Tip>
+
+## Production security
+
+<AccordionGroup>
+  <Accordion title="Use HTTPS for remote access">
+    HTTPS protects credentials in transit. The default HTTP address is intended for local development or trusted local environments, not public transmission of secrets.
+  </Accordion>
+  <Accordion title="Keep credentials out of logs">
+    Do not log full request headers containing `x-api-key` or `Authorization`. Mask or omit secrets in debugging output.
+  </Accordion>
+  <Accordion title="Rotate credentials independently">
+    Create a new key, update the integration, verify requests, and revoke the previous key. See [Scoped API Keys](/api-key-scopes#rotation-and-incident-response).
+  </Accordion>
+  <Accordion title="Avoid browser-side secrets">
+    Browser applications expose bundled code and network requests to users. Route privileged calls through a trusted backend instead.
+  </Accordion>
+</AccordionGroup>
+
+## Diagnose a rejected request
+
+<Steps>
+  <Step title="Verify the base URL and route">
+    Ensure the request reaches the intended Figranium instance and endpoint.
+  </Step>
+  <Step title="Check the header">
+    Confirm that the key is present, has no accidental whitespace, and is not revoked.
+  </Step>
+  <Step title="Check permissions and Task restrictions">
+    Verify that the key can perform the operation and access the specific Task.
+  </Step>
+  <Step title="Inspect the response">
+    Record the HTTP status and safe error fields, but never print the secret itself. See [Errors & Retries](/api-errors).
+  </Step>
+</Steps>
+
+<Card title="REST API Reference" icon="code" href="/rest-api">
+  Browse all endpoints, request bodies, and response formats.
+</Card>
