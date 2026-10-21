@@ -115,7 +115,11 @@
             "icon": "api",
             "pages": [
               "rest-api",
-              "api-key"
+              "api-authentication",
+              "api-key",
+              "api-key-scopes",
+              "api-task-execution",
+              "api-errors"
             ]
           },
           {
