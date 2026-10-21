@@ -1,72 +1,157 @@
 ---
 title: "Scoped API Keys"
 sidebarTitle: "Scoped Keys"
-description: "Restrict Figranium API keys by permission and Task allowlist."
+description: "Create least-privilege API credentials with Task-level restrictions, permission scopes, and safe rotation."
 ---
 
-Scoped API keys let you give integrations only the access they need. Configure them in **Settings > API Keys**.
+Scoped API keys let you control **what an integration can do** and **which Tasks it can access**. Instead of sharing a single administrator credential with every integration, create separate named credentials with only the permissions they need.
 
-## Available permissions
+<CardGroup cols={2}>
+  <Card title="Permission scopes" icon="shield-lock">
+    Grant read, execution, or management privileges independently.
+  </Card>
+  <Card title="Task allowlists" icon="list-check">
+    Restrict a credential to selected Task IDs.
+  </Card>
+  <Card title="Independent revocation" icon="key-off">
+    Disable one integration without disrupting the others.
+  </Card>
+  <Card title="One-time secret" icon="lock">
+    Copy the newly created secret before dismissing it.
+  </Card>
+</CardGroup>
 
-| Permission | Access |
-| :-- | :-- |
-| `tasks:read` | Read Tasks |
-| `tasks:run` | Run Tasks and read execution results |
-| `tasks:manage` | Manage Tasks |
+## Understand the permissions
+
+| Scope | What it allows | Typical use |
+| :-- | :-- | :-- |
+| `tasks:read` | Read Task definitions and listings | Catalogs and dashboards |
+| `tasks:run` | Execute Tasks and read their execution results | Automations and job runners |
+| `tasks:manage` | Create, update, and delete Tasks | Deployment and administration |
 
 <Note>
-  Older keys using `results:read` are accepted and normalized to `tasks:run`.
+  Existing `results:read` permissions are normalized to `tasks:run`. New integrations should use `tasks:run`.
 </Note>
 
-## Create a scoped key
+<Tip>
+  A key used only to trigger a known Task usually needs **`tasks:run`**, not `tasks:manage`. Add `tasks:read` only when the integration needs to discover or inspect Tasks.
+</Tip>
+
+## Create a scoped credential
 
 <Steps>
-  <Step title="Open API Keys">
-    Go to **Settings > API Keys** and select **Add API Key**.
+  <Step title="Open the API key settings">
+    In your Figranium instance, navigate to **Settings → API Keys** and choose **Add API Key**.
   </Step>
-  <Step title="Name the integration">
-    Use a recognizable name, such as `Daily reporting` or `n8n production`.
+  <Step title="Give the key a descriptive name">
+    Prefer names that identify the caller and environment, such as `n8n production – price monitor` or `internal reporting dashboard`. This makes future audits and revocation easier.
   </Step>
-  <Step title="Choose permissions">
-    Select only the permissions the integration needs. A run-only integration usually needs `tasks:run`; a dashboard listing Tasks needs `tasks:read`.
+  <Step title="Select the minimum permission scopes">
+    Choose from **Read Tasks**, **Run Tasks & read results**, and **Manage Tasks**. Select only what the caller needs today; create a replacement credential if its responsibilities change.
   </Step>
-  <Step title="Restrict Tasks if appropriate">
-    Choose the Task IDs this key should access. The allowlist limits access even when a permission would otherwise allow the operation.
+  <Step title="Optionally restrict accessible Tasks">
+    Select the Tasks this integration may use. An allowlist narrows access even if the key has the correct scope. If you need a key to access a different Task, update the integration's credential strategy accordingly.
   </Step>
-  <Step title="Copy and store the secret">
-    The full secret is displayed only at creation. Save it in your integration's secret storage.
+  <Step title="Create and copy the secret">
+    The new secret is shown only once. Save it in a server-side secret store or your integration's credential manager.
+  </Step>
+  <Step title="Test with a permitted operation">
+    Make a small request using the new key. Verify the intended operation succeeds and that operations outside its permission or Task restrictions are denied.
   </Step>
 </Steps>
 
-## Example: run a single Task
+## How permissions and allowlists work together
 
-Create a key with `tasks:run` and restrict it to the desired Task. Then call its execution endpoint:
+A request must satisfy **both** checks: the operation requires an appropriate scope, and a Task-restricted key must be permitted to access the target Task.
 
-```bash
-curl -X POST "http://localhost:11345/api/tasks/TASK_ID/api" \
-  -H "x-api-key: YOUR_SCOPED_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"variables":{"query":"example"}}'
-```
+<AccordionGroup>
+  <Accordion title="Example: one Task, run-only access">
+    Grant `tasks:run` and allowlist `task_prices`. The integration can trigger that Task and read its execution results, but it cannot manage Task definitions or access unrelated Tasks.
 
-The key cannot be used to access Tasks outside its allowlist. For reading Task definitions, separately grant `tasks:read`.
+    ```bash
+    curl -X POST "https://figranium.example.com/api/tasks/task_prices/api" \
+      -H "x-api-key: YOUR_SCOPED_KEY"
+    ```
+  </Accordion>
+  <Accordion title="Example: a read-only Task dashboard">
+    Grant `tasks:read` and limit the key to the Tasks the dashboard should display. Do not grant `tasks:run` if the dashboard should never start browser executions.
 
-## Common configurations
+    ```bash
+    curl "https://figranium.example.com/api/tasks" \
+      -H "Authorization: Bearer YOUR_SCOPED_KEY"
+    ```
+  </Accordion>
+  <Accordion title="Example: Task deployment automation">
+    Grant `tasks:manage` for a deployment tool that updates definitions. Add `tasks:read` if it inspects existing Tasks, and `tasks:run` only if it also executes them. Keep deployment credentials separate from runtime credentials.
+  </Accordion>
+</AccordionGroup>
 
-| Integration | Suggested permission |
-| :-- | :-- |
-| Task inventory dashboard | `tasks:read` |
-| Scheduled external trigger | `tasks:run` |
-| Task administration tool | `tasks:read`, `tasks:manage` (and `tasks:run` if it executes Tasks) |
+## Choose scopes by integration
 
-These are starting points; verify the endpoints your integration actually uses.
+<Tabs>
+  <Tab title="Webhooks and scheduled triggers">
+    **Recommended starting point:** `tasks:run` with a Task allowlist.
 
-## Rotate or revoke
+    External schedulers and workflow platforms that already know a Task ID do not normally need to list or edit every Task.
+  </Tab>
+  <Tab title="Reporting">
+    **Recommended starting point:** `tasks:read` for Task metadata, plus `tasks:run` only if the reporting workflow needs execution results.
 
-Create a replacement key, update the integration, verify it works, and then revoke the old key under **Settings > API Keys**. Revocation immediately invalidates integrations using that secret.
+    Confirm which endpoints the report actually calls before adding permissions.
+  </Tab>
+  <Tab title="Task administration">
+    **Recommended starting point:** `tasks:manage` and any additional read/run scopes required by the administration workflow.
+
+    Avoid using an administrative credential for ordinary scheduled executions.
+  </Tab>
+</Tabs>
+
+## Rotation and incident response
+
+<Steps>
+  <Step title="Create a replacement">
+    Create a new named key with the same minimum scopes and Task restrictions.
+  </Step>
+  <Step title="Update callers">
+    Replace the old secret in your automation platform, server environment, or secret manager.
+  </Step>
+  <Step title="Verify traffic">
+    Test the expected API calls using the replacement.
+  </Step>
+  <Step title="Revoke the old key">
+    Return to **Settings → API Keys**, select the old key, and confirm revocation. Calls using the old secret will lose access immediately.
+  </Step>
+</Steps>
 
 <Warning>
-  Never use a broad legacy key where a limited named key is sufficient. API-key administration itself uses authenticated UI-session endpoints; do not assume a scoped Task key can create or revoke other keys.
+  If a secret is exposed, revoke it promptly rather than waiting for a normal rotation window. Do not commit secrets, place them in browser JavaScript, or include them in screenshots or support logs.
 </Warning>
 
-See [Authentication](/api-authentication) and the [REST API Reference](/rest-api).
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="My key works for one Task but not another">
+    Check the Task allowlist. A key can have `tasks:run` yet still be denied access to a Task outside its allowed IDs.
+  </Accordion>
+  <Accordion title="I can read Tasks but cannot execute them">
+    `tasks:read` does not include execution permission. Use a key with `tasks:run` for execution endpoints.
+  </Accordion>
+  <Accordion title="I cannot edit Tasks using a run-only key">
+    Management requires `tasks:manage`. Keep this separate from runtime credentials unless necessary.
+  </Accordion>
+  <Accordion title="Can a scoped key create other keys?">
+    API-key administration uses authenticated UI-session endpoints. Task scopes do not automatically grant API-key administration.
+  </Accordion>
+  <Accordion title="I lost the secret">
+    The full secret is shown only on creation. Create a replacement key, update integrations, and revoke the old one.
+  </Accordion>
+</AccordionGroup>
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="lock" href="/api-authentication">
+    Learn the supported headers and secure credential handling.
+  </Card>
+  <Card title="Run Tasks" icon="player-play" href="/api-task-execution">
+    Execute Tasks using a restricted key.
+  </Card>
+</CardGroup>
