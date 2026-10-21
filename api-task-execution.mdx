@@ -1,52 +1,194 @@
 ---
 title: "Run Tasks via REST"
 sidebarTitle: "Run Tasks"
-description: "Trigger Figranium Tasks through the REST API with variables and optional completion webhooks."
+description: "Trigger Figranium Tasks, override variables, use named sessions, and receive completion callbacks."
 ---
 
-Use `POST /api/tasks/:id/api` to execute a saved Task from a script or integration. The default base URL is `http://localhost:11345`.
+The Task execution endpoint lets external services run saved Figranium automations without opening the editor.
 
-## Run a Task
+<CardGroup cols={2}>
+  <Card title="Trigger a Task" icon="player-play">
+    Execute a saved Task by its ID.
+  </Card>
+  <Card title="Customize each run" icon="adjustments">
+    Override variables or browser-session behavior.
+  </Card>
+  <Card title="Completion webhooks" icon="webhook">
+    Receive a callback when an execution finishes.
+  </Card>
+  <Card title="Scoped credentials" icon="shield-lock" href="/api-key-scopes">
+    Restrict a runner to the Tasks it needs.
+  </Card>
+</CardGroup>
 
-```bash
-curl -X POST "http://localhost:11345/api/tasks/TASK_ID/api" \
-  -H "x-api-key: YOUR_API_KEY"
-```
+## Endpoint
 
-A key with `tasks:run` is appropriate. If the key has a Task allowlist, the Task must be included.
+`POST /api/tasks/:id/api`
 
-## Override variables
+The `:id` path segment is the saved Task ID. Find the complete URL in the Task editor's **Task Settings → API** panel under **Trigger via API**.
 
-Send a JSON body and `Content-Type: application/json`:
+<Note>
+  The default base URL is `http://localhost:11345`. Substitute your deployment's hostname when accessing a remote instance.
+</Note>
 
-```bash
-curl -X POST "http://localhost:11345/api/tasks/TASK_ID/api" \
-  -H "x-api-key: YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"variables":{"query":"laptops"}}'
-```
+## Your first execution
 
-Without a body, Figranium uses the Task's default variables.
+<Steps>
+  <Step title="Save a Task">
+    Create or open a Task in the editor, configure its actions, and save it.
+  </Step>
+  <Step title="Copy the trigger URL">
+    Open the Task's API settings and copy its full POST endpoint URL.
+  </Step>
+  <Step title="Create a run-only key">
+    Under **Settings → API Keys**, create a key with `tasks:run` and optionally restrict it to this Task.
+  </Step>
+  <Step title="Send a POST request">
+    ```bash
+    curl -X POST "http://localhost:11345/api/tasks/TASK_ID/api" \
+      -H "x-api-key: YOUR_API_KEY"
+    ```
+  </Step>
+  <Step title="Inspect the response">
+    The endpoint returns an execution result in JSON. Handle both HTTP errors and the execution's reported outcome.
+  </Step>
+</Steps>
 
-## Optional execution settings
+## Supply execution options
 
-| Field | Purpose |
-| :-- | :-- |
-| `variables` | Override Task variables for this run |
-| `webhookUrl` | Receive a completion callback |
-| `statelessExecution` | Use a clean browser context without saved cookies |
-| `sessionId` | Load and persist a named browser session snapshot |
+<Tabs>
+  <Tab title="Default variables">
+    No JSON body is required. The Task uses its saved default variables.
 
-For example:
+    ```bash
+    curl -X POST "http://localhost:11345/api/tasks/TASK_ID/api" \
+      -H "x-api-key: YOUR_API_KEY"
+    ```
+  </Tab>
+  <Tab title="Variable overrides">
+    Pass a `variables` object for run-specific values.
+
+    ```bash
+    curl -X POST "http://localhost:11345/api/tasks/TASK_ID/api" \
+      -H "x-api-key: YOUR_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{"variables":{"query":"wireless headphones","region":"US"}}'
+    ```
+  </Tab>
+  <Tab title="Stateless browser">
+    Set `statelessExecution` to avoid using saved browser cookies.
+
+    ```json
+    {
+      "statelessExecution": true,
+      "variables": { "query": "example" }
+    }
+    ```
+  </Tab>
+  <Tab title="Named session">
+    Set `sessionId` to load and save a named browser-session snapshot.
+
+    ```json
+    {
+      "sessionId": "account_a",
+      "variables": { "query": "example" }
+    }
+    ```
+
+    See [Session State](/session-state#named-session-snapshots-sessionid).
+  </Tab>
+</Tabs>
+
+| JSON field | Required | Purpose |
+| :-- | :-- | :-- |
+| `variables` | No | Override Task variables for this execution |
+| `webhookUrl` | No | Send a POST callback when execution finishes |
+| `statelessExecution` | No | Run in a clean browser context without saved cookies |
+| `sessionId` | No | Load and persist a named session snapshot |
+
+<Warning>
+  When supplying execution options, include `Content-Type: application/json` and a valid JSON body. Without a JSON body, the server runs the Task with its defaults.
+</Warning>
+
+## Completion webhooks
+
+A completion webhook is useful when another system needs to process the outcome of a run.
+
+<Steps>
+  <Step title="Expose a callback endpoint">
+    Configure an HTTPS endpoint in your application that accepts a JSON POST request.
+  </Step>
+  <Step title="Provide its URL">
+    Include `webhookUrl` in the Task execution request.
+    
+    ```json
+    {
+      "variables": { "query": "example" },
+      "webhookUrl": "https://example.com/figranium/callback"
+    }
+    ```
+  </Step>
+  <Step title="Handle the callback">
+    Read the execution ID, Task ID, status, duration, and result from the payload.
+  </Step>
+</Steps>
 
 ```json
 {
-  "variables": { "query": "laptops" },
-  "statelessExecution": true,
-  "webhookUrl": "https://example.com/figranium/callback"
+  "executionId": "exec_abc123",
+  "taskId": "task_1",
+  "status": "success",
+  "durationMs": 4200,
+  "result": { "data": [] }
 }
 ```
 
-A completion webhook receives the execution ID, Task ID, status, duration, and result. Webhook destinations are subject to server-side URL validation; delivery failures are logged without changing the original execution result.
+<Note>
+  Webhook URLs are validated against server-side SSRF restrictions. A private-network destination may be rejected with `INVALID_WEBHOOK_URL` when private networks are not allowed. Callback requests time out after 10 seconds; delivery failures are logged but do not change the original execution result.
+</Note>
 
-See [REST API Reference](/rest-api#trigger-a-task) for detailed response behavior and [Session State](/session-state) for session handling.
+## JavaScript integration
+
+```js
+const baseUrl = process.env.FIGRANIUM_URL ?? "http://localhost:11345";
+const taskId = process.env.FIGRANIUM_TASK_ID;
+
+const response = await fetch(`${baseUrl}/api/tasks/${encodeURIComponent(taskId)}/api`, {
+  method: "POST",
+  headers: {
+    "x-api-key": process.env.FIGRANIUM_API_KEY,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ variables: { query: "example" } })
+});
+
+const result = await response.json();
+if (!response.ok) throw new Error(JSON.stringify(result));
+console.log(result);
+```
+
+## Common problems
+
+<AccordionGroup>
+  <Accordion title="The Task runs with old variable values">
+    Confirm that the body contains a `variables` object and that the request declares `Content-Type: application/json`.
+  </Accordion>
+  <Accordion title="The key cannot run the Task">
+    Confirm that it has `tasks:run` and, if restricted, includes the Task ID in its allowlist.
+  </Accordion>
+  <Accordion title="The webhook never arrives">
+    Check URL validity, network reachability, destination logs, and the server's SSRF restrictions. Callback delivery failures are logged separately from the execution result.
+  </Accordion>
+  <Accordion title="The server is busy">
+    The queue can reject execution requests with `RESOURCE_CAPACITY_EXCEEDED`. See [Errors & Retries](/api-errors).
+  </Accordion>
+</AccordionGroup>
+
+<CardGroup cols={2}>
+  <Card title="REST API Reference" icon="code" href="/rest-api#trigger-a-task">
+    Full endpoint behavior and request options.
+  </Card>
+  <Card title="Errors & Retries" icon="alert-triangle" href="/api-errors">
+    Handle capacity, timeouts, and failed requests.
+  </Card>
+</CardGroup>
