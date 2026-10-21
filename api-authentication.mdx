@@ -1,0 +1,39 @@
+---
+title: "REST API Authentication"
+sidebarTitle: "Authentication"
+description: "Authenticate Figranium REST requests with a named API key."
+---
+
+Figranium accepts named API keys for programmatic access to your instance. Create one under **Settings > API Keys**. Use a separate key for each integration so it can be revoked independently.
+
+## Send a key
+
+The recommended approach is the `x-api-key` header:
+
+```bash
+curl http://localhost:11345/api/tasks \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+Bearer authentication is also supported:
+
+```bash
+curl http://localhost:11345/api/tasks \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+The default local base URL is `http://localhost:11345`. Replace it with your instance URL when deployed remotely, and use HTTPS for remote connections.
+
+## Permissions
+
+Named keys can have `tasks:read`, `tasks:run`, and `tasks:manage` permissions. They can also be restricted to selected Task IDs. An authenticated request can still be rejected when the key lacks the permission or Task access required by the endpoint.
+
+See [Scoped API Keys](/api-key-scopes) for setup and examples.
+
+## Security
+
+<Warning>
+  Never embed API keys in browser-side JavaScript, public repositories, screenshots, or logs. Store secrets in your integration's secret manager or environment variables.
+</Warning>
+
+Keep a key per integration, grant the minimum permissions, and revoke credentials that are no longer needed. See [API Key](/api-key) for the creation and replacement workflow.
