@@ -1,0 +1,87 @@
+---
+title: "Manage Task Versions with the REST API"
+sidebarTitle: "Task Versions"
+description: "Safely update, snapshot, inspect, and roll back Figranium Tasks through the REST API."
+---
+
+Use Task versioning when an integration changes a Task definition and you need a recovery path. Figranium can save snapshots before updates, list saved history, and roll a Task back to a previous version.
+
+## Create a snapshot before an update
+
+When creating or overwriting a Task with `POST /api/tasks`, add `version=true` to the query string:
+
+```bash
+curl -X POST "http://localhost:11345/api/tasks?version=true" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "task_1",
+    "name": "Price monitor",
+    "url": "https://example.com",
+    "mode": "agent",
+    "actions": []
+  }'
+```
+
+If the Task already exists, Figranium snapshots its current version before overwriting it.
+
+## Apply a partial update
+
+Use `PATCH /api/tasks/:id` when you only need to change selected top-level fields. This endpoint snapshots the current Task before applying the update.
+
+```json
+{
+  "name": "Updated price monitor",
+  "description": "Runs every morning"
+}
+```
+
+The `id` and `versions` fields are ignored if included in a patch body.
+
+## List and inspect saved versions
+
+```bash
+curl http://localhost:11345/api/tasks/TASK_ID/versions \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+The response contains version IDs, timestamps, names, and execution modes. Use a version ID to retrieve a specific snapshot:
+
+```bash
+curl http://localhost:11345/api/tasks/TASK_ID/versions/VERSION_ID \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+## Roll back a Task
+
+Restore a previous snapshot with `POST /api/tasks/:id/rollback`:
+
+```bash
+curl -X POST http://localhost:11345/api/tasks/TASK_ID/rollback \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"versionId":"VERSION_ID"}'
+```
+
+Verify the Task after a rollback by fetching it again or listing the Task summary.
+
+## Clear version history
+
+When old snapshots are no longer needed, clear a Task's version history with:
+
+```bash
+curl -X DELETE http://localhost:11345/api/tasks/TASK_ID/versions/clear \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+Treat this as a destructive maintenance operation. Keep a copy of any snapshot you may need before clearing the history.
+
+## Recommended deployment pattern
+
+1. Create a dedicated API key for the deployment tool.
+2. Grant `tasks:manage` and restrict the key to the Tasks it deploys.
+3. Snapshot before an overwrite or use `PATCH` for smaller changes.
+4. Run or inspect the updated Task before promoting it.
+5. Roll back by version ID if the new behavior is not correct.
+
+See [API Scopes](/api-scopes) and the [REST API Reference](/rest-api) for permission and endpoint details.

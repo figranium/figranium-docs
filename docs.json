@@ -51,7 +51,12 @@
               "control-flow",
               "error-handling",
               "javascript-execution",
-              "modular-workflows"
+              "modular-workflows",
+              "tasks",
+              "rest-api-quickstart",
+              "schedules",
+              "rest-api-task-lifecycle",
+              "rest-api-execution-monitoring"
             ]
           },
           {
@@ -115,7 +120,11 @@
             "icon": "api",
             "pages": [
               "rest-api",
-              "api-key"
+              "api-key",
+              "api-scopes",
+              "rest-api-quickstart",
+              "rest-api-execution-monitoring",
+              "rest-api-task-lifecycle"
             ]
           },
           {

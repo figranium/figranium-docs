@@ -1,0 +1,79 @@
+---
+title: "API Key Scopes"
+sidebarTitle: "API Scopes"
+description: "Choose the least-privileged permissions for Figranium API keys and restrict keys to selected Tasks."
+---
+
+API key scopes control which REST API operations an integration can perform. Grant only the permissions the integration needs, then optionally restrict the key to a Task allowlist.
+
+Create and manage keys from **Settings > API Keys**. See [Get Your Figranium API Key](/api-key) for the creation flow and authentication examples.
+
+## Available scopes
+
+| Scope | Access |
+| :-- | :-- |
+| `tasks:read` | Read Tasks. |
+| `tasks:run` | Run Tasks and read their execution results. |
+| `tasks:manage` | Manage Tasks. |
+
+Choose scopes based on the integration's responsibility:
+
+- Use `tasks:read` for dashboards or tools that only need to inspect Task definitions.
+- Use `tasks:run` for jobs that trigger Tasks and collect their results.
+- Use `tasks:manage` for systems that create, update, or delete Tasks.
+
+## MCP and common integrations
+
+### MCP clients
+
+For the Figranium MCP server, use `tasks:manage` when you want the connected AI client to use the full MCP toolset. Figranium's MCP integration can create and manage Tasks, execute them, inspect execution history, manage schedules, and work with Cabinets.
+
+If your MCP client should only run existing Tasks and inspect their results, use `tasks:run` instead. Use `tasks:read` for a read-only MCP connection that only lists or inspects Tasks. In every case, add a Task allowlist when the client should be limited to specific Tasks.
+
+See [MCP Integration](/mcp-integration) for client setup and available tools.
+
+### Other common uses
+
+| Use case | Recommended scope |
+| :-- | :-- |
+| Read-only dashboard or Task catalog | `tasks:read` |
+| Scheduled job, webhook, or script that triggers Tasks | `tasks:run` |
+| Integration that runs Tasks and reads execution results | `tasks:run` |
+| Admin tool that creates, edits, or deletes Tasks | `tasks:manage` |
+| Full-featured MCP client | `tasks:manage` |
+
+## Task allowlists
+
+A Task allowlist narrows a key's access to selected Tasks. A restricted key cannot access other Tasks, even when it has the corresponding scope.
+
+Use an allowlist when an integration only needs to run one workflow or manage a small set of workflows. Leave the allowlist unrestricted only when the integration genuinely needs access to every Task permitted by its scopes.
+
+<Warning>
+  Scopes and Task restrictions work together. A key must have both the required scope and access to the requested Task.
+</Warning>
+
+## Choosing scopes for common REST API operations
+
+| Operation | Minimum scope |
+| :-- | :-- |
+| List or inspect Tasks | `tasks:read` |
+| Trigger a Task with `POST /api/tasks/:id/api` | `tasks:run` |
+| Read execution results | `tasks:run` |
+| Create, update, or delete a Task | `tasks:manage` |
+
+The exact endpoint behavior is documented in the [REST API Reference](/rest-api). Health and capabilities endpoints are available for checking server status and supported features.
+
+## Legacy compatibility
+
+Figranium accepts existing `results:read` keys and normalizes them to the current `tasks:run` access model. New keys should use the current scopes listed above.
+
+## Recommended setup
+
+1. Create one named API key per integration or workflow.
+2. Select the smallest scope that satisfies the integration.
+3. Restrict the key to the required Tasks when possible.
+4. Store the secret securely and rotate or revoke it if exposed.
+
+<Card title="REST API Reference" icon="code" href="/rest-api">
+  Browse endpoint details, request bodies, authentication methods, and examples.
+</Card>

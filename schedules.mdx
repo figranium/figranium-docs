@@ -1,0 +1,245 @@
+---
+title: "Schedules API"
+sidebarTitle: "Schedules"
+description: "Create, update, list, and inspect scheduled task runs with the Figranium Schedules REST API."
+---
+
+The Schedules API lets you automate task execution by attaching recurring schedules to tasks. You can use simple presets (daily, weekly) or define exact timing with cron expressions.
+
+<Note>
+  Schedules require authentication. See [API Key](/api-key) for how to create a key and [API Scopes](/api-scopes) for the required permissions.
+</Note>
+
+---
+
+## List schedules
+
+### `GET /api/schedules`
+
+Returns every task that has an associated schedule, along with the schedule configuration and next run time.
+
+**Response**:
+
+```json
+{
+  "schedules": [
+    {
+      "taskId": "task_1",
+      "taskName": "Daily Price Check",
+      "mode": "agent",
+      "schedule": {
+        "enabled": true,
+        "frequency": "daily",
+        "hour": 9,
+        "minute": 0,
+        "daysOfWeek": [1, 2, 3, 4, 5]
+      }
+    }
+  ]
+}
+```
+
+| Field | Description |
+| :-- | :-- |
+| `taskId` | The task identifier |
+| `taskName` | Display name of the task |
+| `mode` | Task mode (`scrape`, `agent`, or `headful`) |
+| `schedule` | The current [schedule configuration](#schedule-body-fields) |
+
+Returns `401` when the caller is not authenticated.
+
+---
+
+## Create or update a schedule
+
+### `POST /api/schedules/:taskId`
+
+Attaches a new schedule to a task, or replaces an existing one. The task itself is not modified.
+
+**Body**:
+
+```json
+{
+  "enabled": true,
+  "frequency": "daily",
+  "hour": 9,
+  "minute": 0
+}
+```
+
+For advanced scheduling, pass a cron expression directly:
+
+```json
+{
+  "enabled": true,
+  "cron": "0 9 * * 1-5"
+}
+```
+
+**Response**:
+
+```json
+{
+  "schedule": {
+    "enabled": true,
+    "frequency": "daily",
+    "hour": 9,
+    "minute": 0
+  },
+  "description": "Every day at 9:00 AM",
+  "nextRun": 1690099200000
+}
+```
+
+| Field | Description |
+| :-- | :-- |
+| `schedule` | The saved [schedule configuration](#schedule-body-fields) |
+| `description` | Human-readable description of the schedule |
+| `nextRun` | Unix timestamp (ms) of the next scheduled run, or `null` |
+
+Returns `400` when the schedule is invalid and `404` when the task does not exist.
+
+---
+
+## Delete a schedule
+
+### `DELETE /api/schedules/:taskId`
+
+Removes the schedule from a task. The task and its history are kept; it simply stops running on a schedule.
+
+**Response**:
+
+```json
+{
+  "success": true
+}
+```
+
+Returns `404` when the task does not exist.
+
+---
+
+## Get schedule status
+
+### `GET /api/schedules/:taskId/status`
+
+Returns the current schedule configuration for a specific task, including the computed cron expression, human-readable description, and whether the schedule is valid.
+
+**Response**:
+
+```json
+{
+  "schedule": {
+    "enabled": true,
+    "frequency": "daily",
+    "hour": 9,
+    "minute": 0
+  },
+  "cron": "0 9 * * *",
+  "description": "Every day at 9:00 AM",
+  "isValid": true
+}
+```
+
+| Field | Description |
+| :-- | :-- |
+| `schedule` | The current [schedule configuration](#schedule-body-fields) |
+| `cron` | Computed cron expression, or `null` |
+| `description` | Human-readable description, or `null` |
+| `isValid` | Whether the schedule is valid and can fire |
+
+Returns `404` when the task does not exist.
+
+---
+
+## Preview or validate a schedule
+
+### `POST /api/schedules/:taskId/describe`
+
+Validates a schedule configuration without saving it. Use this to preview the computed cron expression, description, and next run time before applying the schedule.
+
+**Body**:
+
+```json
+{
+  "enabled": true,
+  "frequency": "weekly",
+  "hour": 10,
+  "minute": 30,
+  "daysOfWeek": [1, 3, 5]
+}
+```
+
+**Response**:
+
+```json
+{
+  "valid": true,
+  "description": "Monday, Wednesday, Friday at 10:30 AM",
+  "cron": "30 10 * * 1,3,5",
+  "nextRun": 1690187400000
+}
+```
+
+| Field | Description |
+| :-- | :-- |
+| `valid` | Whether the configuration is valid |
+| `description` | Human-readable schedule description, or `null` |
+| `cron` | Computed cron expression, or `null` |
+| `nextRun` | Unix timestamp (ms) of the next run, or `null` |
+
+Returns `401` when the caller is not authenticated.
+
+---
+
+## Get overall scheduler status
+
+### `GET /api/schedules/status/all`
+
+Returns the global scheduler state, such as whether scheduling is enabled and summary statistics. The exact shape is runtime-dependent.
+
+**Response**:
+
+```json
+{
+  "enabled": true,
+  "activeSchedules": 3
+}
+```
+
+Returns `401` when the caller is not authenticated.
+
+---
+
+## Schedule body fields
+
+These fields are accepted in the request body for `POST /api/schedules/:taskId` and `POST /api/schedules/:taskId/describe`.
+
+| Field | Type | Required | Description |
+| :-- | :-- | :-- | :-- |
+| `enabled` | boolean | Yes | Whether the schedule is active |
+| `frequency` | string | No | Preset frequency such as `daily`, `weekly`, `hourly`, or `interval` |
+| `intervalMinutes` | integer | No | Minutes between runs when using `"interval"` frequency |
+| `hour` | integer | No | Hour of day (`0`-`23`) for `daily` or `weekly` |
+| `minute` | integer | No | Minute of hour (`0`-`59`) for `daily` or `weekly` |
+| `daysOfWeek` | integer[] | No | Days of week (`0` = Sunday through `6` = Saturday) for `weekly` |
+| `dayOfMonth` | integer | No | Day of month (`1`-`31`) for monthly-style schedules |
+| `cron` | string | No | Raw cron expression. Overrides `frequency` when provided. |
+
+<Note>
+  You do not need to include every field. When `cron` is provided, it takes precedence over the preset fields. When `frequency` is used, the relevant time fields (for example, `hour` and `minute` for `daily`) are required.
+</Note>
+
+---
+
+## Error responses
+
+| Status | Error code | Cause |
+| :-- | :-- | :-- |
+| `400` | `INVALID_SCHEDULE` | The schedule body is invalid or contains conflicting fields |
+| `401` | `UNAUTHORIZED` | Missing or invalid authentication. See [API Key](/api-key). |
+| `404` | `TASK_NOT_FOUND` | No task exists with the given `taskId` |
+
+<Card title="REST API Reference" icon="code" href="/rest-api">
+  Browse all endpoints, authentication methods, and request examples.
+</Card>

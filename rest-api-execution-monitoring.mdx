@@ -1,0 +1,80 @@
+---
+title: "Monitor REST API Executions"
+sidebarTitle: "Monitor Executions"
+description: "Track queued, running, and finished Figranium executions, retrieve results, and stop work safely."
+---
+
+A Task request can finish immediately, wait in the execution queue, or continue while your integration receives updates. Use the execution endpoints to build dashboards, polling workers, and operational tooling.
+
+## Understand execution state
+
+The lightweight execution list reports the state of each run:
+
+| Field | Meaning |
+| :-- | :-- |
+| `phase` | `queued`, `running`, or `finished`. |
+| `outcome` | Final outcome when `phase` is `finished`. |
+| `startedAt` | Time the run left the queue, in Unix milliseconds. |
+| `finishedAt` | Time the run finished, in Unix milliseconds. |
+| `durationMs` | Run duration in milliseconds. |
+
+Use `GET /api/executions/list` for a summary view and `GET /api/executions/:id` when you need logs and the result payload.
+
+## Poll for completion
+
+A simple worker can list recent executions and fetch the detail for a specific execution:
+
+```bash
+curl http://localhost:11345/api/executions/list \
+  -H "x-api-key: YOUR_API_KEY"
+
+curl http://localhost:11345/api/executions/EXECUTION_ID \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+Use polling when your integration does not support server-sent events. Stop polling after your own application timeout.
+
+## Stream live updates
+
+The REST API exposes a server-sent events endpoint at `GET /api/executions/stream` for clients that need live execution updates. Use an SSE-compatible client to keep a connection open and process events as they arrive.
+
+This is useful for an operations dashboard or an interface that shows a Task's progress without repeatedly requesting the full execution record.
+
+## Retrieve a full result
+
+Large persisted results can be trimmed from an execution history record. When that happens, the record is marked with `truncated: true` and `hasFullResult: true`.
+
+Request the complete result with:
+
+```bash
+curl http://localhost:11345/api/executions/EXECUTION_ID/result \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+The full result is stored only while the execution record is retained. See [Captures and Storage](/captures-and-storage) for retention behavior.
+
+## Stop an execution
+
+Stop a running execution or cancel one that is still queued:
+
+```bash
+curl -X POST http://localhost:11345/api/executions/stop \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"runId":"RUN_ID"}'
+```
+
+A queued run that is cancelled never starts. The request returns `400 MISSING_RUN_ID` when `runId` is missing.
+
+## Handle capacity and timeout responses
+
+Execution requests can fail when resource protection is active:
+
+| Status | Error code | Meaning |
+| :-- | :-- | :-- |
+| `503` | `RESOURCE_CAPACITY_EXCEEDED` | The queue is full or the run waited longer than `EXECUTION_QUEUE_TIMEOUT_MS`. |
+| `504` | `EXECUTION_TIMEOUT` | A non-headful run exceeded `EXECUTION_TIMEOUT_MS`. |
+
+For `503` responses, use the `retryAfterMs` response value and `Retry-After` header to decide when to retry.
+
+See [REST API Reference](/rest-api) for the complete execution endpoint details.

@@ -1,0 +1,103 @@
+---
+title: "REST API Quickstart"
+sidebarTitle: "Quickstart"
+description: "Connect to a Figranium instance, authenticate a request, trigger a Task, and receive its result."
+---
+
+Use this guide to make your first REST API request from a script, integration, or backend service.
+
+## Before you start
+
+You need:
+
+- The base URL of your Figranium instance, such as `http://localhost:11345`.
+- An API key from **Settings > API Keys**.
+- A Task ID for the Task you want to run.
+
+See [Get Your Figranium API Key](/api-key) and [API Scopes](/api-scopes) before creating a key for an integration.
+
+## 1. Check the server
+
+The health endpoint does not require authentication:
+
+```bash
+curl http://localhost:11345/api/health
+```
+
+A healthy server returns `200` with a response containing `"status": "ok"`.
+
+## 2. Authenticate a request
+
+Use the `x-api-key` header for scripts and server-side integrations:
+
+```bash
+curl http://localhost:11345/api/tasks/list \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+Figranium also accepts `Authorization: Bearer YOUR_API_KEY` and the `key` header. If authentication is enabled, protected endpoints require one of these formats.
+
+## 3. Trigger a Task
+
+Send a `POST` request to the Task execution endpoint:
+
+```bash
+curl -X POST http://localhost:11345/api/tasks/TASK_ID/api \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "variables": {
+      "query": "figranium"
+    }
+  }'
+```
+
+The request body is optional. Omit it when the Task uses its default variables.
+
+| Field | Use |
+| :-- | :-- |
+| `variables` | Override Task-level variables for this run. |
+| `webhookUrl` | Receive a `POST` callback when the run finishes. |
+| `statelessExecution` | Run in a clean browser context without saved cookies. |
+| `sessionId` | Load and save a named browser session snapshot. |
+
+## 4. Use a completion webhook
+
+For asynchronous integrations, include `webhookUrl` instead of waiting for the request response:
+
+```json
+{
+  "webhookUrl": "https://your-server.example.com/figranium-callback"
+}
+```
+
+Figranium sends a `POST` request after the Task finishes. The callback includes the execution ID, Task ID, status, duration, and result:
+
+```json
+{
+  "executionId": "exec_abc123",
+  "taskId": "task_1",
+  "status": "success",
+  "durationMs": 4200,
+  "result": { "data": [] }
+}
+```
+
+Webhook URLs are validated against the same SSRF rules as other outbound requests. Delivery failures are logged but do not change the execution result.
+
+## 5. Inspect the result
+
+Use the execution ID returned by the Task run to fetch execution details:
+
+```bash
+curl http://localhost:11345/api/executions/EXECUTION_ID \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+For a large result that was trimmed from the history record, request the complete payload from `/api/executions/EXECUTION_ID/result`.
+
+## Next steps
+
+- [API Scopes](/api-scopes) for least-privilege keys and Task restrictions.
+- [REST API Reference](/rest-api) for the complete endpoint reference.
+- [MCP Integration](/mcp-integration) if an AI client should operate Figranium through MCP.

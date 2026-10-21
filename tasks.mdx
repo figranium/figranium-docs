@@ -1,0 +1,345 @@
+---
+title: "Tasks API"
+sidebarTitle: "Tasks"
+description: "Create, read, update, delete, and execute tasks with the Figranium Tasks REST API. Includes versioning, lightweight listing, and trigger endpoints."
+---
+
+Manage your automation tasks and trigger executions through the Tasks API. All endpoints except the trigger endpoint require API-key authentication. See [API Key](/api-key) and [API Scopes](/api-scopes) for setup guidance.
+
+**Base URL**: `http://localhost:11345` (default)
+
+---
+
+## Authentication
+
+If enabled, authentication must be provided via one of the following methods:
+
+- **Header**: `x-api-key: your_key` or `key: your_key`
+- **Authorization Header**: `Authorization: Bearer your_key`
+- **Request Body**: `{"apiKey": "your_key"}` or `{"key": "your_key"}`
+
+---
+
+## List tasks (lightweight)
+
+### `GET /api/tasks/list`
+
+Returns a lightweight list of all saved tasks with summary metadata (ID, name, description, mode, schedule, variables, createdAt, updatedAt) without version history or full action lists. Requires API-key authentication. Use this for dashboard overviews and lightweight integrations.
+
+**Response**:
+
+```json
+{
+  "tasks": [
+    {
+      "id": "task_1",
+      "name": "Scraper",
+      "description": "Extracts product prices daily",
+      "mode": "agent",
+      "schedule": { "enabled": true, "cron": "0 9 * * *" },
+      "variables": {},
+      "updatedAt": "2026-08-05T18:04:12.335Z",
+      "createdAt": "2026-08-01T12:00:00.000Z"
+    }
+  ]
+}
+```
+
+| Field | Description |
+| :-- | :-- |
+| `id` | Task identifier |
+| `name` | Human-readable name |
+| `description` | Appears on the canvas trigger card and in listings |
+| `mode` | `"scrape"`, `"agent"`, or `"headful"` |
+| `schedule` | Current schedule configuration if any |
+| `variables` | Task-level variables |
+| `updatedAt` | ISO timestamp of last update |
+| `createdAt` | ISO timestamp of creation |
+
+---
+
+## List tasks (full)
+
+### `GET /api/tasks`
+
+Lists all saved tasks with full configuration (except version history). Prefer `GET /api/tasks/list` for lightweight listings.
+
+**Response**:
+
+```json
+[
+  {
+    "id": "task_1",
+    "name": "Scraper",
+    "description": "Extracts product prices daily",
+    "url": "https://example.com",
+    "mode": "agent",
+    "actions": [],
+    "variables": {}
+  }
+]
+```
+
+---
+
+## Create or upsert a task
+
+### `POST /api/tasks`
+
+Creates a new task or overwrites an existing task with the same `id`.
+
+Include `?version=true` in the query string to save a version snapshot before overwriting.
+
+**Query parameters**:
+
+| Parameter | Type | Default | Description |
+| :-- | :-- | :-- | :-- |
+| `version` | string |  | Set to `"true"` to snapshot the current version before overwriting |
+
+**Body**:
+
+```json
+{
+  "id": "task_1",
+  "name": "New Task",
+  "description": "Optional summary of what this task does",
+  "url": "https://example.com",
+  "mode": "agent",
+  "actions": [],
+  "variables": {}
+}
+```
+
+| Field | Type | Required | Description |
+| :-- | :-- | :-- | :-- |
+| `id` | string | No | Unique identifier. Generated if omitted |
+| `name` | string | Yes | Human-readable task name |
+| `description` | string | No | Summary displayed on the canvas trigger card and in listings |
+| `url` | string | No | Starting URL for the task |
+| `mode` | string | Yes | `"scrape"`, `"agent"`, or `"headful"` |
+| `actions` | array | No | Task actions (see [REST API Reference](/rest-api)) |
+| `variables` | object | No | Default variables available during execution |
+
+**Response**: Returns the saved task object.
+
+---
+
+## Partially update a task
+
+### `PATCH /api/tasks/:id`
+
+Applies a partial update to an existing task. Only the fields you include in the body are changed. The `id` and `versions` fields are ignored if supplied. Figranium takes a version snapshot before applying the update, so you can restore the previous state from the version history.
+
+Use this endpoint when you want to change a single attribute (for example, a schedule, a variable, or one action) without re-sending the full task definition.
+
+**Body** (any subset of task fields):
+
+```json
+{
+  "name": "Renamed scraper",
+  "description": "Runs every morning",
+  "url": "https://example.com/products"
+}
+```
+
+**Response**:
+
+```json
+{
+  "id": "task_1",
+  "updatedAt": 1785953052335,
+  "status": "success",
+  "task": { "id": "task_1", "name": "Renamed scraper", "...": "..." }
+}
+```
+
+| Status | Error code | Cause |
+| :-- | :-- | :-- |
+| `400` | `INVALID_PAYLOAD` | The request body is not a JSON object |
+| `404` | `TASK_NOT_FOUND` | No task exists with the given `id` |
+
+---
+
+## Delete a task
+
+### `DELETE /api/tasks/:id`
+
+Deletes a task by ID. Any in-process schedule registered for the task is also removed, so a scheduled run will not fire after deletion.
+
+**Response**:
+
+```json
+{
+  "id": "task_1",
+  "deleted": true,
+  "message": "Task successfully removed."
+}
+```
+
+| Status | Error code | Cause |
+| :-- | :-- | :-- |
+| `404` | `TASK_NOT_FOUND` | No task exists with the given `id` |
+
+---
+
+## Trigger a task
+
+### `POST /api/tasks/:id/api`
+
+Triggers an execution of a specific task. This is the primary endpoint most integrations use: send a `POST` to a task's URL to run it on demand, optionally overriding variables or receiving a webhook callback when it finishes.
+
+<Tip>
+  You don't need to assemble this URL by hand. The **Trigger via API** panel in the task editor's Task Settings API tab shows the complete endpoint URL for your instance (for example, `https://your-figranium.example.com/api/tasks/task_1/api`) with a `POST` badge, and its copy button copies the full URL.
+</Tip>
+
+**Body**:
+
+```json
+{
+  "variables": {
+    "query": "override value"
+  },
+  "webhookUrl": "https://your-server.com/callback"
+}
+```
+
+| Field | Type | Required | Description |
+| :-- | :-- | :-- | :-- |
+| `variables` | object | No | Override task-level variables for this run |
+| `webhookUrl` | string | No | URL to receive a POST callback with the execution result |
+| `statelessExecution` | boolean | No | Run in a clean browser context with no saved cookies |
+| `sessionId` | string | No | Named session snapshot to load before the run and save after. Persists cookies and local storage to `data/sessions/<sessionId>.json`. Sanitized to `[a-zA-Z0-9_-]`. See [Named Session Snapshots](/session-state#named-session-snapshots-sessionid) |
+
+**Response**: Returns the execution result (JSON).
+
+<Note>
+  The request body is optional. If you send the request without a body or without a `Content-Type: application/json` header, Figranium treats the body as `{}` and runs the task with its default variables. This lets tools that can't set request headers (for example, Clay's HTTP action) trigger a task with a bare `POST` to the endpoint URL.
+
+  To pass `variables`, `webhookUrl`, `statelessExecution`, or `sessionId`, you must send `Content-Type: application/json` and a JSON body.
+</Note>
+
+#### Completion webhook
+
+When you include a `webhookUrl`, Figranium sends a `POST` request to that URL after the task finishes. The webhook URL is validated against the same SSRF rules as all other outbound requests (see [Security](/security)). If the URL points to a private network and `ALLOW_PRIVATE_NETWORKS` is `false`, the request returns `400 INVALID_WEBHOOK_URL`.
+
+The callback payload looks like this:
+
+```json
+{
+  "executionId": "exec_abc123",
+  "taskId": "task_1",
+  "status": "success",
+  "durationMs": 4200,
+  "result": { "data": [ ... ] }
+}
+```
+
+The webhook request times out after 10 seconds. Delivery failures are logged on the server but do not affect the execution result returned to the original caller.
+
+---
+
+## Version history
+
+### `GET /api/tasks/:id/versions`
+
+Lists saved versions of a task.
+
+**Response**:
+
+```json
+{
+  "versions": [
+    { "id": "ver_a1b2c3", "timestamp": 1785953052335, "name": "Before patch", "mode": "agent" }
+  ]
+}
+```
+
+| Field | Description |
+| :-- | :-- |
+| `id` | Version identifier |
+| `timestamp` | Epoch milliseconds when the version was saved |
+| `name` | Version name if set |
+| `mode` | Task mode at the time of the version |
+
+| Status | Error code | Cause |
+| :-- | :-- | :-- |
+| `404` | `TASK_NOT_FOUND` | No task exists with the given `id` |
+
+### `GET /api/tasks/:id/versions/:versionId`
+
+Returns a specific version snapshot.
+
+**Response**:
+
+```json
+{
+  "snapshot": { "id": "task_1", "name": "Scraper", "...": "..." },
+  "metadata": { "id": "ver_a1b2c3", "timestamp": 1785953052335 }
+}
+```
+
+| Status | Error code | Cause |
+| :-- | :-- | :-- |
+| `404` | `TASK_NOT_FOUND` or version not found | No task or version exists with the given ID |
+
+### `POST /api/tasks/:id/versions/clear`
+
+Clears a task's version history.
+
+**Response**:
+
+```json
+{ "success": true }
+```
+
+| Status | Error code | Cause |
+| :-- | :-- | :-- |
+| `404` | `TASK_NOT_FOUND` | No task exists with the given `id` |
+
+### `POST /api/tasks/:id/rollback`
+
+Rolls a task back to a previous version.
+
+**Body**:
+
+```json
+{ "versionId": "ver_a1b2c3" }
+```
+
+| Field | Type | Required | Description |
+| :-- | :-- | :-- | :-- |
+| `versionId` | string | Yes | The version identifier to restore |
+
+**Response**: Returns the restored task object.
+
+| Status | Error code | Cause |
+| :-- | :-- | :-- |
+| `400` | `INVALID_PAYLOAD` | Missing or invalid `versionId` |
+| `404` | `TASK_NOT_FOUND` or version not found | No task or version exists with the given ID |
+
+---
+
+## Capacity and timeout errors
+
+Execution endpoints can return these errors when [resource protection](/configuration#host-aware-resource-protection) is active:
+
+| Status | Error code | Cause |
+| :-- | :-- | :-- |
+| `503` | `RESOURCE_CAPACITY_EXCEEDED` | The execution queue is full, or the run waited longer than the configured timeout. The response includes `retryAfterMs` and a `Retry-After` header. |
+| `504` | `EXECUTION_TIMEOUT` | A non-headful run exceeded the timeout and was stopped. |
+
+---
+
+## Related pages
+
+<CardGroup>
+  <Card title="REST API Reference" icon="code" href="/rest-api">
+    Complete reference for endpoints, authentication, and examples.
+  </Card>
+  <Card title="API Key" icon="key" href="/api-key">
+    Generate and authenticate with your API key.
+  </Card>
+  <Card title="API Scopes" icon="lock" href="/api-scopes">
+    Choose the right permissions for your integrations.
+  </Card>
+</CardGroup>
