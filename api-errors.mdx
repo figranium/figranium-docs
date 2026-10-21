@@ -1,32 +1,172 @@
 ---
-title: "REST API Errors"
+title: "REST API Errors & Retries"
 sidebarTitle: "Errors & Retries"
-description: "Handle REST API failures, execution capacity limits, and timeouts."
+description: "Interpret HTTP errors, execution capacity limits, timeouts, and safe retry strategies."
 ---
 
-Check the HTTP status and response body on every REST API call. Error responses can include a machine-readable `error` code.
+A robust API integration must distinguish a rejected HTTP request from a Task that ran but produced an unsuccessful execution outcome. Inspect both the HTTP response and the returned execution result.
 
-## Common conditions
+<CardGroup cols={2}>
+  <Card title="Request validation" icon="file-alert">
+    Fix invalid payloads and missing resources.
+  </Card>
+  <Card title="Authentication" icon="shield-lock" href="/api-key-scopes">
+    Verify credentials, scopes, and Task restrictions.
+  </Card>
+  <Card title="Capacity" icon="server">
+    Handle busy instances and full execution queues.
+  </Card>
+  <Card title="Timeouts" icon="clock">
+    Diagnose runs that exceed configured limits.
+  </Card>
+</CardGroup>
 
-| HTTP status | Meaning | Recommended action |
+## HTTP status overview
+
+| Status | Interpretation | Suggested response |
 | :-- | :-- | :-- |
-| `400` | Invalid request data | Correct the request; do not blindly retry |
-| `401` / `403` | Missing credentials or insufficient access | Check the key, permissions, and Task allowlist |
-| `404` | Resource not found | Verify the Task or resource ID |
-| `503` | Capacity exceeded or service unavailable | Retry cautiously when transient |
-| `504` | Execution timeout | Inspect the Task and execution limits |
+| `200` / `201` | Request accepted or completed | Parse the returned JSON |
+| `400` | Invalid request | Correct the body or parameters |
+| `401` / `403` | Authentication or authorization problem | Check credentials, scopes, and allowlists |
+| `404` | Requested resource not found | Verify the ID and route |
+| `429` | Request throttled, if applicable | Respect rate limits and back off |
+| `500` | Internal server error | Inspect server logs; retry only when safe |
+| `503` | Service degraded or execution capacity exhausted | Inspect error code and retry guidance |
+| `504` | Execution timeout | Review run duration and configured limits |
 
-## Capacity errors
+<Note>
+  These are general HTTP handling guidelines. Not every endpoint returns every status. Consult the [REST API Reference](/rest-api) for endpoint-specific errors.
+</Note>
 
-When resource protection is active, an execution can return `503` with error code `RESOURCE_CAPACITY_EXCEEDED` if the queue is full or the wait exceeds `EXECUTION_QUEUE_TIMEOUT_MS`. The response includes `retryAfterMs` and a `Retry-After` header.
+## Known execution error codes
 
-A `504` with `EXECUTION_TIMEOUT` means a non-headful run exceeded `EXECUTION_TIMEOUT_MS` and was stopped.
+<AccordionGroup>
+  <Accordion title="RESOURCE_CAPACITY_EXCEEDED — HTTP 503">
+    The execution queue is full, or a queued run waited longer than `EXECUTION_QUEUE_TIMEOUT_MS`. When resource protection rejects a run, the response includes `retryAfterMs` and a `Retry-After` header.
 
-## Retry carefully
+    **Action:** reduce concurrency, honor the retry delay, and review the host's resource protection settings.
+  </Accordion>
+  <Accordion title="EXECUTION_TIMEOUT — HTTP 504">
+    A non-headful run exceeded `EXECUTION_TIMEOUT_MS` and was stopped.
 
-- Honor `Retry-After` when present and use bounded exponential backoff for transient failures.
-- Do not retry invalid requests or permission failures without changing the request or credentials.
-- A Task may have external side effects. Before retrying an ambiguous network failure, inspect execution history to avoid duplicate work.
-- If capacity errors persist, review [Resource Protection](/resource-protection).
+    **Action:** investigate long-running actions, selector waits, network conditions, and the configured timeout. Do not automatically replay a run that might have already performed external actions.
+  </Accordion>
+  <Accordion title="INVALID_WEBHOOK_URL — HTTP 400">
+    The completion webhook URL failed server-side validation, including private-network restrictions when `ALLOW_PRIVATE_NETWORKS` is disabled.
 
-For endpoint-specific error codes, see the [REST API Reference](/rest-api).
+    **Action:** use an allowed callback URL and review the [Security](/security) configuration.
+  </Accordion>
+  <Accordion title="TASK_NOT_FOUND — HTTP 404">
+    A Task endpoint could not find the requested Task ID.
+
+    **Action:** confirm that the Task exists and that the integration is using the correct instance and identifier.
+  </Accordion>
+  <Accordion title="INVALID_PAYLOAD — HTTP 400">
+    An endpoint such as Task patching received a body with an invalid structure.
+
+    **Action:** ensure that the body is a JSON object and matches the endpoint's schema.
+  </Accordion>
+</AccordionGroup>
+
+## Safe retry strategy
+
+<Steps>
+  <Step title="Read the response">
+    Capture the status, machine-readable `error` field when present, and any retry guidance.
+  </Step>
+  <Step title="Classify the failure">
+    Do not retry malformed requests, missing permissions, or nonexistent resources without correcting the underlying issue.
+  </Step>
+  <Step title="Check for partial execution">
+    If the connection dropped after a Task started, inspect execution history before repeating a potentially side-effecting operation.
+  </Step>
+  <Step title="Apply bounded backoff">
+    For genuinely transient failures, honor `Retry-After` when present. Otherwise use exponential backoff with jitter and a limited number of attempts.
+  </Step>
+  <Step title="Escalate persistent errors">
+    Inspect application logs, resource utilization, and Task execution details rather than retrying indefinitely.
+  </Step>
+</Steps>
+
+## Retry example
+
+<Tabs>
+  <Tab title="JavaScript">
+    ```js
+    const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    async function fetchWithBackoff(url, options, maxAttempts = 3) {
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        const response = await fetch(url, options);
+        if (response.ok) return response;
+
+        // Retry only capacity-related responses in this example.
+        if (response.status !== 503 || attempt === maxAttempts - 1) {
+          throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+        }
+
+        const retryAfter = response.headers.get("Retry-After");
+        const seconds = retryAfter ? Number(retryAfter) : NaN;
+        const delay = Number.isFinite(seconds)
+          ? Math.max(0, seconds * 1000)
+          : Math.min(8000, 1000 * 2 ** attempt) + Math.random() * 250;
+        await sleep(delay);
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Python">
+    ```python
+    import random
+    import time
+    import requests
+
+    def get_with_backoff(url, headers, attempts=3):
+        for attempt in range(attempts):
+            response = requests.get(url, headers=headers, timeout=30)
+            if response.ok:
+                return response.json()
+            if response.status_code != 503 or attempt == attempts - 1:
+                response.raise_for_status()
+
+            retry_after = response.headers.get("Retry-After")
+            try:
+                delay = max(0, float(retry_after))
+            except (TypeError, ValueError):
+                delay = min(8, 2 ** attempt) + random.uniform(0, 0.25)
+            time.sleep(delay)
+    ```
+
+    This example retries a read request. Be more cautious with POST requests that can start Tasks.
+  </Tab>
+</Tabs>
+
+<Warning>
+  Automatic retries of `POST /api/tasks/:id/api` can duplicate browser actions if the previous attempt started but its response was lost. Check execution history before retrying an ambiguous failure.
+</Warning>
+
+## Diagnosing operational failures
+
+<AccordionGroup>
+  <Accordion title="Health check returns 503">
+    `GET /api/health` can report a degraded instance when the storage backend is unavailable. Verify database connectivity before attempting more work.
+  </Accordion>
+  <Accordion title="Repeated capacity errors">
+    Review `maxConcurrent`, `active`, `queued`, and pressure information from the health response. Consult [Resource Protection](/resource-protection).
+  </Accordion>
+  <Accordion title="Request succeeds but Task outcome is unsuccessful">
+    An HTTP response indicates request processing, not necessarily successful browser automation. Inspect the execution's status, outcome, and error details.
+  </Accordion>
+  <Accordion title="Webhook delivery fails">
+    Callback delivery is independent of the original execution result. Check callback logs, timeout behavior, and URL restrictions.
+  </Accordion>
+</AccordionGroup>
+
+<CardGroup cols={2}>
+  <Card title="Run Tasks" icon="player-play" href="/api-task-execution">
+    Review the execution endpoint and callbacks.
+  </Card>
+  <Card title="REST API Reference" icon="code" href="/rest-api">
+    Find endpoint-specific errors and response schemas.
+  </Card>
+</CardGroup>
