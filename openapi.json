@@ -33,7 +33,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "x-api-key",
-        "description": "API key configured via /api/settings/api-key."
+        "description": "Named scoped API key created in Settings > API Keys. Key administration uses authenticated sessions, not API keys."
       }
     },
     "schemas": {
@@ -1210,25 +1210,84 @@
         }
       }
     },
-    "/api/settings/api-key": {
+    "/api/api-keys": {
       "get": {
         "tags": ["Settings"],
-        "summary": "Get the configured API key",
+        "summary": "List scoped API keys and supported permissions",
+        "description": "Session-only administration. The response excludes key hashes and secrets except the legacySecret field for existing legacy keys.",
+        "security": [{ "sessionAuth": [] }],
         "responses": {
-          "200": { "description": "API key", "content": { "application/json": { "schema": { "type": "object", "properties": { "apiKey": { "type": "string", "nullable": true } } } } } },
+          "200": { "description": "Keys and permissions", "content": { "application/json": { "schema": { "type": "object", "properties": { "keys": { "type": "array", "items": { "type": "object" } }, "legacySecret": { "type": "string", "nullable": true }, "permissions": { "type": "array", "items": { "type": "string" } } } } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
           "500": { "$ref": "#/components/responses/ServerError" }
         }
       },
       "post": {
         "tags": ["Settings"],
-        "summary": "Set or generate the API key",
+        "summary": "Create a named scoped API key",
+        "description": "Requires an authenticated session and CSRF protection. The secret is returned only when the key is created. Task allowlists are optional.",
+        "security": [{ "sessionAuth": [] }],
         "requestBody": {
-          "content": { "application/json": { "schema": { "type": "object", "properties": { "apiKey": { "type": "string", "maxLength": 512 } } } } }
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "required": ["permissions"], "properties": { "name": { "type": "string" }, "permissions": { "type": "array", "items": { "type": "string" } }, "taskIds": { "type": "array", "items": { "type": "string" } } } } } }
         },
         "responses": {
-          "200": { "description": "Saved key", "content": { "application/json": { "schema": { "type": "object", "properties": { "apiKey": { "type": "string" } } } } } },
+          "201": { "description": "Created key metadata and one-time secret", "content": { "application/json": { "schema": { "type": "object", "properties": { "key": { "type": "object" }, "secret": { "type": "string" } } } } } },
           "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
           "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+    "/api/api-keys/{id}": {
+      "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "string" } }],
+      "patch": {
+        "tags": ["Settings"],
+        "summary": "Rename a scoped API key",
+        "description": "Session-only; requires CSRF protection. Legacy keys cannot be renamed.",
+        "security": [{ "sessionAuth": [] }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "required": ["name"], "properties": { "name": { "type": "string" } } } } } },
+        "responses": {
+          "200": { "description": "Updated public key metadata", "content": { "application/json": { "schema": { "type": "object", "properties": { "key": { "type": "object" } } } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "description": "Legacy key cannot be renamed" },
+          "404": { "description": "Key not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Settings"],
+        "summary": "Revoke an API key",
+        "description": "Session-only; requires CSRF protection.",
+        "security": [{ "sessionAuth": [] }],
+        "responses": {
+          "200": { "description": "Revoked", "content": { "application/json": { "schema": { "type": "object", "properties": { "ok": { "type": "boolean" } } } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "description": "Key not found" }
+        }
+      }
+    },
+    "/api/settings/api-key": {
+      "get": {
+        "tags": ["Settings"],
+        "summary": "Retired legacy API key endpoint",
+        "deprecated": true,
+        "description": "Always returns HTTP 410 after authentication. Use /api/api-keys to manage named scoped keys.",
+        "security": [{ "sessionAuth": [] }],
+        "responses": {
+          "410": { "description": "API_KEY_ENDPOINT_REPLACED" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      },
+      "post": {
+        "tags": ["Settings"],
+        "summary": "Retired legacy API key generation endpoint",
+        "deprecated": true,
+        "description": "Always returns HTTP 410 after authentication and CSRF checks. Use POST /api/api-keys.",
+        "security": [{ "sessionAuth": [] }],
+        "responses": {
+          "410": { "description": "API_KEY_ENDPOINT_REPLACED" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
         }
       }
     },
