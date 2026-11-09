@@ -1,26 +1,26 @@
 ---
 title: "API Key Scopes"
 sidebarTitle: "API Scopes"
-description: "Choose the least-privileged permissions for Figranium API keys and restrict keys to selected Tasks."
+description: "Choose the least-privileged access level for Figranium API keys and restrict keys to selected Tasks."
 ---
 
-API key scopes control which REST API operations an integration can perform. Grant only the permissions the integration needs, then optionally restrict the key to a Task allowlist.
+API key scopes control which REST API operations an integration can perform. Each key has one access level, and higher levels include the access of lower ones. Choose the lowest level the integration needs, then optionally restrict the key to a Task allowlist.
 
 Create and manage keys from **Settings > API Keys**. See [Get Your Figranium API Key](/api-key) for the creation flow and authentication examples.
 
 ## Available scopes
 
-| Scope | Access |
-| :-- | :-- |
-| `tasks:read` | Read Tasks. |
-| `tasks:run` | Run Tasks and read their execution results. |
-| `tasks:manage` | Manage Tasks. |
+| Access level | Scope | Access |
+| :-- | :-- | :-- |
+| **Read tasks** | `tasks:read` | View Tasks. |
+| **Run tasks** | `tasks:run` | View and run Tasks, and read their execution results. |
+| **Manage tasks** | `tasks:manage` | View, run, create, edit, and delete Tasks, plus access browser, credential, Cabinet, capture, and screenshot routes. |
 
-Choose scopes based on the integration's responsibility:
+Choose a scope based on the integration's responsibility:
 
 - Use `tasks:read` for dashboards or tools that only need to inspect Task definitions.
 - Use `tasks:run` for jobs that trigger Tasks and collect their results.
-- Use `tasks:manage` for systems that create, update, or delete Tasks.
+- Use `tasks:manage` for systems that create, update, or delete Tasks, or that need browser, credential, Cabinet, capture, or screenshot access.
 
 ## MCP and common integrations
 
@@ -40,13 +40,14 @@ See [MCP Integration](/mcp-integration) for client setup and available tools.
 | Scheduled job, webhook, or script that triggers Tasks | `tasks:run` |
 | Integration that runs Tasks and reads execution results | `tasks:run` |
 | Admin tool that creates, edits, or deletes Tasks | `tasks:manage` |
+| Tool that opens the browser, reads captures or screenshots, or works with Cabinets | `tasks:manage` |
 | Full-featured MCP client | `tasks:manage` |
 
 ## Task allowlists
 
-A Task allowlist narrows a key's access to selected Tasks. A restricted key cannot access other Tasks, even when it has the corresponding scope.
+A Task allowlist narrows a key's access to selected Tasks. A restricted key cannot access other Tasks, even when its scope would otherwise allow it. The allowlist is enforced on every Task operation, including full Task saves.
 
-Use an allowlist when an integration only needs to run one workflow or manage a small set of workflows. Leave the allowlist unrestricted only when the integration genuinely needs access to every Task permitted by its scopes.
+Use an allowlist when an integration only needs to run one workflow or manage a small set of workflows. Leave the allowlist unrestricted only when the integration genuinely needs access to every Task permitted by its scope.
 
 <Warning>
   Scopes and Task restrictions work together. A key must have both the required scope and access to the requested Task.
@@ -60,17 +61,18 @@ Use an allowlist when an integration only needs to run one workflow or manage a 
 | Trigger a Task with `POST /api/tasks/:id/api` | `tasks:run` |
 | Read execution results | `tasks:run` |
 | Create, update, or delete a Task | `tasks:manage` |
+| Open the browser or use the inspector highlight | `tasks:manage` |
+| List or create Cabinets, or download Cabinet items | `tasks:manage` |
+| Read captures or screenshots | `tasks:manage` |
+
+When a key runs a Task with `POST /api/tasks/:id/api`, the request cannot override the Task's `extractionScript`. Requests that include it return `400 EXTRACTION_SCRIPT_OVERRIDE_FORBIDDEN`.
 
 The exact endpoint behavior is documented in the [REST API Reference](/rest-api). Health and capabilities endpoints are available for checking server status and supported features.
-
-## Legacy compatibility
-
-Figranium accepts existing `results:read` keys and normalizes them to the current `tasks:run` access model. New keys should use the current scopes listed above.
 
 ## Recommended setup
 
 1. Create one named API key per integration or workflow.
-2. Select the smallest scope that satisfies the integration.
+2. Select the lowest access level that satisfies the integration.
 3. Restrict the key to the required Tasks when possible.
 4. Store the secret securely and rotate or revoke it if exposed.
 

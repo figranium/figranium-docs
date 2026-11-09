@@ -171,7 +171,7 @@ Common issues and their solutions when running Figranium.
       - **Fix**: Wrap it in an On Error block with a fallback, or reduce the timeout.
     - **Cause 3**: A download action waiting for a file that never triggers.
       - **Fix**: Check that the target element actually initiates a download.
-    - **Note**: Since v0.19, non-headful runs are stopped after `EXECUTION_TIMEOUT_MS` (15 minutes by default) and return `504 EXECUTION_TIMEOUT`. Raise the value in your `.env` if a task legitimately needs longer. See [Configuration](/configuration#execution).
+    - **Note**: Non-headful runs are stopped after `EXECUTION_TIMEOUT_MS` (15 minutes by default) and return `504 EXECUTION_TIMEOUT`. Raise the value in your `.env` if a task legitimately needs longer. See [Configuration](/configuration#execution).
   </Accordion>
 </AccordionGroup>
 

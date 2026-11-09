@@ -67,7 +67,7 @@ Figranium uses environment variables to configure key aspects of the server and 
 
 ### Host-aware resource protection
 
-Starting in v0.19, Figranium protects the host from running too many Chromium processes at once. It reads available memory (including Docker cgroup limits) and CPU count, then picks a conservative concurrency limit automatically:
+Figranium protects the host from running too many Chromium processes at once. It reads available memory (including Docker cgroup limits) and CPU count, then picks a conservative concurrency limit automatically:
 
 | **Available memory** | **Automatic concurrency** |
 | :-- | :-- |

@@ -12,7 +12,7 @@ Use your Figranium API key to authenticate integrations, scripts, and other exte
   </Step>
 
   <Step title="Create a named key">
-    Select **Add API Key**, give the key a name, and choose only the permissions it needs. You can optionally restrict it to specific Tasks.
+    Select **Create API key**, enter a **Key name**, and choose one **Access level**: **Read tasks**, **Run tasks**, or **Manage tasks**. Under **Limit to tasks**, you can optionally restrict the key to specific Tasks.
   </Step>
 
   <Step title="Copy it once">
@@ -48,23 +48,25 @@ curl https://your-figranium.example.com/api/tasks \
   Your Figranium **Base URL** is the address of your own Figranium instance. For example, `https://figranium.example.com` or `http://localhost:11345` for a default local installation.
 </Note>
 
-## Permissions and Task restrictions
+## Access levels and Task restrictions
 
-Create each key for one integration or workflow and grant only the access it needs:
+Each key has a single access level. Higher levels include everything the lower levels allow:
 
-| Permission | Allows |
-| :-- | :-- |
-| `tasks:read` | Read Tasks. |
-| `tasks:run` | Run Tasks and read their execution results. |
-| `tasks:manage` | Manage Tasks. |
+| Access level | Permission | Allows |
+| :-- | :-- | :-- |
+| **Read tasks** | `tasks:read` | View Tasks. |
+| **Run tasks** | `tasks:run` | View and run Tasks, and read their execution results. |
+| **Manage tasks** | `tasks:manage` | View, run, create, edit, and delete Tasks. Also required for browser, credential, Cabinet, capture, and screenshot routes. |
 
-You can restrict a key to selected Tasks with a Task allowlist. A restricted key cannot access other Tasks, even when it has the corresponding permission.
+Create each key for one integration or workflow and pick the lowest access level it needs.
 
-Figranium accepts existing `results:read` keys and normalizes them to the current `tasks:run` access model.
+You can restrict a key to selected Tasks with a Task allowlist. A restricted key cannot access other Tasks, even when its access level would otherwise allow it. The allowlist also applies when a key saves a full Task definition.
+
+Keys cannot replace a Task's extraction script when running it. A run request from an API key that includes `extractionScript` is rejected with `400 EXTRACTION_SCRIPT_OVERRIDE_FORBIDDEN`. To change the script, edit the Task itself.
 
 ## Revoking a key
 
-To invalidate a key, open **Settings > API Keys**, select the key, and confirm the revocation. Any integration using the revoked key must be updated with another key.
+To invalidate a key, open **Settings > API Keys**, select **Revoke** next to the key, and confirm. Integrations using the revoked key lose access immediately and must be updated with another key.
 
 ## Regenerating a key
 

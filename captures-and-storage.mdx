@@ -84,7 +84,7 @@ If you enable `statelessExecution` in a task, it will launch a fully ephemeral i
 
 ### Automatic Retention
 
-Starting in v0.19, Figranium deletes old captures and execution history automatically. The default retention period is **7 days**.
+Figranium deletes old captures and execution history automatically. The default retention period is **7 days**.
 
 To change it, open **Settings > Advanced**, pick a period under **Data retention** (1, 3, 7, 14, 30, 90, or 365 days, or **Never**), and click **Save retention**.
 
@@ -158,7 +158,7 @@ Execution metadata is stored in `data/executions.json`. Browser session profiles
 
 Each stored execution record is capped at 256 KB (override with `MAX_PERSISTED_EXECUTION_BYTES`). When a result is larger, Figranium keeps the run in history but replaces the HTML and data with a truncation notice, keeps the first 20 log lines, and marks the result `truncated: true`. The full result is still returned to the caller that ran the task. This keeps an oversized payload from destabilizing the server.
 
-Starting in v0.20, Figranium also stores the complete result separately and marks the trimmed record `hasFullResult: true`. To view it, open the run in **Executions** and click **Load full data**, or call `GET /api/executions/{id}/result`. The endpoint returns `{ "result": ... }` with the complete stored result, or `404` with `FULL_RESULT_NOT_AVAILABLE` if no full result was stored. Full results are deleted together with their execution records by [retention](#automatic-retention).
+Figranium also stores the complete result separately and marks the trimmed record `hasFullResult: true`. To view it, open the run in **Executions** and click **Load full data**, or call `GET /api/executions/{id}/result`. The endpoint returns `{ "result": ... }` with the complete stored result, or `404` with `FULL_RESULT_NOT_AVAILABLE` if no full result was stored. Full results are deleted together with their execution records by [retention](#automatic-retention).
 
 To clear history manually, use **Clear execution history** under **Maintenance** in **Settings > Advanced**.
 

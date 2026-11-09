@@ -1,0 +1,290 @@
+---
+title: "Executions API"
+sidebarTitle: "Executions"
+description: "List, inspect, stop, and stream Figranium executions via the REST API. Query history, retrieve full results, and monitor live runs."
+---
+
+The Executions API lets you inspect and manage the lifecycle of Figranium runs. Query history, retrieve full results for large payloads, stop queued or running executions, and stream live updates over SSE.
+
+All endpoints accept either a signed-in session cookie or an API key. See [Get Your Figranium API Key](/api-key) and [API Scopes](/api-scopes) for authentication setup.
+
+---
+
+## List executions (API key)
+
+### `GET /api/executions/list`
+
+Returns a lightweight list of execution records with summary metadata without full logs or result payloads. Use this for dashboard views and history listings when you don't need per-execution detail. Requires API-key authentication.
+
+**Response**:
+
+```json
+{
+  "executions": [
+    {
+      "id": "exec_abc123",
+      "taskId": "task_1",
+      "status": 200,
+      "phase": "finished",
+      "outcome": "success",
+      "startedAt": 1785953052335,
+      "finishedAt": 1785953056535,
+      "durationMs": 4200
+    }
+  ]
+}
+```
+
+| Field | Description |
+| :-- | :-- |
+| `phase` | `queued`, `running`, or `finished`. Queued and running runs appear in the list before they complete. |
+| `outcome` | The final outcome of the run. Present only when `phase` is `finished`. |
+| `startedAt` | When the run left the queue and started, in milliseconds since the Unix epoch. |
+| `finishedAt` | When the run finished, in milliseconds since the Unix epoch. |
+| `durationMs` | Run duration in milliseconds. |
+
+---
+
+## List executions (session)
+
+### `GET /api/executions`
+
+Lists execution history using session authentication.
+
+**Response**:
+
+```json
+{
+  "executions": [
+    {
+      "id": "exec_abc123",
+      "timestamp": 1785953052335,
+      "method": "POST",
+      "path": "/api/tasks/task_1/api",
+      "status": "200",
+      "phase": "finished",
+      "outcome": "success",
+      "startedAt": 1785953052335,
+      "finishedAt": 1785953056535,
+      "durationMs": 4200,
+      "source": "api",
+      "mode": "agent",
+      "taskId": "task_1",
+      "taskName": "Daily Scraper",
+      "url": "https://example.com"
+    }
+  ]
+}
+```
+
+| Field | Description |
+| :-- | :-- |
+| `id` | Execution ID |
+| `timestamp` | When the execution was created |
+| `method` | HTTP method of the triggering request |
+| `path` | Endpoint path that triggered the execution |
+| `status` | HTTP status of the execution response |
+| `source` | Origin of the run, such as `api` or `schedule` |
+| `mode` | Execution mode, such as `agent`, `scrape`, or `headful` |
+| `taskId` | ID of the associated task |
+| `taskName` | Name of the associated task |
+| `url` | Target URL for the run |
+
+---
+
+## Get an execution
+
+### `GET /api/executions/:id`
+
+Gets detailed logs and the result for a specific execution. Accepts an API key or a signed-in session.
+
+If the stored record exceeded `MAX_PERSISTED_EXECUTION_BYTES` (default 256 KB), the result in the history record is trimmed and marked with `"truncated": true` and `"hasFullResult": true`. Use `GET /api/executions/:id/result` to load the complete result.
+
+**Response**:
+
+```json
+{
+  "execution": {
+    "id": "exec_abc123",
+    "taskId": "task_1",
+    "phase": "finished",
+    "outcome": "success",
+    "startedAt": 1785953052335,
+    "finishedAt": 1785953056535,
+    "durationMs": 4200
+  }
+}
+```
+
+**Error responses**:
+
+| Status | Error code | Cause |
+| :-- | :-- | :-- |
+| `404` | `EXECUTION_NOT_FOUND` | No execution exists with the given `id` |
+
+---
+
+## Get full result
+
+### `GET /api/executions/:id/result`
+
+Returns the complete stored result for an execution whose history record was trimmed because it exceeded `MAX_PERSISTED_EXECUTION_BYTES` (default 256 KB). Trimmed records have `result.hasFullResult` set to `true`. Accepts a session or an API key.
+
+Full results are deleted together with execution history when the retention period expires. See [Captures and Storage](/captures-and-storage) for retention behavior.
+
+**Response**:
+
+```json
+{
+  "result": {
+    "data": [],
+    "logs": []
+  }
+}
+```
+
+**Error responses**:
+
+| Status | Error code | Cause |
+| :-- | :-- | :-- |
+| `404` | `EXECUTION_NOT_FOUND` | The execution does not exist |
+| `404` | `FULL_RESULT_NOT_AVAILABLE` | The execution was not trimmed, or its full result is no longer stored |
+
+---
+
+## Stop an execution
+
+### `POST /api/executions/stop`
+
+Stops a running execution, or cancels a run that is still waiting in the execution queue. If the run is still queued, it is cancelled before it starts, and the original run request responds with `200`:
+
+```json
+{ "outcome": "stopped", "logs": ["Execution stopped while queued."] }
+```
+
+**Body**:
+
+```json
+{ "runId": "run_abc123" }
+```
+
+| Field | Type | Required | Description |
+| :-- | :-- | :-- | :-- |
+| `runId` | string | Yes | ID of the execution to stop or cancel |
+
+**Response**:
+
+```json
+{ "success": true }
+```
+
+**Error responses**:
+
+| Status | Error code | Cause |
+| :-- | :-- | :-- |
+| `400` | `MISSING_RUN_ID` | `runId` is missing from the request body |
+| `401` | `Unauthorized` | Authentication is required |
+
+If the client that started a queued run disconnects before the run starts, Figranium cancels the queued run automatically.
+
+---
+
+## Stream live updates
+
+### `GET /api/executions/stream?runId=<runId>`
+
+Opens a server-sent events (SSE) stream of live execution updates for a specific run. Use this for real-time dashboards or interfaces that show a task's progress without repeatedly polling the full execution record.
+
+**Query parameters**:
+
+| Parameter | Type | Required | Description |
+| :-- | :-- | :-- | :-- |
+| `runId` | string | Yes | ID of the execution to stream |
+
+The stream returns `text/event-stream` events as the execution progresses. Connect with an SSE-compatible client and process events as they arrive.
+
+**Error responses**:
+
+| Status | Error code | Cause |
+| :-- | :-- | :-- |
+| `400` | `BadRequest` | `runId` is missing |
+| `401` | `Unauthorized` | Authentication is required |
+
+---
+
+## Clear all execution history
+
+### `POST /api/executions/clear`
+
+Clears all execution history records. This operation cannot be undone.
+
+**Response**:
+
+```json
+{ "success": true }
+```
+
+**Error responses**:
+
+| Status | Error code | Cause |
+| :-- | :-- | :-- |
+| `401` | `Unauthorized` | Authentication is required |
+
+---
+
+## Delete an execution
+
+### `DELETE /api/executions/:id`
+
+Deletes a single execution record by ID.
+
+**Response**:
+
+```json
+{ "success": true }
+```
+
+**Error responses**:
+
+| Status | Error code | Cause |
+| :-- | :-- | :-- |
+| `401` | `Unauthorized` | Authentication is required |
+
+---
+
+## Execution schema
+
+The `Execution` object returned by list and detail endpoints contains the following fields:
+
+| Field | Type | Description |
+| :-- | :-- | :-- |
+| `id` | string | Execution ID |
+| `timestamp` | integer | Creation timestamp in milliseconds |
+| `method` | string | HTTP method of the triggering request |
+| `path` | string | Endpoint path that triggered the execution |
+| `status` | string | HTTP status of the execution response |
+| `phase` | string | `queued`, `running`, or `finished` |
+| `outcome` | string | Final outcome. Present only when `phase` is `finished`. |
+| `startedAt` | integer | When the run started, in milliseconds |
+| `finishedAt` | integer | When the run finished, in milliseconds |
+| `durationMs` | integer | Run duration in milliseconds |
+| `source` | string | Origin of the run |
+| `mode` | string | Execution mode |
+| `taskId` | string | Associated task ID |
+| `taskName` | string | Associated task name |
+| `url` | string | Target URL |
+
+---
+
+## Related pages
+
+<Card title="REST API Reference" icon="code" href="/rest-api">
+  Browse the full endpoint reference for tasks, schedules, settings, and more.
+</Card>
+
+<Card title="Get Your API Key" icon="key" href="/api-key">
+  Create and copy an API key for your instance.
+</Card>
+<Card title="API Scopes" icon="shield" href="/api-scopes">
+  Choose least-privileged permissions for integrations.
+</Card>

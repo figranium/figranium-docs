@@ -184,7 +184,7 @@ Global configuration for the Figranium instance. Settings includes **API Keys**,
 - **Appearance**:
   - **Theme**: Pick the color scheme for the Figranium UI. Choose **Auto** (default) to follow your device's light or dark setting, or pick one of four manual themes: **Dark**, **Light**, **Solarized Light**, and **Solarized Dark**. Auto updates automatically when your device preference changes and is the default for both new and existing installations. Each manual option shows a preview image with a swatch of its surface and accent colors so you can see what you're switching to before you commit. The selected theme is applied instantly and persisted three ways: to the backend data store (via `POST /api/settings/theme`), to a `figranium_theme` cookie with a 1-year TTL, and to browser local storage under `figranium.theme`. Server-side persistence means the same theme follows you across browsers and devices on the same Figranium instance. On page load, Figranium reads the cookie first for an instant paint, then reconciles with the server value from `GET /api/settings/theme`.
 - **About**: Shows the installed Figranium version.
-- **Advanced** (`/settings/advanced`, added in v0.19):
+- **Advanced** (`/settings/advanced`):
 
   - **Account**: Change your sign-in email or password. Enter your current password, then click **Save account**. New passwords must be 8 to 128 characters.
   - **Data retention**: Choose how long captures and execution history are kept (default 7 days). See [Automatic Retention](/captures-and-storage#automatic-retention).

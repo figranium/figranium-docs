@@ -4,7 +4,7 @@ sidebarTitle: "Resource Protection"
 description: "How Figranium measures host memory and CPU, sizes browser concurrency, queues runs under pressure, and returns 503 and 504 errors. Includes tuning examples."
 ---
 
-Starting in v0.19, Figranium protects its host from running more Chromium processes than it can handle. A resource monitor measures memory and CPU, a concurrency limit is derived from those numbers, and an execution queue holds extra runs until capacity frees up. This page explains each part, how they interact, and how to tune them for your deployment.
+Figranium protects its host from running more Chromium processes than it can handle. A resource monitor measures memory and CPU, a concurrency limit is derived from those numbers, and an execution queue holds extra runs until capacity frees up. This page explains each part, how they interact, and how to tune them for your deployment.
 
 <CardGroup cols={2}>
   <Card title="Resource monitor" icon="activity" href="#resource-monitor">

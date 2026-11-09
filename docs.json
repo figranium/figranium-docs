@@ -56,7 +56,8 @@
               "rest-api-quickstart",
               "schedules",
               "rest-api-task-lifecycle",
-              "rest-api-execution-monitoring"
+              "rest-api-execution-monitoring",
+              "executions"
             ]
           },
           {
