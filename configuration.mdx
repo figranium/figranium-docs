@@ -1,7 +1,7 @@
 ---
 title: "Figranium Environment Variables and Configuration"
 sidebarTitle: "Configuration"
-description: "Complete reference for Figranium environment variables. Configure ports, sessions, rate limits, databases, CAPTCHA solving, and browser engines."
+description: "Complete reference for Figranium environment variables. Configure ports, sessions, rate limits, databases, CAPTCHA solving, and Folate selector resolution."
 ---
 
 Figranium uses environment variables to configure key aspects of the server and automation environment. These variables are defined in `src/server/constants.js`.
@@ -25,10 +25,6 @@ Figranium uses environment variables to configure key aspects of the server and 
 
   <Card title="Feature Flags" icon="flag" href="#feature-flags">
     Session cookie security and other toggles.
-  </Card>
-
-  <Card title="Browser Engine" icon="world" href="#browser-engine">
-    CloakBrowser stealth engine configuration.
   </Card>
 
   <Card title="CAPTCHA Solving" icon="key" href="#captcha-solving">
@@ -111,14 +107,7 @@ Set `PASSWORD_CACHE_ENABLED=false` in your environment or Docker Compose `enviro
 
 ## Browser Engine
 
-| **Variable** | **Default Value** | **Description** |
-| :-- | :-- | :-- |
-| `USE_CLOAK_ENGINE` | `false` | Set to `true` (or `1`) to run the browser engine on [CloakBrowser](https://github.com/CloakHQ/cloakbrowser), a stealth-patched Chromium binary, instead of the default Playwright \+ `puppeteer-extra-plugin-stealth` stack. Applies to Agent and Headful runners. |
-| `CLOAKBROWSER_LICENSE_KEY` | — | CloakBrowser license key for the latest stealth binary. Read natively by cloakbrowser; you can also run `npx cloakbrowser login` to write it to `~/.cloakbrowser/license.key`. Without a key, the free legacy binary is used. |
-
-<Tip>
-  See [Stealth & Anti-Detection](/stealth-mode#browser-engine) for when to switch engines and what the CloakBrowser stack changes.
-</Tip>
+Figranium uses Playwright Chromium with `playwright-extra` and `puppeteer-extra-plugin-stealth`. The optional CloakBrowser engine was removed in v0.23.0. The `USE_CLOAK_ENGINE` and `CLOAKBROWSER_LICENSE_KEY` environment variables are no longer supported. See [Stealth & Anti-Detection](/stealth-mode#browser-engine).
 
 ## CAPTCHA Solving
 
@@ -187,9 +176,9 @@ DB_POSTGRESDB_PASSWORD=your_neon_password
 DB_POSTGRESDB_DATABASE=neondb
 DB_POSTGRESDB_SSL=true
 
-# Optional CloakBrowser engine
-USE_CLOAK_ENGINE=true
-CLOAKBROWSER_LICENSE_KEY=your_cloakbrowser_license_key
+# Optional Folate overrides
+# FOLATE_PYTHON=/path/to/python3
+# FOLATE_MODEL_DIR=/path/to/folate-model
 
 # Optional CAPTCHA solving (remote endpoint; local model runs by default)
 CAPTCHA_SOLVER_URL=https://solver.example.com

@@ -6,6 +6,21 @@ sidebarTitle: "Changelog"
 
 Stay up to date with the latest changes to Figranium. For documentation changes, see the source repository directly.
 
+<Update label="2026-11-17" description="MCP v1.6.0">
+  ## MCP v1.6.0
+
+  - Added `folate_resolve` for ranking DOM selector candidates from a natural-language query and `folate_status` for checking local Folate runtime availability.
+  - Use natural-language descriptions in selector fields, or prefix them with `folate:` or `ai:` to request explicit Folate resolution. See [MCP Integration](/mcp-integration#4-folate-selector-tools) and [Selectors](/selectors#natural-language-selectors-with-folate).
+  - **MCP support and Figranium availability**: Folate is currently available in Figranium Edge (unstable) builds. MCP v1.6.0 supports Folate tools when connected to an Edge instance with Folate support. The self-hosted GHCR Edge Docker image includes Python, Folate, and its model; source and npm installs of an Edge build attempt to install the package during postinstall when Python 3 is available. Stable Figranium builds for regular users will include Folate soon. See [Configuration](/configuration#folate-selector-resolution).
+</Update>
+
+<Update label="2026-11-16" description="Figranium v0.23.0">
+  ## Figranium v0.23.0
+
+  - **Optional TOTP two-factor authentication**: self-hosted accounts can enable authenticator-app sign-in and use one-time recovery codes. Configure `MASTER_KEY` to encrypt TOTP secrets. See [Security](/security#optional-two-factor-authentication).
+  - **Playwright stealth stack**: removed the optional CloakBrowser engine. Figranium now uses Playwright Chromium with `playwright-extra` and `puppeteer-extra-plugin-stealth`; `USE_CLOAK_ENGINE` and `CLOAKBROWSER_LICENSE_KEY` are no longer supported. See [Stealth & Anti-Detection](/stealth-mode#browser-engine).
+</Update>
+
 <Update label="2026-10-10" description="v0.21.1">
   ## API reliability and credential security
 

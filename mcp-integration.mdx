@@ -157,8 +157,7 @@ The server initializes and communicates a predefined set of instructions directl
 
 ### 1. Task Creation and Execution Environments
 
-- **Task Modes**: Fast, non-interactive tasks should use the `scrape` mode. Detailed, interactive, multi-step tasks requiring complex mouse and keyboard simulation should use the `agent` mode.
-- **Headful Execution**: For debugging or executing tasks that require a visible environment, headful execution is supported to let you visually inspect interactions in real-time.
+- **Task Modes**: Fast, non-interactive tasks should use the `scrape` mode. Detailed, interactive, multi-step tasks requiring complex mouse and keyboard simulation should use the `agent` mode. The MCP task schema does not support `headful` as an execution mode.
 - **Stealth Configurations**: Anti-bot stealth mechanisms can be toggled inside the `stealth` configuration block. These simulate organic mouse curves, natural delays, randomized click offsets, and other human-like interactions.
 
 ### 2. Step Sequence Construction (Actions)
@@ -172,11 +171,17 @@ The server initializes and communicates a predefined set of instructions directl
 
 ### 3. Target Selector Strategy
 
-- Prefer highly robust and resilient selector targets: IDs (e.g., `#[your-css-selector]`), semantic class names, ARIA roles, or reliable text matches.
+- Use a plain-language element description in selector fields when a stable CSS, XPath, ARIA, or Playwright selector is not known. Figranium can resolve natural-language selectors with Folate at runtime. Prefix a description with `folate:` or `ai:` to request explicit Folate resolution.
 - Avoid fragile, heavily nested structural paths (e.g. `div > div > span > button`) that are prone to breakage.
 - When targeting elements inside the Shadow DOM, set the `includeShadowDom` property to `true`.
 
-### 4. Variables and Execution Context
+### 4. Folate selector tools
+
+- **`folate_resolve`** ranks DOM candidates from supplied page HTML for a natural-language query. Required fields: `query` and `html`. Optional fields: `topK` (1-20, default 3) and `maxCandidates` (1-200, default 48). Results include ranked selector matches.
+- **`folate_status`** checks whether the local Folate runtime is available on the connected Figranium instance.
+- Folate is currently available in Figranium Edge (unstable) builds. MCP v1.6.0 supports its Folate tools when connected to an Edge instance with Folate support. Stable Figranium builds for regular users will include Folate soon. The self-hosted GHCR Edge Docker image includes the Python Folate runtime and model. Source or npm installs of an Edge build attempt to install the Folate package during postinstall when Python 3 is available. Check status on the connected instance before relying on runtime resolution.
+
+### 5. Variables and Execution Context
 
 - Task-level `variables` are inputs/configuration that callers may override before execution. Do not use task variables as final output fields.
 - Use `set` for runtime or mid-task state needed by later blocks; it may create or update a runtime variable.
@@ -217,6 +222,12 @@ The MCP server exposes rich tools mapped to Figranium's REST API.
   - Fetches all task IDs, names, and descriptions registered on the server.
 - **`task_execute`**
   - Triggers the execution of a task by ID. Supports runtime variable overrides.
+- **`folate_resolve`**
+
+  - Resolves a natural-language element description against page HTML into ranked CSS/XPath selector candidates. See [Folate selector tools](#4-folate-selector-tools).
+- **`folate_status`**
+
+  - Reports whether the local Folate runtime is available. See [Folate selector tools](#4-folate-selector-tools).
 
 ### Cabinet Operations
 

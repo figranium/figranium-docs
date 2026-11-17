@@ -16,6 +16,12 @@ By default, the Figranium UI requires an account. When you create your account d
 
 All fields must be plain text strings. Requests with missing fields or values that exceed these limits are rejected with a `400` error.
 
+### Optional two-factor authentication
+
+Self-hosted accounts can enable TOTP two-factor sign-in under **Settings > Advanced > Two-factor authentication**. After entering a password, sign in with a six-digit authenticator code. Setup provides downloadable recovery codes; each code can be used once, so store them securely. Repeated failed verification attempts trigger a per-account lockout.
+
+You can set `MASTER_KEY` to encrypt TOTP secrets. If an operator must recover an account after the authenticator and all recovery codes are lost, run `node scripts/reset-2fa.js <email>` from a source checkout while the server is stopped. This recovery script is not included in the npm package.
+
 ### Timing-safe login
 
 `POST /api/auth/login` always performs a bcrypt comparison before returning, even when the email does not match a known user, the request body has the wrong field types, or the email or password exceeds the allowed length. This keeps the response time consistent across all failure modes so an attacker cannot use response-time differences to enumerate valid email addresses or probe for soft-fail paths in input validation.
