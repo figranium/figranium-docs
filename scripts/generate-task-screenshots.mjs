@@ -264,7 +264,7 @@ for (let index = 0; index < manifest.screenshots.length; index++) {
   }
   // Center the workflow itself in the final docs capture. The editor's left
   // navigation rail makes the natural editor composition sit slightly right.
-  const trigger = page.getByText('On Execution', { exact: true }).first();
+  const trigger = page.locator('.canvas-execution-card').first();
   const triggerBox = await trigger.boundingBox();
   const viewport = page.viewportSize();
   if (triggerBox && viewport) {
