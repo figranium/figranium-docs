@@ -179,7 +179,7 @@ The server initializes and communicates a predefined set of instructions directl
 
 - **`folate_resolve`** ranks DOM candidates from supplied page HTML for a natural-language query. Required fields: `query` and `html`. Optional fields: `topK` (1-20, default 3) and `maxCandidates` (1-200, default 48). Results include ranked selector matches.
 - **`folate_status`** checks whether the local Folate runtime is available on the connected Figranium instance.
-- Folate is currently available in Figranium Edge (unstable) builds. MCP v1.6.0 supports its Folate tools when connected to an Edge instance with Folate support. Stable Figranium builds for regular users will include Folate soon. The self-hosted GHCR Edge Docker image includes the Python Folate runtime and model. Source or npm installs of an Edge build attempt to install the Folate package during postinstall when Python 3 is available. Check status on the connected instance before relying on runtime resolution.
+- Folate is currently available in Figranium Edge (unstable) builds. MCP v1.6.0 supports its Folate tools when connected to an Edge instance with Folate support. Stable Figranium builds for regular users will include Folate in the next release. The self-hosted GHCR Edge Docker image includes the Python Folate runtime and model. Source or npm installs of an Edge build attempt to install the Folate package during postinstall when Python 3 is available. Check status on the connected instance before relying on runtime resolution.
 
 ### 5. Variables and Execution Context
 
