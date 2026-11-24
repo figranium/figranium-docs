@@ -141,7 +141,7 @@ The noVNC page mirrors this on the client side: on an RFB disconnect it retries 
 - **Reconnecting...** — the previous session was open for at least 4 seconds before dropping, so the disconnect is treated as a network blip.
 - **Browser session crashed, retrying...** — the session dropped within 4 seconds of connecting, which usually means Xvfb or x11vnc crashed and the viewer is waiting for the restart loop to bring it back.
 
-On Apple Silicon Macs, make sure Docker Desktop is pulling the native `linux/arm64` image. Running the AMD64 image under QEMU emulation is the most common cause of the fast-crash pattern above. See [Troubleshooting — Headful viewer shows "Connecting..." then "Disconnected" on Apple Silicon Macs](/troubleshooting#12-headful-viewer-shows-connecting-then-disconnected-on-apple-silicon-macs).
+On Apple Silicon Macs, make sure Docker Desktop is pulling the native `linux/arm64` image. Running the AMD64 image under QEMU emulation is the most common cause of the fast-crash pattern above. See [Troubleshooting — Headful viewer shows "Connecting..." then "Disconnected" on Apple Silicon Macs](/troubleshooting#headful-viewer-shows-connecting-then-disconnected-on-apple-silicon-macs).
 
 ## Adaptive viewer quality
 
@@ -207,7 +207,7 @@ The endpoint requires an authenticated session or a valid API key. See [`GET /ap
 
 Every WebSocket upgrade to `/websockify` (used by noVNC) is validated before the connection is proxied to the VNC server. Requests must satisfy **all** of the following:
 
-- Originate from an IP address permitted by [`ALLOWED_IPS`](/security#2-ip-allowlist-allowed_ips).
+- Originate from an IP address permitted by [`ALLOWED_IPS`](/security#ip-allowlist-allowed_ips).
 - Present an `Origin` header that matches the request `Host` (CSWSH protection). If both `Origin` and `Host` resolve to loopback or private addresses (`localhost`, `127.0.0.1`, `::1`, `host.docker.internal`, any `*.local` hostname, or an [RFC 1918](https://datatracker.ietf.org/doc/html/rfc1918) private range), the ports and aliases do not need to match. This lets Vite dev servers, Docker port mappings, and IPv6 loopback aliases connect without tripping the CSWSH check while still rejecting cross-origin upgrades from public hosts.
 - Carry either a valid session cookie or an API key (`x-api-key` header or `?apiKey=` query parameter).
 
