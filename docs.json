@@ -11,7 +11,6 @@
     "products": [
       {
         "product": "Figranium",
-        "icon": "layout-dashboard",
         "description": "Visual, self-hosted browser automation",
         "tabs": [
           {
@@ -310,7 +309,6 @@
       },
       {
         "product": "Frowse",
-        "icon": "brand-chrome",
         "description": "Token-lean browser CLI for AI agents",
         "groups": [
           {
@@ -334,7 +332,6 @@
       },
       {
         "product": "Fiptcha",
-        "icon": "checkbox",
         "description": "Local CAPTCHA solving for Node.js",
         "groups": [
           {
@@ -358,7 +355,6 @@
       },
       {
         "product": "Folate",
-        "icon": "list-numbers",
         "description": "Neural DOM element ranker",
         "groups": [
           {
