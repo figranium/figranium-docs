@@ -310,7 +310,7 @@
       },
       {
         "product": "Frowse",
-        "icon": "terminal-2",
+        "icon": "brand-chrome",
         "description": "Token-lean browser CLI for AI agents",
         "groups": [
           {
@@ -334,7 +334,7 @@
       },
       {
         "product": "Fiptcha",
-        "icon": "shield-check",
+        "icon": "checkbox",
         "description": "Local CAPTCHA solving for Node.js",
         "groups": [
           {
@@ -358,7 +358,7 @@
       },
       {
         "product": "Folate",
-        "icon": "target",
+        "icon": "list-numbers",
         "description": "Neural DOM element ranker",
         "groups": [
           {
