@@ -8,296 +8,382 @@
     "dark": "#2563EB"
   },
   "navigation": {
-    "tabs": [
+    "products": [
       {
-        "tab": "Documentation",
-        "icon": "book",
-        "pages": [
+        "product": "Figranium",
+        "icon": "layout-dashboard",
+        "description": "Visual, self-hosted browser automation",
+        "tabs": [
           {
-            "group": "Introduction",
-            "icon": "info-circle",
+            "tab": "Documentation",
+            "icon": "book",
             "pages": [
-              "overview",
-              "why-figranium",
-              "architecture",
-              "pronunciation"
+              {
+                "group": "Introduction",
+                "icon": "info-circle",
+                "pages": [
+                  "overview",
+                  "why-figranium",
+                  "architecture",
+                  "pronunciation"
+                ]
+              },
+              {
+                "group": "Get Started",
+                "icon": "brand-docker",
+                "pages": [
+                  "quickstart",
+                  "host-specs",
+                  "docker-compose",
+                  "digitalocean-one-click",
+                  "multi-arch",
+                  "local-development",
+                  "configuration",
+                  "database-support"
+                ]
+              },
+              {
+                "group": "Editor & Task Building",
+                "icon": "tools",
+                "pages": [
+                  "ui-tour",
+                  "action-blocks",
+                  "selectors",
+                  "highlight-tool",
+                  "variables",
+                  "passwords",
+                  "advanced-templating",
+                  "control-flow",
+                  "error-handling",
+                  "javascript-execution",
+                  "modular-workflows",
+                  "tasks",
+                  "rest-api-quickstart",
+                  "schedules",
+                  "rest-api-task-lifecycle",
+                  "rest-api-execution-monitoring",
+                  "executions"
+                ]
+              },
+              {
+                "group": "Data & Extraction",
+                "icon": "database-export",
+                "pages": [
+                  "data-extraction",
+                  "csv-processing",
+                  "output-providers"
+                ]
+              },
+              {
+                "group": "Running Tasks",
+                "icon": "player-play",
+                "pages": [
+                  "agent-vs-scrape",
+                  "headful-browser",
+                  "stateless-execution",
+                  "task-scheduling",
+                  "task-versioning",
+                  "captures-and-storage",
+                  "file-downloads",
+                  "session-state"
+                ]
+              },
+              {
+                "group": "Anti-Detection",
+                "icon": "masks-theater",
+                "pages": [
+                  "stealth-mode",
+                  "proxy-rotation",
+                  "captcha-solving",
+                  "page-translation"
+                ]
+              },
+              {
+                "group": "Templates",
+                "icon": "template",
+                "pages": [
+                  "community-presets"
+                ]
+              },
+              {
+                "group": "Operations",
+                "icon": "activity-heartbeat",
+                "pages": [
+                  "performance",
+                  "resource-protection",
+                  "security",
+                  "troubleshooting"
+                ]
+              }
             ]
           },
           {
-            "group": "Get Started",
-            "icon": "brand-docker",
-            "pages": [
-              "quickstart",
-              "host-specs",
-              "docker-compose",
-              "digitalocean-one-click",
-              "multi-arch",
-              "local-development",
-              "configuration",
-              "database-support"
-            ]
-          },
-          {
-            "group": "Editor & Task Building",
-            "icon": "tools",
-            "pages": [
-              "ui-tour",
-              "action-blocks",
-              "selectors",
-              "highlight-tool",
-              "variables",
-              "passwords",
-              "advanced-templating",
-              "control-flow",
-              "error-handling",
-              "javascript-execution",
-              "modular-workflows",
-              "tasks",
-              "rest-api-quickstart",
-              "schedules",
-              "rest-api-task-lifecycle",
-              "rest-api-execution-monitoring",
-              "executions"
-            ]
-          },
-          {
-            "group": "Data & Extraction",
-            "icon": "database-export",
-            "pages": [
-              "data-extraction",
-              "csv-processing",
-              "output-providers"
-            ]
-          },
-          {
-            "group": "Running Tasks",
-            "icon": "player-play",
-            "pages": [
-              "agent-vs-scrape",
-              "headful-browser",
-              "stateless-execution",
-              "task-scheduling",
-              "task-versioning",
-              "captures-and-storage",
-              "file-downloads",
-              "session-state"
-            ]
-          },
-          {
-            "group": "Anti-Detection",
-            "icon": "masks-theater",
-            "pages": [
-              "stealth-mode",
-              "proxy-rotation",
-              "captcha-solving",
-              "page-translation"
-            ]
-          },
-          {
-            "group": "Templates",
-            "icon": "template",
-            "pages": [
-              "community-presets"
-            ]
-          },
-          {
-            "group": "Operations",
-            "icon": "activity-heartbeat",
-            "pages": [
-              "performance",
-              "resource-protection",
-              "security",
-              "troubleshooting"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API & Integrations",
-        "icon": "api",
-        "pages": [
-          {
-            "group": "REST API",
+            "tab": "API & Integrations",
             "icon": "api",
             "pages": [
-              "rest-api",
-              "api-key",
-              "api-scopes",
-              "rest-api-quickstart",
-              "rest-api-execution-monitoring",
-              "rest-api-task-lifecycle"
+              {
+                "group": "REST API",
+                "icon": "api",
+                "pages": [
+                  "rest-api",
+                  "api-key",
+                  "api-scopes",
+                  "rest-api-quickstart",
+                  "rest-api-execution-monitoring",
+                  "rest-api-task-lifecycle"
+                ]
+              },
+              {
+                "group": "MCP",
+                "icon": "brain",
+                "pages": [
+                  "mcp-integration"
+                ]
+              },
+              {
+                "group": "Workflow Integrations",
+                "icon": "brand-zapier",
+                "pages": [
+                  "n8n-integration",
+                  "zapier-integration",
+                  "make-integration",
+                  "activepieces-integration",
+                  "dify-integration",
+                  "langflow-integration"
+                ]
+              }
             ]
           },
           {
-            "group": "MCP",
-            "icon": "brain",
-            "pages": [
-              "mcp-integration"
+            "tab": "SDKs",
+            "icon": "sdk",
+            "groups": [
+              {
+                "group": "Introduction",
+                "icon": "info-circle",
+                "pages": [
+                  "sdk/overview"
+                ]
+              },
+              {
+                "group": "JavaScript SDK",
+                "icon": "brand-javascript",
+                "pages": [
+                  "sdk/js/overview",
+                  "sdk/js/installation",
+                  "sdk/js/quickstart",
+                  "sdk/js/client-configuration",
+                  "sdk/js/authentication",
+                  "sdk/js/request-options",
+                  "sdk/js/errors",
+                  "sdk/js/streaming",
+                  "sdk/js/actions",
+                  "sdk/js/variables",
+                  {
+                    "group": "Resources",
+                    "icon": "tool",
+                    "pages": [
+                      "sdk/js/resources/tasks",
+                      "sdk/js/resources/executions",
+                      "sdk/js/resources/schedules",
+                      "sdk/js/resources/cabinets",
+                      "sdk/js/resources/captures",
+                      "sdk/js/resources/browser",
+                      "sdk/js/resources/execution",
+                      "sdk/js/resources/health"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Python SDK",
+                "icon": "brand-python",
+                "pages": [
+                  "sdk/python/overview",
+                  "sdk/python/installation",
+                  "sdk/python/quickstart",
+                  "sdk/python/client-configuration",
+                  "sdk/python/authentication",
+                  "sdk/python/request-options",
+                  "sdk/python/errors",
+                  "sdk/python/streaming",
+                  "sdk/python/async",
+                  "sdk/python/actions",
+                  "sdk/python/variables",
+                  {
+                    "group": "Resources",
+                    "icon": "tool",
+                    "pages": [
+                      "sdk/python/resources/tasks",
+                      "sdk/python/resources/executions",
+                      "sdk/python/resources/schedules",
+                      "sdk/python/resources/cabinets",
+                      "sdk/python/resources/captures",
+                      "sdk/python/resources/browser",
+                      "sdk/python/resources/execution",
+                      "sdk/python/resources/health"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Swift SDK",
+                "icon": "brand-swift",
+                "pages": [
+                  "sdk/swift/overview",
+                  "sdk/swift/installation",
+                  "sdk/swift/quickstart",
+                  "sdk/swift/client-configuration",
+                  "sdk/swift/authentication",
+                  "sdk/swift/request-options",
+                  "sdk/swift/errors",
+                  "sdk/swift/streaming",
+                  "sdk/swift/actions",
+                  "sdk/swift/variables",
+                  "sdk/swift/models",
+                  "sdk/swift/app-intents",
+                  "sdk/swift/foundation-models",
+                  {
+                    "group": "Resources",
+                    "icon": "tool",
+                    "pages": [
+                      "sdk/swift/resources/tasks",
+                      "sdk/swift/resources/executions",
+                      "sdk/swift/resources/schedules",
+                      "sdk/swift/resources/cabinets",
+                      "sdk/swift/resources/captures",
+                      "sdk/swift/resources/browser",
+                      "sdk/swift/resources/execution",
+                      "sdk/swift/resources/health"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Kotlin SDK",
+                "icon": "brand-kotlin",
+                "pages": [
+                  "sdk/kotlin/overview",
+                  "sdk/kotlin/installation",
+                  "sdk/kotlin/quickstart",
+                  "sdk/kotlin/client-configuration",
+                  "sdk/kotlin/authentication",
+                  "sdk/kotlin/request-options",
+                  "sdk/kotlin/errors",
+                  "sdk/kotlin/streaming",
+                  "sdk/kotlin/actions",
+                  "sdk/kotlin/variables",
+                  "sdk/kotlin/models",
+                  "sdk/kotlin/app-functions",
+                  {
+                    "group": "Resources",
+                    "icon": "tool",
+                    "pages": [
+                      "sdk/kotlin/resources/tasks",
+                      "sdk/kotlin/resources/executions",
+                      "sdk/kotlin/resources/schedules",
+                      "sdk/kotlin/resources/cabinets",
+                      "sdk/kotlin/resources/captures",
+                      "sdk/kotlin/resources/browser",
+                      "sdk/kotlin/resources/execution",
+                      "sdk/kotlin/resources/health"
+                    ]
+                  }
+                ]
+              }
             ]
           },
           {
-            "group": "Workflow Integrations",
-            "icon": "brand-zapier",
-            "pages": [
-              "n8n-integration",
-              "zapier-integration",
-              "make-integration",
-              "activepieces-integration",
-              "dify-integration",
-              "langflow-integration"
+            "tab": "Changelog",
+            "icon": "history-toggle",
+            "groups": [
+              {
+                "group": "Changelog",
+                "icon": "history-toggle",
+                "pages": [
+                  "changelog/overview"
+                ]
+              }
             ]
           }
         ]
       },
       {
-        "tab": "SDKs",
-        "icon": "sdk",
+        "product": "Frowse",
+        "icon": "terminal-2",
+        "description": "Token-lean browser CLI for AI agents",
         "groups": [
           {
-            "group": "Introduction",
-            "icon": "info-circle",
+            "group": "Get Started",
+            "icon": "rocket",
             "pages": [
-              "sdk/overview"
+              "frowse/overview",
+              "frowse/installation"
             ]
           },
           {
-            "group": "JavaScript SDK",
-            "icon": "brand-javascript",
+            "group": "Reference",
+            "icon": "book",
             "pages": [
-              "sdk/js/overview",
-              "sdk/js/installation",
-              "sdk/js/quickstart",
-              "sdk/js/client-configuration",
-              "sdk/js/authentication",
-              "sdk/js/request-options",
-              "sdk/js/errors",
-              "sdk/js/streaming",
-              "sdk/js/actions",
-              "sdk/js/variables",
-              {
-                "group": "Resources",
-                "pages": [
-                  "sdk/js/resources/tasks",
-                  "sdk/js/resources/executions",
-                  "sdk/js/resources/schedules",
-                  "sdk/js/resources/cabinets",
-                  "sdk/js/resources/captures",
-                  "sdk/js/resources/browser",
-                  "sdk/js/resources/execution",
-                  "sdk/js/resources/health"
-                ],
-                "icon": "tool"
-              }
-            ]
-          },
-          {
-            "group": "Python SDK",
-            "icon": "brand-python",
-            "pages": [
-              "sdk/python/overview",
-              "sdk/python/installation",
-              "sdk/python/quickstart",
-              "sdk/python/client-configuration",
-              "sdk/python/authentication",
-              "sdk/python/request-options",
-              "sdk/python/errors",
-              "sdk/python/streaming",
-              "sdk/python/async",
-              "sdk/python/actions",
-              "sdk/python/variables",
-              {
-                "group": "Resources",
-                "icon": "tool",
-                "pages": [
-                  "sdk/python/resources/tasks",
-                  "sdk/python/resources/executions",
-                  "sdk/python/resources/schedules",
-                  "sdk/python/resources/cabinets",
-                  "sdk/python/resources/captures",
-                  "sdk/python/resources/browser",
-                  "sdk/python/resources/execution",
-                  "sdk/python/resources/health"
-                ]
-              }
-            ]
-          },
-          {
-            "group": "Swift SDK",
-            "icon": "brand-swift",
-            "pages": [
-              "sdk/swift/overview",
-              "sdk/swift/installation",
-              "sdk/swift/quickstart",
-              "sdk/swift/client-configuration",
-              "sdk/swift/authentication",
-              "sdk/swift/request-options",
-              "sdk/swift/errors",
-              "sdk/swift/streaming",
-              "sdk/swift/actions",
-              "sdk/swift/variables",
-              "sdk/swift/models",
-              "sdk/swift/app-intents",
-              "sdk/swift/foundation-models",
-              {
-                "group": "Resources",
-                "icon": "tool",
-                "pages": [
-                  "sdk/swift/resources/tasks",
-                  "sdk/swift/resources/executions",
-                  "sdk/swift/resources/schedules",
-                  "sdk/swift/resources/cabinets",
-                  "sdk/swift/resources/captures",
-                  "sdk/swift/resources/browser",
-                  "sdk/swift/resources/execution",
-                  "sdk/swift/resources/health"
-                ]
-              }
-            ]
-          },
-          {
-            "group": "Kotlin SDK",
-            "icon": "brand-kotlin",
-            "pages": [
-              "sdk/kotlin/overview",
-              "sdk/kotlin/installation",
-              "sdk/kotlin/quickstart",
-              "sdk/kotlin/client-configuration",
-              "sdk/kotlin/authentication",
-              "sdk/kotlin/request-options",
-              "sdk/kotlin/errors",
-              "sdk/kotlin/streaming",
-              "sdk/kotlin/actions",
-              "sdk/kotlin/variables",
-              "sdk/kotlin/models",
-              "sdk/kotlin/app-functions",
-              {
-                "group": "Resources",
-                "icon": "tool",
-                "pages": [
-                  "sdk/kotlin/resources/tasks",
-                  "sdk/kotlin/resources/executions",
-                  "sdk/kotlin/resources/schedules",
-                  "sdk/kotlin/resources/cabinets",
-                  "sdk/kotlin/resources/captures",
-                  "sdk/kotlin/resources/browser",
-                  "sdk/kotlin/resources/execution",
-                  "sdk/kotlin/resources/health"
-                ]
-              }
+              "frowse/commands",
+              "frowse/agent-skills",
+              "frowse/benchmarks"
             ]
           }
         ]
       },
       {
-        "tab": "Changelog",
-        "icon": "history-toggle",
+        "product": "Fiptcha",
+        "icon": "shield-check",
+        "description": "Local CAPTCHA solving for Node.js",
         "groups": [
           {
-            "group": "Changelog",
+            "group": "Get Started",
+            "icon": "rocket",
             "pages": [
-              "changelog/overview"
-            ],
-            "icon": "history-toggle"
+              "fiptcha/overview",
+              "fiptcha/quickstart"
+            ]
+          },
+          {
+            "group": "Reference",
+            "icon": "book",
+            "pages": [
+              "fiptcha/api-reference",
+              "fiptcha/models-and-runtime",
+              "fiptcha/troubleshooting"
+            ]
+          }
+        ]
+      },
+      {
+        "product": "Folate",
+        "icon": "target",
+        "description": "Neural DOM element ranker",
+        "groups": [
+          {
+            "group": "Get Started",
+            "icon": "rocket",
+            "pages": [
+              "folate/overview",
+              "folate/quickstart"
+            ]
+          },
+          {
+            "group": "Reference",
+            "icon": "book",
+            "pages": [
+              "folate/python-api",
+              "folate/benchmarks",
+              "folate/training"
+            ]
+          },
+          {
+            "group": "Mobile",
+            "icon": "device-mobile",
+            "pages": [
+              "folate/androidfolate"
+            ]
           }
         ]
       }
@@ -345,17 +431,17 @@
   "fonts": {
     "family": "Questrial"
   },
-  "description": "Open-source, self-hosted visual browser automation: build reliable Tasks visually, then run them through an API, SDKs, MCP, n8n, Zapier, and more.",
+  "description": "Open-source browser automation tools: Figranium for visual, self-hosted Tasks, Frowse for token-lean agent browsing, Fiptcha for local CAPTCHA solving, and Folate for neural DOM element grounding.",
   "navbar": {
     "primary": {
       "type": "github",
-      "href": "https://github.com/figranium/figranium"
+      "href": "https://github.com/figranium"
     }
   },
   "footer": {
     "socials": {
       "discord": "https://discord.com/invite/kPmfbgu9Xn",
-      "github": "https://github.com/figranium/figranium",
+      "github": "https://github.com/figranium",
       "x": "https://x.com/figranium",
       "youtube": "https://youtube.com/@Figranium",
       "instagram": "https://instagram.com/figranium"

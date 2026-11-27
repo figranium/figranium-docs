@@ -1,0 +1,65 @@
+---
+title: "Frowse Commands"
+sidebarTitle: "Commands"
+description: "Reference for Frowse CLI commands, aliases, and global flags."
+---
+
+Every command that takes a target accepts a natural-language Folate prompt, a CSS selector, an XPath, or an `@eN` ref from `snapshot --refs`.
+
+## Commands
+
+| Command | Description |
+| :--- | :--- |
+| `open <url>` | Launch the browser and navigate. Aliases: `goto`, `navigate`. |
+| `snapshot` / `summary` | Lightweight, Folate-ready DOM summary. Flags: `--section <name>`, `--max-chars <n>` (default 2200), `--refs`. |
+| `query <prompt>` / `folate` | Query Folate for ranked selectors without acting. Flag: `--top-k N` (default 3). |
+| `click <target>` | Click an element. Flags: `--button`, `--modifiers`, `--new-tab`. `dblclick` is also available. |
+| `fill <target> <text>` | Clear and fill an input. |
+| `type <target> <text>` | Type into an element. Flags: `--clear`, `--delay <ms>`. |
+| `select <target> <value>` | Select a dropdown option by value or label. |
+| `press <key>` | Press a key. Alias: `key`. |
+| `hover`, `focus`, `check`, `uncheck`, `scrollintoview`, `highlight` | Act on a single target. |
+| `scroll <direction> [px]` | Scroll `up`, `down`, `left`, or `right` (default 500 px). Flag: `--selector <sel>`. |
+| `drag <src> <dst>` | Drag one element onto another. |
+| `upload <target> <files...>` | Upload files to a file input. |
+| `get <prop> [target]` | Read `text`, `html`, `value`, `attr`, `title`, `url`, `count`, `box`, or `styles`. |
+| `is <state> <target>` | Check `visible`, `enabled`, or `checked`. |
+| `wait <target>` | Wait for a target or a number of ms. Flags: `--text`, `--url`, `--load`, `--fn`, `--state`. |
+| `read [url]` | Readable article text for the active tab, or fetch a URL without launching Chrome. |
+| `tab [new\|close\|<id>]` | Manage tabs. Flag: `--label <name>`. |
+| `frame <target\|@ref\|main>` | Switch iframe context. |
+| `cookies`, `storage` | Read and set cookies, `localStorage`, and `sessionStorage`. |
+| `console`, `errors` | Show console messages and page errors (`--clear` to reset). |
+| `screenshot [path]` / `pdf <path>` | Capture a screenshot (`--full` for the full page) or a PDF. |
+| `eval <js>` | Run JavaScript in the active page or frame. |
+| `back`, `forward`, `reload` | Navigate history. |
+| `close [--all]` | Close the active session, or all sessions. Aliases: `quit`, `exit`. |
+| `skills <list\|show\|install>` | Manage [bundled agent skills](/frowse/agent-skills). |
+
+## Global flags
+
+| Flag | Description |
+| :--- | :--- |
+| `--json` | Structured output: `{ok, data: {resolvedBy, selector, score, ...}}`. |
+| `--session <name>` | Use an isolated session with its own cookies, tabs, and storage. |
+| `--headed` | Show the browser window. |
+| `--timeout <ms>` | Override the default timeout (15000 ms). |
+| `--cdp <port\|url>` | Attach to an existing Chrome over CDP, for example an already logged-in browser. |
+| `--viewport <w>x<h>` | Set the viewport size. |
+| `--model-dir <path>` | Load Folate weights from a local directory. |
+| `--executable-path <path>` | Launch a specific Chromium binary. |
+| `--user-agent <ua>` | Override the user agent. |
+
+## Writing good prompts
+
+Folate matches your prompt against each element's tag, type, placeholder, ARIA label, name, ID, text, and parent landmark.
+
+- **Mirror the snapshot**: if `snapshot` shows `input[email] "Email address"` under `[form:login]`, write `"Email address email input in form"`.
+- **Include kind, label, and region**: `"Sign in link in nav"`, `"Submit button in dialog"`.
+- **Skip filler** such as `"please find and click on the..."`.
+- **Disambiguate repeated labels** with the landmark: `"Go button in header site-search"`.
+- **Verify before acting** with `frowse query "<prompt>" --top-k 3`.
+
+<Warning>
+Avoid `get text body` and `get html body`. They pull in navbars, footers, and boilerplate and erase the token savings. Target a container instead, such as `frowse get text "main"`.
+</Warning>

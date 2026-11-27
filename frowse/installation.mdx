@@ -1,0 +1,96 @@
+---
+title: "Install Frowse"
+sidebarTitle: "Installation"
+description: "Install the Frowse CLI with npm, npx, pip, or from source, then verify it with a first browser session."
+---
+
+Frowse requires **Python 3.10 or later** on your `PATH`. The npm package also needs **Node.js 18 or later**.
+
+## Install
+
+<Tabs>
+  <Tab title="npm (recommended)">
+    ```bash
+    npm install -g frowse
+    ```
+
+    On first run, the CLI creates an isolated Python environment in `~/.frowse/venv` if the `frowse` Python package is not already installed. Set `FROWSE_PYTHON` to use a specific Python interpreter instead.
+  </Tab>
+  <Tab title="npx">
+    ```bash
+    npx frowse open https://example.com
+    ```
+  </Tab>
+  <Tab title="pip">
+    ```bash
+    pip install frowse
+    ```
+  </Tab>
+  <Tab title="Source">
+    ```bash
+    git clone https://github.com/figranium/frowse
+    cd frowse
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install -e .
+    ```
+  </Tab>
+</Tabs>
+
+Both `frowse` and `agent-browser` binaries are installed, so existing `agent-browser` scripts keep working.
+
+## First session
+
+```bash
+# 1. Open a page (the session stays alive in the background)
+frowse open https://example.com
+
+# 2. Get a compact, Folate-ready DOM summary
+frowse snapshot
+
+# 3. Act with natural-language prompts (or CSS / XPath / @eN)
+frowse fill "Search packages input" "folate"
+frowse select "Country dropdown" "Canada"
+frowse click "Run Search button"
+
+# 4. Read back state and close the session
+frowse get text "#out"
+frowse close
+```
+
+Inspect Folate's ranked matches without acting:
+
+```bash
+frowse query "Sign in link in header" --top-k 3
+```
+
+Use legacy `@eN` refs for an existing `agent-browser` workflow:
+
+```bash
+frowse snapshot --refs
+frowse click @e1
+```
+
+## Set up with an AI coding agent
+
+Paste this prompt into Claude Code, Codex, Cursor, or a similar agent to install Frowse and its [bundled skills](/frowse/agent-skills):
+
+```text
+Install and set up Frowse (https://github.com/figranium/frowse) for browser automation:
+1. Install the CLI globally with `npm install -g frowse` (requires Python 3.10+; or use `pip install frowse`).
+2. Install the bundled agent skills for your environment using `frowse skills install --target <claude|codex|cursor|agents>` (add `--global` to install in your home directory).
+3. Verify the setup by running `frowse open https://example.com`, `frowse snapshot`, and `frowse close`.
+4. Use `frowse` (and the installed Frowse skills) for any browser tasks in the future.
+```
+
+## Environment variables
+
+| Variable | Description |
+| :--- | :--- |
+| `FROWSE_SESSION` | Default session name (falls back to `AGENT_BROWSER_SESSION`, then `default`). |
+| `FROWSE_DEFAULT_TIMEOUT` | Default timeout in ms (falls back to `AGENT_BROWSER_DEFAULT_TIMEOUT`, then `15000`). |
+| `FROWSE_MODEL_DIR` | Local directory containing Folate model weights. |
+| `FROWSE_EXECUTABLE_PATH` | Chromium executable to launch (falls back to `AGENT_BROWSER_EXECUTABLE_PATH`). |
+| `FROWSE_IGNORE_HTTPS_ERRORS` | Set to `1` to ignore HTTPS certificate errors. |
+| `FROWSE_STATE_DIR` | Directory for session daemon state. |
+| `FROWSE_PYTHON` | Python interpreter used by the npm launcher. |

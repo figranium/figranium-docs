@@ -1,0 +1,35 @@
+---
+title: "Folate Benchmarks"
+sidebarTitle: "Benchmarks"
+description: "Folate accuracy and CPU latency on the Mind2Web test splits, and how it compares with a frontier LLM."
+---
+
+Folate is evaluated on the three standard Mind2Web generalization splits across **6,037 action steps** on real-world web pages, using the INT8 ONNX model on CPU.
+
+## Mind2Web results
+
+| Split | Description | Steps | Avg candidates | Top-1 | Top-3 | Top-5 | MRR | Latency (2 vCPU) |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| `test_task` | Unseen tasks on seen websites | 1,256 | 50.0 | **93.31%** | 97.61% | 98.33% | 0.9566 | 2,309.9 ms/step |
+| `test_website` | Unseen websites | 955 | 50.0 | **88.90%** | 95.92% | 96.65% | 0.9274 | 4,328.2 ms/step |
+| `test_domain` | Unseen domains and verticals | 3,826 | 49.8 | **92.08%** | 97.28% | 98.61% | 0.9491 | 2,431.0 ms/step |
+
+Overall Top-1 accuracy is **91.83%**.
+
+## Methodology
+
+- **Task**: at each step the model receives the task instruction, action history, and up to 50 candidate DOM elements, and outputs a relevance logit per candidate.
+- **Top-k**: share of steps where a ground-truth element appears in the top *k* results.
+- **MRR**: mean reciprocal rank of the highest-ranked ground-truth element.
+- **Hardware**: end-to-end latency per step on 2 vCPUs with no GPU. `test_website` is slower because unseen site templates produce longer tokenized attribute sequences, not more candidates.
+
+## Comparison with GPT-6 Luna
+
+| Model | Type | Mind2Web accuracy | Runtime | Cost |
+| :--- | :--- | :---: | :--- | :--- |
+| Folate (`folate-int8`) | Specialized DOM cross-encoder (~107 MB) | 88.90% to 93.31% Top-1 | Local CPU, 180 to 250 MB RAM | $0 (self-hosted) |
+| GPT-6 Luna | Frontier LLM (Decisions API) | 81.2% to 81.8% | Cloud API, ~326 ms median | ~$0.10 per 1,000 decisions |
+
+<Note>
+Folate is evaluated on text-based Mind2Web DOM candidates, while GPT-6 Luna's scores are on multimodal, screenshot-based Mind2Web action selection. GPT-6 Luna is a general model that can plan multi-step tasks; Folate is specialized for single-step element grounding.
+</Note>

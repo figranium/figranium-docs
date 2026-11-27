@@ -1,0 +1,71 @@
+---
+title: "Folate Quickstart"
+sidebarTitle: "Quickstart"
+description: "Install Folate from PyPI, download the model, and rank DOM elements for a natural-language query."
+---
+
+Folate requires **Python 3.10 or later**.
+
+## Install
+
+<Tabs>
+  <Tab title="pip">
+    ```bash
+    pip install folate
+    ```
+  </Tab>
+  <Tab title="Source">
+    ```bash
+    git clone https://github.com/figranium/folate
+    cd folate
+    python3 -m venv .venv
+    source .venv/bin/activate
+    python -m pip install -r requirements.txt
+    ```
+  </Tab>
+</Tabs>
+
+## Rank elements
+
+`FolateSelectorFinder` downloads and caches [`figranium/folate`](https://huggingface.co/figranium/folate) on first run, or loads `./folate-int8` if it exists locally.
+
+```python
+from folate import FolateSelectorFinder
+
+finder = FolateSelectorFinder()
+matches = finder.rank("click Search Flights button", html_source, top_k=3)
+
+for match in matches:
+    print(f"{match['score']:.4f} | {match['selector']} | {match['element']}")
+```
+
+`html_source` is the page HTML as a string, for example from Playwright's `page.content()`.
+
+## Use a local model directory
+
+Pre-fetch the quantized weights:
+
+```bash
+hf download figranium/folate --local-dir ./folate-int8
+```
+
+Then load them:
+
+```python
+finder = FolateSelectorFinder(model_dir="./folate-int8")
+```
+
+## Run the live examples
+
+```bash
+python -m pip install -r examples/requirements.txt
+python -m playwright install chromium
+
+python examples/test_google.py
+python examples/test_amazon.py --offline
+python examples/test_github.py
+```
+
+## Writing queries
+
+Describe the element's kind, label, and region, for example `"Sign in link in nav"` or `"Email address input in login form"`. The [Frowse prompt guide](/frowse/commands#writing-good-prompts) has more tips.

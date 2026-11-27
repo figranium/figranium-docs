@@ -1,0 +1,59 @@
+---
+title: "Folate: Neural DOM Element Ranker"
+sidebarTitle: "Overview"
+description: "Folate is a lightweight, CPU-efficient cross-encoder that turns natural-language queries into real CSS or XPath selectors on a live web page."
+---
+
+Folate is an open-source neural DOM element ranker for browser automation. Given a natural-language query such as `"click Search Flights button"` and a page's HTML, it scores every interactive element and returns the best matching selectors. It runs entirely on CPU with `onnxruntime` and `tokenizers`, with no PyTorch or `transformers` needed at inference time.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/folate/quickstart">
+    Install from PyPI and rank your first page.
+  </Card>
+  <Card title="Python API" icon="brand-python" href="/folate/python-api">
+    `FolateSelectorFinder` constructor and `rank()` reference.
+  </Card>
+  <Card title="Benchmarks" icon="chart-bar" href="/folate/benchmarks">
+    Mind2Web accuracy and CPU latency.
+  </Card>
+  <Card title="Training pipeline" icon="flask" href="/folate/training">
+    Reproduce fine-tuning, export, and evaluation.
+  </Card>
+</CardGroup>
+
+## Model variants
+
+Folate is fine-tuned from `google/electra-base-discriminator` on the `osunlp/Mind2Web` dataset.
+
+| Variant | Precision / format | Disk size | Runtime RAM |
+| :--- | :--- | :--- | :--- |
+| **`folate-int8`** (default) | Dynamic `QUInt8` ONNX | ~107 MB | ~180 to 250 MB |
+| `folate-base` | `float32` Safetensors | ~418 MB | ~1.4+ GB (PyTorch) |
+
+The total footprint stays under 2 GB alongside a headless browser, so it fits on laptops and small containers without a GPU.
+
+## Key capabilities
+
+- **No hallucinated selectors**: ranks only real interactive nodes extracted with `lxml` XPath (`<a>`, `<button>`, `<input>`, `<select>`, `<textarea>`, ARIA interactive roles, and `onclick` or `tabindex` elements), so every returned selector exists on the page.
+- **Compact serialization**: each element becomes a 96-token sequence: `[TAG] ... [ID/NAME/TYPE/ROLE/ARIA-LABEL/PLACEHOLDER/TITLE/ALT/HREF/DATA-TESTID] ... [TEXT] ... [PARENT] ...`.
+- **Edge-friendly**: designed to run next to Chromium on constrained hardware.
+
+## Intended use and limitations
+
+Folate is built for single-step element grounding (`click`, `type`, `select`, `hover`) in local automation pipelines.
+
+- **No multi-step planning**: it ranks candidates for one action query and does not plan workflows or parse page content.
+- **Local DOM context only**: elements are described by their own attributes, text, and immediate parent. Identical siblings with no distinguishing attributes or text cannot be told apart.
+
+## Where Folate is used
+
+- [Frowse](/frowse/overview) uses Folate to resolve natural-language prompts in every command.
+- [Figranium](/selectors#natural-language-selectors-with-folate) uses Folate for natural-language selectors and exposes it through [MCP tools](/mcp-integration).
+- [AndroidFolate](/folate/androidfolate) brings the same approach to Android UI automation.
+
+## Links
+
+- PyPI: [`folate`](https://pypi.org/project/folate/)
+- Model: [`figranium/folate`](https://huggingface.co/figranium/folate) on Hugging Face
+- Demo: [Folate demo Space](https://huggingface.co/spaces/figranium/folate-demo)
+- Source: [github.com/figranium/folate](https://github.com/figranium/folate) (Apache 2.0)

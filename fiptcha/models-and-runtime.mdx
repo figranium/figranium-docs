@@ -1,0 +1,61 @@
+---
+title: "Fiptcha Models and Runtime"
+sidebarTitle: "Models and runtime"
+description: "How Fiptcha picks a vision model, its memory requirements, environment variables, the optional companion process, and Apple Silicon MLX support."
+---
+
+## Models
+
+Fiptcha downloads model assets when they are first needed instead of bundling them in the npm package.
+
+All qualifying machines use **Florence-2** by default:
+
+- `onnx-community/Florence-2-base-ft` on most hosts
+- `mlx-community/Florence-2-base-ft-4bit` on Apple Silicon through the MLX companion
+
+### Memory requirements
+
+Florence-2 needs at least **2 GB** of effective memory and **512 MiB** available. A provider-advertised 2 GB machine is measured in decimal units (2,000,000,000 bytes, about 1907 MiB), so it qualifies without needing a full 2048 MiB.
+
+To pin a tier, set `CAPTCHA_MODEL_TIER`. Accepted values: `auto` (default), `owlvit`, `florence2`, `fiptcha`. Use `owlvit` for a lighter model on constrained hosts.
+
+<Tip>
+In ephemeral containers, persist the model cache directory so models are not re-downloaded every time the container is recreated.
+</Tip>
+
+## Environment variables
+
+| Variable | Description |
+| --- | --- |
+| `CAPTCHA_MODEL_TIER` | `auto`, `owlvit`, `florence2`, or `fiptcha`. |
+| `CAPTCHA_MODEL_DEVICE` | `auto` (default) or `cpu` to force CPU inference. |
+| `CAPTCHA_MODEL_CACHE_DIR` | Model cache directory. Defaults to `data/captcha-model` under the working directory. |
+| `SKIP_LOCAL_CAPTCHA_MODEL` | Set to `true` to disable the local vision model. |
+| `CAPTCHA_COMPANION_URL` | URL of a running companion process. |
+| `CAPTCHA_COMPANION_TOKEN` | Shared token for authenticating with the companion. |
+| `CAPTCHA_COMPANION_PORT` | Port the companion listens on. |
+| `CAPTCHA_COMPANION_INFERENCE_TIMEOUT_MS` | Companion inference timeout (default 45000). |
+| `CAPTCHA_DISABLE_COMPANION` | Set to `true` to never use a companion. |
+| `CAPTCHA_COMPANION_DISABLE_MLX` | Disable the MLX backend in the companion. |
+
+## Companion runtime
+
+Fiptcha includes an optional companion process for environments that run inference outside the Node.js process. Ordinary Node.js integrations do not need it.
+
+```bash
+npm run companion:install        # install companion requirements
+npm run companion:start          # start the companion
+npm run companion:start:docker   # Docker-oriented start
+```
+
+## Apple Silicon and MLX
+
+On compatible Apple Silicon machines, Fiptcha can run Florence-2 through an optional MLX runtime. Consumers that do not use MLX can ignore it.
+
+## Inspect the environment
+
+Containers and VMs often report different memory than their cgroup limits allow. Run the resource probe to see what Fiptcha detects:
+
+```bash
+npm run probe
+```

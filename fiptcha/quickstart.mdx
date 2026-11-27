@@ -1,0 +1,69 @@
+---
+title: "Fiptcha Quickstart"
+sidebarTitle: "Quickstart"
+description: "Install Fiptcha from npm and solve a CAPTCHA in an existing Playwright page."
+---
+
+## Install
+
+```bash
+npm install fiptcha
+```
+
+Fiptcha is a CommonJS package. Large model weights are not bundled; they download on first use. See [Models and runtime](/fiptcha/models-and-runtime).
+
+## Solve a challenge
+
+Pass an active Playwright-compatible `page` and the challenge type:
+
+```js
+const { chromium } = require('playwright');
+const { solveLocalCaptcha } = require('fiptcha');
+
+const browser = await chromium.launch({ headless: false });
+const page = await browser.newPage();
+
+await page.goto('https://example.com');
+
+const logs = [];
+const result = await solveLocalCaptcha(page, {
+  captchaType: 'recaptcha_v2',
+  timeout: 60_000,
+  logs
+});
+
+console.log(result.token);
+console.log(result.provider); // "local"
+console.log(result.model);    // present when a vision model was used
+console.log(result.device);   // "browser", "cpu", or the active inference device
+
+await browser.close();
+```
+
+## Integrate at your runtime boundary
+
+Keep orchestration in your application and call Fiptcha only where a challenge appears:
+
+```js
+const { solveLocalCaptcha } = require('fiptcha');
+
+async function handleCaptcha(page, captchaType) {
+  const logs = [];
+  try {
+    const result = await solveLocalCaptcha(page, { captchaType, timeout: 60_000, logs });
+    return { token: result.token, diagnostics: logs };
+  } catch (error) {
+    console.error('CAPTCHA solve failed:', error.message, logs);
+    throw error;
+  }
+}
+```
+
+<Tip>
+On CPU-only hosts, Florence-2 takes about 4 to 5 seconds per inference. Use a higher timeout, such as `120_000`, for multi-round image grids.
+</Tip>
+
+## Next steps
+
+- [API reference](/fiptcha/api-reference) for every option, including `distorted_text` selectors.
+- [Use Fiptcha inside Figranium](/captcha-solving) with the Solve Captcha block.

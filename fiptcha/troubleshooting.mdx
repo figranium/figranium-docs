@@ -1,0 +1,29 @@
+---
+title: "Fiptcha Troubleshooting"
+sidebarTitle: "Troubleshooting"
+description: "Fix common Fiptcha errors: unsupported types, unavailable vision backends, missing tokens, and repeated model downloads."
+---
+
+<AccordionGroup>
+  <Accordion title="Local solver does not support ...">
+    `captchaType` must be exactly one of `recaptcha_v2`, `hcaptcha`, `turnstile`, or `distorted_text`.
+  </Accordion>
+
+  <Accordion title="vision backend unavailable">
+    The challenge needs the image-solving path, but Fiptcha could not prepare a vision backend. Check available memory and model downloads, then run:
+
+    ```bash
+    npm run probe
+    ```
+
+    If the host is below the Florence-2 [memory requirements](/fiptcha/models-and-runtime#memory-requirements), set `CAPTCHA_MODEL_TIER=owlvit`.
+  </Accordion>
+
+  <Accordion title="Challenge appears but no token is returned">
+    Increase `timeout` (for example to `120_000` on CPU-only hosts) and collect the `logs` array. Verify that the challenge still matches the provider structure expected by your Fiptcha version. Dynamic 3×3 grids are currently less reliable than 4×4 static grids.
+  </Accordion>
+
+  <Accordion title="Models download repeatedly in containers">
+    Persist the model cache (`CAPTCHA_MODEL_CACHE_DIR`) on a volume instead of recreating it with every container.
+  </Accordion>
+</AccordionGroup>

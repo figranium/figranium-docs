@@ -1,0 +1,49 @@
+---
+title: "Fiptcha: Local CAPTCHA Solving for Browser Automation"
+sidebarTitle: "Overview"
+description: "Fiptcha is a standalone Apache-2.0 Node.js library that solves reCAPTCHA v2, hCaptcha, Turnstile, and distorted-text CAPTCHAs locally inside your Playwright page."
+---
+
+Fiptcha is the CAPTCHA runtime that powers [Figranium's CAPTCHA solving](/captcha-solving), packaged as a standalone Node.js library you can embed in any browser automation project. It runs inside the Playwright-compatible page you already have, using local vision models instead of a paid solving service.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/fiptcha/quickstart">
+    Install the package and solve your first challenge.
+  </Card>
+  <Card title="API reference" icon="code" href="/fiptcha/api-reference">
+    Options, return value, and errors for `solveLocalCaptcha`.
+  </Card>
+  <Card title="Models and runtime" icon="cpu" href="/fiptcha/models-and-runtime">
+    Model tiers, memory requirements, companion, and MLX.
+  </Card>
+  <Card title="Troubleshooting" icon="lifebuoy" href="/fiptcha/troubleshooting">
+    Fix common solver errors.
+  </Card>
+</CardGroup>
+
+## Supported challenges
+
+| `captchaType` | Behavior |
+| --- | --- |
+| `recaptcha_v2` | Interacts with the checkbox and solves supported image-grid challenges locally when required. |
+| `hcaptcha` | Interacts with the widget and solves supported image-grid challenges locally when required. |
+| `turnstile` | Performs active-browser interaction and waits for a token. Does not use the vision path. |
+| `distorted_text` | Captures the CAPTCHA image, runs local Florence-2 OCR, and fills the input. |
+
+<Warning>
+3×3 image-grid stability is currently limited. Dynamic 3×3 challenges, especially those that replace tiles after a selection, may be unreliable. 4×4 static grids are the more stable path.
+</Warning>
+
+Fiptcha cannot guarantee every challenge is solvable. CAPTCHA providers change their UI, challenge formats, and risk checks independently of the visible widget.
+
+## What Fiptcha owns
+
+Fiptcha does not launch a browser. Your application keeps control of browser lifecycle, contexts and sessions, navigation, when to run CAPTCHA handling, workflow-level retries, proxies, and persistence.
+
+Fiptcha handles the CAPTCHA-specific runtime: token detection, widget interaction, grid solving, OCR, model downloads, resource checks, and the optional companion runtimes. No Figranium server, task schema, database, or UI is required.
+
+## Links
+
+- npm: [`fiptcha`](https://www.npmjs.com/package/fiptcha)
+- Model: [`figranium/fiptcha`](https://huggingface.co/figranium/fiptcha) on Hugging Face
+- Source: [github.com/figranium/fiptcha](https://github.com/figranium/fiptcha) (Apache 2.0)

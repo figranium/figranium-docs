@@ -1,0 +1,48 @@
+---
+title: "AndroidFolate (Upcoming)"
+sidebarTitle: "AndroidFolate"
+description: "AndroidFolate is an upcoming on-device UI element ranker for Android automation, planned for January 2027."
+---
+
+<Info>
+AndroidFolate is planned for **January 2027**. Weights, bindings, and benchmark results are not published yet. Details below may change.
+</Info>
+
+AndroidFolate brings the Folate approach to Android. It ranks interactive nodes in the live accessibility hierarchy for single-step actions (`click`, `type`, `scroll`, `long_click`), returning only nodes that actually exist.
+
+## Planned model
+
+| Artifact | Backbone | Format | Size | Runtime |
+| :--- | :--- | :--- | :--- | :--- |
+| `model_quantized.tflite` | `google/electra-large-discriminator` (335M) | Static INT8 LiteRT | ~335 MB | NPU delegates and desktop host |
+| `androidfolate-large` | `google/electra-large-discriminator` | `float32` Safetensors | ~1.34 GB | PyTorch / training |
+
+## Supported UI frameworks
+
+Native Android Views and Jetpack Compose, React Native, Flutter Semantics trees, and embedded WebViews share one serialization schema.
+
+## Hardware
+
+**Physical devices** need a transformer-capable NPU and at least 6 GB of RAM:
+
+- **6 GB (minimum)**: the NPU session unloads after inference to avoid memory pressure.
+- **8 GB or more (recommended)**: the session stays warm for zero cold-start latency.
+
+| NPU vendor | Supported SoCs |
+| :--- | :--- |
+| Google Tensor | Tensor G2 and newer (Pixel 7 series onward) |
+| Qualcomm Hexagon | Snapdragon 8-series and upper 7-series |
+| Samsung Exynos | Exynos 1380, 1480, 1580, and 2400+ |
+| MediaTek APU | Dimensity 7200, 8000-series, and 9000-series |
+
+Devices with 4 GB of RAM or less, and SoCs without a transformer-capable NPU, are not supported.
+
+**Emulators** (Android Studio AVD, Cuttlefish, Waydroid, Genymotion, and desktop Android VMs) are first-class. AndroidFolate sends the accessibility tree over a local ADB or gRPC bridge and runs inference on the host: Apple Neural Engine, desktop GPU, or CPU XNNPACK.
+
+## Planned usage
+
+```bash
+hf download figranium/androidfolate --local-dir ./androidfolate-int8
+```
+
+Android is a trademark of Google LLC. AndroidFolate is an independent open-source project by Figranium and is not affiliated with or endorsed by Google.

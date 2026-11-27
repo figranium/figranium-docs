@@ -1,0 +1,94 @@
+---
+title: "Fiptcha API Reference"
+sidebarTitle: "API reference"
+description: "Arguments, options, return value, and errors for solveLocalCaptcha(page, options)."
+---
+
+## `solveLocalCaptcha(page, options)`
+
+The main integration API. Returns a promise that resolves with a token or throws on failure.
+
+```js
+const { solveLocalCaptcha } = require('fiptcha');
+
+const result = await solveLocalCaptcha(page, {
+  captchaType: 'hcaptcha',
+  timeout: 60_000,
+  logs: []
+});
+```
+
+### Arguments
+
+<ParamField path="page" type="Page" required>
+  An active Playwright-compatible page. Fiptcha uses page and frame APIs, locators, mouse interaction, evaluation, and timeouts on this object.
+</ParamField>
+
+<ParamField path="options.captchaType" type="string" required>
+  One of `recaptcha_v2`, `hcaptcha`, `turnstile`, or `distorted_text`.
+</ParamField>
+
+<ParamField path="options.timeout" type="number" default="60000">
+  Maximum solve time in milliseconds.
+</ParamField>
+
+<ParamField path="options.logs" type="string[]">
+  Array that Fiptcha appends diagnostic messages to while solving.
+</ParamField>
+
+### `distorted_text` options
+
+<ParamField path="options.imageSelector" type="string">
+  CSS selector for the CAPTCHA `<img>` or `<canvas>`. Auto-detected if omitted.
+</ParamField>
+
+<ParamField path="options.inputSelector" type="string">
+  CSS selector for the text input to fill. Auto-detected if omitted.
+</ParamField>
+
+<ParamField path="options.submitSelector" type="string">
+  CSS selector for a submit button to click after filling.
+</ParamField>
+
+<ParamField path="options.stripWhitespace" type="boolean" default="true">
+  Strip whitespace from the OCR output.
+</ParamField>
+
+<ParamField path="options.alphanumericOnly" type="boolean" default="false">
+  Strip non-alphanumeric characters from the OCR output.
+</ParamField>
+
+### Return value
+
+<ResponseField name="token" type="string">
+  The solved token. For `distorted_text`, the recognized string.
+</ResponseField>
+
+<ResponseField name="provider" type="string">
+  Always `"local"`.
+</ResponseField>
+
+<ResponseField name="model" type="string">
+  The vision model used, for example `"florence2"`. Omitted when no vision model was needed.
+</ResponseField>
+
+<ResponseField name="device" type="string">
+  `"browser"`, `"cpu"`, or the active inference device.
+</ResponseField>
+
+<ResponseField name="text" type="string">
+  `distorted_text` only. The recognized string (matches `token`).
+</ResponseField>
+
+### Errors
+
+`solveLocalCaptcha` throws when:
+
+- the requested CAPTCHA type is unsupported;
+- a challenge never exposes a usable token or image challenge;
+- a `distorted_text` challenge has no visible image or produces empty OCR output;
+- a required vision backend cannot be prepared;
+- the challenge ends without producing a token;
+- Turnstile does not issue a token after browser interaction.
+
+See [Troubleshooting](/fiptcha/troubleshooting) for fixes.

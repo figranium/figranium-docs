@@ -1,0 +1,90 @@
+---
+title: "Folate Python API"
+sidebarTitle: "Python API"
+description: "Reference for the FolateSelectorFinder class: constructor options, rank(), and the shape of returned matches."
+---
+
+## `FolateSelectorFinder`
+
+```python
+from folate import FolateSelectorFinder
+
+finder = FolateSelectorFinder(
+    model_dir=None,
+    repo_id="figranium/folate",
+    revision=None,
+    num_threads=4,
+    providers=None,
+    model_filename=None,
+)
+```
+
+<ParamField path="model_dir" type="str | None">
+  Local directory containing the model and `tokenizer.json`. If omitted, Folate uses `./folate-int8` when present, otherwise downloads from Hugging Face.
+</ParamField>
+
+<ParamField path="repo_id" type="str" default="figranium/folate">
+  Hugging Face repository to download from.
+</ParamField>
+
+<ParamField path="revision" type="str | None">
+  Hugging Face revision to pin.
+</ParamField>
+
+<ParamField path="num_threads" type="int" default="4">
+  ONNX Runtime intra-op threads.
+</ParamField>
+
+<ParamField path="providers" type="list[str] | None">
+  ONNX Runtime execution providers. Defaults to `CUDAExecutionProvider` when available, otherwise `CPUExecutionProvider`.
+</ParamField>
+
+<ParamField path="model_filename" type="str | None">
+  Model file to load. Defaults to `model_quantized.onnx` (INT8) on CPU and `model.onnx` (FP32) on CUDA, falling back to the INT8 file if the requested one is missing.
+</ParamField>
+
+## `rank()`
+
+```python
+matches = finder.rank(query, page_html, top_k=3, max_candidates=48, batch_size=16)
+```
+
+<ParamField path="query" type="str" required>
+  Natural-language description of the target element.
+</ParamField>
+
+<ParamField path="page_html" type="str" required>
+  Full page HTML.
+</ParamField>
+
+<ParamField path="top_k" type="int" default="3">
+  Number of matches to return.
+</ParamField>
+
+<ParamField path="max_candidates" type="int" default="48">
+  Maximum interactive elements scored after a lexical prefilter.
+</ParamField>
+
+<ParamField path="batch_size" type="int" default="16">
+  Candidates per inference batch.
+</ParamField>
+
+### Returns
+
+A list of dicts, highest score first. Returns an empty list if the page has no interactive elements.
+
+<ResponseField name="score" type="float">
+  Relevance score clipped to 0 to 1.
+</ResponseField>
+
+<ResponseField name="logit" type="float">
+  Raw model logit.
+</ResponseField>
+
+<ResponseField name="selector" type="str">
+  CSS selector (`#id` or a unique attribute selector) when possible, otherwise an XPath.
+</ResponseField>
+
+<ResponseField name="element" type="str">
+  The serialized element the model scored.
+</ResponseField>

@@ -1,0 +1,41 @@
+---
+title: "Frowse Agent Skills"
+sidebarTitle: "Agent skills"
+description: "Install the four SKILL.md guides bundled with Frowse into Claude Code, Codex, Cursor, or a generic agents directory."
+---
+
+Frowse bundles four `SKILL.md` guides that teach AI agents how to use it efficiently.
+
+| Skill | Covers |
+| :--- | :--- |
+| `frowse` | Core loop and how to write Folate prompts. |
+| `frowse-extract` | Targeted text and attribute extraction, and handing verified selectors to a script for bulk scraping. |
+| `frowse-auth` | Isolated sessions, cookies and storage, CDP attachment, and login flows. |
+| `frowse-debug` | Deterministic waits, iframes, console logs, page errors, and screenshots. |
+
+## Manage skills
+
+```bash
+frowse skills list                       # List bundled skills
+frowse skills show frowse                # Print a skill
+frowse skills install --target claude    # Install into .claude/skills/
+```
+
+`--target` accepts:
+
+| Target | Install directory |
+| :--- | :--- |
+| `agents` (default) | `.agents/skills` |
+| `claude` | `.claude/skills` |
+| `codex` | `.codex/skills` |
+| `cursor` | `.cursor/skills` |
+
+Add `--global` to install into your home directory instead of the current project.
+
+## Bulk extraction pattern
+
+For lists and paginated catalogs, avoid running dozens of `snapshot` turns:
+
+1. Run `frowse open <url>` and `frowse snapshot` once.
+2. Find exact CSS selectors with `frowse query "<prompt>" --json`.
+3. Write a small Playwright or fetch script that loops over every item or page with those selectors, at zero LLM token cost.

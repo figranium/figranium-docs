@@ -125,7 +125,7 @@ Selectors are the "coordinates" Figranium uses to find and interact with element
 
 ## Natural-language selectors with Folate
 
-When a stable selector is unknown, an Agent task can use a natural-language description such as `the Search Flights button` in a selector field. Figranium uses Folate to rank matching interactive elements in the current page DOM and resolve the description to a selector. You can also prefix the description with `folate:` or `ai:` to explicitly request Folate resolution.
+When a stable selector is unknown, an Agent task can use a natural-language description such as `the Search Flights button` in a selector field. Figranium uses [Folate](/folate/overview) to rank matching interactive elements in the current page DOM and resolve the description to a selector. You can also prefix the description with `folate:` or `ai:` to explicitly request Folate resolution.
 
 Existing CSS, XPath, ARIA/Playwright selectors, and coordinates remain supported. Folate ranks candidates from the DOM; it does not replace multi-step workflow planning. Folate is currently available in Figranium Edge builds. MCP v1.6.0 provides Folate tools when connected to an Edge instance with Folate support. Stable Figranium builds for regular users will include Folate soon. For self-hosted Edge setup, see [Configuration](/configuration#folate-selector-resolution) and [MCP Integration](/mcp-integration#4-folate-selector-tools).
 

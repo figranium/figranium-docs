@@ -1,0 +1,53 @@
+---
+title: "Frowse: Token-Lean Browser CLI for AI Agents"
+sidebarTitle: "Overview"
+description: "Frowse is a drop-in replacement for agent-browser that pairs compact DOM summaries with local Folate grounding to cut agent token costs by up to 90%."
+---
+
+Frowse is an open-source browser automation CLI built for AI coding agents. It is a drop-in replacement for `agent-browser`: instead of dumping a full accessibility tree on every `snapshot`, it returns a compact semantic summary of the page, then lets the agent target elements with plain-language prompts that [Folate](/folate/overview) resolves locally into exact selectors.
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/frowse/installation">
+    Install with npm, npx, pip, or from source.
+  </Card>
+  <Card title="Commands" icon="terminal-2" href="/frowse/commands">
+    Every CLI command, alias, and global flag.
+  </Card>
+  <Card title="Agent skills" icon="sparkles" href="/frowse/agent-skills">
+    Bundled skills for Claude Code, Codex, Cursor, and more.
+  </Card>
+  <Card title="Benchmarks" icon="chart-bar" href="/frowse/benchmarks">
+    Token usage compared with agent-browser.
+  </Card>
+</CardGroup>
+
+## How it works
+
+1. `frowse open <url>` launches headless Chromium inside a persistent session daemon.
+2. `frowse snapshot` returns a deduplicated, region-by-region summary of the page (about 100 to 300 tokens).
+3. The agent acts with a natural-language prompt such as `frowse click "Run Search button"`. Folate ranks the live DOM on CPU in 10 to 25 ms and resolves the selector.
+4. `frowse close` ends the session.
+
+## Frowse compared with agent-browser
+
+| Capability | `agent-browser` (full refs) | Frowse (`snapshot` + Folate) |
+| :--- | :--- | :--- |
+| Snapshot output | Full accessibility tree or `@e1..@eN` list | Deduplicated region summary (~100 to 300 tokens) |
+| Repeated grid or list items | Every item emitted individually | Collapsed (`"Add to cart" (x100)`, `+92 more`) |
+| Element targeting | `@eN` refs or manual CSS/XPath | Natural-language prompts, CSS, XPath, or `@eN` |
+| Selector grounding cost | Agent context tokens | $0 (local CPU INT8 ONNX via `folate`) |
+| CLI compatibility | `agent-browser` | Drop-in `frowse` and `agent-browser` binaries |
+
+## Key capabilities
+
+- **Lightweight DOM summary**: groups visible interactive elements by landmark (`dialog`, `header`, `nav`, `form`, `main`, `aside`, `footer`), keeps input types, labels, placeholders, and select options, and collapses repeated actions.
+- **Natural-language grounding**: pass descriptions directly to `click`, `fill`, `type`, `select`, `hover`, `check`, `get`, or `wait`, or inspect ranked matches with `frowse query`.
+- **Persistent session daemon**: keeps Chromium and the quantized `folate-int8` model warm in memory across CLI calls through per-session Unix sockets (`--session <name>`).
+- **agent-browser compatibility**: ships both `frowse` and `agent-browser` binaries and supports `--json`, `--headed`, `--cdp`, `--refs`, tabs, iframes, cookies, storage, dialogs, and screenshots.
+
+## Related projects
+
+- [Folate](/folate/overview) is the neural DOM ranker Frowse uses for grounding.
+- [Figranium](/overview) uses the same Folate model for [natural-language selectors](/selectors).
+
+Frowse is released under the Apache 2.0 license. Source: [github.com/figranium/frowse](https://github.com/figranium/frowse).

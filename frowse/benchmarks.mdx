@@ -1,0 +1,26 @@
+---
+title: "Frowse Benchmarks"
+sidebarTitle: "Benchmarks"
+description: "Token usage of Frowse compared with agent-browser across three real-world agent workflows."
+---
+
+Independent subagent runs with Gemini 4 Hydrogen Medium in Antigravity Cloud compared Frowse 0.1.0 (with the bundled `frowse` and `frowse-extract` skills) against `agent-browser` 0.43.0. Token counts measure exact `o200k_base` CLI output during browser execution, with no shared context.
+
+| Workflow | Frowse tokens | agent-browser tokens | Reduction |
+| :--- | :---: | :---: | :---: |
+| Google Store Pixel ecosystem (under $1,000) | **15,154** (64 steps) | 59,290 (41 steps) | **74.4%** (3.9× lower) |
+| Hacker News top stories and comments | **761** (7 steps) | 8,457 (5 steps) | **91.0%** (11.1× lower) |
+| crates.io package discovery (`ort`) | **3,096** (29 steps) | 6,773 (12 steps) | **54.3%** (2.2× lower) |
+| **Total** | **19,011** | **74,520** | **74.5%** (3.9× lower) |
+
+Both agents completed all three workflows end to end and reached identical verified answers. Including the initial `frowse skills show` reads, Frowse used 21,913 tokens in total.
+
+## Why Frowse takes more steps
+
+`agent-browser` takes fewer, much larger steps because `snapshot` dumps the full accessibility tree. Frowse uses compact summaries plus targeted micro-queries (`query`, scoped `get text`, `is enabled`, and small `eval` calls). Most responses are under 200 bytes, so the extra round trips cost far fewer context tokens overall.
+
+<Accordion title="Benchmark prompts">
+  1. **Google Store Pixel ecosystem:** On the Google Store, find a full Google Pixel ecosystem (Pixel phone, Pixel Watch, and Pixel Buds, plus any other Pixel device if it fits) for under $1,000 total before tax: brand new, Google-branded, and sold and fulfilled by Google Store. Verify each item's configuration, outright price, and URL.
+  2. **Hacker News:** Find the top 3 stories with at least 50 points (title, points, comment count), open the comments of the highest-scoring one, and extract the first top-level comment's author and a short excerpt.
+  3. **crates.io:** Search for `ort`, open the crate page, and report the latest version, release date, license, and repository URL.
+</Accordion>
