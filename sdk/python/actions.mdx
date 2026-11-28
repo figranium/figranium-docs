@@ -1,7 +1,7 @@
 ---
 title: "Task Action Helpers"
 sidebarTitle: "Actions"
-description: "Build Figranium task action lists with typed helpers. Navigation, interaction, extraction, control flow, HTTP, CAPTCHA, and file upload action factories from the Python SDK."
+description: "Build Figranium Browsers task action lists with typed helpers. Navigation, interaction, extraction, control flow, HTTP, CAPTCHA, and file upload action factories from the Python SDK."
 ---
 
 Tasks are executed as ordered lists of actions. The Python SDK exports typed factories under the `actions` namespace that generate correctly shaped action dicts with stable IDs, plus an `action()` helper for one-offs.
@@ -125,7 +125,7 @@ Supported `conditionOp` values include:
 | `actions.set(var_name, value, base=None)` | `set` | Assign `value` to `var_name`. |
 | `actions.merge(var_name, value, base=None)` | `merge` | Merge `value` into an existing `var_name`. |
 
-The exported `variable(name)` helper produces the `{$name}` template token Figranium expects when a value should be substituted from a runtime variable:
+The exported `variable(name)` helper produces the `{$name}` template token Figranium Browsers expects when a value should be substituted from a runtime variable:
 
 ```python
 actions.type("#search", variable("query"))
@@ -151,7 +151,7 @@ The SDK includes helpers for the Cabinet upload flow.
 | `actions.upload(*, selector=None, cabinet_id=None, mark_as_uploaded=None, base=None)` | `upload` | Attach the newest unuploaded item from a Cabinet. |
 | `actions.finalize_uploads(base=None)` | `finalize_uploads` | Mark all Cabinet items attached during the current execution as uploaded. |
 
-When `cabinet_id` is omitted on an upload action, Figranium uses the task's `downloadCabinetId`; if the task also omits it, the instance default Cabinet is used. `cabinetId` remains accepted as a legacy compatibility alias`downloadCabinetId`; if the task also omits it, the instance default Cabinet is used. `cabinetId` remains accepted as a legacy compatibility alias.
+When `cabinet_id` is omitted on an upload action, Figranium Browsers uses the task's `downloadCabinetId`; if the task also omits it, the instance default Cabinet is used. `cabinetId` remains accepted as a legacy compatibility alias`downloadCabinetId`; if the task also omits it, the instance default Cabinet is used. `cabinetId` remains accepted as a legacy compatibility alias.
 
 Keeping finalization separate is useful when an upload should only be consumed after the surrounding workflow reaches a successful point.
 

@@ -1,10 +1,10 @@
 ---
 title: "Stream Executions and Selector Events in Kotlin"
 sidebarTitle: "Streaming"
-description: "Consume Figranium Server-Sent Events with the Kotlin SDK. Execution and selector streams as cold Flow on Dispatchers.IO, event parsing, polling with watch, and cancellation."
+description: "Consume Figranium Browsers Server-Sent Events with the Kotlin SDK. Execution and selector streams as cold Flow on Dispatchers.IO, event parsing, polling with watch, and cancellation."
 ---
 
-Figranium exposes two Server-Sent Events endpoints, and the Kotlin SDK surfaces both as cold `Flow<StreamEvent<JsonElement>>` backed by OkHttp. You consume them with `collect`, and cancellation stops the underlying call immediately.
+Figranium Browsers exposes two Server-Sent Events endpoints, and the Kotlin SDK surfaces both as cold `Flow<StreamEvent<JsonElement>>` backed by OkHttp. You consume them with `collect`, and cancellation stops the underlying call immediately.
 
 ## Streams
 

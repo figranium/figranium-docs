@@ -1,17 +1,17 @@
 ---
-title: "Highlight Tool for Interactive DOM Selection in Figranium"
+title: "Highlight Tool for Interactive DOM Selection in Figranium Browsers"
 sidebarTitle: "Highlight Tool"
-description: "Use Figranium's Highlight Tool to visually pick elements from the headful browser and generate robust CSS selectors and XPaths automatically."
+description: "Use Figranium Browsers' Highlight Tool to visually pick elements from the headful browser and generate robust CSS selectors and XPaths automatically."
 ---
 
-The **Highlight Tool** (also known as Inspect Mode) provides interactive, visual DOM selection and element targeting in Figranium. It connects the visual headful browser directly to the workflow editor, allowing you to point, hover, and click on live webpage elements to automatically generate robust CSS selectors and XPaths.
+The **Highlight Tool** (also known as Inspect Mode) provides interactive, visual DOM selection and element targeting in Figranium Browsers. It connects the visual headful browser directly to the workflow editor, allowing you to point, hover, and click on live webpage elements to automatically generate robust CSS selectors and XPaths.
 
 The Highlight Tool operates in two primary modes:
 
 1. **Action Block Targeting**: Selects elements directly into an action block's selector field.
 2. **Standalone Page Inspection**: Highlights elements on hover, displays selector candidate tooltips, and copies selected selectors to the clipboard.
 
-In addition to interactive UI usage, Figranium exposes a REST API endpoint (`POST /api/inspector/highlight`) for programmatic element inspection and highlight overlay generation.
+In addition to interactive UI usage, Browsers exposes a REST API endpoint (`POST /api/inspector/highlight`) for programmatic element inspection and highlight overlay generation.
 
 ---
 
@@ -38,7 +38,7 @@ When building a task in the Spatial Editor, every action block that requires a t
 
 ### Selector Options and Alternatives
 
-When you select an element, Figranium generates **up to five candidate selectors** ranked by stability and readability:
+When you select an element, Browsers generates **up to five candidate selectors** ranked by stability and readability:
 
 - The **highest-ranked selector** is automatically inserted into the action block's selector input field.
 - The **alternative selectors** appear as selectable pill buttons below the input field in the action configuration drawer.
@@ -58,7 +58,7 @@ Standalone inspection allows you to inspect elements on the live page without im
 
 <Steps>
   <Step title="Open the toolbar">
-    Open the **Headful Browser** modal toolbar at the top of the editor.
+    Open the **Browsers** headful browser modal toolbar at the top of the editor.
   </Step>
   <Step title="Toggle inspect mode">
     Click the **Inspect UI** toggle button (or press the inspect shortcut).
@@ -87,7 +87,7 @@ To exit inspect mode, click **Stop Inspect** in the Headful modal toolbar. This 
 
 ## Programmatic Highlighting via REST API
 
-Figranium provides a REST API endpoint to activate inspection mode or locate and highlight target elements programmatically.
+Figranium Browsers provides a REST API endpoint to activate inspection mode or locate and highlight target elements programmatically.
 
 ### Endpoint: `POST /api/inspector/highlight`
 
@@ -155,7 +155,7 @@ Activates inspect mode on an active session and returns verified selectors match
 
 ## Selector Generation Ranking Algorithm
 
-Both UI inspect mode and API highlighting rely on Figranium's selector generation engine (`_figraniumGetSelectors` / `inspectTargetInPage`). When an element is selected or inspected, candidate selectors are prioritized using the following hierarchy:
+Both UI inspect mode and API highlighting rely on the Browsers selector generation engine (`_figraniumGetSelectors` / `inspectTargetInPage`). When an element is selected or inspected, candidate selectors are prioritized using the following hierarchy:
 
 1. **Name and Placeholder Attributes**: `[name="email"]`, `[placeholder="Search..."]`
 2. **Text Content**: `button:has-text("Submit")`, `a:has-text("Login")` for buttons, links, and text labels

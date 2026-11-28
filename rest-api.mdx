@@ -1,10 +1,10 @@
 ---
 title: "REST API Reference"
 sidebarTitle: "REST API"
-description: "Complete reference for the Figranium REST API. Trigger tasks, manage schedules, inspect executions, configure proxies, and control the browser programmatically."
+description: "Complete reference for the Figranium Browsers REST API. Trigger tasks, manage schedules, inspect executions, configure proxies, and control the browser programmatically."
 ---
 
-Figranium exposes a local REST API for task management, execution, and data retrieval.
+Figranium Browsers exposes a local REST API for task management, execution, and data retrieval.
 
 **Base URL**: `http://localhost:11345` (default)
 
@@ -22,7 +22,7 @@ Figranium exposes a local REST API for task management, execution, and data retr
 
 ### `GET /api/health`
 
-Returns the server status and storage backend connectivity. Use this endpoint for uptime monitoring, load-balancer health checks, or verifying that Figranium is ready to accept work.
+Returns the server status and storage backend connectivity. Use this endpoint for uptime monitoring, load-balancer health checks, or verifying that Figranium Browsers is ready to accept work.
 
 **Response** (healthy):
 
@@ -70,7 +70,7 @@ Returns the server status and storage backend connectivity. Use this endpoint fo
 | :-- | :-- |
 | `status` | `"ok"` or `"degraded"` |
 | `uptime` | Server uptime in seconds |
-| `version` | Running Figranium version |
+| `version` | Running Figranium Browsers version |
 | `storage` | `"json"` (file-based) or `"postgres"` |
 | `storage_error` | Present only when the database is unreachable |
 | `protection` | Non-sensitive [resource protection](/configuration#host-aware-resource-protection) state: detected memory and CPU, `maxConcurrent`, `pressure` (`"Normal"` or `"Busy"`), and `active` and `queued` execution counts |
@@ -100,7 +100,7 @@ Execution endpoints can return these errors when [resource protection](/configur
 Triggers an execution of a specific task. This is the primary endpoint most integrations use: send a `POST` to a task's URL to run it on demand, optionally overriding variables or receiving a webhook callback when it finishes.
 
 <Tip>
-  You don't need to assemble this URL by hand. The **Trigger via API** panel in the task editor's Task Settings API tab shows the complete endpoint URL for your instance (for example, `https://your-figranium.example.com/api/tasks/task_1/api`) with a `POST` badge, and its copy button copies the full URL.
+  You don't need to assemble this URL by hand. The **Trigger via API** panel in the task editor's Task Settings API tab shows the complete endpoint URL for your instance (for example, `https://your-browsers.example.com/api/tasks/task_1/api`) with a `POST` badge, and its copy button copies the full URL.
 </Tip>
 
 **Body**:
@@ -124,14 +124,14 @@ Triggers an execution of a specific task. This is the primary endpoint most inte
 **Response**: Returns the execution result (JSON).
 
 <Note>
-  The request body is optional. If you send the request without a body or without a `Content-Type: application/json` header, Figranium treats the body as `{}` and runs the task with its default variables. This lets tools that can't set request headers (for example, Clay's HTTP action) trigger a task with a bare `POST` to the endpoint URL.
+  The request body is optional. If you send the request without a body or without a `Content-Type: application/json` header, Figranium Browsers treats the body as `{}` and runs the task with its default variables. This lets tools that can't set request headers (for example, Clay's HTTP action) trigger a task with a bare `POST` to the endpoint URL.
 
   To pass `variables`, `webhookUrl`, `statelessExecution`, or `sessionId`, you must send `Content-Type: application/json` and a JSON body.
 </Note>
 
 #### Completion webhook
 
-When you include a `webhookUrl`, Figranium sends a `POST` request to that URL after the task finishes. The webhook URL is validated against the same SSRF rules as all other outbound requests (see [Security](/security)). If the URL points to a private network and `ALLOW_PRIVATE_NETWORKS` is `false`, the request returns `400 INVALID_WEBHOOK_URL`.
+When you include a `webhookUrl`, Figranium Browsers sends a `POST` request to that URL after the task finishes. The webhook URL is validated against the same SSRF rules as all other outbound requests (see [Security](/security)). If the URL points to a private network and `ALLOW_PRIVATE_NETWORKS` is `false`, the request returns `400 INVALID_WEBHOOK_URL`.
 
 The callback payload looks like this:
 
@@ -222,7 +222,7 @@ If enabled, authentication must be provided via one of the following methods:
   </Accordion>
 
   <Accordion title="PATCH /api/tasks/:id">
-    Applies a partial update to an existing task. Only the fields you include in the body are changed. The `id` and `versions` fields are ignored if supplied. Figranium takes a version snapshot of the task before applying the update, so you can restore the previous state from the version history.
+    Applies a partial update to an existing task. Only the fields you include in the body are changed. The `id` and `versions` fields are ignored if supplied. Figranium Browsers takes a version snapshot of the task before applying the update, so you can restore the previous state from the version history.
 
     Use this endpoint when you want to change a single attribute (for example, a schedule, a variable, or one action) without re-sending the full task definition.
 
@@ -374,7 +374,7 @@ If enabled, authentication must be provided via one of the following methods:
     { "outcome": "stopped", "logs": ["Execution stopped while queued."] }
     ```
 
-    If the client that started a queued run disconnects before the run starts, Figranium cancels the queued run.
+    If the client that started a queued run disconnects before the run starts, Browsers cancels the queued run.
 
     Returns `400 MISSING_RUN_ID` if `runId` is missing.
   </Accordion>
@@ -410,7 +410,7 @@ If enabled, authentication must be provided via one of the following methods:
 
 Use these endpoints to list and fetch community templates from the official [Templates Hub](/community-presets). Both endpoints require a signed-in workspace session (the session cookie set when you sign in). API keys are not accepted. Requests are rate limited.
 
-Figranium caches the Hub catalog for 5 minutes and waits up to 12 seconds for the Hub to respond.
+Figranium Browsers caches the Hub catalog for 5 minutes and waits up to 12 seconds for the Hub to respond.
 
 <AccordionGroup>
   <Accordion title="GET /api/templates">
@@ -648,7 +648,7 @@ Paginated list responses and single-template responses include `Cache-Control: p
 
 ## Browser
 
-Programmatic control of the managed headful browser session. Use these endpoints when an external tool or agent needs to open a browser, drive it, and inspect the page without going through the Figranium UI.
+Programmatic control of the managed headful browser session. Use these endpoints when an external tool or agent needs to open a browser, drive it, and inspect the page without going through the Figranium Browsers UI.
 
 <AccordionGroup>
   <Accordion title="POST /api/browser/open">
@@ -684,13 +684,13 @@ Programmatic control of the managed headful browser session. Use these endpoints
     }
     ```
 
-    **Automatic headless fallback**: if the initial headful launch fails because no display is available, Figranium retries once in headless mode automatically and returns the running session. You only need to pass `headless: true` explicitly if you want to skip the failed first attempt.
+    **Automatic headless fallback**: if the initial headful launch fails because no display is available, Browsers retries once in headless mode automatically and returns the running session. You only need to pass `headless: true` explicitly if you want to skip the failed first attempt.
 
     **Error responses**:
 
     | Status | Error code | Cause |
     | :-- | :-- | :-- |
-    | `409` | `HEADFUL_DISPLAY_UNAVAILABLE` | No X server is available on the host and the headless fallback also failed. Figranium detects this from any of: `missing X server`, `$DISPLAY`, `platform failed to initialize`, `no display server`, `X11 connection failed`, `cannot open display`, or `target closed` during launch. |
+    | `409` | `HEADFUL_DISPLAY_UNAVAILABLE` | No X server is available on the host and the headless fallback also failed. Browsers detects this from any of: `missing X server`, `$DISPLAY`, `platform failed to initialize`, `no display server`, `X11 connection failed`, `cannot open display`, or `target closed` during launch. |
     | `409` | `BROWSER_LAUNCH_FAILED` | The session was created but did not reach a running state |
     | `500` | `BROWSER_LAUNCH_FAILED` | The launch threw an unexpected error; see `details` for the underlying message |
 
@@ -722,7 +722,7 @@ Programmatic control of the managed headful browser session. Use these endpoints
   <Accordion title="POST /api/inspector/highlight">
     Activates the inspect overlay on the active browser session and, given a `targetHint`, returns up to five candidate elements with CSS selectors, XPath, and a confidence score. Optionally returns a base64-encoded JPEG snapshot of the current viewport with the top match visually outlined.
 
-    Accepts either a signed-in dashboard session or an API key. This lets the Figranium UI drive the inspector directly while external clients (for example, an MCP server resolving a plain-language target into a selector) authenticate with an API key. See [Authentication](#authentication) for accepted formats.
+    Accepts either a signed-in dashboard session or an API key. This lets the Browsers UI drive the inspector directly while external clients (for example, an MCP server resolving a plain-language target into a selector) authenticate with an API key. See [Authentication](#authentication) for accepted formats.
 
     Use this endpoint from an external agent or CLI to resolve a plain-language target (for example, `"Sign in"` or `input[name="q"]`) into a selector you can feed back into a task action. Match strategy, in order:
 
@@ -730,7 +730,7 @@ Programmatic control of the managed headful browser session. Use these endpoints
     2. Match common attributes (`name`, `placeholder`, `aria-label`, `title`, `alt`, `value`, `data-testid`, `data-test-id`).
     3. Match visible text on `button`, `a`, `label`, `span`, `div`, `h1`–`h4`, `li`, and `p`.
 
-    If no browser session is running and you supply `url`, Figranium launches one first.
+    If no browser session is running and you supply `url`, Browsers launches one first.
 
     **Body**:
 

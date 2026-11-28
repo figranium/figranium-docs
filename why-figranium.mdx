@@ -1,10 +1,10 @@
 ---
-title: "Why Choose Figranium Over Code, SaaS, and Low-Code Tools"
-sidebarTitle: "Why Figranium"
-description: "Compare Figranium to code-first frameworks, SaaS scraping platforms, and low-code tools to decide if self-hosted visual browser automation fits your stack."
+title: "Why Choose Figranium Browsers Over Code, SaaS, and Low-Code Tools"
+sidebarTitle: "Why Figranium Browsers"
+description: "Compare Figranium Browsers to code-first frameworks, SaaS scraping platforms, and low-code tools to decide if self-hosted visual browser automation fits your stack."
 ---
 
-Figranium is a self-hosted visual browser automation platform. You compose workflows from action blocks, then run them through the REST API, CLI, scheduler, n8n, or MCP. This page compares Figranium to three common alternatives so you can decide if it fits your stack.
+Figranium Browsers is a self-hosted visual browser automation platform. You compose workflows from action blocks, then run them through the REST API, CLI, scheduler, n8n, or MCP. This page compares Browsers to three common alternatives so you can decide if it fits your stack.
 
 <CardGroup cols={2}>
   <Card title="Build visually" icon="cube">
@@ -24,25 +24,25 @@ Figranium is a self-hosted visual browser automation platform. You compose workf
   </Card>
 </CardGroup>
 
-## Figranium vs. code-first frameworks (Playwright / Puppeteer)
+## Figranium Browsers vs. code-first frameworks (Playwright / Puppeteer)
 
-Code-first frameworks give you full control over the browser in TypeScript or Python. That power comes with maintenance overhead: every selector change, retry policy, and stealth tweak lives in your codebase. Figranium keeps the same Playwright engine under the hood but exposes it through a visual block editor. You still get stealth patching, proxy rotation, and headless or headful execution, without maintaining hundreds of lines of browser-control code for every workflow.
+Code-first frameworks give you full control over the browser in TypeScript or Python. That power comes with maintenance overhead: every selector change, retry policy, and stealth tweak lives in your codebase. Browsers keeps the same Playwright engine under the hood but exposes it through a visual block editor. You still get stealth patching, proxy rotation, and headless or headful execution, without maintaining hundreds of lines of browser-control code for every workflow.
 
-Choose a code-first framework when your team wants browser control embedded directly into a test suite or application and prefers reviewing automation as source code. Figranium is better when multiple team members need to build or modify workflows, or when you want a stable API surface that does not change every time a page layout shifts.
+Choose a code-first framework when your team wants browser control embedded directly into a test suite or application and prefers reviewing automation as source code. Browsers is better when multiple team members need to build or modify workflows, or when you want a stable API surface that does not change every time a page layout shifts.
 
-## Figranium vs. SaaS scraping platforms
+## Figranium Browsers vs. SaaS scraping platforms
 
-Hosted scraping platforms manage browsers and proxies for you, but they bill by usage credits and keep your task definitions on their servers. Figranium is fully self-hosted: you run it on your own VM, bare-metal box, or local machine. There are no usage credits, no metered page loads, and no external access to your execution logs or extracted data.
+Hosted scraping platforms manage browsers and proxies for you, but they bill by usage credits and keep your task definitions on their servers. Browsers is fully self-hosted: you run it on your own VM, bare-metal box, or local machine. There are no usage credits, no metered page loads, and no external access to your execution logs or extracted data.
 
-Choose a hosted provider when you specifically want managed browser infrastructure rather than operating the automation layer yourself. Figranium is better when data residency, predictable costs, or custom proxy/CAPTCHA setups matter.
+Choose a hosted provider when you specifically want managed browser infrastructure rather than operating the automation layer yourself. Browsers is better when data residency, predictable costs, or custom proxy/CAPTCHA setups matter.
 
-## Figranium vs. low-code workflow platforms (n8n / Zapier)
+## Figranium Browsers vs. low-code workflow platforms (n8n / Zapier)
 
-Low-code platforms excel at connecting APIs and gluing services together. They are not designed for complex browser interactions such as clicking through shadow DOM, solving CAPTCHAs, or harvesting structured data from rendered pages. Figranium complements them: build the browser workflow in Figranium, then trigger it from an n8n node or Zapier webhook.
+Low-code platforms excel at connecting APIs and gluing services together. They are not designed for complex browser interactions such as clicking through shadow DOM, solving CAPTCHAs, or harvesting structured data from rendered pages. Browsers complements them: build the browser workflow in Browsers, then trigger it from an n8n node or Zapier webhook.
 
-Choose a general-purpose workflow platform when your automation does not actually need a browser. Figranium is better when the workflow requires real page rendering, JavaScript execution, or interaction with sites that have no public API.
+Choose a general-purpose workflow platform when your automation does not actually need a browser. Browsers is better when the workflow requires real page rendering, JavaScript execution, or interaction with sites that have no public API.
 
-## When Figranium fits
+## When Figranium Browsers fits
 
 - You need to automate a website that has no suitable API.
 - You want a visual workflow rather than handwritten browser-control code.
@@ -56,5 +56,5 @@ Choose a general-purpose workflow platform when your automation does not actuall
 
 - **Code-first frameworks** — if your primary need is embedding browser control into a software test suite and your team prefers source-code review.
 - **Hosted browser infrastructure** — if you want fully managed browsers and are comfortable with usage-based billing and third-party data hosting.
-- **Dedicated antidetect browsers** — if you need persistent, isolated browser profiles for multi-account workflows (Multilogin, GoLogin, etc.). Figranium runs stealth-patched Chromium and rotates proxies, user agents, and viewports per task, but it is not a standalone antidetect profile manager.
+- **Dedicated antidetect browsers** — if you need persistent, isolated browser profiles for multi-account workflows (Multilogin, GoLogin, etc.). Figranium Browsers runs stealth-patched Chromium and rotates proxies, user agents, and viewports per task, but it is not a standalone antidetect profile manager.
 - **General-purpose workflow platforms** — if your workflow does not need a browser at all.

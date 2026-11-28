@@ -1,14 +1,14 @@
 ---
-title: "Connect Figranium Tasks to an Existing Baserow Table"
+title: "Connect Figranium Browsers Tasks to an Existing Baserow Table"
 sidebarTitle: "Output Providers"
 description: "Connect a Baserow token, select an existing database and table, then map task results to fields so each run can append rows automatically."
 ---
 
-Connect an existing Baserow table to a Figranium task to append extracted results after each run. Create the destination and its fields in Baserow first, then choose them in the task's output settings.
+Connect an existing Baserow table to a Figranium Browsers task to append extracted results after each run. Create the destination and its fields in Baserow first, then choose them in the task's output settings.
 
 ## Overview
 
-After a task finishes extracting data, Figranium can send its JSON result to a configured output destination. For Baserow, each object becomes a row and an array of objects becomes a batch of rows.
+After a task finishes extracting data, Browsers can send its JSON result to a configured output destination. For Baserow, each object becomes a row and an array of objects becomes a batch of rows.
 
 ## Supported Providers
 
@@ -24,7 +24,7 @@ Additional providers may be added in future releases.
 
 ## Baserow Integration
 
-[Baserow](https://baserow.io) is a self-hosted, open-source alternative to Airtable. Figranium can append extracted JSON data to a table that you select from the databases and tables available to your saved token.
+[Baserow](https://baserow.io) is a self-hosted, open-source alternative to Airtable. Browsers can append extracted JSON data to a table that you select from the databases and tables available to your saved token.
 
 ### Prerequisites
 
@@ -44,7 +44,7 @@ You can add a Baserow credential in **Settings > Connections** or from the task 
     Select **Baserow**, then enter a name, the Baserow base URL (for example, `https://api.baserow.io`), and your API token.
   </Step>
   <Step title="Save the credential">
-    Save the credential. Figranium stores it separately from task variables and uses it when sending rows to Baserow.
+    Save the credential. Browsers stores it separately from task variables and uses it when sending rows to Baserow.
   </Step>
 </Steps>
 
@@ -58,7 +58,7 @@ You can add a Baserow credential in **Settings > Connections** or from the task 
     Select **Baserow**, then select the saved credential that can access your destination.
   </Step>
   <Step title="Choose or provision a destination">
-    Select an existing database and table available to the token, or use the provisioning flow to create a dedicated database and table for the Task output. Figranium can create compatible text fields and add missing columns for provisioned destinations.
+    Select an existing database and table available to the token, or use the provisioning flow to create a dedicated database and table for the Task output. Browsers can create compatible text fields and add missing columns for provisioned destinations.
   </Step>
   <Step title="Create matching fields in Baserow">
     Create a field for each key in your extraction output. The task editor shows known output fields that are missing from the selected table. If you use a JavaScript extraction script and have no sample output yet, run the task once to identify the fields.
@@ -76,7 +76,7 @@ Provisioning and database or table discovery require the saved Baserow token to 
 
 ### Return data that matches your table
 
-Figranium uses Baserow's `user_field_names=true` option. Object keys in your extraction result must match the field names in the selected table exactly, including capitalization.
+Browsers uses Baserow's `user_field_names=true` option. Object keys in your extraction result must match the field names in the selected table exactly, including capitalization.
 
 Return a single object to insert one row:
 
@@ -110,12 +110,12 @@ Each returned object becomes a row. Nested objects and arrays are serialized as 
 | JSON object `{}` | Create one row in the selected table |
 | JSON array `[{}, {}]` | Batch-create rows in the selected table |
 
-Figranium authenticates with `Authorization: Token <your-token>`.
+Browsers authenticates with `Authorization: Token <your-token>`.
 
 ### Error handling
 
 By default, output push failures are ignored so a temporary Baserow issue does not fail the task. Set **On Push Error** to `fail` if the execution should fail when the push fails. Check the execution logs for the output push status.
 
 <Note>
-  Figranium validates Baserow URLs and redirect destinations to help prevent requests to private or internal network addresses. See [Security best practices](/security) for details.
+  Browsers validates Baserow URLs and redirect destinations to help prevent requests to private or internal network addresses. See [Security best practices](/security) for details.
 </Note>

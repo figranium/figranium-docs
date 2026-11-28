@@ -1,24 +1,24 @@
 ---
 title: "DigitalOcean 1-Click"
 sidebarTitle: "DigitalOcean"
-description: "Deploy Figranium on DigitalOcean with the official 1-Click App, automatic updates, and a preconfigured self-hosted environment."
+description: "Deploy Figranium Browsers on DigitalOcean with the official 1-Click App, automatic updates, and a preconfigured self-hosted environment."
 ---
 
-Deploy Figranium on your own DigitalOcean Droplet with the official 1-Click App.
+Deploy Figranium Browsers on your own DigitalOcean Droplet with the official 1-Click App.
 
-The image comes preconfigured with Docker, Figranium, Caddy, and an automatic updater, so you can go from a new Droplet to a working visual browser automation environment without manually installing the application stack.
+The image comes preconfigured with Docker, Figranium Browsers, Caddy, and an automatic updater, so you can go from a new Droplet to a working visual browser automation environment without manually installing the application stack.
 
 <CardGroup cols={2}>
   <Card title="1-Click deployment" icon="bolt">
-    Provision a self-hosted Figranium instance directly from the DigitalOcean Marketplace.
+    Provision a self-hosted Figranium Browsers instance directly from the DigitalOcean Marketplace.
   </Card>
 
   <Card title="Automatic updates" icon="history">
-    The deployment checks for the latest stable Figranium image after boot and once per hour.
+    The deployment checks for the latest stable Browsers image after boot and once per hour.
   </Card>
 
   <Card title="Caddy included" icon="link">
-    Access Figranium through the Droplet's public IP without specifying the internal application port.
+    Access Figranium Browsers through the Droplet's public IP without specifying the internal application port.
   </Card>
 
   <Card title="Self-hosted" icon="server">
@@ -29,14 +29,14 @@ The image comes preconfigured with Docker, Figranium, Caddy, and an automatic up
 ## Deploy
 
 <Steps>
-  <Step title="Create a Figranium Droplet">
-    Open the Figranium listing in the DigitalOcean Marketplace and create a Droplet from the 1-Click App.
+  <Step title="Create a Figranium Browsers Droplet">
+    Open the Figranium Browsers listing in the DigitalOcean Marketplace and create a Droplet from the 1-Click App.
   </Step>
   <Step title="Choose your Droplet size">
     Use at least 2 GB of RAM for typical workloads. For heavier browser tasks or concurrent executions, 4 GB or more is recommended.
   </Step>
   <Step title="Wait for provisioning">
-    DigitalOcean will create the Droplet and start the preconfigured Figranium environment automatically.
+    DigitalOcean will create the Droplet and start the preconfigured Figranium Browsers environment automatically.
   </Step>
 </Steps>
 
@@ -46,51 +46,51 @@ The image comes preconfigured with Docker, Figranium, Caddy, and an automatic up
 
 ## Getting Started
 
-Your Figranium instance is ready to use after the Droplet finishes provisioning.
+Your Figranium Browsers instance is ready to use after the Droplet finishes provisioning.
 
 <Steps>
-  <Step title="Open Figranium">
+  <Step title="Open Figranium Browsers">
     Visit:
 
     ```text
     http://your_droplet_public_ipv4
     ```
 
-    Caddy is preconfigured as a reverse proxy, so you do not need to specify Figranium's internal application port.
+    Caddy is preconfigured as a reverse proxy, so you do not need to specify Figranium Browsers' internal application port.
 
     On your first visit, create your administrator account and sign in.
   </Step>
   <Step title="Create your first automation">
-    From the dashboard, create a new task and use Figranium's visual editor to build your browser workflow.
+    From the dashboard, create a new task and use Figranium Browsers' visual editor to build your browser workflow.
 
     You can automate navigation, clicks, typing, data extraction, screenshots, JavaScript, and other browser interactions.
   </Step>
   <Step title="Use the API">
-    Figranium includes a REST API for executing tasks and connecting your instance to external applications, AI agents, and workflow automation platforms.
+    Figranium Browsers includes a REST API for executing tasks and connecting your instance to external applications, AI agents, and workflow automation platforms.
 
-    Your API key is available from Figranium's settings after signing in.
+    Your API key is available from Figranium Browsers' settings after signing in.
 
     <Card title="REST API" icon="code" href="/rest-api">
-      Learn how to execute and manage Figranium programmatically.
+      Learn how to execute and manage Figranium Browsers programmatically.
     </Card>
   </Step>
 </Steps>
 
 ## Automatic updates
 
-The DigitalOcean deployment keeps Figranium current automatically.
+The DigitalOcean deployment keeps Figranium Browsers current automatically.
 
 <Tip>
-  The updater runs shortly after boot and then checks once per hour for a newer stable Figranium container image.
+  The updater runs shortly after boot and then checks once per hour for a newer stable Figranium Browsers container image.
 </Tip>
 
-When a newer image is available, Docker pulls it and recreates the Figranium service using the updated image. If the deployed image is already current, the running container is left unchanged.
+When a newer image is available, Docker pulls it and recreates the Figranium Browsers service using the updated image. If the deployed image is already current, the running container is left unchanged.
 
-Persistent application data and captures are stored outside the application container and are preserved when Figranium is updated.
+Persistent application data and captures are stored outside the application container and are preserved when Figranium Browsers is updated.
 
 ## Custom domain and HTTPS
 
-You can optionally serve Figranium from your own domain or subdomain and let Caddy manage HTTPS automatically.
+You can optionally serve Figranium Browsers from your own domain or subdomain and let Caddy manage HTTPS automatically.
 
 <Steps>
   <Step title="Point your domain to the Droplet">
@@ -130,19 +130,19 @@ You can optionally serve Figranium from your own domain or subdomain and let Cad
 
 Once the DNS record resolves to the Droplet, Caddy automatically provisions and renews an HTTPS certificate for the domain.
 
-Your Figranium instance will then be available at:
+Your Figranium Browsers instance will then be available at:
 
 ```text
 https://your-domain.example.com
 ```
 
 <Warning>
-  Do not expose Figranium publicly without completing the initial administrator setup and reviewing your instance's security configuration.
+  Do not expose Figranium Browsers publicly without completing the initial administrator setup and reviewing your instance's security configuration.
 </Warning>
 
 ## Connect a PostgreSQL database
 
-By default, Figranium stores data in files on the Droplet. To use a PostgreSQL database instead, such as a DigitalOcean Managed Database, set the connection details as environment variables on the Figranium service and restart it. Figranium accepts lowercase names such as `db_host`, `db_port`, `db_username`, `db_password`, `db_database`, and `db_ssl`, alongside the standard uppercase variables.
+By default, Figranium Browsers stores data in files on the Droplet. To use a PostgreSQL database instead, such as a DigitalOcean Managed Database, set the connection details as environment variables on the Figranium Browsers service and restart it. Figranium Browsers accepts lowercase names such as `db_host`, `db_port`, `db_username`, `db_password`, `db_database`, and `db_ssl`, alongside the standard uppercase variables.
 
 ```bash
 db_host=your-cluster.db.ondigitalocean.com
@@ -159,14 +159,14 @@ db_ssl=true
 
 ## What the 1-Click App includes
 
-- Figranium running from the latest stable container image
+- Figranium Browsers running from the latest stable container image
 - Docker and Docker Compose
 - Caddy configured as a reverse proxy
-- Automatic Figranium update checks after boot and every hour
+- Automatic Figranium Browsers update checks after boot and every hour
 - Persistent application data and capture storage
 - DigitalOcean Droplet Agent support
 
-The result is a standard self-hosted Figranium deployment with the server setup already handled for you.
+The result is a standard self-hosted Figranium Browsers deployment with the server setup already handled for you.
 
 <CardGroup cols={2}>
   <Card title="Build visually" icon="stack-2" href="/action-blocks">
@@ -174,6 +174,6 @@ The result is a standard self-hosted Figranium deployment with the server setup 
   </Card>
 
   <Card title="Connect your stack" icon="plug" href="/mcp-integration">
-    Use the API, SDK, MCP server, and integrations to connect Figranium to agents and automation tools.
+    Use the API, SDK, MCP server, and integrations to connect Figranium Browsers to agents and automation tools.
   </Card>
 </CardGroup>

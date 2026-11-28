@@ -1,10 +1,10 @@
 ---
 title: "Build Task Actions with the Swift SDK"
 sidebarTitle: "Actions"
-description: "Use the Actions enum to build Figranium task actions in Swift. Navigation, interaction, extraction, control flow, HTTP, CAPTCHA, and upload helpers with auto-generated IDs."
+description: "Use the Actions enum to build Figranium Browsers task actions in Swift. Navigation, interaction, extraction, control flow, HTTP, CAPTCHA, and upload helpers with auto-generated IDs."
 ---
 
-Figranium tasks are executed as ordered lists of actions. The Swift SDK exports typed static builders on the `Actions` enum that generate correctly shaped `Action` values with stable IDs, plus an `action()` helper for one-offs.
+Figranium Browsers tasks are executed as ordered lists of actions. The Swift SDK exports typed static builders on the `Actions` enum that generate correctly shaped `Action` values with stable IDs, plus an `action()` helper for one-offs.
 
 ## Import
 
@@ -111,7 +111,7 @@ Supported `operation` values include:
 
 `captchaType` is one of `"recaptcha_v2"`, `"recaptcha_v3"`, `"hcaptcha"`, or `"turnstile"`. See [CAPTCHA Solving](/captcha-solving) for setup and return-value shape.
 
-The exported `variable(name)` helper produces the `{$name}` template token Figranium expects when a value should be substituted from a runtime variable:
+The exported `variable(name)` helper produces the `{$name}` template token Figranium Browsers expects when a value should be substituted from a runtime variable:
 
 ```swift
 Actions.type("#search", value: variable("query"))
@@ -128,7 +128,7 @@ The SDK includes helpers for the Cabinet upload flow.
 | `Actions.upload(selector: String? = nil, cabinetId: String? = nil, markAsUploaded: Bool? = nil)` | `upload` | Attach the newest unuploaded item from a Cabinet. |
 | `Actions.finalizeUploads()` | `finalize_uploads` | Mark all Cabinet items attached during the current execution as uploaded. |
 
-When `cabinetId` is omitted on an upload action, Figranium uses the task's `cabinetId`; if the task also omits it, the instance default Cabinet is used.
+When `cabinetId` is omitted on an upload action, Browsers uses the task's `cabinetId`; if the task also omits it, the instance default Cabinet is used.
 
 Keeping finalization separate is useful when an upload should only be consumed after the surrounding workflow reaches a successful point.
 

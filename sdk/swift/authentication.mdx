@@ -1,10 +1,10 @@
 ---
-title: "Authenticate the Figranium Swift SDK"
+title: "Authenticate the Figranium Browsers Swift SDK"
 sidebarTitle: "Authentication"
-description: "Authenticate the Figranium Swift SDK with API keys, session cookies, or no auth. Header formats, keychain storage, and session login flow."
+description: "Authenticate the Figranium Browsers Swift SDK with API keys, session cookies, or no auth. Header formats, keychain storage, and session login flow."
 ---
 
-The Figranium Swift SDK offers three authentication modes via the `FigraniumAuthentication` enum. Every request is signed automatically based on the mode you choose when creating the client.
+The Figranium Browsers Swift SDK offers three authentication modes via the `FigraniumAuthentication` enum. Every request is signed automatically based on the mode you choose when creating the client.
 
 ## Authentication modes
 
@@ -16,7 +16,7 @@ The Figranium Swift SDK offers three authentication modes via the `FigraniumAuth
 
 ## Create an API key
 
-Sign into the Figranium web UI and generate an API key from **Settings**. Copy the value once; you will not see it again.
+Sign into the Figranium Browsers web UI and generate an API key from **Settings**. Copy the value once; you will not see it again.
 
 ## Pass an API key
 
@@ -109,7 +109,7 @@ Retrieve the key at runtime and pass it to the client initializer.
 
 ## What API keys can access
 
-API keys authenticate every task, execution, schedule, capture, browser, and execution endpoint exposed by the SDK. Server-administration operations (creating API keys, changing themes, and managing proxies) are performed in the Figranium web UI.
+API keys authenticate every task, execution, schedule, capture, browser, and execution endpoint exposed by the SDK. Server-administration operations (creating API keys, changing themes, and managing proxies) are performed in the Figranium Browsers web UI.
 
 <Warning>
   Store API keys in environment variables or the Keychain. Never commit keys to source control or expose them in client-side code.
@@ -123,6 +123,6 @@ API keys authenticate every task, execution, schedule, capture, browser, and exe
   </Card>
 
   <Card title="API key" icon="key" href="/api-key">
-    How Figranium API keys work and how to manage them from the web UI.
+    How Figranium Browsers API keys work and how to manage them from the web UI.
   </Card>
 </CardGroup>

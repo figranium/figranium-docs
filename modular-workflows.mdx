@@ -1,10 +1,10 @@
 ---
 title: "Modular Workflows (Task Chaining)"
 sidebarTitle: "Modular Workflows"
-description: "Break complex Figranium automations into reusable sub-tasks and chain them together with the start action for maintainable, scalable workflows."
+description: "Break complex Figranium Browsers automations into reusable sub-tasks and chain them together with the start action for maintainable, scalable workflows."
 ---
 
-Figranium supports **Modular Workflows**, allowing you to break complex automations into smaller, reusable tasks and chain them together using the **Start Task** block.
+Figranium Browsers supports **Modular Workflows**, allowing you to break complex automations into smaller, reusable tasks and chain them together using the **Start Task** block.
 
 ## Why Modular Workflows?
 
@@ -32,7 +32,7 @@ As automations grow, a single monolithic task becomes hard to maintain. Modular 
 
 The Start Task action triggers another task by its ID, running it as a sub-task within the current execution context.
 
-<img src="/images/tasks/modular-workflows-task-1.png" alt="Figranium task preview: The Start Task Action" />
+![Figranium Browsers task preview: The Start Task Action](/images/tasks/modular-workflows-task-1.png)
 
 **Key behaviors:**
 
@@ -49,19 +49,19 @@ The Start Task action triggers another task by its ID, running it as a sub-task 
   <Step title="Create the Child Task">
     Build a standalone task that handles a specific sub-flow. For example, a "Handle Cookie Banner" task:
 
-    <img src="/images/tasks/modular-workflows-task-2.png" alt="Figranium task preview: How to Chain Tasks" />
+    ![Figranium Browsers task preview: How to Chain Tasks](/images/tasks/modular-workflows-task-2.png)
 
     Note its task ID from the dashboard URL.
   </Step>
   <Step title="Add `start` to Your Main Task">
     In your main task, add a **Start Task** block where you want the child task to run:
 
-    <img src="/images/tasks/modular-workflows-task-3.png" alt="Figranium task preview: How to Chain Tasks" />
+    ![Figranium Browsers task preview: How to Chain Tasks](/images/tasks/modular-workflows-task-3.png)
   </Step>
   <Step title="Pass Variables to Child Tasks">
     Variables defined in the parent task are automatically available in the child task using the same `{$varName}` syntax. There is no special configuration needed.
 
-    <img src="/images/tasks/modular-workflows-task-4.png" alt="Figranium task preview: How to Chain Tasks" />
+    ![Figranium Browsers task preview: How to Chain Tasks](/images/tasks/modular-workflows-task-4.png)
   </Step>
 </Steps>
 
@@ -73,19 +73,19 @@ The Start Task action triggers another task by its ID, running it as a sub-task 
 
 Create a single "Login" task and call it at the start of all tasks that require authentication:
 
-<img src="/images/tasks/modular-workflows-task-5.png" alt="Figranium task preview: Common Modular Patterns" />
+![Figranium Browsers task preview: Common Modular Patterns](/images/tasks/modular-workflows-task-5.png)
 
 ### Pattern 2: Paginated Scraping
 
 Break pagination into a loop calling a "Scrape One Page" sub-task:
 
-<img src="/images/tasks/modular-workflows-task-6.png" alt="Figranium task preview: Common Modular Patterns" />
+![Figranium Browsers task preview: Common Modular Patterns](/images/tasks/modular-workflows-task-6.png)
 
 ### Pattern 3: Error Recovery
 
 Use an **On Error** block to trigger a recovery sub-task when something goes wrong:
 
-<img src="/images/tasks/modular-workflows-task-7.png" alt="Figranium task preview: Common Modular Patterns" />
+![Figranium Browsers task preview: Common Modular Patterns](/images/tasks/modular-workflows-task-7.png)
 
 ---
 
@@ -93,7 +93,7 @@ Use an **On Error** block to trigger a recovery sub-task when something goes wro
 
 After a Start Task block, the child task's extraction result is available in `block.output`:
 
-<img src="/images/tasks/modular-workflows-task-8.png" alt="Figranium task preview: Accessing Child Task Output" />
+![Figranium Browsers task preview: Accessing Child Task Output](/images/tasks/modular-workflows-task-8.png)
 
 ---
 
@@ -103,7 +103,7 @@ It is technically possible to create recursive chains (Task A starts Task B, whi
 
 **Always include a termination condition to prevent infinite loops:**
 
-<img src="/images/tasks/modular-workflows-task-9.png" alt="Figranium task preview: Recursive Flows" />
+![Figranium Browsers task preview: Recursive Flows](/images/tasks/modular-workflows-task-9.png)
 
 ---
 
@@ -122,7 +122,7 @@ The Start Task block sanitizes the task ID before issuing the internal API call.
 
 If sanitization removes every character (for example, when a template variable resolves to `../../api/clear-cookies?` or any other non-conforming string), the action fails fast with `Invalid task id.` and no request is made. This prevents a crafted variable value from being used to probe other internal endpoints through the Start Task block.
 
-<img src="/images/tasks/modular-workflows-task-10.png" alt="Figranium task preview: Task ID validation" />
+![Figranium Browsers task preview: Task ID validation](/images/tasks/modular-workflows-task-10.png)
 
 When `user_input` resolves to `task_abc123`, the action runs normally. When it resolves to `../../api/clear-cookies?`, the action errors with `Invalid task id.` and the parent task continues with that step marked failed.
 

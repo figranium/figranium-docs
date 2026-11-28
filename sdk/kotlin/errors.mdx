@@ -1,10 +1,10 @@
 ---
-title: "Handle Errors from the Figranium Kotlin SDK"
+title: "Handle Errors from the Figranium Browsers Kotlin SDK"
 sidebarTitle: "Errors"
 description: "FigraniumException is the single error type in the Kotlin SDK. Learn its fields, SDK-generated codes, and how to branch on status or catch transport and timeout failures."
 ---
 
-The Figranium Kotlin SDK raises one error type for every failure: `FigraniumException`. It extends `java.io.IOException`, so you can catch it alongside transport errors in a single `catch` block. You can branch on `status` for HTTP semantics, on `code` for machine-readable categories, and on `message` for a human-readable description.
+The Figranium Browsers Kotlin SDK raises one error type for every failure: `FigraniumException`. It extends `java.io.IOException`, so you can catch it alongside transport errors in a single `catch` block. You can branch on `status` for HTTP semantics, on `code` for machine-readable categories, and on `message` for a human-readable description.
 
 ## FigraniumException shape
 
@@ -18,7 +18,7 @@ class FigraniumException(
 ) : IOException(message)
 ```
 
-Because `FigraniumException` extends `IOException`, OkHttp transport failures (such as `SocketTimeoutException` or `UnknownHostException`) and Figranium API errors can be handled together or separately depending on how you structure your catch blocks.
+Because `FigraniumException` extends `IOException`, OkHttp transport failures (such as `SocketTimeoutException` or `UnknownHostException`) and Browsers API errors can be handled together or separately depending on how you structure your catch blocks.
 
 ## Basic handling
 
@@ -44,7 +44,7 @@ try {
 
 <AccordionGroup>
   <Accordion title="`status`">
-    The HTTP status returned by the Figranium server, if a response arrived. `0` when the request never reached a status, such as a network failure, DNS error, or cancelled request.
+    The HTTP status returned by the Figranium Browsers server, if a response arrived. `0` when the request never reached a status, such as a network failure, DNS error, or cancelled request.
   </Accordion>
 
   <Accordion title="`code`">
@@ -54,7 +54,7 @@ try {
     | :-- | :-- |
     | `EMPTY_RESPONSE` | The response body was empty or the server returned 204. |
     | `INVALID_RESPONSE` | The response body could not be parsed as JSON. |
-    | `NETWORK_ERROR` | The stream could not be opened, or a non-Figranium error occurred during a stream request. |
+    | `NETWORK_ERROR` | The stream could not be opened, or a non-Browsers error occurred during a stream request. |
   </Accordion>
 
   <Accordion title="`details`">
@@ -66,7 +66,7 @@ try {
   </Accordion>
 
   <Accordion title="`message`">
-    Human-readable description of what went wrong. For server errors, this is taken from the response body's `message` or `error` field. For SDK-generated errors, it describes the condition (for example, "Figranium returned an empty response").
+    Human-readable description of what went wrong. For server errors, this is taken from the response body's `message` or `error` field. For SDK-generated errors, it describes the condition (for example, "Browsers returned an empty response").
   </Accordion>
 </AccordionGroup>
 
@@ -97,7 +97,7 @@ try {
 
 ## Transport failures
 
-When the request never gets a response (server unreachable, DNS failure, TLS error), OkHttp throws an `IOException`. Because `FigraniumException` extends `IOException`, you can handle both Figranium errors and transport errors in one catch, or distinguish them by type.
+When the request never gets a response (server unreachable, DNS failure, TLS error), OkHttp throws an `IOException`. Because `FigraniumException` extends `IOException`, you can handle both Browsers errors and transport errors in one catch, or distinguish them by type.
 
 ```kotlin Client.kt
 import dev.figranium.sdk.*
@@ -106,9 +106,9 @@ import java.io.IOException
 try {
     client.health.check()
 } catch (e: FigraniumException) {
-    println("Figranium API error: ${e.message}")
+    println("Browsers API error: ${e.message}")
 } catch (e: IOException) {
-    println("Figranium is unreachable: ${e.message}")
+    println("Browsers is unreachable: ${e.message}")
 }
 ```
 
@@ -124,7 +124,7 @@ import kotlinx.coroutines.CancellationException
 try {
     client.runTask("slow-task", options = RequestOptions(timeoutMillis = 5_000))
 } catch (e: FigraniumException) {
-    println("Figranium error: ${e.message}")
+    println("Browsers error: ${e.message}")
 } catch (e: CancellationException) {
     println("The request was cancelled")
 } catch (e: IOException) {

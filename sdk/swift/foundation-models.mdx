@@ -1,10 +1,10 @@
 ---
-title: "Expose Figranium tasks as a Foundation Models tool"
+title: "Expose Figranium Browsers tasks as a Foundation Models tool"
 sidebarTitle: "Foundation Models"
-description: "Use RunFigraniumTaskTool to let Apple Intelligence invoke approved Figranium browser automation tasks from a LanguageModelSession on iOS 26+, macOS 26+, and visionOS 26+."
+description: "Use RunFigraniumTaskTool to let Apple Intelligence invoke approved Figranium Browsers browser automation tasks from a LanguageModelSession on iOS 26+, macOS 26+, and visionOS 26+."
 ---
 
-On iOS 26+, macOS 26+, and visionOS 26+, the Figranium Swift SDK provides `RunFigraniumTaskTool`, a constrained Foundation Models tool that lets Apple Intelligence invoke pre-approved browser automation tasks. The tool is compiled only when `FoundationModels` and `FoundationModelsMacros` are available, so it does not affect builds on earlier platforms.
+On iOS 26+, macOS 26+, and visionOS 26+, the Figranium Browsers Swift SDK provides `RunFigraniumTaskTool`, a constrained Foundation Models tool that lets Apple Intelligence invoke pre-approved browser automation tasks. The tool is compiled only when `FoundationModels` and `FoundationModelsMacros` are available, so it does not affect builds on earlier platforms.
 
 <Note>
   This feature requires `import FoundationModels` and the `@Generable` macro from `FoundationModelsMacros`. It is unavailable on tvOS, watchOS, and earlier Apple platform versions.
@@ -21,7 +21,7 @@ public struct RunFigraniumTaskTool: Tool {
     public let allowedTaskIDs: Set<String>
     public init(client: Figranium, allowedTaskIDs: Set<String>)
     public var name: String { "run_figranium_task" }
-    public var description: String { "Runs an approved deterministic Figranium browser automation task and returns its JSON result." }
+    public var description: String { "Runs an approved deterministic Figranium Browsers browser automation task and returns its JSON result." }
     public var parameters: GenerationSchema { Arguments.generationSchema }
     public func call(arguments: Arguments) async throws -> String
 }
@@ -30,7 +30,7 @@ public struct RunFigraniumTaskTool: Tool {
 **Tool parameters:**
 
 <ParamField body="taskID" type="String" required>
-  The identifier of a pre-approved Figranium task to run. The model receives this as a guided parameter.
+  The identifier of a pre-approved Figranium Browsers task to run. The model receives this as a guided parameter.
 </ParamField>
 
 **Returns:** A JSON-encoded `ExecutionResult<JSONValue>` string. If encoding fails, it returns `"{}"`.

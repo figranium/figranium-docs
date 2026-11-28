@@ -1,14 +1,14 @@
 ---
 title: "Run Tasks with Stateless Execution for Clean Browser Sessions"
 sidebarTitle: "Stateless Mode"
-description: "Learn how Figranium's stateless execution mode isolates each run with no cookies or storage persistence. Compare with stateful mode and enable via UI or API."
+description: "Learn how Figranium Browsers' stateless execution mode isolates each run with no cookies or storage persistence. Compare with stateful mode and enable via UI or API."
 ---
 
-By default, Figranium maintains persistent browser profiles on disk across task runs. **Stateless Execution** allows you to bypass this for tasks that require a clean, isolated browser environment.
+By default, Figranium Browsers maintains persistent browser profiles on disk across task runs. **Stateless Execution** allows you to bypass this for tasks that require a clean, isolated browser environment.
 
 ## What is Stateless Execution?
 
-When enabled, Figranium launches the browser context **without loading** any existing cookies, local storage, IndexedDB, or session data. Once the task completes, all session data generated during the run is **discarded** and not saved back to the global storage state.
+When enabled, Browsers launches the browser context **without loading** any existing cookies, local storage, IndexedDB, or session data. Once the task completes, all session data generated during the run is **discarded** and not saved back to the global storage state.
 
 Think of it as opening a private/incognito window for each task run.
 
@@ -16,7 +16,7 @@ Think of it as opening a private/incognito window for each task run.
 
 <CardGroup cols={2}>
   <Card title="Stateful (default)" icon="database">
-    Without stateless mode, Figranium:
+    Without stateless mode, Browsers:
 
     1. Launches the browser using a persistent profile directory on disk (`data/browser-profile` for agent mode, `data/browser-profile-scrape` for scrape mode).
     2. Runs the task with the full browser context available (logged-in sessions, preferences, etc.).
@@ -31,7 +31,7 @@ Think of it as opening a private/incognito window for each task run.
 
     1. The browser starts as a true incognito session — launched in-memory with no disk profile directory at all (no cookies, no local storage, no session).
     2. After execution, all generated cookies and storage are **thrown away** — nothing is written to disk.
-    3. No persistent browser profile is ever read from or written to.
+    3. No persistent browser profile is ever read from or written to by Browsers.
 
     Each run is completely independent and isolated from every other run.
   </Card>
@@ -86,6 +86,8 @@ Content-Type: application/json
 ```
 
 You can also bake `statelessExecution: true` into the saved task definition itself, so every run — whether triggered from the UI, API, or scheduler — always runs stateless.
+
+## Combining with Proxy Rotation
 
 ## Combining with Proxy Rotation
 

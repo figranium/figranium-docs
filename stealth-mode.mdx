@@ -1,10 +1,10 @@
 ---
 title: "Stealth & Anti-Detection"
 sidebarTitle: "Stealth Mode"
-description: "Learn about Figranium's stealth flags, browser fingerprinting, Playwright stealth stack, and cookie-consent auto-dismissal."
+description: "Learn about Figranium Browsers' stealth flags, browser fingerprinting, Playwright stealth stack, and cookie-consent auto-dismissal."
 ---
 
-Figranium is designed to bypass modern bot detection systems by mimicking human behavior and masking automation fingerprints.
+Figranium Browsers is designed to bypass modern bot detection systems by mimicking human behavior and masking automation fingerprints.
 
 ## Stealth Flags
 
@@ -23,7 +23,7 @@ When creating an **Agent** task, you can configure the following stealth setting
 
 ## Browser Fingerprinting
 
-Beyond behavioral simulation, Figranium implements several technical anti-detection measures:
+Beyond behavioral simulation, Browsers implements several technical anti-detection measures:
 
 <CardGroup cols={2}>
   <Card title="User Agent Rotation" icon="brand-chrome">
@@ -53,13 +53,13 @@ Beyond behavioral simulation, Figranium implements several technical anti-detect
 
 ## Browser Engine
 
-Figranium uses Playwright Chromium with `playwright-extra` and `puppeteer-extra-plugin-stealth` for browser automation. The optional CloakBrowser engine was removed in Figranium v0.23.0; `USE_CLOAK_ENGINE` and `CLOAKBROWSER_LICENSE_KEY` are no longer supported. See the [v0.23.0 release notes](/changelog/overview#figranium-v0-23-0).
+Browsers uses Playwright Chromium with `playwright-extra` and `puppeteer-extra-plugin-stealth` for browser automation. The optional CloakBrowser engine was removed in Browsers v0.23.0; `USE_CLOAK_ENGINE` and `CLOAKBROWSER_LICENSE_KEY` are no longer supported. See the [v0.23.0 release notes](/changelog/overview#figranium-v0-23-0).
 
 ## Cookie-Consent Auto-Dismissal
 
 Every Agent-mode page automatically clicks through common cookie-consent banners so your task can interact with the real page immediately, without you having to author a Click block for every consent dialog you might hit.
 
-Figranium injects the community-maintained [`idcac-playwright`](https://www.npmjs.com/package/idcac-playwright) ruleset (a Playwright port of the "I don't care about cookies" browser extension) into every page in the Agent browser context. The script runs on the page's `domcontentloaded` event and looks for known consent-banner selectors from OneTrust, Cookiebot, TrustArc, Quantcast, and hundreds of other providers. When it finds one, it clicks the **reject** or **close** button — never **accept** — and lets your task continue.
+Browsers injects the community-maintained [`idcac-playwright`](https://www.npmjs.com/package/idcac-playwright) ruleset (a Playwright port of the "I don't care about cookies" browser extension) into every page in the Agent browser context. The script runs on the page's `domcontentloaded` event and looks for known consent-banner selectors from OneTrust, Cookiebot, TrustArc, Quantcast, and hundreds of other providers. When it finds one, it clicks the **reject** or **close** button — never **accept** — and lets your task continue.
 
 - **Scope**: Agent mode only. Headful and Scrape modes do not dismiss consent banners (Headful is for human interaction; Scrape doesn't render banners at all because there is no browser).
 - **Protocols**: Applies to `http://` and `https://` pages. `file://` and `data:` URLs are skipped by the underlying ruleset.

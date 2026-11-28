@@ -1,7 +1,7 @@
 ---
 title: "Task Action Helpers"
 sidebarTitle: "Actions"
-description: "Build Figranium task action lists with typed helpers. Navigation, interaction, extraction, control flow, HTTP, and CAPTCHA action factories from the SDK."
+description: "Build Figranium Browsers task action lists with typed helpers. Navigation, interaction, extraction, control flow, HTTP, and CAPTCHA action factories from the SDK."
 ---
 
 Tasks are executed as ordered lists of actions. The SDK exports typed factories under the `actions` namespace that generate correctly shaped action objects with stable IDs, plus an `action()` helper for typed one-offs.
@@ -118,7 +118,7 @@ Condition objects for `if` and `while` accept:
 | `actions.set(varName, value, base?)` | `set` | Assign `value` to `varName`. |
 | `actions.merge(varName, value, base?)` | `merge` | Merge `value` into an existing `varName`. |
 
-The exported `variable(name)` helper produces the `{$name}` template token Figranium expects when a value should be substituted from a runtime variable:
+The exported `variable(name)` helper produces the `{$name}` template token Figranium Browsers expects when a value should be substituted from a runtime variable:
 
 ```ts
 actions.type("#search", variable("query"));
@@ -150,7 +150,7 @@ The SDK includes typed helpers for the Cabinet upload flow.
 | `actions.upload(input?, base?)` | `upload` | Attach the newest unuploaded item from a Cabinet. Set `downloadCabinetId` to choose a Cabinet and `markAsUploaded` to finalize immediately after attaching. |
 | `actions.finalizeUploads(base?)` | `finalize_uploads` | Mark all Cabinet items attached during the current execution as uploaded. |
 
-When `downloadCabinetId` is omitted on an Upload action, Figranium uses the task's `cabinetId`; if the task also omits it, the instance default Cabinet is used.
+When `downloadCabinetId` is omitted on an Upload action, Figranium Browsers uses the task's `cabinetId`; if the task also omits it, the instance default Cabinet is used.
 
 Keeping finalization separate is useful when an upload should only be consumed after the surrounding workflow reaches a successful point.
 

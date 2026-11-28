@@ -1,7 +1,7 @@
 ---
-title: "Per-Request Options in the Figranium Kotlin SDK"
+title: "Per-Request Options in the Figranium Browsers Kotlin SDK"
 sidebarTitle: "Request Options"
-description: "Pass timeout and headers per call in the Figranium Kotlin SDK. Override timeouts, inject one-off headers, and understand header merge order."
+description: "Pass timeout and headers per call in the Figranium Browsers Kotlin SDK. Override timeouts, inject one-off headers, and understand header merge order."
 ---
 
 Every SDK method accepts an optional `options` argument that controls per-call timeouts and one-off headers. The same `RequestOptions` shape works for regular requests and for Kotlin Flow streams.
@@ -92,7 +92,7 @@ val client = Figranium(
 try {
     client.runTask("slow-task", options = RequestOptions(timeoutMillis = 5_000))
 } catch (e: FigraniumException) {
-    println("Figranium error: ${e.message}")
+    println("Browsers error: ${e.message}")
 } catch (e: IOException) {
     println("Network or timeout failure: ${e.message}")
 }

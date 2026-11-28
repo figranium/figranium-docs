@@ -1,10 +1,10 @@
 ---
-title: "Integrate Figranium with Android AppFunctions and system assistants"
+title: "Integrate Figranium Browsers with Android AppFunctions and system assistants"
 sidebarTitle: "AppFunctions"
 description: "Configure FigraniumAppFunctionConfiguration to expose runFigraniumTask as an Android AppFunction. Control the task allowlist, enable or disable the function, and keep credentials out of parameters."
 ---
 
-On Android 16 (API 36) and later, the Figranium Kotlin SDK exposes a single system AppFunction for running an approved deterministic task. You provide the client through a `FigraniumAppFunctionClientProvider` so your app controls authentication and secrets. AppFunctions never accept credentials as parameters.
+On Android 16 (API 36) and later, the Figranium Browsers Kotlin SDK exposes a single system AppFunction for running an approved deterministic task. You provide the client through a `FigraniumAppFunctionClientProvider` so your app controls authentication and secrets. AppFunctions never accept credentials as parameters.
 
 <Note>
   AppFunctions support requires Android API 36+ (compileSdk 37). On devices with an older version, `FigraniumAppFunctions.setEnabled` is a no-op and the base SDK works unchanged.
@@ -29,7 +29,7 @@ The KSP compiler generates the service metadata from the `@AppFunctionServiceEnt
 
 ## Configure the client provider
 
-Before the system can invoke any Figranium AppFunction, call `FigraniumAppFunctionConfiguration.configure(_:)` once from `Application.onCreate` with a provider that vends a configured `Figranium` client.
+Before the system can invoke any Browsers AppFunction, call `FigraniumAppFunctionConfiguration.configure(_:)` once from `Application.onCreate` with a provider that vends a configured `Figranium` client.
 
 ```kotlin MyApplication.kt
 import android.app.Application
@@ -83,7 +83,7 @@ abstract class BaseFigraniumAppFunctionService : AppFunctionService()
 
 ### runFigraniumTask
 
-Runs one explicitly approved deterministic Figranium task.
+Runs one explicitly approved deterministic Figranium Browsers task.
 
 **Signature:**
 
@@ -94,9 +94,9 @@ suspend fun runFigraniumTask(parameters: RunFigraniumTaskParameters): FigraniumA
 
 - **Parameter:** `RunFigraniumTaskParameters` with a single `taskId` field, the ID of an app-approved deterministic task.
 - **Returns:** `FigraniumAppFunctionResult` containing:
-  - `outcome` (`String`): the Figranium execution outcome such as `success` or `error`. Falls back to `unknown` when the server omits it.
+  - `outcome` (`String`): the Browsers execution outcome such as `success` or `error`. Falls back to `unknown` when the server omits it.
   - `data` (`String?`): JSON output from the approved task.
-  - `runId` (`String?`): the run ID, if returned by Figranium.
+  - `runId` (`String?`): the run ID, if returned by Browsers.
 - **HTTP endpoint:** `POST /tasks/{id}/api` (via `client.runTask<JsonObject>(taskId)`)
 
 ### Data types
@@ -139,7 +139,7 @@ FigraniumAppFunctions.setEnabled(context, enabled = true)
 ## Security notes
 
 - Keep API keys in Android Keystore-backed storage or another secure app-owned store. Never pass credentials as AppFunction parameters.
-- The allowlist means an assistant can run only the tasks your app explicitly approves. It cannot create arbitrary browser actions or read Figranium credentials.
+- The allowlist means an assistant can run only the tasks your app explicitly approves. It cannot create arbitrary browser actions or read Browsers credentials.
 - If the provider throws, the exception propagates through the AppFunction runtime.
 
 ## Error reference
@@ -155,7 +155,7 @@ FigraniumAppFunctions.setEnabled(context, enabled = true)
   </Card>
 
   <Card title="Client configuration" icon="settings" href="/sdk/kotlin/client-configuration">
-    Review base URL, timeouts, and custom headers for the Figranium client.
+    Review base URL, timeouts, and custom headers for the Browsers client.
   </Card>
 
   <Card title="Actions" icon="bolt" href="/sdk/kotlin/actions">

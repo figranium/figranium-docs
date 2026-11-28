@@ -1,7 +1,7 @@
 ---
-title: "Per-Request Options in the Figranium Python SDK"
+title: "Per-Request Options in the Figranium Browsers Python SDK"
 sidebarTitle: "Request Options"
-description: "Pass timeout and headers per call in the Figranium Python SDK. Override timeouts, inject one-off headers, and handle request aborts and network errors."
+description: "Pass timeout and headers per call in the Figranium Browsers Python SDK. Override timeouts, inject one-off headers, and handle request aborts and network errors."
 ---
 
 Every SDK method accepts an optional `options` keyword argument that controls per-call timeouts and one-off headers. The same `RequestOptions` shape works for regular requests and for Server-Sent Events streams.
@@ -83,7 +83,7 @@ except FigraniumError as error:
     if error.code == "REQUEST_ABORTED":
         print("The request timed out:", error.__cause__)
     elif error.code == "NETWORK_ERROR":
-        print("Figranium is unreachable:", error.__cause__)
+        print("Figranium Browsers is unreachable:", error.__cause__)
 ```
 
 ## Stream timeouts

@@ -1,14 +1,14 @@
 ---
 title: "Data Extraction"
 sidebarTitle: "Extraction"
-description: "Extract structured data from web pages using visual field mapping, CSS selectors, XPath, or custom JavaScript in Figranium's flexible extraction system."
+description: "Extract structured data from web pages using visual field mapping, CSS selectors, XPath, or custom JavaScript in Figranium Browsers' flexible extraction system."
 ---
 
-Figranium offers powerful visual and script-based tools to extract structured data from web pages. The extraction process executes automatically **after** all visual action blocks complete.
+Figranium Browsers offers powerful visual and script-based tools to extract structured data from web pages. The extraction process executes automatically **after** all visual action blocks complete.
 
 ## Visual Field Mapping (Default)
 
-Every task opens its extraction editor in **Visual** mode by default. Instead of manually writing JavaScript parsers, you define the fields and repeating groups you want to capture and target elements directly on the page. Figranium automatically generates and maintains the underlying execution script.
+Every task opens its extraction editor in **Visual** mode by default. Instead of manually writing JavaScript parsers, you define the fields and repeating groups you want to capture and target elements directly on the page. Browsers automatically generates and maintains the underlying execution script.
 
 Visual mode is ideal when:
 
@@ -33,7 +33,7 @@ In **Visual** mode, click **Add Field** in the **Extraction Script** block on th
 
 ### Supported Attribute Types
 
-Figranium provides seven specialized attribute extraction types:
+Browsers provides seven specialized attribute extraction types:
 
 1. **Text (`text`)**: Reads and trims text content (`el.textContent.trim()`).
 2. **HTML (`html`)**: Extracts inner HTML (`el.innerHTML`).
@@ -49,7 +49,7 @@ Figranium provides seven specialized attribute extraction types:
 
 ### Image URL Extraction (`image`)
 
-Extracting image URLs from modern websites requires handling lazy loading, responsive `srcset` definitions, and CSS background images. When an attribute type is set to **Image URL**, Figranium executes an inline resolver that:
+Extracting image URLs from modern websites requires handling lazy loading, responsive `srcset` definitions, and CSS background images. When an attribute type is set to **Image URL**, Browsers executes an inline resolver that:
 
 1. Checks `el.currentSrc`, `el.src`, `data-src`, `data-lazy-src`, or `data-original` attributes.
 2. Inspects `srcset` attributes, parsing candidate URLs and returning the highest-density candidate.
@@ -58,13 +58,13 @@ Extracting image URLs from modern websites requires handling lazy loading, respo
 
 ### Link URL Extraction (`link`)
 
-When set to **Link URL**, Figranium checks `href`, `src`, or `data-href` attributes on the matched element and converts relative paths into canonical absolute URLs using the browser's `location.href`.
+When set to **Link URL**, Browsers checks `href`, `src`, or `data-href` attributes on the matched element and converts relative paths into canonical absolute URLs using the browser's `location.href`.
 
 ---
 
 ## Repeating Groups (`extractionGroups`)
 
-Web pages frequently contain repeating structures such as product listings, search result cards, tabular rows, or comment feeds. Figranium supports **Repeating Groups** to extract nested, structured array data without requiring manual loops.
+Web pages frequently contain repeating structures such as product listings, search result cards, tabular rows, or comment feeds. Browsers supports **Repeating Groups** to extract nested, structured array data without requiring manual loops.
 
 ### How Repeating Groups Work
 
@@ -99,11 +99,11 @@ Extracting a repeating group named `products` with container selector `.product-
 
 ## Under the Hood: Script Generation
 
-When running in **Visual** mode, Figranium translates field definitions and repeating groups into an optimized JavaScript extraction function executed via Playwright's `page.evaluate()`.
+When running in **Visual** mode, Browsers translates field definitions and repeating groups into an optimized JavaScript extraction function executed via Playwright's `page.evaluate()`.
 
 ### Generated Script Example
 
-For a task configured with top-level fields (`title`, `banner_image`, `is_sale`) and a repeating group (`items`), Figranium generates code equivalent to:
+For a task configured with top-level fields (`title`, `banner_image`, `is_sale`) and a repeating group (`items`), Browsers generates code equivalent to:
 
 ```javascript
 return {
@@ -137,11 +137,11 @@ Next to selector inputs for both individual fields and repeating group container
 
 1. Click the target icon next to any field or group container selector.
 2. Click any element on the live browser canvas.
-3. Figranium inspects the element hierarchy and generates robust CSS selectors.
+3. Browsers inspects the element hierarchy and generates robust CSS selectors.
 4. A list of candidate selectors is displayed, allowing single-click substitution.
 
 <Note>
-  Extraction scripts run using native browser methods (`document.querySelector`), which do not support Playwright-specific pseudo-selectors like `:has-text(...)`. Figranium automatically filters out incompatible pseudo-selectors from inspector candidate lists when configuring visual extraction fields.
+  Extraction scripts run using native browser methods (`document.querySelector`), which do not support Playwright-specific pseudo-selectors like `:has-text(...)`. Browsers automatically filters out incompatible pseudo-selectors from inspector candidate lists when configuring visual extraction fields.
 </Note>
 
 ---
@@ -192,7 +192,7 @@ return {
 
 ## DOM Cleaning and Shadow DOM
 
-Before extraction runs, Figranium optimizes page HTML to reduce payload size and eliminate noise.
+Before extraction runs, Browsers optimizes page HTML to reduce payload size and eliminate noise.
 
 ### Stripped Elements
 
@@ -208,7 +208,7 @@ The following tags are removed during cleaning: `script`, `style`, `link`, `meta
 
 ### Shadow DOM Support
 
-If a web page utilizes open Shadow DOM trees (common in Web Components), Figranium serializes shadow roots into `<template data-shadowroot="open">` elements inside cleaned HTML. Shadow DOM inclusion can be toggled on or off in **Task Settings**.
+If a web page utilizes open Shadow DOM trees (common in Web Components), Browsers serializes shadow roots into `<template data-shadowroot="open">` elements inside cleaned HTML. Shadow DOM inclusion can be toggled on or off in **Task Settings**.
 
 <Tip>
   When scraping pages built with Web Components, enable Shadow DOM support in **Task Settings** so selectors can traverse shadow boundaries through the serialized template elements.
@@ -232,7 +232,7 @@ When setting the task output format to **CSV**:
 
 #### Single Repeating Group Unwrapping
 
-When the extraction result is an object with a single key whose value is an array of objects (the shape produced by a lone repeating group), Figranium unwraps that array before serialization. Each group item becomes its own CSV row instead of a single row containing a stringified array in one cell.
+When the extraction result is an object with a single key whose value is an array of objects (the shape produced by a lone repeating group), Browsers unwraps that array before serialization. Each group item becomes its own CSV row instead of a single row containing a stringified array in one cell.
 
 For example, an extraction that returns:
 

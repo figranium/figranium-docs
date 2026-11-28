@@ -1,25 +1,25 @@
 ---
 title: "Activepieces Integration"
 sidebarTitle: "Activepieces"
-description: "Connect Figranium to Activepieces, authenticate with your instance URL and API key, and run browser automation tasks from flows."
+description: "Connect Figranium Browsers to Activepieces, authenticate with your instance URL and API key, and run browser automation tasks from flows."
 ---
 
-The Figranium piece for Activepieces brings Figranium browser automation into Activepieces flows. Connect your instance, choose a task, and pass runtime variables from earlier flow steps into each run.
+The Activepieces piece brings Figranium Browsers browser automation into Activepieces flows. Connect your instance, choose a task, and pass runtime variables from earlier flow steps into each run.
 
 ## Install the piece
 
 <Steps>
-  <Step title="Install Figranium">
+  <Step title="Install Figranium Browsers">
     In Activepieces, open **Platform Admin → Pieces → Install Piece**, choose **NPM Registry**, and install `@figranium/piece`.
   </Step>
   <Step title="Configure the connection">
-    Add your Figranium **Base URL** and **API key**. Use the base URL without a trailing slash. If you need an API key, see [Get Your Figranium API Key](/api-key).
+    Add your Figranium Browsers **Base URL** and **API key**. Use the base URL without a trailing slash. If you need an API key, see [Get Your Figranium Browsers API Key](/api-key).
   </Step>
-  <Step title="Add a Figranium action">
-    Add Figranium to your flow and choose the action you want to use.
+  <Step title="Add a Figranium Browsers action">
+    Add Figranium Browsers to your flow and choose the action you want to use.
   </Step>
   <Step title="Choose a task">
-    For **Execute Task**, select the saved Figranium task to run.
+    For **Execute Task**, select the saved Figranium Browsers task to run.
   </Step>
   <Step title="Map variables">
     Provide runtime variables when the task needs dynamic inputs. Values can come from previous Activepieces steps.
@@ -27,21 +27,21 @@ The Figranium piece for Activepieces brings Figranium browser automation into Ac
 </Steps>
 
 <Note>
-  Dynamic fields such as the Task dropdown are loaded by the Activepieces server, so your Figranium Base URL must be reachable from the Activepieces host.
+  Dynamic fields such as the Task dropdown are loaded by the Activepieces server, so your Figranium Browsers Base URL must be reachable from the Activepieces host.
 </Note>
 
 ## Actions
 
-The piece can execute tasks, list tasks and executions, manage schedules, inspect scheduler status, and make custom Figranium API calls.
+The piece can execute tasks, list tasks and executions, manage schedules, inspect scheduler status, and make custom Figranium Browsers API calls.
 
 For the underlying endpoints, see the [REST API Reference](/rest-api).
 
 ## Runtime variables
 
-Runtime variables let one saved Figranium task accept different inputs on each Activepieces run. Variable names must match those defined by the task.
+Runtime variables let one saved Figranium Browsers task accept different inputs on each Activepieces run. Variable names must match those defined by the task.
 
 See [Variables & Templating](/variables) for details.
 
 ## Authentication
 
-The piece authenticates directly with your Figranium instance using your API key. Keep the key secret and rotate it if it is exposed. See [API Key](/api-key) for key management.
+The piece authenticates directly with your Figranium Browsers instance using your API key. Keep the key secret and rotate it if it is exposed. See [API Key](/api-key) for key management.

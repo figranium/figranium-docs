@@ -1,10 +1,10 @@
 ---
 title: "JavaScript Execution"
 sidebarTitle: "JavaScript"
-description: "Execute custom JavaScript in the browser context for complex logic, data transformation, unsupported interactions, and dynamic content handling."
+description: "Execute custom JavaScript in the Figranium Browsers context for complex logic, data transformation, unsupported interactions, and dynamic content handling."
 ---
 
-Figranium allows you to execute custom JavaScript in the browser context at any point in a task. This is the most powerful feature for handling complex logic, data transformation, unsupported interactions, and dynamic content.
+Figranium Browsers allows you to execute custom JavaScript in the browser context at any point in a task. This is the most powerful feature for handling complex logic, data transformation, unsupported interactions, and dynamic content.
 
 ## The Run JavaScript Block
 
@@ -17,7 +17,7 @@ The code runs directly in the browser page context (via Playwright's `page.evalu
 - **Scope**: Full access to the global `window` object.
 - **DOM**: Full access to `document`, `querySelector`, `querySelectorAll`, etc.
 - **Variables**: Access runtime variables using `{$varName}` syntax — they are injected as string literals before evaluation.
-- **Async**: Your code is wrapped in an async function, so top-level `await` and top-level `return` both work directly. Figranium awaits the returned promise automatically.
+- **Async**: Your code is wrapped in an async function, so top-level `await` and top-level `return` both work directly. Browsers awaits the returned promise automatically.
 
 ### Return Values
 
@@ -125,13 +125,13 @@ return false;
 
 Use `block.output` to pass data between JavaScript blocks:
 
-<img src="/images/tasks/javascript-execution-task-1.png" alt="Figranium task preview: Chaining JavaScript Blocks" />
+![Figranium Browsers task preview: Chaining JavaScript Blocks](/images/tasks/javascript-execution-task-1.png)
 
 ---
 
 ## Extraction Scripts vs. JavaScript Action Blocks
 
-Figranium has two places where you can run JavaScript:
+Browsers has two places where you can run JavaScript:
 
 |  | JavaScript Action Block | Extraction Script |
 | :-- | :-- | :-- |
@@ -151,5 +151,5 @@ For final data collection, prefer the **Extraction Script** field in task settin
 </Warning>
 
 - The JavaScript action block runs in the **browser** context, not in Node.js. You cannot access the file system or Node.js APIs from within these blocks.
-- For complex data processing that needs Node.js features, use the **Extraction Script** which runs through Figranium's sandboxed JSDOM environment. The sandbox is hardened against prototype-chain escape techniques, so extraction scripts cannot break out to access the host Node.js runtime.
+- For complex data processing that needs Node.js features, use the **Extraction Script** which runs through the Browsers sandboxed JSDOM environment. The sandbox is hardened against prototype-chain escape techniques, so extraction scripts cannot break out to access the host Node.js runtime.
 - Data objects passed into the sandbox are **read-only**. You cannot set, define, or delete properties on them. If you need to transform data, copy values into new objects you create within your script. See [Sandbox isolation](/security#sandbox-isolation) for details.

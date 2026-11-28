@@ -1,10 +1,10 @@
 ---
-title: "Handle Errors from the Figranium Swift SDK"
+title: "Handle Errors from the Figranium Browsers Swift SDK"
 sidebarTitle: "Errors"
 description: "FigraniumError is the single error type in the Swift SDK. Learn its fields, SDK-generated codes, and how to branch on status or catch transport and timeout failures."
 ---
 
-The Figranium Swift SDK raises one error type for every failure: `FigraniumError`. It covers HTTP error responses, network failures, timeouts, and request aborts. You can branch on `error.status` for HTTP semantics, on `error.code` for machine-readable categories, and on `error.errorDescription` for a human-readable message.
+The Figranium Browsers Swift SDK raises one error type for every failure: `FigraniumError`. It covers HTTP error responses, network failures, timeouts, and request aborts. You can branch on `error.status` for HTTP semantics, on `error.code` for machine-readable categories, and on `error.errorDescription` for a human-readable message.
 
 ## FigraniumError shape
 
@@ -42,7 +42,7 @@ do {
 
 <AccordionGroup>
   <Accordion title="`status`">
-    The HTTP status returned by the Figranium server, if a response arrived. `0` when the request never reached a status, such as a network failure, DNS error, or cancelled request.
+    The HTTP status returned by the Figranium Browsers server, if a response arrived. `0` when the request never reached a status, such as a network failure, DNS error, or cancelled request.
   </Accordion>
 
   <Accordion title="`code`">
@@ -50,7 +50,7 @@ do {
 
     | Code | Meaning |
     | :-- | :-- |
-    | `NETWORK_ERROR` | The request could not reach the server, or a non-Figranium error occurred during the request (including JSON decoding failures). |
+    | `NETWORK_ERROR` | The request could not reach the server, or a non-Browsers error occurred during the request (including JSON decoding failures). |
     | `REQUEST_ABORTED` | The request was aborted by a timeout or cancellation. |
     | `EMPTY_RESPONSE` | The response body was empty or the server returned 204. |
     | `INTENT_NOT_CONFIGURED` | `FigraniumIntentConfiguration` was not configured before invoking an App Intent. |
@@ -66,7 +66,7 @@ do {
   </Accordion>
 
   <Accordion title="`message`">
-    Human-readable description of what went wrong. For server errors, this is taken from the response body's `message` or `error` field. For SDK-generated errors, it describes the condition (for example, "Figranium request was cancelled").
+    Human-readable description of what went wrong. For server errors, this is taken from the response body's `message` or `error` field. For SDK-generated errors, it describes the condition (for example, "Browsers request was cancelled").
   </Accordion>
 </AccordionGroup>
 
@@ -101,7 +101,7 @@ do {
     try await client.health.check()
 } catch let error as FigraniumError {
     if error.code == "NETWORK_ERROR" {
-        print("Figranium is unreachable")
+        print("Figranium Browsers is unreachable")
     }
 }
 ```

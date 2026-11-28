@@ -1,10 +1,10 @@
 ---
-title: "Handle Errors from the Figranium Python SDK"
+title: "Handle Errors from the Figranium Browsers Python SDK"
 sidebarTitle: "Errors"
-description: "FigraniumError is the single exception class in the Python SDK. Learn its fields, SDK-generated codes, and how to branch on status or catch transport and timeout failures."
+description: "FigraniumError is the single exception class in the Figranium Browsers Python SDK. Learn its fields, SDK-generated codes, and how to branch on status or catch transport and timeout failures."
 ---
 
-The Figranium Python SDK raises one exception class for every failure: `FigraniumError`. It covers HTTP error responses, network failures, timeouts, and request aborts. You can branch on `error.status` for HTTP semantics, on `error.code` for machine-readable categories, and on `error.__cause__` for the original transport exception.
+The Figranium Browsers Python SDK raises one exception class for every failure: `FigraniumError`. It covers HTTP error responses, network failures, timeouts, and request aborts. You can branch on `error.status` for HTTP semantics, on `error.code` for machine-readable categories, and on `error.__cause__` for the original transport exception.
 
 ## FigraniumError shape
 
@@ -40,7 +40,7 @@ except FigraniumError as error:
 
 <AccordionGroup>
   <Accordion title="`status`">
-    The HTTP status returned by the Figranium server, if a response arrived. `0` when the request never reached a status, such as a network failure, DNS error, or cancelled request.
+    The HTTP status returned by the Figranium Browsers server, if a response arrived. `0` when the request never reached a status, such as a network failure, DNS error, or cancelled request.
   </Accordion>
 
   <Accordion title="`code`">
@@ -93,7 +93,7 @@ try:
     client.health.check()
 except FigraniumError as error:
     if error.code == "NETWORK_ERROR":
-        print("Figranium is unreachable:", error.__cause__)
+        print("Figranium Browsers is unreachable:", error.__cause__)
 ```
 
 ## Timeouts and cancellation

@@ -1,10 +1,10 @@
 ---
 title: "Tasks API"
 sidebarTitle: "Tasks"
-description: "Create, read, update, delete, and execute tasks with the Figranium Tasks REST API. Includes versioning, lightweight listing, and trigger endpoints."
+description: "Create, read, update, delete, and execute tasks with the Figranium Browsers Tasks REST API. Includes versioning, lightweight listing, and trigger endpoints."
 ---
 
-Manage your automation tasks and trigger executions through the Tasks API. All endpoints except the trigger endpoint require API-key authentication. See [API Key](/api-key) and [API Scopes](/api-scopes) for setup guidance.
+Manage your Figranium Browsers automation tasks and trigger executions through the Tasks API. All endpoints except the trigger endpoint require API-key authentication. See [API Key](/api-key) and [API Scopes](/api-scopes) for setup guidance.
 
 **Base URL**: `http://localhost:11345` (default)
 
@@ -128,7 +128,7 @@ Include `?version=true` in the query string to save a version snapshot before ov
 
 ### `PATCH /api/tasks/:id`
 
-Applies a partial update to an existing task. Only the fields you include in the body are changed. The `id` and `versions` fields are ignored if supplied. Figranium takes a version snapshot before applying the update, so you can restore the previous state from the version history.
+Applies a partial update to an existing task. Only the fields you include in the body are changed. The `id` and `versions` fields are ignored if supplied. Browsers takes a version snapshot before applying the update, so you can restore the previous state from the version history.
 
 Use this endpoint when you want to change a single attribute (for example, a schedule, a variable, or one action) without re-sending the full task definition.
 
@@ -189,7 +189,7 @@ Deletes a task by ID. Any in-process schedule registered for the task is also re
 Triggers an execution of a specific task. This is the primary endpoint most integrations use: send a `POST` to a task's URL to run it on demand, optionally overriding variables or receiving a webhook callback when it finishes.
 
 <Tip>
-  You don't need to assemble this URL by hand. The **Trigger via API** panel in the task editor's Task Settings API tab shows the complete endpoint URL for your instance (for example, `https://your-figranium.example.com/api/tasks/task_1/api`) with a `POST` badge, and its copy button copies the full URL.
+  You don't need to assemble this URL by hand. The **Trigger via API** panel in the task editor's Task Settings API tab shows the complete endpoint URL for your instance (for example, `https://your-browsers.example.com/api/tasks/task_1/api`) with a `POST` badge, and its copy button copies the full URL.
 </Tip>
 
 **Body**:
@@ -213,14 +213,14 @@ Triggers an execution of a specific task. This is the primary endpoint most inte
 **Response**: Returns the execution result (JSON).
 
 <Note>
-  The request body is optional. If you send the request without a body or without a `Content-Type: application/json` header, Figranium treats the body as `{}` and runs the task with its default variables. This lets tools that can't set request headers (for example, Clay's HTTP action) trigger a task with a bare `POST` to the endpoint URL.
+  The request body is optional. If you send the request without a body or without a `Content-Type: application/json` header, Browsers treats the body as `{}` and runs the task with its default variables. This lets tools that can't set request headers (for example, Clay's HTTP action) trigger a task with a bare `POST` to the endpoint URL.
 
   To pass `variables`, `webhookUrl`, `statelessExecution`, or `sessionId`, you must send `Content-Type: application/json` and a JSON body.
 </Note>
 
 #### Completion webhook
 
-When you include a `webhookUrl`, Figranium sends a `POST` request to that URL after the task finishes. The webhook URL is validated against the same SSRF rules as all other outbound requests (see [Security](/security)). If the URL points to a private network and `ALLOW_PRIVATE_NETWORKS` is `false`, the request returns `400 INVALID_WEBHOOK_URL`.
+When you include a `webhookUrl`, Browsers sends a `POST` request to that URL after the task finishes. The webhook URL is validated against the same SSRF rules as all other outbound requests (see [Security](/security)). If the URL points to a private network and `ALLOW_PRIVATE_NETWORKS` is `false`, the request returns `400 INVALID_WEBHOOK_URL`.
 
 The callback payload looks like this:
 

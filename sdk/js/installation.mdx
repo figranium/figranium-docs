@@ -1,15 +1,15 @@
 ---
-title: "Install the Figranium JavaScript SDK"
+title: "Install the Figranium Browsers JavaScript SDK"
 sidebarTitle: "Installation"
-description: "Install @figranium/sdk with npm, yarn, pnpm, or bun. Requirements, module formats, and CommonJS versus ESM guidance for the Figranium SDK."
+description: "Install @figranium/sdk with npm, yarn, pnpm, or bun. Requirements, module formats, and CommonJS versus ESM guidance for the Figranium Browsers SDK."
 ---
 
-The Figranium JavaScript SDK installs from npm as `@figranium/sdk`. It ships parallel ESM and CommonJS builds with bundled TypeScript declarations, so most projects need no additional configuration.
+The Figranium Browsers JavaScript SDK installs from npm as `@figranium/sdk`. It ships parallel ESM and CommonJS builds with bundled TypeScript declarations, so most projects need no additional configuration.
 
 ## Requirements
 
 - Node.js `18` or newer (for the built-in global `fetch`), or a modern browser.
-- A running Figranium server that the client can reach at its `baseUrl`. Local installs default to `http://localhost:11345`.
+- A running Figranium Browsers server that the client can reach at its `baseUrl`. Local installs default to `http://localhost:11345`.
 
 ## Install
 
@@ -61,7 +61,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY });
 
 ## Verify the install
 
-Call `health.check()` to confirm the SDK can reach your Figranium server.
+Call `health.check()` to confirm the SDK can reach your Figranium Browsers server.
 
 ```ts verify.ts
 import { Figranium } from "@figranium/sdk";
@@ -75,7 +75,7 @@ const status = await figranium.health.check();
 console.log(status);
 ```
 
-A healthy Figranium instance returns a JSON object with `status: "ok"`.
+A healthy Figranium Browsers instance returns a JSON object with `status: "ok"`.
 
 ## Browsers and bundlers
 

@@ -1,10 +1,10 @@
 ---
 title: "Page Translation"
 sidebarTitle: "Page Translation"
-description: "Translate browser-rendered task pages before actions and extraction using Figranium's per-task translate.js integration."
+description: "Translate browser-rendered task pages before actions and extraction using Figranium Browsers' per-task translate.js integration."
 ---
 
-Figranium can translate the rendered target page for a task before its actions and extraction logic run. Translation is configured per task and is **disabled by default**.
+Figranium Browsers can translate the rendered target page for a task before its actions and extraction logic run. Translation is configured per task and is **disabled by default**.
 
 ## Enable translation
 
@@ -16,7 +16,7 @@ In Task Settings, enable **Page Translation** and choose a target language. `tar
 - Translation is reapplied after later navigations in the same browser page.
 - **Headful sessions** use the same task translation setting.
 - **Scrape mode** is HTTP-only and does not execute page translation.
-- If `translation` is omitted, Figranium behaves as if `enabled` were `false`.
+- If `translation` is omitted, Browsers behaves as if `enabled` were `false`.
 
 This is useful when your selectors, extraction logic, or downstream data processing expect page text in a consistent language while the source site may render another one.
 

@@ -1,10 +1,10 @@
 ---
 title: "Debug and Interact with Headful Browser Sessions"
 sidebarTitle: "Headful Browser"
-description: "Use Figranium's built-in VNC viewer to debug automation visually, interact with popups, pick selectors, and sync cookies to agent runs."
+description: "Use Figranium Browsers' built-in VNC viewer to debug automation visually, interact with popups, pick selectors, and sync cookies to agent runs."
 ---
 
-Figranium includes powerful **Headful Debugging** capabilities that allow you to see and interact with the automation as it runs. This is powered by a VNC server running alongside the Playwright container.
+Figranium Browsers includes powerful **Headful Debugging** capabilities that allow you to see and interact with the automation as it runs. This is powered by a VNC server running alongside the Playwright container.
 
 ## Why Headful?
 
@@ -49,7 +49,7 @@ The VNC interface provides a standard desktop environment:
 
 ## Popups and multi-page navigation
 
-Headful sessions automatically track the active browser page across popups and new tabs. When a site opens a popup — for example, an OAuth login window or a payment gateway — Figranium switches to the new page so you can interact with it in the VNC viewer. When that page closes, the session returns to the previous page.
+Headful sessions automatically track the active browser page across popups and new tabs. When a site opens a popup — for example, an OAuth login window or a payment gateway — Browsers switches to the new page so you can interact with it in the VNC viewer. When that page closes, the session returns to the previous page.
 
 This means workflows that span multiple pages work without any extra configuration:
 
@@ -65,7 +65,7 @@ Headful sessions use a dedicated persistent browser profile directory (`data/bro
 
 - **Sync interval**: Every 30 seconds while a headful session is active.
 - **Sync on close**: Cookies are also saved when the headful session is stopped via **Close Browser**.
-- **Agent & scrape pickup**: Each non-stateless agent or scrape run injects the saved cookies at startup, so they pick up any session established in headful.
+- **Agent & scrape pickup**: Each non-stateless agent or scrape run injects the saved cookies at startup, so they pick up any session established in the headful browser.
 
 This means the typical workflow still works:
 
@@ -86,19 +86,19 @@ This means the typical workflow still works:
 
 ## Element picking
 
-The headful browser doubles as a selector discovery tool. When you click the **Highlight Tool** icon in an action block's selector field, Figranium opens a headful session with **inspect mode already active** — no extra step required.
+The headful browser doubles as a selector discovery tool. When you click the **Highlight Tool** icon in an action block's selector field, Browsers opens a headful session with **inspect mode already active** — no extra step required.
 
 1. The crosshair overlay appears automatically in the VNC viewer.
 2. Hover over any element to see it highlighted with a tooltip showing the top selector candidates.
 3. Click the element to confirm your selection.
 
-Figranium generates up to five selector alternatives, ranked from most readable to most structural. The best candidate auto-fills the selector field, and the alternatives appear as clickable pills below the input so you can compare and switch without re-picking.
+Browsers generates up to five selector alternatives, ranked from most readable to most structural. The best candidate auto-fills the selector field, and the alternatives appear as clickable pills below the input so you can compare and switch without re-picking.
 
 See [CSS Selectors — Built-in Highlight Tool](/selectors#built-in-highlight-tool) for details on the ranking algorithm.
 
 ## Save login credentials
 
-When you submit a password form in a headful browser session, Figranium can detect the website login and offer to save or update its Login item in the Figranium 1Password vault. Connect a 1Password service account under **Settings > Connections** to use this option. Choose **Save password** to confirm, or **Not now** to dismiss the prompt. Figranium does not save the credentials until you confirm.
+When you submit a password form in a headful browser session, Browsers can detect the website login and offer to save or update its Login item in the Figranium Browsers 1Password vault. Connect a 1Password service account under **Settings > Connections** to use this option. Choose **Save password** to confirm, or **Not now** to dismiss the prompt. Browsers does not save the credentials until you confirm.
 
 The saved Login can then provide `{$password}` and `{$uname}` variables for tasks whose URL matches that website. See [1Password Login variables](/variables#1password-login-variables).
 
@@ -110,7 +110,7 @@ Headful sessions resolve [task variables](/variables) in the starting URL. For e
 https://{$site}.example.com/dashboard
 ```
 
-Figranium replaces the variable with its current value before navigating.
+Browsers replaces the variable with its current value before navigating.
 
 ## API integration
 
@@ -145,6 +145,8 @@ On Apple Silicon Macs, make sure Docker Desktop is pulling the native `linux/arm
 
 ## Adaptive viewer quality
 
+## Adaptive viewer quality
+
 The viewer adjusts its image quality to your connection. It samples throughput and latency every 30 seconds and also reads your browser's network hints, then picks one of three profiles:
 
 | Profile | When it applies | What changes |
@@ -164,25 +166,25 @@ The low-bandwidth stream runs on its own ports, configurable with environment va
 | `NOVNC_PORT` | `54311` | websockify for the full-resolution stream |
 | `NOVNC_LOW_PORT` | `54312` | websockify for the low-bandwidth stream |
 
-The embedded viewer reaches the low-bandwidth stream through `/websockify-low` on the main Figranium port, so you don't need to publish these ports.
+The embedded viewer reaches the low-bandwidth stream through `/websockify-low` on the main Browsers port, so you don't need to publish these ports.
 
 ## Access control
 
-Figranium's VNC stack is hardened against unauthenticated access. If you connect to it through the embedded viewer in the UI, everything works automatically — this section is only relevant if you build a custom client or open a raw VNC connection.
+Browsers' VNC stack is hardened against unauthenticated access. If you connect to it through the embedded viewer in the UI, everything works automatically — this section is only relevant if you build a custom client or open a raw VNC connection.
 
 ### Network binding
 
 `x11vnc` (port `5900`) binds to `127.0.0.1` inside the container and is not reachable from outside. `websockify` (port `54311`) binds to `0.0.0.0` so it can be reached over a Docker port forward. This is what makes the headful viewer work on Apple Silicon Macs and other setups that rely on port forwarding into the container.
 
-Exposing `54311` to the network is not the same as leaving VNC unauthenticated. Every WebSocket upgrade to `54311` is checked against the same rules as `/websockify` on the main Figranium port: `ALLOWED_IPS`, Origin/Host match, and a valid session cookie or API key. Direct RFB connections to port `5900` are still impossible from outside the container.
+Exposing `54311` to the network is not the same as leaving VNC unauthenticated. Every WebSocket upgrade to `54311` is checked against the same rules as `/websockify` on the main Browsers port: `ALLOWED_IPS`, Origin/Host match, and a valid session cookie or API key. Direct RFB connections to port `5900` are still impossible from outside the container.
 
 <Note>
-  For production, keep publishing the main Figranium port (default `11345`) and route the viewer through `wss://<host>:11345/websockify`. Only publish `54311` if you need direct access from a custom noVNC client, and put it behind the same auth as any other Figranium endpoint.
+  For production, keep publishing the main Browsers port (default `11345`) and route the viewer through `wss://<host>:11345/websockify`. Only publish `54311` if you need direct access from a custom noVNC client, and put it behind the same auth as any other Browsers endpoint.
 </Note>
 
 ### VNC password
 
-On first start, Figranium generates a random VNC password and writes it to `data/vnc_password.txt`. `x11vnc` requires this password for every connection, so a client that reaches port `5900` still cannot attach without it.
+On first start, Browsers generates a random VNC password and writes it to `data/vnc_password.txt`. `x11vnc` requires this password for every connection, so a client that reaches port `5900` still cannot attach without it.
 
 The embedded noVNC viewer fetches the password automatically from an authenticated endpoint before connecting — you do not need to type it in.
 

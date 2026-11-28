@@ -1,10 +1,10 @@
 ---
 title: "Variables & Templating"
 sidebarTitle: "Variables"
-description: "Learn how Figranium's variable system makes tasks reusable and dynamic with task variables, runtime overrides, and built-in helpers."
+description: "Learn how Figranium Browsers' variable system makes tasks reusable and dynamic with task variables, runtime overrides, and built-in helpers."
 ---
 
-Figranium uses a powerful variable system to make tasks reusable and dynamic. You can reference variables anywhere in a task using the `{$varName}` syntax, and combine them with JavaScript expressions for complex logic.
+Figranium Browsers uses a powerful variable system to make tasks reusable and dynamic. You can reference variables anywhere in a task using the `{$varName}` syntax, and combine them with JavaScript expressions for complex logic.
 
 ## Variable Syntax
 
@@ -12,11 +12,11 @@ Anywhere in a task (URL, Selectors, Action Values, Scripts), you can reference a
 
 **Example**:
 
-- **Variable**: `query` = "Figranium"
+- **Variable**: `query` = "Figranium Browsers"
 - **Action**: Type into `input[name="q"]`
 - **Value**: `{$query}`
 
-When executed, Figranium replaces `{$query}` with "Figranium".
+When executed, Browsers replaces `{$query}` with "Figranium Browsers".
 
 ## Defining Variables
 
@@ -42,7 +42,7 @@ When executed, Figranium replaces `{$query}` with "Figranium".
 
 ## 1Password Login Variables
 
-Connect a 1Password service account in **Settings > Connections** to use Login items in tasks. Figranium resolves credential variables on the server from the Login item whose website matches the task URL. See [Passwords](/passwords) for the Vault list and connection steps.
+Connect a 1Password service account in **Settings > Connections** to use Login items in tasks. Browsers resolves credential variables on the server from the Login item whose website matches the task URL. See [Passwords](/passwords) for the Vault list and connection steps.
 
 - `{$password}` and `{$uname}` use the password and username for the task URL's website.
 - `{$passwords.example^com}` and `{$unames.example^com}` select a specific hostname. Replace each dot with `^`, for example `{$passwords.login^example^com}` for `login.example.com`.
@@ -51,7 +51,7 @@ Connect a 1Password service account in **Settings > Connections** to use Login i
 - Resolved usernames and passwords are redacted from execution results and logs.
 
 <Tip>
-  Figranium can offer to save or update a Login item after you enter credentials in the [headful browser](/headful-browser#save-login-credentials). The prompt requires a connected 1Password service account.
+  Figranium Browsers can offer to save or update a Login item after you enter credentials in the [headful browser](/headful-browser#save-login-credentials). The prompt requires a connected 1Password service account.
 </Tip>
 
 ## Variable Types
@@ -70,13 +70,13 @@ Connect a 1Password service account in **Settings > Connections** to use Login i
   </Card>
 
   <Card title="Built-in Variables" icon="code">
-    Figranium provides special variables like `{$now}` for the current timestamp and `block.output` for the previous action's result.
+    Figranium Browsers provides special variables like `{$now}` for the current timestamp and `block.output` for the previous action's result.
   </Card>
 </CardGroup>
 
 ## Special Variables
 
-Figranium provides several built-in variables:
+Browsers provides several built-in variables:
 
 <CardGroup cols={2}>
   <Card title="`{$now}`" icon="clock">
@@ -126,7 +126,7 @@ This value persists for the remainder of the task execution.
 
 Ordinary variable values are not masked or redacted in execution logs. Values you `Type` into an input, pass as a `{$variable}`, or return from a `javascript` block can appear in the execution record stored at `data/executions.json` (or the equivalent PostgreSQL table). Treat that record as sensitive. Credentials resolved from 1Password variables are redacted from results and logs.
 
-For passwords, API tokens, and other secrets used in a login flow, we recommend:
+For passwords, API tokens, and other secrets used in a login flow, we recommend these practices:
 
 <Steps>
   <Step title="Don't hard-code secrets as defaults">
@@ -139,7 +139,7 @@ For passwords, API tokens, and other secrets used in a login flow, we recommend:
     Use `{$password}` directly in the `Type` action's **Value** field rather than copying it into intermediate `set` variables or `javascript` blocks, which increases the surface area where the value can be logged.
   </Step>
   <Step title="Rotate execution history">
-    Delete runs that contain secrets from **Executions**, or purge everything via **Settings \> Advanced \> Clear execution history**. Figranium also auto-rotates the log at `MAX_EXECUTIONS` entries (default 500). See [Captures & Storage](/captures-and-storage).
+    Delete runs that contain secrets from **Executions**, or purge everything via **Settings \> Advanced \> Clear execution history**. The Browsers log auto-rotates at `MAX_EXECUTIONS` entries (default 500). See [Captures & Storage](/captures-and-storage).
   </Step>
   <Step title="Restrict access to the host">
     All execution data stays on your own machine or server. Because there is no in-app redaction, anyone with filesystem or database access to `data/executions.json` can read historical values. Follow [Security best practices](/security) to keep that data private.

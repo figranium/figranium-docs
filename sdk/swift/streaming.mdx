@@ -1,10 +1,10 @@
 ---
 title: "Stream Executions and Selector Events in Swift"
 sidebarTitle: "Streaming"
-description: "Consume Figranium Server-Sent Events with the Swift SDK. Execution and selector streams as AsyncThrowingStream, event parsing, polling with watch, and cancellation via Task."
+description: "Consume Figranium Browsers Server-Sent Events with the Swift SDK. Execution and selector streams as AsyncThrowingStream, event parsing, polling with watch, and cancellation via Task."
 ---
 
-Figranium exposes two Server-Sent Events endpoints, and the Swift SDK surfaces both as `AsyncThrowingStream<StreamEvent<JSONValue>, Error>`. You consume them with `for try await`, and you cancel them by cancelling the surrounding `Task`.
+Figranium Browsers exposes two Server-Sent Events endpoints, and the Swift SDK surfaces both as `AsyncThrowingStream<StreamEvent<JSONValue>, Error>`. You consume them with `for try await`, and you cancel them by cancelling the surrounding `Task`.
 
 ## Streams
 

@@ -1,15 +1,15 @@
 ---
 title: "Quickstart"
-description: "Install Figranium, build your first browser task in the visual editor, run it, and trigger it through the API in a few minutes."
+description: "Install Figranium Browsers, build your first browser task in the visual editor, run it, and trigger it through the API in a few minutes."
 ---
 
-This quickstart takes you from a fresh machine to a working Figranium task. You will install Figranium with Docker Compose, create a task in the visual editor, run it once, and then trigger the same task through the REST API.
+This quickstart takes you from a fresh machine to a working Figranium Browsers task. You will install Figranium Browsers with Docker Compose, create a task in the visual editor, run it once, and then trigger the same task through the REST API.
 
-## 1. Install Figranium
+## 1. Install Figranium Browsers
 
 <Steps>
   <Step title="Create a project directory">
-    Create a folder for your Figranium installation:
+    Create a folder for your Figranium Browsers installation:
 
     ```bash
     mkdir figranium-server
@@ -24,17 +24,17 @@ This quickstart takes you from a fresh machine to a working Figranium task. You 
     wget https://raw.githubusercontent.com/figranium/figranium/main/docker-compose.deploy.yml -O docker-compose.yml
     ```
 
-    The deployment file pulls the pre-built Figranium image, so you do not need to clone the repository or build it locally.
+    The deployment file pulls the pre-built Figranium Browsers image, so you do not need to clone the repository or build it locally.
   </Step>
 
-  <Step title="Start Figranium">
+  <Step title="Start Figranium Browsers">
     Launch the container:
 
     ```bash
     docker compose up -d
     ```
 
-    Docker will pull the latest Figranium image and start the application.
+    Docker will pull the latest Figranium Browsers image and start the application.
   </Step>
 
   <Step title="Open the UI">
@@ -48,7 +48,7 @@ This quickstart takes you from a fresh machine to a working Figranium task. You 
 
 ## 2. Create your first task
 
-From the Figranium dashboard:
+From the Figranium Browsers dashboard:
 
 <Steps>
   <Step title="Create a task">
@@ -66,12 +66,12 @@ From the Figranium dashboard:
   </Step>
 
   <Step title="Save the task">
-    Save the task. Figranium stores the task definition on your own instance and gives it a stable task ID.
+    Save the task. Figranium Browsers stores the task definition on your own instance and gives it a stable task ID.
   </Step>
 </Steps>
 
 <Tip>
-  Figranium tasks are built from deterministic action blocks. You can add clicks, typing, waits, JavaScript, extraction, control flow, uploads, downloads, and more. See [Action Blocks](/action-blocks) for the full block reference.
+  Figranium Browsers tasks are built from deterministic action blocks. You can add clicks, typing, waits, JavaScript, extraction, control flow, uploads, downloads, and more. See [Action Blocks](/action-blocks) for the full block reference.
 </Tip>
 
 ## 3. Run it in the editor
@@ -89,7 +89,7 @@ Every run is also recorded under **Executions** so you can inspect it later.
 
 ## 4. Trigger the same task through the API
 
-Figranium exposes every saved task through a stable endpoint:
+Figranium Browsers exposes every saved task through a stable endpoint:
 
 ```text
 POST /api/tasks/:id/api
@@ -143,10 +143,10 @@ You now have one task that can run from both the visual editor and the API. The 
   </Card>
 
   <Card title="SDKs" icon="sdk" href="/sdk/overview">
-    Use Figranium from JavaScript, Python, Swift, or Kotlin.
+    Use Figranium Browsers from JavaScript, Python, Swift, or Kotlin.
   </Card>
 
   <Card title="MCP" icon="brain" href="/mcp-integration">
-    Connect Figranium tasks to MCP-compatible AI clients.
+    Connect Figranium Browsers tasks to MCP-compatible AI clients.
   </Card>
 </CardGroup>

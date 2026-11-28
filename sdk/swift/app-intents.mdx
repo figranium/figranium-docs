@@ -1,10 +1,10 @@
 ---
-title: "Integrate Figranium with Shortcuts and Siri using App Intents"
+title: "Integrate Figranium Browsers with Shortcuts and Siri using App Intents"
 sidebarTitle: "App Intents"
 description: "Configure FigraniumIntentClientProvider to expose RunFigraniumTaskIntent, StopFigraniumExecutionIntent, and GetFigraniumExecutionStatusIntent in Shortcuts and system experiences on Apple platforms."
 ---
 
-On Apple platforms that support App Intents, the Figranium Swift SDK exposes three system intents: running a task, stopping an execution, and checking execution status. You provide the client through a `FigraniumIntentClientProvider` so your app controls authentication and secrets. Intents never accept credentials as parameters.
+On Apple platforms that support App Intents, the Figranium Browsers Swift SDK exposes three system intents: running a task, stopping an execution, and checking execution status. You provide the client through a `FigraniumIntentClientProvider` so your app controls authentication and secrets. Intents never accept credentials as parameters.
 
 <Note>
   App Intents support is compiled only when `#if canImport(AppIntents)` is true. Server-side Swift deployments without App Intents use the rest of the SDK unchanged.
@@ -12,7 +12,7 @@ On Apple platforms that support App Intents, the Figranium Swift SDK exposes thr
 
 ## Configure the client provider
 
-Before the system can present any Figranium intent, call `FigraniumIntentConfiguration.configure(_:)` once at app launch with a provider that vends a configured `Figranium` client.
+Before the system can present any Browsers intent, call `FigraniumIntentConfiguration.configure(_:)` once at app launch with a provider that vends a configured `Figranium` client.
 
 ```swift AppIntentProvider.swift
 import Figranium

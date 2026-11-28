@@ -1,18 +1,18 @@
 ---
-title: "Capture and Manage File Downloads in Figranium"
+title: "Capture and Manage File Downloads in Figranium Browsers"
 sidebarTitle: "Downloads"
-description: "Learn how Figranium intercepts, stores, and exposes downloaded files during automation tasks. Includes wait strategies and API access."
+description: "Learn how Figranium Browsers intercepts, stores, and exposes downloaded files during automation tasks. Includes wait strategies and API access."
 ---
 
-Figranium stores intercepted browser downloads in **Cabinets**: durable, installation-wide download queues that make files reusable across executions and upload steps.
+Figranium Browsers stores intercepted browser downloads in **Cabinets**: durable, installation-wide download queues that make files reusable across executions and upload steps.
 
 Every installation has a default Cabinet. New installations start with **Basic Cabinet**, while legacy intercepted downloads are migrated automatically so existing download links continue to work.
 
 ## How downloads are stored
 
-Figranium automatically monitors browser sessions for download events. When a download is triggered by a click, form submission, or navigation, the file is intercepted and routed into the Cabinet selected by the task.
+Browsers automatically monitors browser sessions for download events. When a download is triggered by a click, form submission, or navigation, the file is intercepted and routed into the Cabinet selected by the task.
 
-Task Settings exposes a Cabinet selection for downloads. If the task does not specify one, Figranium uses the instance's default Cabinet.
+Task Settings exposes a Cabinet selection for downloads. If the task does not specify one, Browsers uses the instance's default Cabinet.
 
 Cabinet items preserve their original filename and folder structure in isolated storage so files with the same name do not collide. Items also track metadata such as kind, size, timestamps, upload status, and source task/execution.
 
@@ -61,12 +61,12 @@ When you delete a Cabinet, you choose a replacement Cabinet. You can migrate the
 </Warning>
 
 <Note>
-  Individual Cabinets have direct, reload-safe URLs. If a Cabinet URL points to an invalid Cabinet, Figranium falls back to the default Cabinet.
+  Individual Cabinets have direct, reload-safe URLs. If a Cabinet URL points to an invalid Cabinet, Browsers falls back to the default Cabinet.
 </Note>
 
 ## Reusing a download with Upload
 
-Figranium provides two Agent actions for turning a captured download into a later upload.
+Browsers provides two Agent actions for turning a captured download into a later upload.
 
 <AccordionGroup>
   <Accordion title="Upload" icon="upload">
@@ -74,7 +74,7 @@ Figranium provides two Agent actions for turning a captured download into a late
 
     An Upload action can choose its own Cabinet. If it does not, it uses the task's selected Cabinet, then falls back to the instance default.
 
-    This makes download-then-upload workflows possible without copying files outside Figranium.
+    This makes download-then-upload workflows possible without copying files outside Figranium Browsers.
   </Accordion>
 
   <Accordion title="Finalize Uploads" icon="check">

@@ -1,10 +1,10 @@
 ---
-title: "Authenticate the Figranium Kotlin SDK"
+title: "Authenticate the Figranium Browsers Kotlin SDK"
 sidebarTitle: "Authentication"
-description: "Authenticate the Figranium Kotlin SDK with API keys, session cookies, or no auth. Header formats, secure storage with Android Keystore, and session login flow."
+description: "Authenticate the Figranium Browsers Kotlin SDK with API keys, session cookies, or no auth. Header formats, secure storage with Android Keystore, and session login flow."
 ---
 
-The Figranium Kotlin SDK offers three authentication modes via the `FigraniumAuthentication` sealed interface. Every request is signed automatically based on the mode you choose when creating the client.
+The Figranium Browsers Kotlin SDK offers three authentication modes via the `FigraniumAuthentication` sealed interface. Every request is signed automatically based on the mode you choose when creating the client.
 
 ## Authentication modes
 
@@ -16,7 +16,7 @@ The Figranium Kotlin SDK offers three authentication modes via the `FigraniumAut
 
 ## Create an API key
 
-Sign into the Figranium web UI and generate an API key from **Settings**. Copy the value once; you will not see it again.
+Sign into the Figranium Browsers web UI and generate an API key from **Settings**. Copy the value once; you will not see it again.
 
 ## Pass an API key
 
@@ -104,7 +104,7 @@ On server-side JVM code, read keys from environment variables or a secrets manag
 
 ## What API keys can access
 
-API keys authenticate every task, execution, schedule, capture, browser, and execution endpoint exposed by the SDK. Server-administration operations (creating API keys, changing themes, and managing proxies) are performed in the Figranium web UI.
+API keys authenticate every task, execution, schedule, capture, browser, and execution endpoint exposed by the SDK. Server-administration operations (creating API keys, changing themes, and managing proxies) are performed in the Browsers web UI.
 
 <Warning>
   Store API keys in environment variables, Android Keystore, or a secrets manager. Never commit keys to source control or expose them in client-side code.
@@ -116,6 +116,6 @@ API keys authenticate every task, execution, schedule, capture, browser, and exe
   </Card>
 
   <Card title="API Key" icon="key" href="/api-key">
-    How Figranium API keys work and how to manage them from the web UI.
+    How Figranium Browsers API keys work and how to manage them from the web UI.
   </Card>
 </CardGroup>

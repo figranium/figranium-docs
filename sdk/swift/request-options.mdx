@@ -1,7 +1,7 @@
 ---
-title: "Per-Request Options in the Figranium Swift SDK"
+title: "Per-Request Options in the Figranium Browsers Swift SDK"
 sidebarTitle: "Request Options"
-description: "Pass timeout and headers per call in the Figranium Swift SDK. Override timeouts, inject one-off headers, and handle request aborts and network errors."
+description: "Pass timeout and headers per call in the Figranium Browsers Swift SDK. Override timeouts, inject one-off headers, and handle request aborts and network errors."
 ---
 
 Every SDK method accepts an optional `options` argument that controls per-call timeouts and one-off headers. The same `RequestOptions` shape works for regular requests and for Server-Sent Events streams.
@@ -92,7 +92,7 @@ do {
     if error.code == "REQUEST_ABORTED" {
         print("The request timed out or was cancelled")
     } else if error.code == "NETWORK_ERROR" {
-        print("Figranium is unreachable")
+        print("Figranium Browsers is unreachable")
     }
 }
 ```

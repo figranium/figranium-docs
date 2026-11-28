@@ -1,7 +1,7 @@
 ---
-title: "Action Blocks Reference for Figranium Automation"
+title: "Action Blocks Reference for Figranium Browsers Automation"
 sidebarTitle: "Action Blocks"
-description: "Complete reference for Figranium action blocks. Browse navigation, interaction, logic, data, and advanced blocks to build deterministic browser automation flows."
+description: "Complete reference for Figranium Browsers action blocks. Browse navigation, interaction, logic, data, and advanced blocks to build deterministic browser automation flows."
 ---
 
 import { FigraniumTask } from '/snippets/figranium-embed.jsx';
@@ -180,9 +180,9 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
 
     **Example — store the main article text in a variable:**
 
-    <FigraniumTask task={{"id":"docs-action-blocks-1","name":"Data & Variables","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"get_content","selector":".article-body","varName":"articleText"}]}} title="Figranium task preview: Data & Variables" height={320} />
-
     After this block runs, `{$articleText}` contains the visible text of the `.article-body` element.
+
+    <FigraniumTask task={{"id":"docs-action-blocks-1","name":"Data & Variables","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"get_content","selector":".article-body","varName":"articleText"}]}} title="Figranium Browsers task preview: Data & Variables" height={320} />
   </Accordion>
 </AccordionGroup>
 
@@ -218,7 +218,7 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
   </Accordion>
 
   <Accordion title="Upload " icon="upload">
-    Attaches the newest unuploaded item from a Cabinet to the current page. Use it for download-then-upload workflows without moving files outside Figranium.
+    Attaches the newest unuploaded item from a Cabinet to the current page. Use it for download-then-upload workflows without moving files outside Figranium Browsers.
 
     - **Selector**: Target file input, file chooser trigger, or compatible drop target.
     - **Cabinet ID**: (Optional) Cabinet to read from. If omitted, the task's Cabinet is used, then the default Cabinet.
@@ -254,7 +254,7 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
 
     **Example — fetch an API and store the result:**
 
-    <FigraniumTask task={{"id":"docs-action-blocks-2","name":"Advanced Actions","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"http_request","method":"GET","value":"https://api.example.com/products?page={$page}","headers":"{\"Authorization\": \"Bearer {$token}\"}","varName":"apiResponse"}]}} title="Figranium task preview: Advanced Actions" height={320} />
+    <FigraniumTask task={{"id":"docs-action-blocks-2","name":"Advanced Actions","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"http_request","method":"GET","value":"https://api.example.com/products?page={$page}","headers":"{\"Authorization\": \"Bearer {$token}\"}","varName":"apiResponse"}]}} title="Figranium Browsers task preview: Advanced Actions" height={320} />
 
     After this block runs, `{$apiResponse}` contains the parsed JSON response.
   </Accordion>
@@ -279,7 +279,7 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
 
     **Example — solve a reCAPTCHA v2 widget and store the result:**
 
-    <FigraniumTask task={{"id":"docs-action-blocks-3","name":"Advanced Actions","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"solve_captcha","captchaType":"recaptcha_v2","selector":"#recaptcha-container","varName":"captchaResult","timeout":120000}]}} title="Figranium task preview: Advanced Actions" height={320} />
+    <FigraniumTask task={{"id":"docs-action-blocks-3","name":"Advanced Actions","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"solve_captcha","captchaType":"recaptcha_v2","selector":"#recaptcha-container","varName":"captchaResult","timeout":120000}]}} title="Figranium Browsers task preview: Advanced Actions" height={320} />
 
     For tasks that hit CAPTCHAs at unpredictable points, you can turn on the task-level **Auto-Solve Captchas** setting instead of scattering Solve Captcha blocks through the flow. It runs the same detection pass after the initial task navigation and after every Navigate, Click, and Type, and no-ops when no challenge is present. See [CAPTCHA Solving](/captcha-solving) for the full setup, environment variables, and the auto-solve toggle.
   </Accordion>
@@ -296,7 +296,7 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
 
     **Example — wait for a Turnstile widget scoped to its container:**
 
-    <FigraniumTask task={{"id":"docs-action-blocks-4","name":"Advanced Actions","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"wait_captcha","captchaType":"turnstile","selector":"#turnstile-container","varName":"captchaReady","timeout":30000}]}} title="Figranium task preview: Advanced Actions" height={320} />
+    <FigraniumTask task={{"id":"docs-action-blocks-4","name":"Advanced Actions","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"wait_captcha","captchaType":"turnstile","selector":"#turnstile-container","varName":"captchaReady","timeout":30000}]}} title="Figranium Browsers task preview: Advanced Actions" height={320} />
 
     See [CAPTCHA Solving](/captcha-solving#wait-for-captcha) for the readiness checks and return value details.
   </Accordion>
@@ -308,7 +308,7 @@ In Agent mode, tasks are built from a sequence of actions. These actions are exe
 
     **Example — placeholder inside an `if` branch:**
 
-    <FigraniumTask task={{"id":"docs-action-blocks-5","name":"Advanced Actions","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"do_nothing"}]}} title="Figranium task preview: Advanced Actions" height={320} />
+    <FigraniumTask task={{"id":"docs-action-blocks-5","name":"Advanced Actions","url":"https://example.com","mode":"agent","wait":0,"rotateUserAgents":false,"rotateProxies":false,"rotateViewport":false,"humanTyping":true,"stealth":{"allowTypos":false,"idleMovements":false,"overscroll":false,"deadClicks":false,"fatigue":false,"naturalTyping":false,"cursorGlide":false},"variables":{},"actions":[{"id":"block-1","type":"do_nothing"}]}} title="Figranium Browsers task preview: Advanced Actions" height={320} />
   </Accordion>
 </AccordionGroup>
 

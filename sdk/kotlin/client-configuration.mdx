@@ -1,7 +1,7 @@
 ---
-title: "Configure the Figranium Kotlin SDK Client"
+title: "Configure the Figranium Browsers Kotlin SDK Client"
 sidebarTitle: "Client"
-description: "Configure the Figranium Kotlin SDK: baseUrl, authentication, default headers, timeout, custom OkHttpClient, and kotlinx.serialization.Json settings."
+description: "Configure the Figranium Browsers Kotlin SDK: baseUrl, authentication, default headers, timeout, custom OkHttpClient, and kotlinx.serialization.Json settings."
 ---
 
 The `Figranium` class is the coroutine-first entry point for the Kotlin SDK. It is created with a single constructor that accepts every configuration option as an optional argument, so a local install works with `Figranium()`. The constructor uses `@JvmOverloads` for clean Java interop.
@@ -21,7 +21,7 @@ class Figranium(
 ```
 
 <ParamField path="baseUrl" type="String">
-  Absolute URL of your Figranium server. Trailing slashes are trimmed automatically. Defaults to `http://localhost:11345`.
+  Absolute URL of your Figranium Browsers server. Trailing slashes are trimmed automatically. Defaults to `http://localhost:11345`.
 </ParamField>
 
 <ParamField path="authentication" type="FigraniumAuthentication">
@@ -48,7 +48,7 @@ class Figranium(
 
 ### `baseUrl`
 
-Pass the absolute URL of your Figranium server. The constructor trims any trailing slash before converting it to `okhttp3.HttpUrl`.
+Pass the absolute URL of your Figranium Browsers server. The constructor trims any trailing slash before converting it to `okhttp3.HttpUrl`.
 
 ```kotlin example.kt
 val client = Figranium(baseUrl = "https://figranium.example")

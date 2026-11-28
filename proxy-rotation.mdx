@@ -1,14 +1,14 @@
 ---
-title: "Configure Proxy Rotation in Figranium"
+title: "Configure Proxy Rotation in Figranium Browsers"
 sidebarTitle: "Proxies"
-description: "Learn how to configure, import, and rotate HTTP and SOCKS5 proxies in Figranium, including SSRF safety and rotation strategies for scraping tasks."
+description: "Learn how to configure, import, and rotate HTTP and SOCKS5 proxies in Figranium Browsers, including SSRF safety and rotation strategies for scraping tasks."
 ---
 
-Figranium includes a robust proxy management system to evade IP-based blocking. You can configure proxies globally or enable rotation on a per-task basis.
+Figranium Browsers includes a robust proxy management system to evade IP-based blocking. You can configure proxies globally or enable rotation on a per-task basis.
 
 ## Recommended proxy providers
 
-If you need a proxy provider for Figranium, we recommend:
+If you need a proxy provider for Browsers, we recommend:
 
 <CardGroup cols={2}>
   <Card title="Proxy-Seller" icon="circle-number-1" href="https://proxy-seller.com/">
@@ -16,7 +16,7 @@ If you need a proxy provider for Figranium, we recommend:
   </Card>
 
   <Card title="RapidProxy" icon="circle-number-2" href="https://www.rapidproxy.io/?ref=figranium">
-    Residential proxy infrastructure for scraping and browser automation, with rotating proxy options that work well with Figranium's proxy pool support.
+    Residential proxy infrastructure for scraping and browser automation, with rotating proxy options that work well with Browsers' proxy pool support.
   </Card>
 </CardGroup>
 
@@ -28,7 +28,7 @@ Navigate to **Settings \> Proxies** to manage your proxy list.
 
 <Steps>
   <Step title="Open proxy settings">
-    Go to **Settings \> Proxies** in the Figranium UI.
+    Go to **Settings \> Proxies** in the Browsers UI.
   </Step>
   <Step title="Click Add Proxy">
     Click **Add Proxy** and enter the details:
@@ -42,7 +42,7 @@ Navigate to **Settings \> Proxies** to manage your proxy list.
   </Step>
 </Steps>
 
-If you paste a full URL with embedded credentials (for example `http://user:pass@1.2.3.4:8080`) into the **Server** field, Figranium extracts the `user` and `pass` parts into the **Username** and **Password** fields automatically and stores only `http://1.2.3.4:8080` as the server. The same split happens on bulk import. This prevents duplicate-looking entries in the list and keeps upstream authentication working when the proxy is used in a rotation pool.
+If you paste a full URL with embedded credentials (for example `http://user:pass@1.2.3.4:8080`) into the **Server** field, Browsers extracts the `user` and `pass` parts into the **Username** and **Password** fields automatically and stores only `http://1.2.3.4:8080` as the server. The same split happens on bulk import. This prevents duplicate-looking entries in the list and keeps upstream authentication working when the proxy is used in a rotation pool.
 
 <Warning>
   Proxy server addresses are validated against the SSRF blocklist. Addresses that resolve to private or internal networks (such as `localhost`, `127.0.0.1`, or `169.254.169.254`) are rejected unless you set `ALLOW_PRIVATE_NETWORKS=true`. See [Security best practices](/security) for the full list of blocked ranges.
@@ -64,7 +64,7 @@ Lines can also be separated by commas or semicolons. Duplicate server addresses 
 
 ### Rotating pool proxies
 
-Some proxy providers give you a single gateway address that rotates through a pool of IPs on each request. You can mark a proxy as a **rotating pool** to track this in Figranium.
+Some proxy providers give you a single gateway address that rotates through a pool of IPs on each request. You can mark a proxy as a **rotating pool** to track this in Browsers.
 
 When adding or editing a proxy, enable the **Rotating pool** checkbox. You can optionally provide an **estimated pool size** — the approximate number of IPs behind the gateway. This is purely informational and appears as a badge next to the proxy in the list (for example, "Pool (~500)").
 
@@ -72,7 +72,7 @@ Rotating pool proxies work the same as regular proxies for rotation and executio
 
 ## Rotation Strategies
 
-Figranium supports two rotation modes:
+Browsers supports two rotation modes:
 
 1. **Round-Robin**: Cycles through the list sequentially (Proxy 1 -\> Proxy 2 -\> ...). This ensures even usage.
 2. **Random**: Picks a random proxy from the list for each execution.
@@ -93,5 +93,5 @@ In the **Task Editor**, enable the **Rotate Proxies** checkbox.
 - When disabled: The task will use the **Default Proxy** (if set) or the **Host IP**.
 
 <Info>
-  Proxy server addresses are validated against the SSRF blocklist whenever you add or edit them. If the address points to a restricted range, Figranium rejects it with an `INVALID_URL` error.
+  Proxy server addresses are validated against the SSRF blocklist whenever you add or edit them. If the address points to a restricted range, Browsers rejects it with an `INVALID_URL` error.
 </Info>

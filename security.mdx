@@ -1,14 +1,14 @@
 ---
 title: "Security Best Practices"
 sidebarTitle: "Security"
-description: "Secure your Figranium instance with authentication, IP allowlists, SSRF protection, TLS, session hardening, and rate limiting. Reference all security settings and headers."
+description: "Secure your Figranium Browsers instance with authentication, IP allowlists, SSRF protection, TLS, session hardening, and rate limiting. Reference all security settings and headers."
 ---
 
-Securing your Figranium instance is critical, especially when running on a public server.
+Securing your Figranium Browsers instance is critical, especially when running on a public server.
 
 ## Authentication
 
-By default, the Figranium UI requires an account. When you create your account during initial setup, Figranium enforces the following requirements:
+By default, the Figranium Browsers UI requires an account. When you create your account during initial setup, Figranium Browsers enforces the following requirements:
 
 - **Name**: Must be 100 characters or fewer.
 - **Email**: Must be a valid email address (max 255 characters).
@@ -30,7 +30,7 @@ No configuration is required — timing equalization is always active on the log
 
 ### Timing-safe API key comparison
 
-API key authentication on every API endpoint that accepts `x-api-key`, `Authorization: Bearer`, or a `key` header is hardened against timing attacks. Instead of comparing the provided key to the stored key directly, Figranium computes an HMAC-SHA256 of each key against a freshly generated random salt and compares the resulting digests with `crypto.timingSafeEqual`.
+API key authentication on every API endpoint that accepts `x-api-key`, `Authorization: Bearer`, or a `key` header is hardened against timing attacks. Instead of comparing the provided key to the stored key directly, Figranium Browsers computes an HMAC-SHA256 of each key against a freshly generated random salt and compares the resulting digests with `crypto.timingSafeEqual`.
 
 This means:
 
@@ -99,7 +99,7 @@ When `ALLOW_PRIVATE_NETWORKS` is `false`, the following addresses are blocked:
 
 **Protocol validation** is always enforced regardless of the `ALLOW_PRIVATE_NETWORKS` setting. Only `http:` and `https:` URLs are allowed. Schemes such as `file://`, `ftp://`, and `javascript:` are blocked even when private network access is enabled.
 
-SSRF protection also applies to **output provider credentials**. When you add or update a credential with a `baseUrl` (for example, a Baserow instance URL), Figranium validates the URL to block requests to private or internal network addresses. If the URL fails validation, the credential is rejected with an `INVALID_BASE_URL` error.
+SSRF protection also applies to **output provider credentials**. When you add or update a credential with a `baseUrl` (for example, a Baserow instance URL), Figranium Browsers validates the URL to block requests to private or internal network addresses. If the URL fails validation, the credential is rejected with an `INVALID_BASE_URL` error.
 
 ### Proxy server validation
 
@@ -117,7 +117,7 @@ If you need to use a proxy on your local network (for example, a SOCKS5 proxy ru
 
 ### Redirect protection
 
-When `ALLOW_PRIVATE_NETWORKS` is `false`, all outbound HTTP requests — including webhook callbacks and output provider requests (such as Baserow) — are protected against redirect-based SSRF attacks. If a URL returns a redirect (HTTP 3xx), Figranium validates the destination URL at every hop before following it. This prevents an attacker from providing a URL that initially resolves to a public address but redirects to a private one (such as `169.254.169.254` or `localhost`).
+When `ALLOW_PRIVATE_NETWORKS` is `false`, all outbound HTTP requests — including webhook callbacks and output provider requests (such as Baserow) — are protected against redirect-based SSRF attacks. If a URL returns a redirect (HTTP 3xx), Figranium Browsers validates the destination URL at every hop before following it. This prevents an attacker from providing a URL that initially resolves to a public address but redirects to a private one (such as `169.254.169.254` or `localhost`).
 
 - Up to 5 redirects are followed per request. If this limit is exceeded, the request fails.
 - Each redirect destination is checked against the same private-IP blocklist used for scrape URLs.
@@ -126,7 +126,7 @@ When `ALLOW_PRIVATE_NETWORKS` is `false`, all outbound HTTP requests — includi
 
 ### Cross-origin credential stripping
 
-When a redirect crosses origin boundaries (for example, from `api.baserow.io` to a different domain), Figranium automatically strips sensitive headers from the redirected request. This prevents credentials from leaking to untrusted third-party servers.
+When a redirect crosses origin boundaries (for example, from `api.baserow.io` to a different domain), Figranium Browsers automatically strips sensitive headers from the redirected request. This prevents credentials from leaking to untrusted third-party servers.
 
 The following headers are removed on cross-origin redirects:
 
@@ -140,7 +140,7 @@ This protection applies to all outbound requests that follow redirects, includin
 
 ### Browser navigation protection
 
-When `ALLOW_PRIVATE_NETWORKS` is `false`, Figranium also guards against SSRF at the browser level. Every cross-origin navigation in a scrape, headful, or agent browser session is validated before the request leaves the browser. If a page attempts to navigate to a private network address, the navigation is blocked.
+When `ALLOW_PRIVATE_NETWORKS` is `false`, Figranium Browsers also guards against SSRF at the browser level. Every cross-origin navigation in a scrape, headful, or agent browser session is validated before the request leaves the browser. If a page attempts to navigate to a private network address, the navigation is blocked.
 
 - Same-origin navigations (where the destination shares the same origin as the current page) are allowed without additional checks.
 - Only top-level navigations are validated; sub-resource requests (images, scripts, etc.) are not intercepted.
@@ -153,7 +153,7 @@ Extraction scripts and the extraction worker run inside a sandboxed environment 
 - **Read-only access** — you cannot set, define, or delete properties on proxied data objects. Attempts to do so are silently ignored.
 - **Null prototypes** — `Object.getPrototypeOf()` returns `null` on sandboxed objects, preventing prototype-chain traversal back to host objects.
 
-These restrictions apply to the data objects provided by Figranium (such as the page content passed to extraction workers), not to objects you create within your script. If your extraction script creates its own arrays or objects, those work normally.
+These restrictions apply to the data objects provided by Figranium Browsers (such as the page content passed to extraction workers), not to objects you create within your script. If your extraction script creates its own arrays or objects, those work normally.
 
 ```js
 // This works — you're creating your own object
@@ -171,21 +171,21 @@ sourceData.customField = "value"; // silently ignored
 
 ### DNS validation caching
 
-To reduce the overhead of repeated DNS lookups during URL validation, Figranium caches hostname resolution results for 30 seconds. Both allowed and blocked hostnames are cached, so subsequent requests to the same host resolve instantly. The cache is cleared automatically after the TTL expires.
+To reduce the overhead of repeated DNS lookups during URL validation, Figranium Browsers caches hostname resolution results for 30 seconds. Both allowed and blocked hostnames are cached, so subsequent requests to the same host resolve instantly. The cache is cleared automatically after the TTL expires.
 
 ## Session Security
 
 - **Session Lifetime**: Dashboard sessions expire after 7 days of inactivity. You will need to log in again after this period.
-- **HTTPS**: Always run Figranium behind a reverse proxy (Nginx, Caddy) that handles TLS/SSL.
+- **HTTPS**: Always run Figranium Browsers behind a reverse proxy (Nginx, Caddy) that handles TLS/SSL.
 - **Secure Cookies**: Set `SESSION_COOKIE_SECURE=true` in your `.env` file to ensure cookies are only sent over HTTPS. Session cookies are always set with the `httpOnly` flag, which prevents client-side JavaScript from accessing the session token and mitigates XSS-based session theft.
-- **HSTS**: When `SESSION_COOKIE_SECURE` is enabled, Figranium automatically sets `Strict-Transport-Security` headers (`max-age=31536000; includeSubDomains`) on every response. This instructs browsers to only communicate with your instance over HTTPS for one year, preventing protocol-downgrade attacks.
+- **HSTS**: When `SESSION_COOKIE_SECURE` is enabled, Figranium Browsers automatically sets `Strict-Transport-Security` headers (`max-age=31536000; includeSubDomains`) on every response. This instructs browsers to only communicate with your instance over HTTPS for one year, preventing protocol-downgrade attacks.
 - **Strong Secret**: Ensure `SESSION_SECRET` is a long, random string.
 
 ### Secrets in execution logs
 
-Figranium does not currently mask variable values, typed input, or `javascript` block return values in the execution record it writes to `data/executions.json` (or the equivalent PostgreSQL table). If a task types a password into a login form or receives a token as a runtime variable, that value can appear in the stored execution log.
+Figranium Browsers does not currently mask variable values, typed input, or `javascript` block return values in the execution record it writes to `data/executions.json` (or the equivalent PostgreSQL table). If a task types a password into a login form or receives a token as a runtime variable, that value can appear in the stored execution log.
 
-Because Figranium is self-hosted, this data never leaves your machine, but anyone with filesystem or database access to the host can read it. To limit exposure:
+Because Figranium Browsers is self-hosted, this data never leaves your machine, but anyone with filesystem or database access to the host can read it. To limit exposure:
 
 - Pass secrets as **runtime variables** via `POST /api/tasks/:id/api` instead of saving them as task defaults — see [Variables & Templating](/variables#handling-sensitive-values).
 - Clear runs that contain sensitive values from **Settings \> Advanced \> Clear execution history**.
@@ -195,7 +195,7 @@ Saved output provider credentials (such as Baserow tokens) are a separate store 
 
 ## Content Security Policy
 
-Figranium sets a `Content-Security-Policy` (CSP) header on every HTTP response. This header tells browsers which origins are allowed to load scripts, styles, fonts, images, and network connections — providing defense-in-depth against cross-site scripting (XSS) and code injection attacks.
+Figranium Browsers sets a `Content-Security-Policy` (CSP) header on every HTTP response. This header tells browsers which origins are allowed to load scripts, styles, fonts, images, and network connections — providing defense-in-depth against cross-site scripting (XSS) and code injection attacks.
 
 The policy is applied automatically with no configuration required. The default directives are:
 
@@ -214,7 +214,7 @@ The policy is applied automatically with no configuration required. The default 
   If you integrate a third-party service whose domain is not in the allow-list above, the browser will block those requests. Check the browser console for CSP violation reports to diagnose connectivity issues with external services.
 </Note>
 
-Figranium also sets the following security headers on every response:
+Figranium Browsers also sets the following security headers on every response:
 
 - **`X-Content-Type-Options: nosniff`** — prevents browsers from MIME-sniffing responses.
 - **`X-Frame-Options: SAMEORIGIN`** — blocks your instance from being embedded in iframes on other domains.
@@ -223,7 +223,7 @@ Figranium also sets the following security headers on every response:
 
 ## Reverse proxy and `TRUST_PROXY`
 
-If you run Figranium behind a reverse proxy (Nginx, Caddy, AWS ALB), you should set `TRUST_PROXY=true` so the server can read the real client IP from proxy headers for logging and rate limiting.
+If you run Figranium Browsers behind a reverse proxy (Nginx, Caddy, AWS ALB), you should set `TRUST_PROXY=true` so the server can read the real client IP from proxy headers for logging and rate limiting.
 
 <Note>
   On Render, `trust proxy` is enabled automatically when the platform-provided `RENDER=true` environment variable is present, so you do not need to set `TRUST_PROXY` yourself. This prevents the server from crashing with `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR` when the rate limiter receives the platform's `X-Forwarded-For` header.
@@ -244,20 +244,20 @@ In practice this means:
 
 To stay secure with `TRUST_PROXY` enabled:
 
-- Only set `TRUST_PROXY=true` when Figranium is actually behind a trusted proxy.
+- Only set `TRUST_PROXY=true` when Figranium Browsers is actually behind a trusted proxy.
 - Configure your proxy to overwrite (not append to) the `X-Forwarded-For` header so untrusted values from clients are stripped.
 - Combine with `ALLOWED_IPS` to restrict which addresses can reach the server.
 
 ## Headful / VNC access control
 
-The [headful browser](/headful-browser) is powered by an embedded VNC stack (`x11vnc` \+ noVNC \+ `websockify`). Figranium hardens this stack against unauthenticated access with three layers of protection:
+The [headful browser](/headful-browser) is powered by an embedded VNC stack (`x11vnc` \+ noVNC \+ `websockify`). Figranium Browsers hardens this stack against unauthenticated access with three layers of protection:
 
-- **VNC bound to localhost, websockify gated by auth**: `x11vnc` (port `5900`) listens on `127.0.0.1` inside the container and is not reachable from outside. `websockify` (port `NOVNC_PORT`, default `54311`) listens on `0.0.0.0` so it can be reached over a Docker port forward — required for Apple Silicon hosts and other setups that need port forwarding to work — but every WebSocket upgrade is validated against the checks below before it is proxied to `x11vnc`. Do not publish `54311` on a public interface: rely on the main Figranium port (default `11345`) and the authenticated `/websockify` endpoint instead.
+- **VNC bound to localhost, websockify gated by auth**: `x11vnc` (port `5900`) listens on `127.0.0.1` inside the container and is not reachable from outside. `websockify` (port `NOVNC_PORT`, default `54311`) listens on `0.0.0.0` so it can be reached over a Docker port forward — required for Apple Silicon hosts and other setups that need port forwarding to work — but every WebSocket upgrade is validated against the checks below before it is proxied to `x11vnc`. Do not publish `54311` on a public interface: rely on the main Figranium Browsers port (default `11345`) and the authenticated `/websockify` endpoint instead.
 - **Password-protected VNC**: `x11vnc` is launched with `-passwd`, using a random password generated on first start and persisted at `data/vnc_password.txt`. The embedded viewer fetches this password from `GET /api/headful/vnc-password` (auth required) before connecting.
 - **Authenticated WebSocket upgrades**: every upgrade request to `/websockify` must pass the [`ALLOWED_IPS`](#ip-allowlist-allowed_ips) check, an Origin/Host match (CSWSH protection), and either a valid session cookie or an API key (`x-api-key` header or `?apiKey=` query parameter). Failed attempts are dropped and logged with a `[SECURITY]` prefix.
 
 <Note>
-  No configuration is required. All three protections are always active. Connect through the Figranium UI, or proxy through `wss://<host>:11345/websockify` with a session cookie or API key. Direct connections to `<host>:54311` still require a valid session cookie or API key on the upgrade request, so an exposed `54311` without credentials will be rejected.
+  No configuration is required. All three protections are always active. Connect through the Figranium Browsers UI, or proxy through `wss://<host>:11345/websockify` with a session cookie or API key. Direct connections to `<host>:54311` still require a valid session cookie or API key on the upgrade request, so an exposed `54311` without credentials will be rejected.
 </Note>
 
 To retrieve the VNC password for a custom client:
@@ -271,7 +271,7 @@ See [Headful browser — Access control](/headful-browser#access-control) for th
 
 ## Rate Limiting
 
-Figranium includes built-in rate limiting to prevent abuse.
+Figranium Browsers includes built-in rate limiting to prevent abuse.
 
 - **Authentication**: Max 10 failed login attempts per 15 minutes (`AUTH_RATE_LIMIT_MAX`). The same limiter is applied to `POST /api/auth/setup` and `POST /api/auth/login` to slow brute-force attempts.
 - **Setup check**: `GET /api/auth/check-setup` is rate-limited with the same authentication limiter so attackers cannot rapidly probe whether your instance has been configured (a precondition for targeted setup-hijack attacks against fresh deployments).

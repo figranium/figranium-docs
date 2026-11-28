@@ -1,7 +1,7 @@
 ---
 title: "REST API Quickstart"
 sidebarTitle: "Quickstart"
-description: "Connect to a Figranium instance, authenticate a request, trigger a Task, and receive its result."
+description: "Connect to a Figranium Browsers instance, authenticate a request, trigger a Task, and receive its result."
 ---
 
 Use this guide to make your first REST API request from a script, integration, or backend service.
@@ -10,11 +10,11 @@ Use this guide to make your first REST API request from a script, integration, o
 
 You need:
 
-- The base URL of your Figranium instance, such as `http://localhost:11345`.
+- The base URL of your Figranium Browsers instance, such as `http://localhost:11345`.
 - An API key from **Settings > API Keys**.
 - A Task ID for the Task you want to run.
 
-See [Get Your Figranium API Key](/api-key) and [API Scopes](/api-scopes) before creating a key for an integration.
+See [Get Your Figranium Browsers API Key](/api-key) and [API Scopes](/api-scopes) before creating a key for an integration.
 
 ## 1. Check the server
 
@@ -35,7 +35,7 @@ curl http://localhost:11345/api/tasks/list \
   -H "x-api-key: YOUR_API_KEY"
 ```
 
-Figranium also accepts `Authorization: Bearer YOUR_API_KEY` and the `key` header. If authentication is enabled, protected endpoints require one of these formats.
+Browsers also accepts `Authorization: Bearer YOUR_API_KEY` and the `key` header. If authentication is enabled, protected endpoints require one of these formats.
 
 ## 3. Trigger a Task
 
@@ -71,7 +71,7 @@ For asynchronous integrations, include `webhookUrl` instead of waiting for the r
 }
 ```
 
-Figranium sends a `POST` request after the Task finishes. The callback includes the execution ID, Task ID, status, duration, and result:
+Browsers sends a `POST` request after the Task finishes. The callback includes the execution ID, Task ID, status, duration, and result:
 
 ```json
 {
@@ -100,4 +100,4 @@ For a large result that was trimmed from the history record, request the complet
 
 - [API Scopes](/api-scopes) for least-privilege keys and Task restrictions.
 - [REST API Reference](/rest-api) for the complete endpoint reference.
-- [MCP Integration](/mcp-integration) if an AI client should operate Figranium through MCP.
+- [MCP Integration](/mcp-integration) if an AI client should operate Browsers through MCP.

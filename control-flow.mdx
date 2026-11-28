@@ -1,10 +1,10 @@
 ---
 title: "Control Flow"
 sidebarTitle: "Control Flow"
-description: "Handle dynamic web pages, conditional logic, pagination, and multi-step processes with if/else, loops, and error handling in Figranium tasks."
+description: "Handle dynamic web pages, conditional logic, pagination, and multi-step processes with if/else, loops, and error handling in Figranium Browsers tasks."
 ---
 
-Figranium provides robust control flow mechanisms to handle dynamic web pages, conditional logic, pagination, and multi-step processes.
+Figranium Browsers provides robust control flow mechanisms to handle dynamic web pages, conditional logic, pagination, and multi-step processes.
 
 ## Conditional Execution (If / Else / End)
 
@@ -14,7 +14,7 @@ The **If** block executes a sequence of actions only when a condition is met.
 
 Every `if` block must be closed with an `end` block. An optional `else` block can be placed between them.
 
-<img src="/images/tasks/control-flow-task-1.png" alt="Figranium task preview: Conditional Execution (If / Else / End)" />
+![Figranium Browsers task preview: Conditional Execution (If / Else / End)](/images/tasks/control-flow-task-1.png)
 
 ### Condition Types
 
@@ -61,7 +61,7 @@ Every `if` block must be closed with an `end` block. An optional `else` block ca
     | Selector | `exists`, `not_exists` |
   </Tab>
   <Tab title="Selector Condition">
-    Set `conditionVarType` to `selector` to branch on whether an element is currently present in the DOM. Figranium runs `document.querySelector(selector)` against the live page each time the condition is evaluated.
+    Set `conditionVarType` to `selector` to branch on whether an element is currently present in the DOM. Browsers runs `document.querySelector(selector)` against the live page each time the condition is evaluated.
 
     | Field | Description |
     | :-- | :-- |
@@ -73,11 +73,11 @@ Every `if` block must be closed with an `end` block. An optional `else` block ca
 
     **Example: Skip a modal only when it's showing**
 
-    <img src="/images/tasks/control-flow-task-2.png" alt="Figranium task preview: Conditional Execution (If / Else / End)" />
+    ![Figranium Browsers task preview: Conditional Execution (If / Else / End)](/images/tasks/control-flow-task-2.png)
 
     **Example: Paginate while a "next" button remains**
 
-    <img src="/images/tasks/control-flow-task-3.png" alt="Figranium task preview: Conditional Execution (If / Else / End)" />
+    ![Figranium Browsers task preview: Conditional Execution (If / Else / End)](/images/tasks/control-flow-task-3.png)
   </Tab>
 </Tabs>
 
@@ -85,13 +85,13 @@ Every `if` block must be closed with an `end` block. An optional `else` block ca
 
 Check whether the user is already logged in, and skip the login form if so:
 
-<img src="/images/tasks/control-flow-task-4.png" alt="Figranium task preview: Conditional Execution (If / Else / End)" />
+![Figranium Browsers task preview: Conditional Execution (If / Else / End)](/images/tasks/control-flow-task-4.png)
 
 ### Nested Conditions
 
 You can nest `if` blocks inside each other. Each nested block requires its own `end`:
 
-<img src="/images/tasks/control-flow-task-5.png" alt="Figranium task preview: Conditional Execution (If / Else / End)" />
+![Figranium Browsers task preview: Conditional Execution (If / Else / End)](/images/tasks/control-flow-task-5.png)
 
 ---
 
@@ -101,7 +101,7 @@ You can nest `if` blocks inside each other. Each nested block requires its own `
   <Accordion title="While Loop" icon="rotate">
     Executes a block of actions repeatedly as long as the condition remains `true`.
 
-    <img src="/images/tasks/control-flow-task-6.png" alt="Figranium task preview: Loop Types" />
+    ![Figranium Browsers task preview: Loop Types](/images/tasks/control-flow-task-6.png)
 
     **Common use cases:**
 
@@ -111,19 +111,19 @@ You can nest `if` blocks inside each other. Each nested block requires its own `
 
     **Example: Scraping paginated results**
 
-    <img src="/images/tasks/control-flow-task-7.png" alt="Figranium task preview: Loop Types" />
+    ![Figranium Browsers task preview: Loop Types](/images/tasks/control-flow-task-7.png)
 
     <Warning>
       Prevent infinite loops by tracking a counter variable:
 
-      <img src="/images/tasks/control-flow-task-8.png" alt="Figranium task preview: Loop Types" />
+      ![Figranium Browsers task preview: Loop Types](/images/tasks/control-flow-task-8.png)
     </Warning>
   </Accordion>
 
   <Accordion title="Foreach Loop" icon="list">
     Iterates over all elements matching a CSS selector, executing the block once per element.
 
-    <img src="/images/tasks/control-flow-task-9.png" alt="Figranium task preview: Loop Types" />
+    ![Figranium Browsers task preview: Loop Types](/images/tasks/control-flow-task-9.png)
 
     **Loop variables available inside the block:**
 
@@ -136,23 +136,23 @@ You can nest `if` blocks inside each other. Each nested block requires its own `
 
     **Example: Clicking each item in a list**
 
-    <img src="/images/tasks/control-flow-task-10.png" alt="Figranium task preview: Loop Types" />
+    ![Figranium Browsers task preview: Loop Types](/images/tasks/control-flow-task-10.png)
 
     **Example: Extracting data from a table**
 
-    <img src="/images/tasks/control-flow-task-11.png" alt="Figranium task preview: Loop Types" />
+    ![Figranium Browsers task preview: Loop Types](/images/tasks/control-flow-task-11.png)
   </Accordion>
 
   <Accordion title="Repeat N Times" icon="repeat">
     Executes a block a fixed number of times regardless of any condition.
 
-    <img src="/images/tasks/control-flow-task-12.png" alt="Figranium task preview: Loop Types" />
+    ![Figranium Browsers task preview: Loop Types](/images/tasks/control-flow-task-12.png)
 
     The `loop.index` variable is available inside `repeat` blocks (zero-based).
 
     **Example: Submit a form 3 times**
 
-    <img src="/images/tasks/control-flow-task-13.png" alt="Figranium task preview: Loop Types" />
+    ![Figranium Browsers task preview: Loop Types](/images/tasks/control-flow-task-13.png)
   </Accordion>
 </AccordionGroup>
 
@@ -162,15 +162,15 @@ You can nest `if` blocks inside each other. Each nested block requires its own `
 
 The **On Error** block acts like a `try/catch`. If any action in the main flow throws an error (timeout, element not found, network failure), execution jumps to the error handler block.
 
-<img src="/images/tasks/control-flow-task-14.png" alt="Figranium task preview: Error Handling (On Error)" />
+![Figranium Browsers task preview: Error Handling (On Error)](/images/tasks/control-flow-task-14.png)
 
 **Example: Handle a CAPTCHA popup**
 
-<img src="/images/tasks/control-flow-task-15.png" alt="Figranium task preview: Error Handling (On Error)" />
+![Figranium Browsers task preview: Error Handling (On Error)](/images/tasks/control-flow-task-15.png)
 
 **Example: Dismiss a cookie banner that may or may not appear**
 
-<img src="/images/tasks/control-flow-task-16.png" alt="Figranium task preview: Error Handling (On Error)" />
+![Figranium Browsers task preview: Error Handling (On Error)](/images/tasks/control-flow-task-16.png)
 
 Placing an empty `on_error`/`end` block before an optional action effectively makes that action non-fatal.
 
@@ -182,7 +182,7 @@ See [Error Handling](/error-handling) for a deeper guide on retry patterns and r
 
 Immediately terminates the current task execution with a given status.
 
-<img src="/images/tasks/control-flow-task-17.png" alt="Figranium task preview: Stop Task" />
+![Figranium Browsers task preview: Stop Task](/images/tasks/control-flow-task-17.png)
 
 Use `stop` inside conditionals to short-circuit execution when a goal is already met or when an unrecoverable state is detected.
 

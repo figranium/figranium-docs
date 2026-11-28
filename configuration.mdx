@@ -1,10 +1,10 @@
 ---
-title: "Figranium Environment Variables and Configuration"
+title: "Figranium Browsers Environment Variables and Configuration"
 sidebarTitle: "Configuration"
-description: "Complete reference for Figranium environment variables. Configure ports, sessions, rate limits, databases, CAPTCHA solving, and Folate selector resolution."
+description: "Complete reference for Figranium Browsers environment variables. Configure ports, sessions, rate limits, databases, CAPTCHA solving, and Folate selector resolution."
 ---
 
-Figranium uses environment variables to configure key aspects of the server and automation environment. These variables are defined in `src/server/constants.js`.
+Figranium Browsers uses environment variables to configure key aspects of the server and automation environment. These variables are defined in `src/server/constants.js`.
 
 <CardGroup cols={2}>
   <Card title="Core Variables" icon="settings" href="#core-variables">
@@ -58,12 +58,12 @@ Figranium uses environment variables to configure key aspects of the server and 
 | `EXECUTION_QUEUE_TIMEOUT_MS` | `600000` (10 min) | Maximum time an execution can wait in the queue before it is rejected. |
 | `EXECUTION_TIMEOUT_MS` | `900000` (15 min) | Maximum runtime for a non-headful execution. Runs that exceed it are stopped and return `504 EXECUTION_TIMEOUT`. |
 | `RESOURCE_MEMORY_RESERVE_MB` | max(512 MB, 15% of memory) | Minimum memory headroom kept free for the host. |
-| `RESOURCE_CPU_THRESHOLD` | `0.9` | Normalized CPU load (load average divided by CPU count) at which Figranium pauses dequeuing. |
+| `RESOURCE_CPU_THRESHOLD` | `0.9` | Normalized CPU load (load average divided by CPU count) at which Figranium Browsers pauses dequeuing. |
 | `RESOURCE_PROBE_INTERVAL_MS` | `30000` | How often runtime resource protection samples memory and CPU. |
 
 ### Host-aware resource protection
 
-Figranium protects the host from running too many Chromium processes at once. It reads available memory (including Docker cgroup limits) and CPU count, then picks a conservative concurrency limit automatically:
+Figranium Browsers protects the host from running too many Chromium processes at once. It reads available memory (including Docker cgroup limits) and CPU count, then picks a conservative concurrency limit automatically:
 
 | **Available memory** | **Automatic concurrency** |
 | :-- | :-- |
@@ -95,19 +95,19 @@ Set `MAX_CONCURRENT_EXECUTIONS` to a positive integer to replace the automatic l
 | `SESSION_COOKIE_SECURE` | `false` | Set to `true` if serving over HTTPS. |
 | `FIGRANIUM_TELEMETRY_ENABLED` | `true` | Controls anonymous usage telemetry. Set to `false` to disable telemetry entirely. |
 | `PASSWORD_CACHE_ENABLED` | `true` | Controls server-side caching of 1Password Login-item metadata and password lookups. Set to `false` to bypass the cache. |
-| `PASSWORD_CACHE_KEY` | Local key file | Optional secret used to derive the encryption key for the 1Password cache. If unset, Figranium creates or reuses `data/password_cache.key`. |
+| `PASSWORD_CACHE_KEY` | Local key file | Optional secret used to derive the encryption key for the 1Password cache. If unset, Figranium Browsers creates or reuses `data/password_cache.key`. |
 | `MASTER_KEY` | — | Optional external master key that enables authenticated encryption for new file-backed secrets. Without it, new file-backed secret writes use plaintext JSON. |
 | `MASTER_KEY_FILE` | `data/master.key` | Optional path for the local master-key file used when configured. Use a persistent, separately protected path for stronger key separation. |
 
-By default, Figranium caches 1Password Login-item metadata and password lookups on the server to reduce repeated requests. The persistent cache is encrypted with AES-256-GCM. If `PASSWORD_CACHE_KEY` is unset, Figranium creates or reuses a random key in `data/password_cache.key`; the cache file and key are stored together in `data/` by default. For more control, set `PASSWORD_CACHE_KEY` to a secret managed separately from that directory.
+By default, Figranium Browsers caches 1Password Login-item metadata and password lookups on the server to reduce repeated requests. The persistent cache is encrypted with AES-256-GCM. If `PASSWORD_CACHE_KEY` is unset, Figranium Browsers creates or reuses a random key in `data/password_cache.key`; the cache file and key are stored together in `data/` by default. For more control, set `PASSWORD_CACHE_KEY` to a secret managed separately from that directory.
 
-Secret encryption is opt-in for new file-backed credentials. Configure `MASTER_KEY` to enable authenticated envelope encryption, and use `MASTER_KEY_FILE` when you need to control the local key-file path. Without an explicitly configured master key, new file-backed secret writes use plaintext JSON. Existing encrypted files remain accessible with their original key and migrate to plaintext only after successful decryption when encryption is disabled. Figranium refuses to overwrite encrypted data when its original key is unavailable.
+Secret encryption is opt-in for new file-backed credentials. Configure `MASTER_KEY` to enable authenticated envelope encryption, and use `MASTER_KEY_FILE` when you need to control the local key-file path. Without an explicitly configured master key, new file-backed secret writes use plaintext JSON. Existing encrypted files remain accessible with their original key and migrate to plaintext only after successful decryption when encryption is disabled. Figranium Browsers refuses to overwrite encrypted data when its original key is unavailable.
 
 Set `PASSWORD_CACHE_ENABLED=false` in your environment or Docker Compose `environment` section to bypass the cache and retrieve values directly from 1Password. Password management can continue if the optional encrypted local cache cannot be written. See [Passwords](/passwords#local-storage-and-encryption) for file protection and cache expiry details.
 
 ## Browser Engine
 
-Figranium uses Playwright Chromium with `playwright-extra` and `puppeteer-extra-plugin-stealth`. The optional CloakBrowser engine was removed in v0.23.0. The `USE_CLOAK_ENGINE` and `CLOAKBROWSER_LICENSE_KEY` environment variables are no longer supported. See [Stealth & Anti-Detection](/stealth-mode#browser-engine).
+Figranium Browsers uses Playwright Chromium with `playwright-extra` and `puppeteer-extra-plugin-stealth`. The optional CloakBrowser engine was removed in v0.23.0. The `USE_CLOAK_ENGINE` and `CLOAKBROWSER_LICENSE_KEY` environment variables are no longer supported. See [Stealth & Anti-Detection](/stealth-mode#browser-engine).
 
 ## CAPTCHA Solving
 
@@ -144,7 +144,7 @@ Figranium uses Playwright Chromium with `playwright-extra` and `puppeteer-extra-
 | `DB_POSTGRESDB_DATABASE` | — | Database name. |
 | `DB_POSTGRESDB_SSL` | `false` | Set to `true` to enable SSL/TLS database connections. |
 
-Figranium also accepts the shorter `DB_PROTOCOL`, `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_DATABASE`, and `DB_SSL` names, plus their lowercase forms (for example, `db_host`). PostgreSQL connection details can only be set with environment variables, not from the Settings page. See [Alternative variable names](/database-support#alternative-variable-names).
+Figranium Browsers also accepts the shorter `DB_PROTOCOL`, `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_DATABASE`, and `DB_SSL` names, plus their lowercase forms (for example, `db_host`). PostgreSQL connection details can only be set with environment variables, not from the Settings page. See [Alternative variable names](/database-support#alternative-variable-names).
 
 <Tip>
   For production deployments, [Neon](https://neon.tech) is the recommended backend database provider due to its serverless autoscaling and zero-maintenance PostgreSQL infrastructure. See [PostgreSQL Support](/database-support) for full details.
@@ -187,6 +187,6 @@ CAPTCHA_SOLVER_KEY=your-client-key
 
 ## Notes
 
-- **Allow Private Networks**: By default, `ALLOW_PRIVATE_NETWORKS` is `false`, meaning Figranium blocks requests to private and internal network addresses. If you need to scrape services on your local network (e.g., during development), set this to `true`.
-- **Session Secret**: If `SESSION_SECRET` is not provided, Figranium will generate a random one on startup (or read from `data/session_secret.txt` if available). However, for consistent sessions across restarts, set a static secret.
-- **Allowed IPs**: If you expose Figranium to the internet, **always restrict access** using `ALLOWED_IPS` or authentication.
+- **Allow Private Networks**: By default, `ALLOW_PRIVATE_NETWORKS` is `false`, meaning Figranium Browsers blocks requests to private and internal network addresses. If you need to scrape services on your local network (e.g., during development), set this to `true`.
+- **Session Secret**: If `SESSION_SECRET` is not provided, Figranium Browsers will generate a random one on startup (or read from `data/session_secret.txt` if available). However, for consistent sessions across restarts, set a static secret.
+- **Allowed IPs**: If you expose Figranium Browsers to the internet, **always restrict access** using `ALLOWED_IPS` or authentication.

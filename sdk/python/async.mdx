@@ -1,7 +1,7 @@
 ---
-title: "Use the Async Figranium Client"
+title: "Use the Async Figranium Browsers Client"
 sidebarTitle: "Async Client"
-description: "Use AsyncFigranium to call Figranium from async Python. Same constructor, same resources, same methods, but every call is awaited."
+description: "Use AsyncFigranium to call Figranium Browsers from async Python. Same constructor, same resources, same methods, but every call is awaited."
 ---
 
 `AsyncFigranium` mirrors `Figranium` exactly: the same constructor keyword arguments, the same resource attributes, and the same method names. The only difference is that every network call returns an awaitable coroutine, and stream methods return `AsyncIterator` instead of `Iterator`.

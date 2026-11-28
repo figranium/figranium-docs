@@ -1,10 +1,10 @@
 ---
 title: "Manage Task Versions with the REST API"
 sidebarTitle: "Task Versions"
-description: "Safely update, snapshot, inspect, and roll back Figranium Tasks through the REST API."
+description: "Safely update, snapshot, inspect, and roll back Figranium Browsers Tasks through the REST API."
 ---
 
-Use Task versioning when an integration changes a Task definition and you need a recovery path. Figranium can save snapshots before updates, list saved history, and roll a Task back to a previous version.
+Use Task versioning when an integration changes a Task definition and you need a recovery path. Browsers can save snapshots before updates, list saved history, and roll a Task back to a previous version.
 
 ## Create a snapshot before an update
 
@@ -23,7 +23,7 @@ curl -X POST "http://localhost:11345/api/tasks?version=true" \
   }'
 ```
 
-If the Task already exists, Figranium snapshots its current version before overwriting it.
+If the Task already exists, Figranium Browsers snapshots its current version before overwriting it.
 
 ## Apply a partial update
 

@@ -1,7 +1,7 @@
 ---
-title: "Configure the Figranium Swift SDK Client"
+title: "Configure the Figranium Browsers Swift SDK Client"
 sidebarTitle: "Client"
-description: "Configure the Figranium Swift SDK: baseURL, authentication, timeouts, custom URLSession, default headers, and per-request options."
+description: "Configure the Figranium Browsers Swift SDK: baseURL, authentication, timeouts, custom URLSession, default headers, and per-request options."
 ---
 
 The `Figranium` class is a `final` class with two initializers: a designated initializer that accepts a `URL` and an authentication enum, and a convenience initializer that accepts a `String` base URL and an optional API key. Every option is optional, and the SDK falls back to sensible defaults so a local install works with `Figranium()`.
@@ -21,7 +21,7 @@ public init(
 ```
 
 <ParamField path="baseURL" type="URL">
-  Absolute URL of your Figranium server. Must use `http` or `https` (enforced with a `precondition`). Defaults to `http://localhost:11345`.
+  Absolute URL of your Figranium Browsers server. Must use `http` or `https` (enforced with a `precondition`). Defaults to `http://localhost:11345`.
 </ParamField>
 
 <ParamField path="authentication" type="FigraniumAuthentication">
@@ -52,7 +52,7 @@ public convenience init(
 ```
 
 <ParamField path="baseURL" type="String">
-  Absolute URL of your Figranium server as a string. Must be a valid URL (enforced with a `precondition`). Defaults to `"http://localhost:11345"`.
+  Absolute URL of your Figranium Browsers server as a string. Must be a valid URL (enforced with a `precondition`). Defaults to `"http://localhost:11345"`.
 </ParamField>
 
 <ParamField path="apiKey" type="String?">

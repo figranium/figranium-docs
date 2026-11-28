@@ -1,10 +1,10 @@
 ---
-title: "Figranium JavaScript SDK Quickstart"
+title: "Figranium Browsers JavaScript SDK Quickstart"
 sidebarTitle: "Quickstart"
-description: "Build, save, and run a typed Figranium task with the SDK in a few minutes. Includes runtime variables and a full working TypeScript example."
+description: "Build, save, and run a typed Figranium Browsers task with the SDK in a few minutes. Includes runtime variables and a full working TypeScript example."
 ---
 
-This quickstart takes you from an empty project to running a saved Figranium task through the SDK. You will construct a typed `Task`, save it to the server, and execute it with runtime variables.
+This quickstart takes you from an empty project to running a saved Figranium Browsers task through the SDK. You will construct a typed `Task`, save it to the server, and execute it with runtime variables.
 
 <Steps>
   <Step title="Install the SDK">
@@ -15,7 +15,7 @@ This quickstart takes you from an empty project to running a saved Figranium tas
     ```
   </Step>
   <Step title="Create the client">
-    Point the client at your Figranium server and pass your API key. `baseUrl` defaults to `http://localhost:11345`.
+    Point the client at your Figranium Browsers server and pass your API key. `baseUrl` defaults to `http://localhost:11345`.
 
     ```ts
     import { Figranium } from "@figranium/sdk";
@@ -52,7 +52,7 @@ This quickstart takes you from an empty project to running a saved Figranium tas
     const saved = await figranium.tasks.save(task);
     ```
 
-    `variable("query")` produces Figranium's `{$query}` template token. Every action helper generates a stable, unique action ID.
+    `variable("query")` produces the Figranium Browsers `{$query}` template token. Every action helper generates a stable, unique action ID.
   </Step>
   <Step title="Run the task">
     Execute the saved task with runtime variables. `runTask` is a convenience wrapper around `tasks.run`.

@@ -1,10 +1,10 @@
 ---
-title: "Figranium UI Tour: Dashboard, Templates, Vault, Editor, Executions, Cabinets, Settings"
+title: "Figranium Browsers UI Tour: Dashboard, Templates, Vault, Editor, Executions, Cabinets, Settings"
 sidebarTitle: "UI Tour"
-description: "Explore Figranium's main sections: Dashboard, Templates, Vault, Editor, Executions, Cabinets, and Settings. Learn how to navigate, build tasks, manage cookies and logins, and configure your instance."
+description: "Explore Figranium Browsers' main sections: Dashboard, Templates, Vault, Editor, Executions, Cabinets, and Settings. Learn how to navigate, build tasks, manage cookies and logins, and configure your instance."
 ---
 
-Figranium's user interface is organized around Dashboard, Templates, Vault, Editor, Executions, Cabinets, and Settings. Vault groups reusable cookie states and 1Password Login information in one place.
+Figranium Browsers' user interface is organized around Dashboard, Templates, Vault, Editor, Executions, Cabinets, and Settings. Vault groups reusable cookie states and 1Password Login information in one place.
 
 <CardGroup cols={2}>
   <Card title="Dashboard" icon="home" href="#dashboard">
@@ -34,7 +34,10 @@ Figranium's user interface is organized around Dashboard, Templates, Vault, Edit
 
 ## Dashboard
 
-<img src="/images/tasks/ui-dashboard.png" alt="Figranium Dashboard with a clean set of example automation tasks" />
+<img
+  src="/images/tasks/ui-dashboard.png"
+  alt="Figranium Browsers Dashboard with a clean set of example automation tasks"
+/>
 
 - **Overview**: View all your saved automation tasks in a grid layout.
 - **Actions**:
@@ -50,9 +53,12 @@ Figranium's user interface is organized around Dashboard, Templates, Vault, Edit
 
 ## Templates
 
-<img src="/images/tasks/ui-templates.png" alt="Figranium Templates page displaying community templates" />
+<img
+  src="/images/tasks/ui-templates.png"
+  alt="Figranium Browsers Templates page displaying community templates"
+/>
 
-The **Templates** screen (`/templates`) lists ready-to-use community automations from the official Figranium Templates Hub.
+The **Templates** screen (`/templates`) lists ready-to-use community automations from the official Figranium Browsers Templates Hub.
 
 - **Find templates**: Search by template, site, or use case, filter by category, and sort by **Most popular**, **Newest**, or **Name**. Click **Load more templates** to see more results.
 - **Preview**: Click a card to open a preview with the template's README and expected output. Each card shows its creator and whether the creator is verified.
@@ -64,22 +70,25 @@ See [Templates](/community-presets) for details.
 
 <img
   src="/images/tasks/ui-vault.png"
-  alt="Figranium Vault showing reusable cookie states and 1Password Login items"
+  alt="Figranium Browsers Vault showing reusable cookie states and 1Password Login items"
 />
 
 The **Vault** screen brings browser session states and passwords together in two tabs.
 
 - **Cookies / States**: Create an empty cookie state or import a Playwright storage-state JSON file. Rename or delete saved states, and select one for a task using the editor's **States** control. Executions load the selected state and persist updated cookies back to it; choose **No State** to start with an isolated browser context.
-- **Passwords**: Connect a 1Password service account through **Settings > Connections** to view Login items accessible to Figranium. The list shows website domains, usernames, item names, and their vault without revealing password values.
+- **Passwords**: Connect a 1Password service account through **Settings > Connections** to view Login items accessible to Figranium Browsers. The list shows website domains, usernames, item names, and their vault without revealing password values.
 - **Using logins**: Reference the matching website's username or password in task variables, or choose to save a Login item after submitting a login form in a headful browser session.
 
 See [Session State](/session-state), [Passwords](/passwords), and [Variables](/variables) for details.
 
 ## Editor
 
-<img src="/images/tasks/editor-ui.png" alt="Figranium editor showing a realistic automation workflow" />
+<img
+  src="/images/tasks/editor-ui.png"
+  alt="Figranium Browsers editor showing a realistic automation workflow"
+/>
 
-The core of Figranium. This screen features an infinite canvas spatial editor for building your automation flows:
+The core of Figranium Browsers. This screen features an infinite canvas spatial editor for building your automation flows:
 
 - **Infinite Canvas (Configuration)**:
   - **Task Name**: Rename your task.
@@ -100,7 +109,7 @@ The core of Figranium. This screen features an infinite canvas spatial editor fo
   - **Action Palette**: A floating overlay to quickly find and add new action blocks anywhere on the canvas. The palette opens with the search field focused so you can start typing immediately. As you type, blocks are filtered in real time.
     - **Search**: Type to filter available actions (e.g., "click", "if", "while"). A clear button appears inside the search field when text is entered, letting you reset the filter with one click.
     - **Keyboard navigation**: Use the arrow keys to move between actions in the grid — `Up`/`Down` move between rows and `Left`/`Right` move within a row. Press `Enter` to insert the highlighted action. Press `Escape` to clear the current search query; if the search field is already empty, pressing `Escape` closes the palette. The active item is visually highlighted so you always know which action is selected. All interactive elements have visible focus indicators for keyboard and screen-reader users.
-    - **Auto-open configuration modal**: After you insert a configurable action from the palette, Figranium automatically opens that block's settings modal so you can fill in its selector, value, or other parameters straight away — no extra double-click required. Structural blocks that take no configuration (Else, End, On Error, and Do Nothing) skip this step and are added silently.
+    - **Auto-open configuration modal**: After you insert a configurable action from the palette, Figranium Browsers automatically opens that block's settings modal so you can fill in its selector, value, or other parameters straight away — no extra double-click required. Structural blocks that take no configuration (Else, End, On Error, and Do Nothing) skip this step and are added silently.
     - **Shortcut hints**: Buttons throughout the editor display their keyboard shortcut in a tooltip when you hover or focus them (e.g., "Add action (Ctrl \+ K)" or "Run Task (Ctrl \+ Enter)").
   - **Variables**: Define dynamic parameters (e.g., `{$query}`) for reuse. The editor header includes a Variables shortcut that opens the Variables tab in Task Settings directly.
   - **On Execution**: New tasks include the On Execution configuration panel by default. Its task-level wait defaults to `0` seconds unless you explicitly set another value.
@@ -112,7 +121,7 @@ The core of Figranium. This screen features an infinite canvas spatial editor fo
   - View next/last run status and duration.
 - **Keyboard shortcuts**:
   - Press `Cmd/Ctrl + Enter` to run the current task immediately. The results drawer opens automatically so you can watch live output.
-  - Press `Escape` to dismiss the topmost overlay. Figranium evaluates overlays in the following priority order and closes the first one that is open:
+  - Press `Escape` to dismiss the topmost overlay. Figranium Browsers evaluates overlays in the following priority order and closes the first one that is open:
     1. Version preview
     2. Action Palette
     3. Cabinet (side panel)
@@ -136,7 +145,7 @@ The core of Figranium. This screen features an infinite canvas spatial editor fo
 
 <img
   src="/images/tasks/ui-executions.png"
-  alt="Figranium Executions page with representative successful and failed runs"
+  alt="Figranium Browsers Executions page with representative successful and failed runs"
 />
 
 A chronological log of task executions triggered from the editor, the API, or a schedule. Interactive Headful browser sessions are intentionally excluded from this list.
@@ -153,7 +162,10 @@ A chronological log of task executions triggered from the editor, the API, or a 
 
 ## Cabinets
 
-<img src="/images/tasks/ui-cabinets.png" alt="Figranium Cabinets page with organized example output files" />
+<img
+  src="/images/tasks/ui-cabinets.png"
+  alt="Figranium Browsers Cabinets page with organized example output files"
+/>
 
 Cabinets are durable, installation-wide download queues used by browser downloads and Upload actions.
 
@@ -167,23 +179,26 @@ See [Downloads and Cabinets](/file-downloads) for the full workflow.
 
 ## Settings
 
-<img src="/images/tasks/ui-settings.png" alt="Figranium Settings page" />
+<img
+  src="/images/tasks/ui-settings.png"
+  alt="Figranium Browsers Settings page"
+/>
 
-Global configuration for the Figranium instance. Settings includes **API Keys**, **Connections**, **User Agent**, **Proxies**, **Appearance**, **About**, and **Advanced**. Connections is where you configure integrations such as 1Password.
+Global configuration for the Figranium Browsers instance. Settings includes **API Keys**, **Connections**, **User Agent**, **Proxies**, **Appearance**, **About**, and **Advanced**. Connections is where you configure integrations such as 1Password.
 
 - **API Keys**: A unified panel for managing keys and provider connections:
   - **Tasks API Key**: Your key for remote execution via the REST API. Copy or regenerate it here.
   - **Database / Output Providers**: Add credentials for output destinations like Baserow.
   - Click **Add API Key** to open the provider selection modal and configure a new entry.
-- **User Agent**: Set a global User-Agent string or let Figranium rotate them.
+- **User Agent**: Set a global User-Agent string or let Figranium Browsers rotate them.
 - **Proxies**:
   - **Add Proxy**: Input HTTP/SOCKS proxies. The button disables until a server address is provided and shows a loading spinner during submission.
   - **Import**: Bulk add proxies from a list.
   - **Rotation**: Configure rotation strategy (Round-Robin vs Random) and whether to include your local IP.
   - **Keyboard navigation**: All proxy panel buttons support keyboard navigation with visible focus indicators. Hover over any button to see a tooltip describing its action.
 - **Appearance**:
-  - **Theme**: Pick the color scheme for the Figranium UI. Choose **Auto** (default) to follow your device's light or dark setting, or pick one of four manual themes: **Dark**, **Light**, **Solarized Light**, and **Solarized Dark**. Auto updates automatically when your device preference changes and is the default for both new and existing installations. Each manual option shows a preview image with a swatch of its surface and accent colors so you can see what you're switching to before you commit. The selected theme is applied instantly and persisted three ways: to the backend data store (via `POST /api/settings/theme`), to a `figranium_theme` cookie with a 1-year TTL, and to browser local storage under `figranium.theme`. Server-side persistence means the same theme follows you across browsers and devices on the same Figranium instance. On page load, Figranium reads the cookie first for an instant paint, then reconciles with the server value from `GET /api/settings/theme`.
-- **About**: Shows the installed Figranium version.
+  - **Theme**: Pick the color scheme for the Figranium Browsers UI. Choose **Auto** (default) to follow your device's light or dark setting, or pick one of four manual themes: **Dark**, **Light**, **Solarized Light**, and **Solarized Dark**. Auto updates automatically when your device preference changes and is the default for both new and existing installations. Each manual option shows a preview image with a swatch of its surface and accent colors so you can see what you're switching to before you commit. The selected theme is applied instantly and persisted three ways: to the backend data store (via `POST /api/settings/theme`), to a `figranium_theme` cookie with a 1-year TTL, and to browser local storage under `figranium.theme`. Server-side persistence means the same theme follows you across browsers and devices on the same Figranium Browsers instance. On page load, Figranium Browsers reads the cookie first for an instant paint, then reconciles with the server value from `GET /api/settings/theme`.
+- **About**: Shows the installed Figranium Browsers version.
 - **Advanced** (`/settings/advanced`):
 
   - **Account**: Change your sign-in email or password. Enter your current password, then click **Save account**. New passwords must be 8 to 128 characters.
@@ -194,7 +209,7 @@ Global configuration for the Figranium instance. Settings includes **API Keys**,
 
 ## Global keyboard shortcuts
 
-Figranium provides global keyboard shortcuts that let you navigate between screens and trigger common actions from anywhere in the app. These shortcuts work on every screen as long as the focus is not inside a text input, textarea, or content-editable element.
+Figranium Browsers provides global keyboard shortcuts that let you navigate between screens and trigger common actions from anywhere in the app. These shortcuts work on every screen as long as the focus is not inside a text input, textarea, or content-editable element.
 
 | Shortcut | Action |
 | --- | --- |
@@ -214,7 +229,7 @@ Each sidebar button displays its shortcut in a tooltip when you hover or focus i
 
 ## Notifications
 
-Figranium displays toast-style notifications in the center of the screen to confirm actions or report errors. Each notification includes:
+Figranium Browsers displays toast-style notifications in the center of the screen to confirm actions or report errors. Each notification includes:
 
 - **Status icon**: A checkmark icon for success or an error icon for failures, so the status is clear without relying on color alone.
 - **Status label**: An explicit "Success" or "Error" heading above the message text.

@@ -1,10 +1,10 @@
 ---
 title: "Captures, Recordings, and Storage Management"
 sidebarTitle: "Captures"
-description: "Learn how Figranium captures screenshots, videos, and downloads during automation runs. Manage storage, cookies, and cleanup."
+description: "Learn how Figranium Browsers captures screenshots, videos, and downloads during automation runs. Manage storage, cookies, and cleanup."
 ---
 
-Figranium automatically captures visual evidence and intercepted files from your automation runs. This is crucial for debugging, auditing, and ensuring quality.
+Figranium Browsers automatically captures visual evidence and intercepted files from your automation runs. This is crucial for debugging, auditing, and ensuring quality.
 
 <CardGroup cols={2}>
   <Card title="Screenshots" icon="camera" href="#screenshots">
@@ -45,7 +45,7 @@ You can trigger additional screenshots during an `agent` task using the `screens
 
 ## Video Recordings
 
-Figranium can record full session videos (WebM format) for **Agent** tasks.
+Browsers can record full session videos (WebM format) for **Agent** tasks.
 
 - **Enable**: Set `disableRecording` to `false` in the task editor.
 - **Location**: `public/captures/<run_id>.webm`
@@ -57,11 +57,11 @@ Figranium can record full session videos (WebM format) for **Agent** tasks.
 
 ## File Downloads
 
-Figranium automatically intercepts files downloaded during an automation run. For more details on how to manage and access these files, see the [File Downloads](/file-downloads) documentation.
+Browsers automatically intercepts files downloaded during an automation run. For more details on how to manage and access these files, see the [File Downloads](/file-downloads) documentation.
 
 ## Cookie Persistence
 
-Figranium stores cookies and browser session state in persistent profile directories on disk — one per execution mode:
+Browsers stores cookies and browser session state in persistent profile directories on disk — one per execution mode:
 
 - `data/browser-profile` — agent mode
 - `data/browser-profile-scrape` — scrape mode
@@ -74,7 +74,7 @@ Each mode has its own isolated profile. Cookies from a headful login are bridged
 
 ### Upgrading from v0.9.6 or Earlier
 
-If you are upgrading from a version that used `storage_state.json`, Figranium will automatically migrate your existing cookies into all three profile directories on first startup. The `storage_state.json` file is then deleted. No manual action is required.
+If you are upgrading from a version that used `storage_state.json`, Browsers will automatically migrate your existing cookies into all three profile directories on first startup. The `storage_state.json` file is then deleted. No manual action is required.
 
 ### Stateless Execution
 
@@ -84,7 +84,7 @@ If you enable `statelessExecution` in a task, it will launch a fully ephemeral i
 
 ### Automatic Retention
 
-Figranium deletes old captures and execution history automatically. The default retention period is **7 days**.
+Browsers deletes old captures and execution history automatically. The default retention period is **7 days**.
 
 To change it, open **Settings > Advanced**, pick a period under **Data retention** (1, 3, 7, 14, 30, 90, or 365 days, or **Never**), and click **Save retention**.
 
@@ -101,7 +101,7 @@ You can also read and set retention through [`GET` and `POST /api/settings/syste
 
 ### Exporting data
 
-Export a backup of your workspace data, or move it to another Figranium instance, as a ZIP file.
+Export a backup of your workspace data, or move it to another Browsers instance, as a ZIP file.
 
 1. Open **Settings > Advanced** and find **Export data**.
 2. Select the categories to include. All five are selected by default.
@@ -112,7 +112,7 @@ Export a backup of your workspace data, or move it to another Figranium instance
 | **Tasks** | `tasks.json` with every saved task |
 | **Executions** | `executions.json` with stored execution history |
 | **Captures** | A `captures/` folder with screenshots and recordings |
-| **API Keys** | `api-keys.json` with your Figranium API key |
+| **API Keys** | `api-keys.json` with your Figranium Browsers API key |
 | **Cookies** | `cookies.json` with saved browser cookies |
 
 Every archive also includes `manifest.json`, which records the export time and the selected categories:
@@ -134,7 +134,7 @@ You can also export through [`POST /api/settings/export`](/rest-api#system-setti
 
 ### Importing data
 
-Restore selected categories from a Figranium export ZIP in **Settings > Advanced > Import data**. Choose the archive, select the categories to restore, and click **Import selected**. Imported categories replace their matching workspace data. Categories you leave unselected are not changed.
+Restore selected categories from a Browsers export ZIP in **Settings > Advanced > Import data**. Choose the archive, select the categories to restore, and click **Import selected**. Imported categories replace their matching workspace data. Categories you leave unselected are not changed.
 
 Use the import flow when moving selected Tasks, Executions, Captures, API Keys, or Cookies between instances. Treat archives as sensitive because API keys and cookies are readable inside the ZIP.
 
@@ -143,7 +143,7 @@ Use the import flow when moving selected Tasks, Executions, Captures, API Keys, 
 Screenshots, videos, and downloaded files accumulate in `public/captures`. Video recordings are stored separately in `data/recordings`. You can delete or download them:
 
 <Note>
-  Agent runs write captures to `src/public/captures`, while scrape runs write to `public/captures`. Figranium serves and reads from both paths, so captures always surface in a run's execution detail regardless of which mode produced them. If you run Figranium in Docker, mount the same host directory to both `/app/public/captures` and `/app/src/public/captures` so no captures are lost. See [Installation with Docker Compose](/docker-compose) for the recommended volume configuration.
+  Agent runs write captures to `src/public/captures`, while scrape runs write to `public/captures`. Browsers serves and reads from both paths, so captures always surface in a run's execution detail regardless of which mode produced them. If you run Figranium in Docker, mount the same host directory to both `/app/public/captures` and `/app/src/public/captures` so no captures are lost. See [Installation with Docker Compose](/docker-compose) for the recommended volume configuration.
 </Note>
 
 1. **Download**: Open a run in **Executions**, click **View All Captures**, then click the download icon on any capture card to save the file to your device.
@@ -154,11 +154,11 @@ When you clear captures, both screenshots in `public/captures` and video recordi
 
 ### Execution Logs
 
-Execution metadata is stored in `data/executions.json`. Browser session profiles are stored separately in `data/browser-profile*` directories and are not affected by execution log rotation. This file grows over time. Figranium keeps at most 500 execution records (`MAX_EXECUTIONS` in `server/constants.js`) and also prunes records older than the [retention period](#automatic-retention).
+Execution metadata is stored in `data/executions.json`. Browser session profiles are stored separately in `data/browser-profile*` directories and are not affected by execution log rotation. This file grows over time. Browsers keeps at most 500 execution records (`MAX_EXECUTIONS` in `server/constants.js`) and also prunes records older than the [retention period](#automatic-retention).
 
-Each stored execution record is capped at 256 KB (override with `MAX_PERSISTED_EXECUTION_BYTES`). When a result is larger, Figranium keeps the run in history but replaces the HTML and data with a truncation notice, keeps the first 20 log lines, and marks the result `truncated: true`. The full result is still returned to the caller that ran the task. This keeps an oversized payload from destabilizing the server.
+Each stored execution record is capped at 256 KB (override with `MAX_PERSISTED_EXECUTION_BYTES`). When a result is larger, Browsers keeps the run in history but replaces the HTML and data with a truncation notice, keeps the first 20 log lines, and marks the result `truncated: true`. The full result is still returned to the caller that ran the task. This keeps an oversized payload from destabilizing the server.
 
-Figranium also stores the complete result separately and marks the trimmed record `hasFullResult: true`. To view it, open the run in **Executions** and click **Load full data**, or call `GET /api/executions/{id}/result`. The endpoint returns `{ "result": ... }` with the complete stored result, or `404` with `FULL_RESULT_NOT_AVAILABLE` if no full result was stored. Full results are deleted together with their execution records by [retention](#automatic-retention).
+Browsers also stores the complete result separately and marks the trimmed record `hasFullResult: true`. To view it, open the run in **Executions** and click **Load full data**, or call `GET /api/executions/{id}/result`. The endpoint returns `{ "result": ... }` with the complete stored result, or `404` with `FULL_RESULT_NOT_AVAILABLE` if no full result was stored. Full results are deleted together with their execution records by [retention](#automatic-retention).
 
 To clear history manually, use **Clear execution history** under **Maintenance** in **Settings > Advanced**.
 

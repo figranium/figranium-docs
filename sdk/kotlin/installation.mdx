@@ -1,17 +1,17 @@
 ---
-title: "Install the Figranium Kotlin SDK"
+title: "Install the Figranium Browsers Kotlin SDK"
 sidebarTitle: "Installation"
-description: "Add the Figranium Kotlin SDK via Gradle. Includes Kotlin 2.2+, Android minSdk 23, optional appfunctions with KSP. Verify with a health check."
+description: "Add the Figranium Browsers Kotlin SDK via Gradle. Includes Kotlin 2.2+, Android minSdk 23, optional appfunctions with KSP. Verify with a health check."
 ---
 
-The Figranium Kotlin SDK is published to Maven Central. It requires Kotlin 2.2 or newer, a JVM toolchain of 17, and Android minSdk 23 if you target Android. Add the `figranium` artifact (and optionally `figranium-appfunctions`) to your Gradle build.
+The Figranium Browsers Kotlin SDK is published to Maven Central. It requires Kotlin 2.2 or newer, a JVM toolchain of 17, and Android minSdk 23 if you target Android. Add the `figranium` artifact (and optionally `figranium-appfunctions`) to your Gradle build.
 
 ## Requirements
 
 - Kotlin 2.2 or newer.
 - Gradle build with Kotlin 1.9 or Android Gradle Plugin 9.x.
 - Android minSdk 23 (or a plain JVM project).
-- A running Figranium server that the client can reach. Local installs default to `http://localhost:11345`.
+- A running Figranium Browsers server that the client can reach. Local installs default to `http://localhost:11345`.
 
 ## Add the dependency
 
@@ -75,7 +75,7 @@ import dev.figranium.sdk.appfunctions.*
 
 ## Verify the install
 
-Call `health.check()` to confirm the SDK can reach your Figranium server.
+Call `health.check()` to confirm the SDK can reach your Figranium Browsers server.
 
 ```kotlin verify.kt
 import dev.figranium.sdk.*
@@ -85,7 +85,7 @@ val status = client.health.check()
 println(status.status)
 ```
 
-A healthy Figranium instance returns a `HealthStatus` with `status` equal to `"ok"`.
+A healthy Browsers instance returns a `HealthStatus` with `status` equal to `"ok"`.
 
 ## Next steps
 

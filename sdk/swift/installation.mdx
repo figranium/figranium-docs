@@ -1,16 +1,16 @@
 ---
-title: "Install the Figranium Swift SDK"
+title: "Install the Figranium Browsers Swift SDK"
 sidebarTitle: "Installation"
-description: "Add the Figranium Swift package via Xcode or Package.swift. Requires Swift 6.0+ and macOS 13/iOS 16/tvOS 16/watchOS 9. Verify with a health check."
+description: "Add the Figranium Browsers Swift package via Xcode or Package.swift. Requires Swift 6.0+ and macOS 13/iOS 16/tvOS 16/watchOS 9. Verify with a health check."
 ---
 
-The Figranium Swift SDK installs from GitHub as a Swift Package Manager dependency. It has no external dependencies and builds on macOS, iOS, tvOS, watchOS, and server-side Swift.
+The Figranium Browsers Swift SDK installs from GitHub as a Swift Package Manager dependency. It has no external dependencies and builds on macOS, iOS, tvOS, watchOS, and server-side Swift.
 
 ## Requirements
 
 - Swift 6.0 or newer.
 - Deployment target of macOS 13, iOS 16, tvOS 16, or watchOS 9.
-- A running Figranium server that the client can reach. Local installs default to `http://localhost:11345`.
+- A running Figranium Browsers server that the client can reach. Local installs default to `http://localhost:11345`.
 
 ## Add the package
 
@@ -59,7 +59,7 @@ import Figranium
 
 ## Verify the install
 
-Call `health.check()` to confirm the SDK can reach your Figranium server.
+Call `health.check()` to confirm the SDK can reach your Browsers server.
 
 ```swift verify.swift
 import Figranium
@@ -69,7 +69,7 @@ let status = try await client.health.check()
 print(status.status ?? "unknown")
 ```
 
-A healthy Figranium instance returns a `HealthStatus` with `status` equal to `"ok"`.
+A healthy Figranium Browsers instance returns a `HealthStatus` with `status` equal to `"ok"`.
 
 ## Next steps
 

@@ -10,7 +10,7 @@
   "navigation": {
     "products": [
       {
-        "product": "Figranium",
+        "product": "Figranium Browsers",
         "description": "Visual, self-hosted browser automation",
         "tabs": [
           {
@@ -427,7 +427,7 @@
   "fonts": {
     "family": "Questrial"
   },
-  "description": "Open-source browser automation tools: Figranium for visual, self-hosted Tasks, Frowse for token-lean agent browsing, Fiptcha for local CAPTCHA solving, and Folate for neural DOM element grounding.",
+  "description": "Open-source browser automation tools: Figranium Browsers for visual, self-hosted Tasks, Frowse for token-lean agent browsing, Fiptcha for local CAPTCHA solving, and Folate for neural DOM element grounding.",
   "navbar": {
     "primary": {
       "type": "github",

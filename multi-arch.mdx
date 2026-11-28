@@ -1,10 +1,10 @@
 ---
 title: "Multi-Architecture Installation via Git Clone"
 sidebarTitle: "Multi-Arch"
-description: "Build Figranium from source for any architecture using Git and Docker Compose. A reliable fallback when pre-built GHCR images are unavailable."
+description: "Build Figranium Browsers from source for any architecture using Git and Docker Compose. A reliable fallback when pre-built GHCR images are unavailable."
 ---
 
-This guide covers the secondary installation method for Figranium, which is suitable for all architectures (x86\_64, ARM64, etc.) by building the Docker image locally.
+This guide covers the secondary installation method for Figranium Browsers, which is suitable for all architectures (x86\_64, ARM64, etc.) by building the Docker image locally.
 
 While the primary and recommended installation method is using the pre-built images from [GitHub Container Registry (GHCR)](/docker-compose), this method provides a reliable fallback for environments where pre-built images might not be optimal or available.
 
@@ -22,7 +22,7 @@ While the primary and recommended installation method is using the pre-built ima
 
 <Steps>
   <Step title="Clone the Repository">
-    Clone the Figranium repository to your local machine:
+    Clone the Figranium Browsers repository to your local machine:
 
     ```bash
     git clone https://github.com/figranium/figranium.git
@@ -39,7 +39,7 @@ While the primary and recommended installation method is using the pre-built ima
     This command will:
 
     1. Download the necessary base images.
-    2. Compile the Figranium source code and build the Docker image for your specific architecture.
+    2. Compile the Figranium Browsers source code and build the Docker image for your specific architecture.
     3. Start the containers as defined in the `docker-compose.yml` file.
   </Step>
   <Step title="Access the Application">

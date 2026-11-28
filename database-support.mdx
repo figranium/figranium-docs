@@ -1,20 +1,20 @@
 ---
-title: "PostgreSQL Database Support for Figranium"
+title: "PostgreSQL Database Support for Figranium Browsers"
 sidebarTitle: "Database"
-description: "Configure Figranium to use PostgreSQL instead of file-based storage. Includes Neon setup, SSL connections, migration behavior, and stored data overview."
+description: "Configure Figranium Browsers to use PostgreSQL instead of file-based storage. Includes Neon setup, SSL connections, migration behavior, and stored data overview."
 ---
 
-For production environments requiring high availability and robust data management, Figranium can be configured to use **PostgreSQL** instead of the default file-based storage.
+For production environments requiring high availability and robust data management, Figranium Browsers can be configured to use **PostgreSQL** instead of the default file-based storage.
 
 ## Recommended Backend: Neon
 
-For production deployments, we strongly recommend [Neon](https://neon.tech) as the backend database for Figranium. Neon is a fully managed, serverless PostgreSQL platform that fits seamlessly with Figranium's architecture.
+For production deployments, we strongly recommend [Neon](https://neon.tech) as the backend database for Figranium Browsers. Neon is a fully managed, serverless PostgreSQL platform that fits seamlessly with Figranium Browsers' architecture.
 
 ### Why Neon?
 
 - **Serverless Architecture**: Automatically scales compute resources based on load and scales down when idle, minimizing costs for low-traffic or batch automation workloads.
 - **Instant Setup & Zero Maintenance**: Provision a production-ready PostgreSQL instance in seconds without configuring servers, managing storage volumes, or running manual updates.
-- **Built-in SSL Security**: Neon requires SSL by default, aligning perfectly with Figranium's SSL support (`DB_POSTGRESDB_SSL=true`).
+- **Built-in SSL Security**: Neon requires SSL by default, aligning perfectly with Figranium Browsers' SSL support (`DB_POSTGRESDB_SSL=true`).
 - **High Availability & Branching**: Offers automated point-in-time recovery and database branching, making it easy to isolate staging or development execution environments.
 
 <Tip>
@@ -36,12 +36,12 @@ To enable PostgreSQL, set the following environment variables in your deployment
 | **`DB_POSTGRESDB_SSL`** | Set to `true` to connect over SSL/TLS. Defaults to `false`. |
 
 <Note>
-  Database settings are managed with environment variables only. The **Settings** page no longer stores PostgreSQL connection details, so set these variables in your `.env` file, Docker Compose file, or hosting provider and restart Figranium.
+  Database settings are managed with environment variables only. The **Settings** page no longer stores PostgreSQL connection details, so set these variables in your `.env` file, Docker Compose file, or hosting provider and restart Figranium Browsers.
 </Note>
 
 ### Alternative variable names
 
-Figranium also accepts shorter variable names, in both uppercase and lowercase. The lowercase forms match the names used by platforms such as DigitalOcean. When more than one name is set for the same field, Figranium uses the first match in this order: uppercase short name, lowercase short name, then the `DB_POSTGRESDB_*` name.
+Figranium Browsers also accepts shorter variable names, in both uppercase and lowercase. The lowercase forms match the names used by platforms such as DigitalOcean. When more than one name is set for the same field, Figranium Browsers uses the first match in this order: uppercase short name, lowercase short name, then the `DB_POSTGRESDB_*` name.
 
 | **Field** | **Accepted variables** |
 | :-- | :-- |
@@ -57,11 +57,11 @@ Setting any of these connection variables turns on PostgreSQL storage.
 
 ### SSL connections
 
-Set `DB_POSTGRESDB_SSL=true` when your PostgreSQL server requires encrypted connections. This is required for managed Postgres services such as Neon, AWS RDS, Google Cloud SQL, Azure Database, or Supabase. Figranium connects with SSL enabled and `rejectUnauthorized: false`, which allows self-signed certificates commonly used by managed providers.
+Set `DB_POSTGRESDB_SSL=true` when your PostgreSQL server requires encrypted connections. This is required for managed Postgres services such as Neon, AWS RDS, Google Cloud SQL, Azure Database, or Supabase. Figranium Browsers connects with SSL enabled and `rejectUnauthorized: false`, which allows self-signed certificates commonly used by managed providers.
 
 ### Neon Configuration Example
 
-To connect Figranium to a Neon PostgreSQL instance, obtain your connection details from the Neon console and set the following environment variables:
+To connect Figranium Browsers to a Neon PostgreSQL instance, obtain your connection details from the Neon console and set the following environment variables:
 
 ```bash
 DB_TYPE=postgres
@@ -80,7 +80,7 @@ DB_POSTGRESDB_SSL=true
     When PostgreSQL is enabled, the following data is stored in the database instead of on disk:
 
     - **Tasks and execution logs** — task definitions, run history, and metadata.
-    - **API keys** — Figranium API key.
+    - **API keys** — Figranium Browsers API key.
     - **Credentials** — saved credentials used by output providers and action blocks.
     - **Proxy configuration** — proxy list, default proxy, rotation mode, and rotation settings.
 
@@ -95,10 +95,10 @@ DB_POSTGRESDB_SSL=true
 
 When you switch to PostgreSQL:
 
-1. **Automatic setup**: Figranium creates the necessary tables on first run, and migrates existing API key columns to `TEXT` if you are upgrading from an earlier version.
+1. **Automatic setup**: Figranium Browsers creates the necessary tables on first run, and migrates existing API key columns to `TEXT` if you are upgrading from an earlier version.
 2. **Data persistence**: Task metadata, execution logs, settings, credentials, API keys, and proxy configuration are stored in the database.
 3. **Captures**: Visual assets (screenshots and recordings) remain on the local file system or mounted volumes; only their metadata is stored in Postgres.
-4. **Fallback**: If the database is unreachable at startup, Figranium falls back to file-based storage and logs the failure.
+4. **Fallback**: If the database is unreachable at startup, Figranium Browsers falls back to file-based storage and logs the failure.
 
 <Info>
   For production deployments, we recommend using a managed PostgreSQL provider like Neon to avoid manual database administration and ensure reliable backups.

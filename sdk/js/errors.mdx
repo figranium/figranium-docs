@@ -1,7 +1,7 @@
 ---
-title: "Handle Errors from the Figranium SDK"
+title: "Handle Errors from the Figranium Browsers SDK"
 sidebarTitle: "Errors"
-description: "FigraniumError shape from the Figranium JavaScript SDK. HTTP status, server error code, details, request ID, and transport failure diagnostics."
+description: "FigraniumError shape from the Figranium Browsers JavaScript SDK. HTTP status, server error code, details, request ID, and transport failure diagnostics."
 ---
 
 Every SDK method that fails throws a `FigraniumError`. The class normalizes HTTP responses and transport failures into a single, inspectable error type so you can branch on status codes, error codes, or transport conditions without parsing raw responses.
@@ -44,7 +44,7 @@ try {
 
 <AccordionGroup>
   <Accordion title="`status`">
-    - The HTTP status returned by the Figranium server, if a response arrived.
+    - The HTTP status returned by the Figranium Browsers server, if a response arrived.
     - `0` when the request never reached a status (network failure, DNS error, cancelled request).
   </Accordion>
 

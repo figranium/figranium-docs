@@ -1,12 +1,12 @@
 ---
 title: "Executions API"
 sidebarTitle: "Executions"
-description: "List, inspect, stop, and stream Figranium executions via the REST API. Query history, retrieve full results, and monitor live runs."
+description: "List, inspect, stop, and stream Figranium Browsers executions via the REST API. Query history, retrieve full results, and monitor live runs."
 ---
 
-The Executions API lets you inspect and manage the lifecycle of Figranium runs. Query history, retrieve full results for large payloads, stop queued or running executions, and stream live updates over SSE.
+The Executions API lets you inspect and manage the lifecycle of Figranium Browsers runs. Query history, retrieve full results for large payloads, stop queued or running executions, and stream live updates over SSE.
 
-All endpoints accept either a signed-in session cookie or an API key. See [Get Your Figranium API Key](/api-key) and [API Scopes](/api-scopes) for authentication setup.
+All endpoints accept either a signed-in session cookie or an API key. See [Get Your Figranium Browsers API Key](/api-key) and [API Scopes](/api-scopes) for authentication setup.
 
 ---
 
@@ -185,7 +185,7 @@ Stops a running execution, or cancels a run that is still waiting in the executi
 | `400` | `MISSING_RUN_ID` | `runId` is missing from the request body |
 | `401` | `Unauthorized` | Authentication is required |
 
-If the client that started a queued run disconnects before the run starts, Figranium cancels the queued run automatically.
+If the client that started a queued run disconnects before the run starts, Figranium Browsers cancels the queued run automatically.
 
 ---
 

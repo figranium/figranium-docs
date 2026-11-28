@@ -1,22 +1,22 @@
 ---
 title: "n8n Integration"
 sidebarTitle: "n8n"
-description: "Connect Figranium to n8n workflows with the official verified community node and run browser automation tasks with dynamic inputs."
+description: "Connect Figranium Browsers to n8n workflows with the official verified community node and run browser automation tasks with dynamic inputs."
 ---
 
-The official Figranium n8n community node (`n8n-nodes-figranium`) connects n8n workflows to Figranium. Use it to execute saved browser automation tasks, pass runtime variables, and work with tasks, executions, and schedules.
+The official n8n community node (`n8n-nodes-figranium`) connects n8n workflows to Figranium Browsers. Use it to execute saved browser automation tasks, pass runtime variables, and work with tasks, executions, and schedules.
 
 ## Install the node
 
 <Steps>
-  <Step title="Add Figranium">
-    In an n8n workflow, click **Add node**, search for **Figranium**, and select the verified community node.
+  <Step title="Add Figranium Browsers">
+    In an n8n workflow, click **Add node**, search for **Figranium Browsers**, and select the verified community node.
   </Step>
   <Step title="Install the node">
     Install it when prompted, then add it to your workflow.
   </Step>
   <Step title="Configure credentials">
-    Create a **Figranium API** credential with your Figranium **Base URL** and **API key**. Use the base URL without a trailing slash. If you need an API key, see [Get Your Figranium API Key](/api-key).
+    Create a **Figranium Browsers API** credential with your Figranium Browsers **Base URL** and **API key**. Use the base URL without a trailing slash. If you need an API key, see [Get Your Figranium Browsers API Key](/api-key).
   </Step>
   <Step title="Choose an operation">
     Select **Execute Task** to run a saved task, or choose one of the task, execution, or schedule operations.
@@ -38,10 +38,10 @@ For the underlying endpoints, see the [REST API Reference](/rest-api).
 
 ## Runtime variables
 
-Runtime variables let the same Figranium task accept different inputs on every n8n run. Variable names are case-sensitive and must match those defined by the task.
+Runtime variables let the same Figranium Browsers task accept different inputs on every n8n run. Variable names are case-sensitive and must match those defined by the task.
 
 See [Variables & Templating](/variables) for details.
 
 ## Authentication
 
-The node authenticates directly with your Figranium instance using the API key in the **Figranium API** credential. Keep the key secret and rotate it if it is exposed. See [API Key](/api-key) for key management.
+The node authenticates directly with your Figranium Browsers instance using the API key in the **Figranium Browsers API** credential. Keep the key secret and rotate it if it is exposed. See [API Key](/api-key) for key management.

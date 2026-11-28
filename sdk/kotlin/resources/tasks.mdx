@@ -1,10 +1,10 @@
 ---
-title: "TasksResource: Manage, Version, and Execute Figranium Tasks"
+title: "TasksResource: Manage, Version, and Execute Figranium Browsers Tasks"
 sidebarTitle: "Tasks"
-description: "Reference for the TasksResource in the Figranium Kotlin SDK. List, save, update, version, roll back, and execute tasks with typed coroutine methods and request options."
+description: "Reference for the TasksResource in the Figranium Browsers Kotlin SDK. List, save, update, version, roll back, and execute tasks with typed coroutine methods and request options."
 ---
 
-The `TasksResource` on the Figranium Kotlin SDK is the primary way to manage tasks. Use it to list, create, update, version, and run tasks. Every method is `suspend` and accepts an optional `options` parameter for per-request overrides such as custom headers or timeouts. The client-level convenience `client.runTask(id, input, options)` proxies directly to `client.tasks.run(id, input, options)`.
+The `TasksResource` on the Figranium Browsers Kotlin SDK is the primary way to manage tasks. Use it to list, create, update, version, and run tasks. Every method is `suspend` and accepts an optional `options` parameter for per-request overrides such as custom headers or timeouts. The client-level convenience `client.runTask(id, input, options)` proxies directly to `client.tasks.run(id, input, options)`.
 
 ```kotlin TasksResource.kt
 import dev.figranium.sdk.*

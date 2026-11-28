@@ -1,17 +1,17 @@
 ---
-title: "Authenticate the Figranium Python SDK"
+title: "Authenticate the Figranium Browsers Python SDK"
 sidebarTitle: "Authentication"
-description: "Authenticate the Figranium Python SDK with an API key. Header formats, switching between Authorization and x-api-key, and key management guidance."
+description: "Authenticate the Figranium Browsers Python SDK with an API key. Header formats, switching between Authorization and x-api-key, and key management guidance."
 ---
 
-The Figranium Python SDK authenticates with an API key. Create one in the Figranium web UI, then pass it to the client so every request is signed automatically.
+The Figranium Browsers Python SDK authenticates with an API key. Create one in the Figranium Browsers web UI, then pass it to the client so every request is signed automatically.
 
 <Steps>
   <Step title="Create an API key">
-    Sign into the Figranium web UI and generate an API key from Settings. Copy the value once; you will not see it again.
+    Sign into the Figranium Browsers web UI and generate an API key from Settings. Copy the value once; you will not see it again.
   </Step>
   <Step title="Pass the key to the client">
-    Provide `api_key` when constructing the client. Figranium sends it as `Authorization: Bearer <key>` by default.
+    Provide `api_key` when constructing the client. Figranium Browsers sends it as `Authorization: Bearer <key>` by default.
 
     ```python
     import os
@@ -39,7 +39,7 @@ The Figranium Python SDK authenticates with an API key. Create one in the Figran
 
 ## What API keys can access
 
-API keys authenticate every task, execution, schedule, capture, browser, and execution endpoint exposed by the SDK. Server-administration operations (creating API keys, changing themes, and managing proxies) are performed in the Figranium web UI.
+API keys authenticate every task, execution, schedule, capture, browser, and execution endpoint exposed by the SDK. Server-administration operations (creating API keys, changing themes, and managing proxies) are performed in the Figranium Browsers web UI.
 
 <Warning>
   Store API keys in environment variables or a secrets manager. Never commit keys to source control or expose them in client-side code.
@@ -53,6 +53,6 @@ API keys authenticate every task, execution, schedule, capture, browser, and exe
   </Card>
 
   <Card title="API key" icon="key" href="/api-key">
-    How Figranium API keys work and how to manage them from the web UI.
+    How Figranium Browsers API keys work and how to manage them from the web UI.
   </Card>
 </CardGroup>

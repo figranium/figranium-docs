@@ -1,10 +1,10 @@
 ---
 title: "Error Handling"
 sidebarTitle: "Error Handling"
-description: "Make your Figranium automation tasks resilient with On Error blocks, retry loops, timeout strategies, and fallback sub-tasks."
+description: "Make your Figranium Browsers automation tasks resilient with On Error blocks, retry loops, timeout strategies, and fallback sub-tasks."
 ---
 
-Figranium provides several mechanisms to make your automation tasks resilient to failures, from optional actions to retry loops and fallback sub-tasks.
+Figranium Browsers provides several mechanisms to make your automation tasks resilient to failures, from optional actions to retry loops and fallback sub-tasks.
 
 ## Why Tasks Fail
 
@@ -42,9 +42,9 @@ A well-designed task anticipates these failures and handles them gracefully.
 
 ## The On Error Block
 
-The On Error block is Figranium's primary error handling mechanism. It works like a `try/catch`: if any action in the main flow raises an error, execution jumps to the On Error block.
+The On Error block is the primary error handling mechanism in Browsers. It works like a `try/catch`: if any action in the main flow raises an error, execution jumps to the On Error block.
 
-<img src="/images/tasks/error-handling-task-1.png" alt="Figranium task preview: The On Error Block" />
+![Figranium Browsers task preview: The On Error Block](/images/tasks/error-handling-task-1.png)
 
 The On Error / End pair should be placed in the task to catch errors from preceding actions. Any error thrown by an action before the On Error block is caught.
 
@@ -52,19 +52,19 @@ The On Error / End pair should be placed in the task to catch errors from preced
   <Accordion title="Making an Action Optional" icon="circle-check">
     The simplest use: place an empty On Error / End block to absorb errors from an action that may or may not exist:
 
-    <img src="/images/tasks/error-handling-task-2.png" alt="Figranium task preview: The On Error Block" />
+    ![Figranium Browsers task preview: The On Error Block](/images/tasks/error-handling-task-2.png)
   </Accordion>
 
   <Accordion title="Fallback Action" icon="rotate">
     Perform a fallback action when the primary approach fails:
 
-    <img src="/images/tasks/error-handling-task-3.png" alt="Figranium task preview: The On Error Block" />
+    ![Figranium Browsers task preview: The On Error Block](/images/tasks/error-handling-task-3.png)
   </Accordion>
 
   <Accordion title="Stop on Error with a Reason" icon="player-stop">
     Log the failure and stop the task cleanly:
 
-    <img src="/images/tasks/error-handling-task-4.png" alt="Figranium task preview: The On Error Block" />
+    ![Figranium Browsers task preview: The On Error Block](/images/tasks/error-handling-task-4.png)
   </Accordion>
 </AccordionGroup>
 
@@ -76,13 +76,13 @@ The On Error / End pair should be placed in the task to catch errors from preced
 
 Use a While loop combined with a counter to retry a failing action up to N times:
 
-<img src="/images/tasks/error-handling-task-5.png" alt="Figranium task preview: Retry Patterns" />
+![Figranium Browsers task preview: Retry Patterns](/images/tasks/error-handling-task-5.png)
 
 This retries up to 3 times with a 2-second pause between attempts, then continues if any attempt succeeds.
 
 ### Retry a Login
 
-<img src="/images/tasks/error-handling-task-6.png" alt="Figranium task preview: Retry Patterns" />
+![Figranium Browsers task preview: Retry Patterns](/images/tasks/error-handling-task-6.png)
 
 ---
 
@@ -92,13 +92,13 @@ Popups that appear unpredictably are a common cause of task failures. Handle the
 
 ### Check and Dismiss Before Proceeding
 
-<img src="/images/tasks/error-handling-task-7.png" alt="Figranium task preview: Handling Popups and Modals" />
+![Figranium Browsers task preview: Handling Popups and Modals](/images/tasks/error-handling-task-7.png)
 
 ### Dismiss Any Popup on Every Page
 
 Use a sub-task triggered via a Start Task block to handle common popups at the beginning of every task:
 
-<img src="/images/tasks/error-handling-task-8.png" alt="Figranium task preview: Handling Popups and Modals" />
+![Figranium Browsers task preview: Handling Popups and Modals](/images/tasks/error-handling-task-8.png)
 
 <Tip>
   See [Modular Workflows](/modular-workflows) for more on reusing sub-tasks across multiple parent tasks.
@@ -110,7 +110,7 @@ Use a sub-task triggered via a Start Task block to handle common popups at the b
 
 Each action block can have its own `timeout` (in milliseconds). Use shorter timeouts for elements that should appear quickly, and longer ones for slow-loading content.
 
-<img src="/images/tasks/error-handling-task-9.png" alt="Figranium task preview: Timeout Strategies" />
+![Figranium Browsers task preview: Timeout Strategies](/images/tasks/error-handling-task-9.png)
 
 Use an On Error block around short-timeout actions to make them non-fatal when the element doesn't appear.
 
@@ -120,7 +120,7 @@ Use an On Error block around short-timeout actions to make them non-fatal when t
 
 Use a JavaScript block inside an On Error branch to log diagnostic information to the execution output:
 
-<img src="/images/tasks/error-handling-task-10.png" alt="Figranium task preview: Logging Errors for Inspection" />
+![Figranium Browsers task preview: Logging Errors for Inspection](/images/tasks/error-handling-task-10.png)
 
 The returned object appears in the execution detail view, giving you context about what the page looked like when the failure occurred.
 

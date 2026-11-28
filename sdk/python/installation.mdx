@@ -1,15 +1,15 @@
 ---
-title: "Install the Figranium Python SDK"
+title: "Install the Figranium Browsers Python SDK"
 sidebarTitle: "Installation"
-description: "Install figranium-sdk with pip, uv, poetry, or pipx. Requires Python 3.9+ and a reachable Figranium server. Verify with a health check."
+description: "Install figranium-sdk with pip, uv, poetry, or pipx. Requires Python 3.9+ and a reachable Figranium Browsers server. Verify with a health check."
 ---
 
-The Figranium Python SDK installs from PyPI as `figranium-sdk`. It has a single runtime dependency on `httpx>=0.27,<1`, so it stays lightweight in your dependency tree.
+The Figranium Browsers Python SDK installs from PyPI as `figranium-sdk`. It has a single runtime dependency on `httpx>=0.27,<1`, so it stays lightweight in your dependency tree.
 
 ## Requirements
 
 - Python `3.9` or newer.
-- A running Figranium server that the client can reach at its `base_url`. Local installs default to `http://localhost:11345`.
+- A running Figranium Browsers server that the client can reach at its `base_url`. Local installs default to `http://localhost:11345`.
 
 ## Install
 
@@ -55,7 +55,7 @@ from figranium import AsyncFigranium
 
 ## Verify the install
 
-Call `health.check()` to confirm the SDK can reach your Figranium server.
+Call `health.check()` to confirm the SDK can reach your Figranium Browsers server.
 
 ```python verify_sync.py
 import os
@@ -69,7 +69,7 @@ with Figranium(
     print(status)
 ```
 
-A healthy Figranium instance returns a dict like `{"status": "ok"}`.
+A healthy Figranium Browsers instance returns a dict like `{"status": "ok"}`.
 
 For async environments, use `AsyncFigranium` with `asyncio.run`:
 

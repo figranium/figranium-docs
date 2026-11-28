@@ -1,10 +1,10 @@
 ---
-title: "HealthResource: Check Figranium Server Status"
+title: "HealthResource: Check Figranium Browsers Server Status"
 sidebarTitle: "Health"
-description: "Use the HealthResource to verify that a Figranium server is running and reachable. No authentication is required."
+description: "Use the HealthResource to verify that a Figranium Browsers server is running and reachable. No authentication is required."
 ---
 
-The `HealthResource` provides a lightweight liveness probe for any Figranium instance. Call `check()` to confirm the server is up, read its version, and verify that your SDK install and network path are working. No API key or session is required.
+The `HealthResource` provides a lightweight liveness probe for any Figranium Browsers instance. Call `check()` to confirm the server is up, read its version, and verify that your SDK install and network path are working. No API key or session is required.
 
 ## Client setup
 
@@ -29,7 +29,7 @@ const figranium = new Figranium({ apiKey: process.env.FIGRANIUM_API_KEY! });
     `HealthStatus` extends `UnknownRecord` for forward compatibility, so newer servers can add fields without breaking existing consumers. Common fields include:
 
     - `status`: a human-readable status string such as `"ok"`
-    - `version`: the running Figranium server version
+    - `version`: the running Figranium Browsers server version
 
     ### Example: verify connectivity
 

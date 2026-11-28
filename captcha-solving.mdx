@@ -4,7 +4,7 @@ description: "Solve reCAPTCHA v2/v3, hCaptcha, and Cloudflare Turnstile challeng
 sidebarTitle: "CAPTCHAs"
 ---
 
-Agent mode can detect and solve CAPTCHA challenges without leaving the task flow. Figranium ships a **resource-adaptive local solver** that runs an OWL-ViT or Florence-2 model against the task's own headless browser and injects the resulting token. If you configure a YesCaptcha/AntiCaptcha-compatible remote endpoint, the block tries it first and falls back to the local solver on failure.
+Agent mode can detect and solve CAPTCHA challenges without leaving the task flow. Figranium Browsers ships a **resource-adaptive local solver** that runs an OWL-ViT or Florence-2 model against the task's own headless browser and injects the resulting token. If you configure a YesCaptcha/AntiCaptcha-compatible remote endpoint, the block tries it first and falls back to the local solver on failure.
 
 Supported challenges: reCAPTCHA v2, reCAPTCHA v3, hCaptcha, Cloudflare Turnstile.
 
@@ -23,7 +23,7 @@ A separate **Wait for Captcha** block pauses until a challenge widget is ready w
 
 ## How solving works
 
-When the block runs, Figranium:
+When the block runs, Browsers:
 
 <Steps>
   <Step title="Detect the challenge and wait for readiness">
@@ -48,7 +48,10 @@ Local image solving requires at least **2 GiB effective cgroup memory**. Hosts b
 
 Drop the **Solve Captcha** block into a task at the step where you expect a challenge. See [Action Blocks — Solve Captcha](/action-blocks#solve-captcha) for the full field reference; the shape is:
 
-<img src="/images/tasks/captcha-solving-task-1.png" alt="Figranium task preview: Solve Captcha" />
+<img
+  src="/images/tasks/captcha-solving-task-1.png"
+  alt="Figranium Browsers task preview: Solve Captcha"
+/>
 
 - `captchaType` is optional — omit it to auto-detect from the page. Supported values: `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, `turnstile`.
 - `selector` is optional — omit it to scan the whole page.
@@ -57,13 +60,16 @@ Drop the **Solve Captcha** block into a task at the step where you expect a chal
 
 **Example — submit a form, then solve the reCAPTCHA it renders:**
 
-<img src="/images/tasks/captcha-solving-task-2.png" alt="Figranium task preview: Solve Captcha" />
+<img
+  src="/images/tasks/captcha-solving-task-2.png"
+  alt="Figranium Browsers task preview: Solve Captcha"
+/>
 
 ---
 
 ## Wait for Captcha
 
-The **Wait for Captcha** block pauses the task until a CAPTCHA control is ready to interact with, without clicking or solving it. Figranium polls the page until the widget's checkbox (or equivalent provider control) is initialized, visible, enabled, pointer-receivable, and stable.
+The **Wait for Captcha** block pauses the task until a CAPTCHA control is ready to interact with, without clicking or solving it. Browsers polls the page until the widget's checkbox (or equivalent provider control) is initialized, visible, enabled, pointer-receivable, and stable.
 
 Use it when:
 
@@ -71,7 +77,10 @@ Use it when:
 - You want to confirm a challenge appeared before branching with an [If](/control-flow) block.
 - A widget loads asynchronously and later steps race against it.
 
-<img src="/images/tasks/captcha-solving-task-3.png" alt="Figranium task preview: Wait for Captcha" />
+<img
+  src="/images/tasks/captcha-solving-task-3.png"
+  alt="Figranium Browsers task preview: Wait for Captcha"
+/>
 
 - `captchaType` is optional — omit it to wait for the first ready challenge of any supported type. Supported values: `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, `turnstile`.
 - `selector` is optional — omit it to scan the whole page.
@@ -86,10 +95,10 @@ The Solve Captcha block runs the same readiness wait internally before solving, 
 
 ## Cloudflare managed challenges
 
-Cloudflare serves Turnstile in two forms: a standalone widget embedded in a page, and a **managed challenge** (the full-page "Checking your browser" interstitial on Challenge pages). Figranium handles both:
+Cloudflare serves Turnstile in two forms: a standalone widget embedded in a page, and a **managed challenge** (the full-page "Checking your browser" interstitial on Challenge pages). Browsers handles both:
 
 - **Standalone Turnstile** solves through the remote endpoint or locally, like other challenge types.
-- **Managed challenges** require a configured remote solver. Figranium intercepts the challenge before navigation completes and captures the one-time site key, action, `cData`, `chlPageData`, callback, and user agent that compatible solvers need. The payload uses the field conventions of your endpoint, supporting both 2Captcha-style and AntiCaptcha-style dialects automatically based on the endpoint hostname.
+- **Managed challenges** require a configured remote solver. Browsers intercepts the challenge before navigation completes and captures the one-time site key, action, `cData`, `chlPageData`, callback, and user agent that compatible solvers need. The payload uses the field conventions of your endpoint, supporting both 2Captcha-style and AntiCaptcha-style dialects automatically based on the endpoint hostname.
 
 Without `CAPTCHA_SOLVER_URL` set, a managed challenge fails with the local route reporting `managed Turnstile challenges require a configured remote solver` in `attempts`.
 
@@ -97,7 +106,7 @@ Without `CAPTCHA_SOLVER_URL` set, a managed challenge fails with the local route
 
 ## Auto-Solve Captchas (task setting)
 
-Toggle **Auto-Solve Captchas** in the task settings **Behavior** tab. When enabled, Figranium runs the same detection pass automatically after the initial task navigation and after every Navigate, Click, and Type action in that task.
+Toggle **Auto-Solve Captchas** in the task settings **Behavior** tab. When enabled, Browsers runs the same detection pass automatically after the initial task navigation and after every Navigate, Click, and Type action in that task.
 
 - Default: **off**. Tasks that don't need CAPTCHA handling pay no extra latency.
 - When no challenge is present on the page, the auto-pass silently no-ops.
@@ -125,7 +134,7 @@ On Apple Silicon (Docker Desktop or native macOS), an optional companion process
 
 ```bash
 npm run captcha:companion:install       # pinned Python 3.10+ venv + generated token
-npm run captcha:companion:start         # native Figranium, loopback only
+npm run captcha:companion:start         # native Browsers, loopback only
 npm run captcha:companion:start:docker  # Docker Desktop, authenticated external bind
 ```
 

@@ -1,14 +1,14 @@
 ---
 title: "Troubleshooting"
 sidebarTitle: "Troubleshooting"
-description: "Diagnose and fix common Figranium issues: browser launch failures, proxy errors, element timeouts, session expiry, CAPTCHAs, and more."
+description: "Diagnose and fix common Figranium Browsers issues: browser launch failures, proxy errors, element timeouts, session expiry, CAPTCHAs, and more."
 ---
 
 <Warning>
   **The official `figranium` NPM package is retired and is not supported from v0.13 onward.** The "NPM" fixes below apply only to legacy installs; on v0.13\+, use Docker or a source install.
 </Warning>
 
-Common issues and their solutions when running Figranium.
+Common issues and their solutions when running Figranium Browsers.
 
 ## Browser fails to launch
 
@@ -41,7 +41,7 @@ Common issues and their solutions when running Figranium.
               memory: 2g
         shm_size: '1g'
         ```
-      - Figranium already passes `--disable-dev-shm-usage` by default, which helps on constrained systems.
+      - Figranium Browsers already passes `--disable-dev-shm-usage` by default, which helps on constrained systems.
   </Accordion>
 
   <Accordion title="Out of memory (ENOMEM)">
@@ -88,7 +88,7 @@ Common issues and their solutions when running Figranium.
     - **Cause 2**: The element loads asynchronously after the page renders.
       - **Fix**: Add a Wait action (e.g., 2000ms) before the failing action, or use a Wait for Selector action explicitly targeting the element.
     - **Cause 3**: The element is inside a `<iframe>`.
-      - **Note**: Figranium does not currently support cross-origin iframes. Same-origin iframes may work via JavaScript execution.
+      - **Note**: Figranium Browsers does not currently support cross-origin iframes. Same-origin iframes may work via JavaScript execution.
     - **Cause 4**: The element is inside a Shadow DOM.
       - **Fix**: Enable **Shadow DOM** support in task settings, then use deep selectors.
     - **Cause 5**: The element is only visible on desktop and the viewport is too small.
@@ -121,7 +121,7 @@ Common issues and their solutions when running Figranium.
   <Accordion title="Page shows CAPTCHA or Access Denied">
     - **Cause**: The target website detected automated browser behavior, or served a CAPTCHA challenge.
     - **Fix**:
-      1. If a supported CAPTCHA renders (reCAPTCHA v2/v3, hCaptcha, Cloudflare Turnstile), drop a **Solve Captcha** block at that step, or toggle **Auto-Solve Captchas** in the task's Behavior tab. Figranium routes solves through a configured YesCaptcha/AntiCaptcha-compatible endpoint first and falls back to the built-in local model. See [CAPTCHA Solving](/captcha-solving) for setup and environment variables.
+      1. If a supported CAPTCHA renders (reCAPTCHA v2/v3, hCaptcha, Cloudflare Turnstile), drop a **Solve Captcha** block at that step, or toggle **Auto-Solve Captchas** in the task's Behavior tab. Figranium Browsers routes solves through a configured YesCaptcha/AntiCaptcha-compatible endpoint first and falls back to the built-in local model. See [CAPTCHA Solving](/captcha-solving) for setup and environment variables.
       2. Enable **Stealth Mode** options in the Task Editor (natural typing, idle movements, etc.).
       3. Use high-quality **Residential Proxies** rather than datacenter IPs.
       4. Rotate **User Agents** in `Settings > System > User Agent`.
@@ -138,7 +138,7 @@ Common issues and their solutions when running Figranium.
   <Accordion title="Headless detection or viewport mismatch">
     - **Cause**: Some sites detect headless browsers via JavaScript (e.g., `navigator.webdriver`).
     - **Fix**:
-      - Ensure **Stealth Plugin** is active (it is by default in Figranium).
+      - Ensure **Stealth Plugin** is active (it is by default in Figranium Browsers).
       - Check if the failure is viewport-related (some sites show different content at different sizes). Set a realistic viewport in task settings.
       - Compare the page HTML in both modes using `javascript` blocks that return `document.documentElement.outerHTML`.
   </Accordion>
@@ -181,7 +181,7 @@ Common issues and their solutions when running Figranium.
 
 <AccordionGroup>
   <Accordion title="Runs are queued or rejected under load">
-    - **Cause**: Figranium's host-aware resource protection limits how many browsers run at once. Extra runs wait in a queue, which pauses when memory or CPU is under pressure. When the queue is full (50 by default) or a run waits more than 10 minutes, the request is rejected with `503`.
+    - **Cause**: Figranium Browsers' host-aware resource protection limits how many browsers run at once. Extra runs wait in a queue, which pauses when memory or CPU is under pressure. When the queue is full (50 by default) or a run waits more than 10 minutes, the request is rejected with `503`.
     - **Fix**:
       - Retry after the number of seconds in the `Retry-After` header.
       - Check `protection` in [`GET /api/health`](/rest-api#health) to see `maxConcurrent`, `pressure`, `active`, and `queued`.
@@ -200,7 +200,7 @@ Common issues and their solutions when running Figranium.
       - Verify `DB_POSTGRESDB_HOST`, `DB_POSTGRESDB_PORT`, `DB_POSTGRESDB_USER`, `DB_POSTGRESDB_PASSWORD` in your `.env`.
       - Test connectivity: `psql -h $DB_POSTGRESDB_HOST -U $DB_POSTGRESDB_USER`.
       - Check that the database and user exist with correct permissions.
-      - Figranium will **fall back to file-based storage** if the DB is unavailable — check server logs for the fallback warning.
+      - Figranium Browsers will **fall back to file-based storage** if the DB is unavailable — check server logs for the fallback warning.
   </Accordion>
 </AccordionGroup>
 
@@ -234,8 +234,8 @@ Common issues and their solutions when running Figranium.
 
 <AccordionGroup>
   <Accordion title="VNC viewer disconnects on Apple Silicon">
-    - **Cause**: An older Figranium image was published as `linux/amd64` only. On Apple Silicon (M1–M4) Macs, Docker Desktop pulls that image and runs it under QEMU emulation, where Xvfb and x11vnc are prone to crashing seconds after start. The noVNC viewer connects briefly, then drops. The selector-picker SSE stream fails the same way because it depends on the same headful browser session.
-    - **Fix**: Update to the latest image. Figranium is now published as a true multi-architecture image (`linux/amd64` and `linux/arm64`), so Apple Silicon pulls a native ARM64 build:
+    - **Cause**: An older Figranium Browsers image was published as `linux/amd64` only. On Apple Silicon (M1–M4) Macs, Docker Desktop pulls that image and runs it under QEMU emulation, where Xvfb and x11vnc are prone to crashing seconds after start. The noVNC viewer connects briefly, then drops. The selector-picker SSE stream fails the same way because it depends on the same headful browser session.
+    - **Fix**: Update to the latest image. Figranium Browsers is now published as a true multi-architecture image (`linux/amd64` and `linux/arm64`), so Apple Silicon pulls a native ARM64 build:
       ```bash
       docker compose pull
       docker compose up -d
@@ -260,7 +260,7 @@ Common issues and their solutions when running Figranium.
 
 <AccordionGroup>
   <Accordion title="Rate limiter crash behind Render proxy">
-    - **Cause**: When Figranium runs behind a reverse proxy (such as Render's edge), incoming requests carry an `X-Forwarded-For` header. The rate limiter rejects this header unless the server is explicitly told to trust the proxy, causing the process to crash on the first authenticated request.
+    - **Cause**: When Figranium Browsers runs behind a reverse proxy (such as Render's edge), incoming requests carry an `X-Forwarded-For` header. The rate limiter rejects this header unless the server is explicitly told to trust the proxy, causing the process to crash on the first authenticated request.
     - **Fix**: On Render, no action is needed — the server detects the platform-provided `RENDER=true` environment variable and enables `trust proxy` automatically. On other proxied deployments (Nginx, Caddy, AWS ALB, Fly.io), set `TRUST_PROXY=true` in your environment:
       ```bash
       TRUST_PROXY=true
@@ -283,6 +283,6 @@ Common issues and their solutions when running Figranium.
   </Card>
 
   <Card title="GitHub Issues" icon="code" href="https://github.com/figranium/figranium/issues">
-    File issues at the Figranium GitHub repository.
+    File issues at the Figranium Browsers GitHub repository.
   </Card>
 </CardGroup>

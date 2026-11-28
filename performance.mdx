@@ -1,10 +1,10 @@
 ---
 title: "Performance & Optimization"
 sidebarTitle: "Performance"
-description: "Make Figranium tasks faster and more reliable at scale. Optimize waits, selectors, loops, storage, and Docker resources for production deployments."
+description: "Make Figranium Browsers tasks faster and more reliable at scale. Optimize waits, selectors, loops, storage, and Docker resources for production deployments."
 ---
 
-This guide covers strategies for making Figranium tasks faster, more efficient, and more reliable at scale.
+This guide covers strategies for making Figranium Browsers tasks faster, more efficient, and more reliable at scale.
 
 ## Understanding Execution Time
 
@@ -25,11 +25,17 @@ The biggest time sinks are usually **navigation** (waiting for pages to load) an
 
 Instead of waiting a fixed time:
 
-<img src="/images/tasks/performance-task-1.png" alt="Figranium task preview: Reduce Unnecessary Waits" />
+<img
+  src="/images/tasks/performance-task-1.png"
+  alt="Figranium Browsers task preview: Reduce Unnecessary Waits"
+/>
 
 Wait for the result element to appear:
 
-<img src="/images/tasks/performance-task-2.png" alt="Figranium task preview: Reduce Unnecessary Waits" />
+<img
+  src="/images/tasks/performance-task-2.png"
+  alt="Figranium Browsers task preview: Reduce Unnecessary Waits"
+/>
 
 This completes as soon as the element appears — often much faster than the fixed wait.
 
@@ -78,11 +84,14 @@ This is dramatically faster than navigating to each product page individually.
 
 ## Foreach loop optimization
 
-Figranium automatically optimizes Foreach loops based on which loop variables you use. If your loop body does not reference `{$loop.html}`, the engine skips fetching the inner HTML of each element, which significantly reduces serialization overhead.
+Figranium Browsers automatically optimizes Foreach loops based on which loop variables you use. If your loop body does not reference `{$loop.html}`, the engine skips fetching the inner HTML of each element, which significantly reduces serialization overhead.
 
 This means simple text-based loops are fast by default:
 
-<img src="/images/tasks/performance-task-3.png" alt="Figranium task preview: Foreach loop optimization" />
+<img
+  src="/images/tasks/performance-task-3.png"
+  alt="Browsers task preview: Foreach loop optimization"
+/>
 
 If your loop body uses `{$loop.html}`, the full HTML is still available as expected — no changes are needed.
 
@@ -104,7 +113,10 @@ If you are working with very large extractions and notice slow rendering, switch
 
 For maximum performance when extracting structured data, collect all data in one JavaScript block rather than iterating with a Foreach loop plus individual JavaScript blocks:
 
-<img src="/images/tasks/performance-task-4.png" alt="Figranium task preview: Batch extraction" />
+<img
+  src="/images/tasks/performance-task-4.png"
+  alt="Browsers task preview: Batch extraction"
+/>
 
 ---
 
@@ -137,13 +149,13 @@ curl --proxy "http://user:pass@proxy-host:port" -o /dev/null -s -w "%{time_total
 
 ### Execution History
 
-Figranium stores execution records in `data/executions.json` (or in PostgreSQL). Over time, this file can grow large and slow down the dashboard.
+Figranium Browsers stores execution records in `data/executions.json` (or in PostgreSQL). Over time, this file can grow large and slow down the dashboard.
 
 - Clear history manually from **Settings > Advanced > Maintenance > Clear execution history**.
 
 ### Screenshot and Recording Cleanup
 
-Recordings (video files) can be large. Figranium deletes captures, recordings, and execution history older than the [retention period](/captures-and-storage#automatic-retention) (7 days by default). Shorten the period in **Settings > Advanced** for high-volume workloads, or clear captures manually under **Maintenance**.
+Recordings (video files) can be large. Figranium Browsers deletes captures, recordings, and execution history older than the [retention period](/captures-and-storage#automatic-retention) (7 days by default). Shorten the period in **Settings > Advanced** for high-volume workloads, or clear captures manually under **Maintenance**.
 
 ### PostgreSQL for Scale
 
@@ -194,7 +206,7 @@ services:
   Chromium is memory-hungry. Running it with less than 512MB of RAM will cause frequent crashes.
 </Warning>
 
-Figranium reads Docker memory limits and picks a safe number of concurrent browsers automatically. For example, a container limited to 2 GB runs one execution at a time and queues the rest. Raising the memory limit raises the automatic concurrency. See [Host-aware resource protection](/configuration#host-aware-resource-protection).
+Figranium Browsers reads Docker memory limits and picks a safe number of concurrent browsers automatically. For example, a container limited to 2 GB runs one execution at a time and queues the rest. Raising the memory limit raises the automatic concurrency. See [Host-aware resource protection](/configuration#host-aware-resource-protection).
 
 ---
 
