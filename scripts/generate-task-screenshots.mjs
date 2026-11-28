@@ -102,13 +102,33 @@ const headers = {
   origin: apiBaseUrl,
   cookie: `${sessionName}=${sessionValue}`,
 };
+async function fetchWithRetry(url, options, retries = 4) {
+  let lastError;
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      const response = await fetch(url, options);
+      if (response.ok || (response.status < 500 && response.status !== 429)) {
+        return response;
+      }
+      lastError = new Error(`HTTP ${response.status} ${url}`);
+    } catch (error) {
+      lastError = error;
+    }
+    if (attempt < retries - 1) {
+      const delayMs = 1000 * 2 ** attempt;
+      await new Promise((resolveDelay) => setTimeout(resolveDelay, delayMs));
+    }
+  }
+  throw lastError;
+}
+
 const hubBase = 'https://templates.figranium.dev';
 const hubItems = [];
 let next = `${hubBase}/api/presets`;
 const visited = new Set();
 while (next && !visited.has(next)) {
   visited.add(next);
-  const response = await fetch(next);
+  const response = await fetchWithRetry(next);
   if (!response.ok) throw new Error(`Templates Hub request failed: ${response.status} ${next}`);
   const body = await response.json();
   const items = Array.isArray(body) ? body
@@ -126,7 +146,7 @@ for (const [index, item] of hubItems.entries()) {
     : await (async () => {
         const id = item.id ?? item.uuid ?? item.slug;
         if (!id) throw new Error('Templates Hub entry missing an identifier');
-        const response = await fetch(`${hubBase}/api/presets/${encodeURIComponent(id)}`);
+        const response = await fetchWithRetry(`${hubBase}/api/presets/${encodeURIComponent(id)}`);
         if (!response.ok) throw new Error(`Template fetch failed: ${response.status} ${id}`);
         return response.json();
       })();
